@@ -380,6 +380,6 @@
 <script type=module src=ProgramDesignWorkspace.33e91746.js></script>
 
 
-<script>!function(){function e(){let e=Math.max(document.documentElement.scrollHeight,document.body.scrollHeight);window.parent.postMessage({phxHeight:e},"*")}window.addEventListener("load",e),new ResizeObserver(e).observe(document.body)}();</script>
+<script>!function(){function e(){let e=document.documentElement.getBoundingClientRect().height;window.parent.postMessage({phxHeight:e},"*")}window.addEventListener("load",e),setInterval(e,500)}();</script>
 
 
