@@ -1,13 +1,20 @@
 {
   "name": "powerhouse-rp-toolkit",
   "version": "1.0.0",
-  "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",
-  "main": "server.js",
-  "scripts": {
+  "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",  "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "build": "parcel build index.html --dist-dir docs --public-url ./",
+    "deploy": "npm run build && git add docs && git commit -m \"deploy\" && git push"
   },
-  "keywords": ["fitness", "renaissance periodization", "training", "workout"],
+  "keywords": [
+    "fitness",
+    "renaissance periodization",
+    "training",
+    "workout"
+  ],
   "author": "PowerHouseATX",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "parcel": "^2.15.2"
+  }
 }

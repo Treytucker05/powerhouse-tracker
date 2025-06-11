@@ -11,7 +11,7 @@ const muscles = Object.keys(trainingState.volumeLandmarks);
 /**
  * Initialize the weekly volume chart
  */
-export function initChart() {
+function initChart() {
   const canvas = document.getElementById('weeklyChart');
   if (!canvas) {
     console.error('Chart canvas not found');
@@ -31,8 +31,7 @@ export function initChart() {
 
   const chartData = muscles.map(muscle => trainingState.currentWeekSets[muscle] || 0);
   const backgroundColors = muscles.map(muscle => trainingState.getVolumeColor(muscle));
-  
-  weeklyChart = new Chart(ctx, {
+    weeklyChart = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: muscles,
@@ -42,6 +41,26 @@ export function initChart() {
         backgroundColor: backgroundColors,
         borderColor: backgroundColors.map(color => color.replace('0.6', '1')),
         borderWidth: 2
+      }, {
+        label: 'MEV',
+        data: muscles.map(muscle => trainingState.volumeLandmarks[muscle].MEV),
+        type: 'line',
+        borderColor: 'rgba(255, 255, 0, 0.8)',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        pointRadius: 3,
+        pointBackgroundColor: 'rgba(255, 255, 0, 1)',
+        borderDash: [5, 5]
+      }, {
+        label: 'MRV',
+        data: muscles.map(muscle => trainingState.volumeLandmarks[muscle].MRV),
+        type: 'line',
+        borderColor: 'rgba(255, 0, 0, 0.8)',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        pointRadius: 3,
+        pointBackgroundColor: 'rgba(255, 0, 0, 1)',
+        borderDash: [10, 5]
       }]
     },
     options: {
@@ -98,70 +117,28 @@ export function initChart() {
 /**
  * Update chart with current data
  */
-export function updateChart() {
+function updateChart() {
   if (!weeklyChart) return;
   
   const newData = muscles.map(muscle => trainingState.currentWeekSets[muscle] || 0);
   const newColors = muscles.map(muscle => trainingState.getVolumeColor(muscle));
   
+  // Update current sets data
   weeklyChart.data.datasets[0].data = newData;
   weeklyChart.data.datasets[0].backgroundColor = newColors;
   weeklyChart.data.datasets[0].borderColor = newColors.map(color => color.replace('0.6', '1'));
   
-  weeklyChart.update();
-}
-
-/**
- * Add volume landmarks overlay to chart
- */
-export function addVolumeLandmarks() {
-  if (!weeklyChart) return;
-  
-  // Add MEV line
-  weeklyChart.data.datasets.push({
-    label: 'MEV',
-    data: muscles.map(muscle => trainingState.volumeLandmarks[muscle].MEV),
-    type: 'line',
-    borderColor: 'rgba(255, 255, 0, 0.8)',
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    pointRadius: 0,
-    borderDash: [5, 5]
-  });
-  
-  // Add MRV line
-  weeklyChart.data.datasets.push({
-    label: 'MRV',
-    data: muscles.map(muscle => trainingState.volumeLandmarks[muscle].MRV),
-    type: 'line',
-    borderColor: 'rgba(255, 0, 0, 0.8)',
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    pointRadius: 0,
-    borderDash: [10, 5]
-  });
+  // Update landmark lines
+  weeklyChart.data.datasets[1].data = muscles.map(muscle => trainingState.volumeLandmarks[muscle].MEV);
+  weeklyChart.data.datasets[2].data = muscles.map(muscle => trainingState.volumeLandmarks[muscle].MRV);
   
   weeklyChart.update();
-}
-
-/**
- * Export chart as image for reports
- */
-export function exportChartImage() {
-  if (!weeklyChart) return null;
-  
-  try {
-    return weeklyChart.toBase64Image();
-  } catch (e) {
-    console.warn('Chart image export failed:', e);
-    return null;
-  }
 }
 
 /**
  * Reset chart data
  */
-export function resetChart() {
+function resetChart() {
   muscles.forEach(muscle => {
     trainingState.updateWeeklySets(muscle, trainingState.volumeLandmarks[muscle].MEV);
   });
@@ -171,7 +148,7 @@ export function resetChart() {
 /**
  * Show deload visualization
  */
-export function showDeloadVisualization() {
+function showDeloadVisualization() {
   if (!weeklyChart) return;
   
   // Temporarily show 50% volume
@@ -185,8 +162,98 @@ export function showDeloadVisualization() {
   
   // Reset after 3 seconds
   setTimeout(() => {
-    updateChart();
-  }, 3000);
+    updateChart();  }, 3000);
 }
 
-export { weeklyChart };
+/**
+ * Add volume landmarks overlay to chart
+ */
+function addVolumeLandmarks() {
+  if (!weeklyChart) return;
+  
+  // Landmarks are already built into the chart
+  // This function maintains compatibility with existing code
+  console.log('Volume landmarks are permanently displayed on chart');
+}
+
+/**
+ * Export chart as image for reports
+ */
+function exportChartImage() {
+  if (!weeklyChart) {
+    console.warn('No chart available for export');
+    return null;
+  }
+  
+  try {
+    // Get chart as base64 image
+    const base64Image = weeklyChart.toBase64Image('image/png', 1);
+    
+    // Create download link
+    const link = document.createElement('a');
+    link.download = `workout-volume-chart-week-${trainingState.weekNo}.png`;
+    link.href = base64Image;
+    
+    // Trigger download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Show success message
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      z-index: 10000;
+      font-weight: 600;
+    `;
+    notification.textContent = 'Chart exported successfully!';
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      document.body.removeChild(notification);
+    }, 3000);
+    
+    return base64Image;
+  } catch (e) {
+    console.error('Chart export failed:', e);
+    
+    // Show error message
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #f44336;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      z-index: 10000;
+      font-weight: 600;
+    `;
+    notification.textContent = 'Export failed. Please try again.';
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      document.body.removeChild(notification);
+    }, 3000);
+    
+    return null;
+  }
+}
+
+// --- consolidated exports ---
+export {
+  initChart,
+  updateChart,
+  resetChart,
+  addVolumeLandmarks,
+  exportChartImage,
+  showDeloadVisualization,
+  weeklyChart
+};
