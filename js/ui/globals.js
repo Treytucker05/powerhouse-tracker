@@ -42,20 +42,51 @@ window.resetWeeklyData = resetChart;
 window.showVolumeLandmarks = addVolumeLandmarks;
 window.exportSummary = exportChartImage;
 
-/* ----- expose section toggle (basic implementation) ----- */
+/* ----- expose section toggle (enhanced with display:none) ----- */
 window.toggleSection = function(sectionId) {
   const content = document.getElementById(sectionId + '-content');
   const banner = content.previousElementSibling;
   const icon = banner.querySelector('.expand-icon');
-  
-  if (content.classList.contains('expanded')) {
-    content.classList.remove('expanded');
+
+  const opening = !content.classList.contains('expanded');
+
+  // ------- EXPAND -------
+  if (opening) {
+    content.style.display = 'block';           // back in flow
+    // allow next paint, then add class so CSS transition plays
+    requestAnimationFrame(() => {
+      content.classList.add('expanded');
+      banner.classList.add('expanded');
+      // Update icon rotation
+      if (icon) {
+        icon.style.transform = 'rotate(180deg)';
+      }
+      postHeight();                            // send new tall height
+    });
+  }
+
+  // ------- COLLAPSE -------
+  else {
+    content.classList.remove('expanded');      // start transition
     banner.classList.remove('expanded');
-    icon.style.transform = 'rotate(0deg)';
-  } else {
-    content.classList.add('expanded');
-    banner.classList.add('expanded');
-    icon.style.transform = 'rotate(180deg)';
+    // Update icon rotation
+    if (icon) {
+      icon.style.transform = 'rotate(0deg)';
+    }
+
+    // when transition ends hide element to drop layout height
+    content.addEventListener('transitionend', function handler() {
+      content.style.display = 'none';
+      content.removeEventListener('transitionend', handler);
+      postHeight();                            // send shorter height
+    });
+  }
+
+  // helper sends current height to parent iframe
+  function postHeight() {
+    if (!window.parent) return;
+    const h = document.documentElement.getBoundingClientRect().height;
+    window.parent.postMessage({ phxHeight: h }, '*');
   }
 };
 

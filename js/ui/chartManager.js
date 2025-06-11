@@ -79,8 +79,7 @@ function initChart() {
               const sets = context.parsed.y;
               const landmarks = trainingState.volumeLandmarks[muscle];
               const status = trainingState.getVolumeStatus(muscle, sets);
-              
-              return [
+                return [
                 `Status: ${status}`,
                 `MEV: ${landmarks.MEV} | MRV: ${landmarks.MRV}`,
                 `Target RIR: ${trainingState.getTargetRIR()}`
@@ -88,15 +87,15 @@ function initChart() {
             }
           }
         }
-      },
-      scales: {
+      },      scales: {
         y: {
           beginAtZero: true,
           grid: {
             color: 'rgba(255, 255, 255, 0.1)'
           },
           ticks: {
-            color: '#fff'
+            color: '#fff',
+            stepSize: 1  // Show every 1 set on Y-axis
           }
         },
         x: {

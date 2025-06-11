@@ -1241,5 +1241,17 @@ document.addEventListener('input', function(e) {
 
 <script type="module" src="js/ui/globals.js"></script>
 
+<!-- Auto-resize: post height every 500 ms -->
+<script>
+(function () {
+  function postHeight () {
+    const h = document.documentElement.getBoundingClientRect().height;
+    window.parent.postMessage({ phxHeight: h }, '*');
+  }
+  window.addEventListener('load', postHeight);
+  setInterval(postHeight, 500);   // heartbeat
+})();
+</script>
+
 </body>
 </html>
