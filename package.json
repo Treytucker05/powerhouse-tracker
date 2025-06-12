@@ -1,10 +1,9 @@
 {
   "name": "powerhouse-rp-toolkit",
   "version": "1.0.0",
-  "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",
-  "scripts": {
+  "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",  "scripts": {
     "start": "node server.js",
-    "build": "parcel build index.html --dist-dir docs --public-url ./",
+    "build": "parcel build index.html --dist-dir docs --public-url ./ --no-scope-hoist",
     "deploy": "npm run build && git add docs && git commit -m \"deploy\" && git push"
   },
   "keywords": [
@@ -16,6 +15,7 @@
   "author": "PowerHouseATX",
   "license": "MIT",
   "devDependencies": {
+    "@parcel/packager-raw-url": "^2.15.2",
     "@parcel/transformer-webmanifest": "^2.15.2",
     "parcel": "^2.15.2"
   }
