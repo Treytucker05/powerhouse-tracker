@@ -3,8 +3,20 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PowerHouseATX Workout Calculator</title>
+<title>PowerHouseATX Workout Calculator - Advanced Intelligence</title>
+
+<!-- PWA Configuration -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#667eea">
+<meta name="description" content="Advanced AI-powered training intelligence system for optimal workout programming and progression">
+
+<!-- Preload critical resources -->
+<link rel="preload" href="js/core/trainingState.js" as="script">
+<link rel="preload" href="js/algorithms/volume.js" as="script">
+<link rel="preload" href="css/enhancedAdvanced.css" as="style">
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="css/enhancedAdvanced.css">
 <style>
 /* --- Global Styles & Resets --- */
 * {
@@ -601,176 +613,552 @@ button.small {
   pointer-events: none;
 }
 
-/* Notifications */
-.notification {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+/* RIR Schedule & Load Feedback Styling */
+.rir-schedule-display,
+.load-feedback-section,
+.load-progression-section {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  body {
-    padding: 15px;
-  }
-  
-  h1 {
-    font-size: 2.5rem;
-  }
-  
-  .page-title {
-    font-size: 1.8rem;
-  }
-  
-  .calculator-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-  
-  .calculator {
-    padding: 25px;
-    margin: 15px 0;
-  }
-
-  .status-grid {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  }
-
-  .chart-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .radio-group {
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  .algorithm-details {
-    grid-template-columns: 1fr;
-  }
+.rir-schedule-display h4,
+.load-feedback-section h4,
+.load-progression-section h4 {
+  color: #FF0000;
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  font-weight: 600;
 }
 
-@media (max-width: 480px) {
-  body {
-    padding: 10px;
-  }
-  
-  h1 {
-    font-size: 2rem;
-  }
-  
-  .calculator {
-    padding: 20px;
-  }
-
-  .landmark-grid {
-    grid-template-columns: 1fr;
-  }
+#rirScheduleContent {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 15px 0;
 }
 
-/* === Quick Start Guide === */
-.quick-start-guide {
+.rir-week-target {
+  padding: 12px;
   background: rgba(255, 0, 0, 0.1);
   border: 1px solid rgba(255, 0, 0, 0.3);
-  border-radius: 12px;
-  padding: 25px;
-  margin: 25px 0;
-  animation: slideDown 0.5s ease-out;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 600;
 }
 
-.quick-start-guide h3 {
-  color: #FF0000;
+.rir-week-target.current {
+  background: rgba(255, 0, 0, 0.2);
+  border-color: rgba(255, 0, 0, 0.5);
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+}
+
+.rir-week-target .week-label {
+  font-size: 0.9rem;
+  color: #ccc;
+  margin-bottom: 4px;
+}
+
+.rir-week-target .rir-value {
   font-size: 1.4rem;
-  margin-bottom: 15px;
+  color: #FF0000;
+  font-weight: 700;
+}
+
+#loadAdjustmentContent,
+#loadProgressionContent {
+  font-size: 0.95rem;
+}
+
+.load-adjustment-item {
+  padding: 10px;
+  margin: 8px 0;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  border-left: 3px solid #FF0000;
+}
+
+.load-adjustment-item .muscle-name {
+  font-weight: 600;
+  color: #FF0000;
+  margin-bottom: 4px;
+}
+
+.load-adjustment-item .adjustment-details {
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.progression-recommendation {
+  padding: 15px;
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: 8px;
+  margin: 10px 0;
+}
+
+.progression-recommendation.maintain {
+  background: rgba(255, 193, 7, 0.1);
+  border-color: rgba(255, 193, 7, 0.3);
+}
+
+.progression-recommendation.reduce {
+  background: rgba(244, 67, 54, 0.1);
+  border-color: rgba(244, 67, 54, 0.3);
+}
+
+.progression-recommendation .action {
+  font-weight: 600;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.progression-recommendation .reasoning {
+  font-size: 0.9rem;
+  color: #ccc;
+  line-height: 1.4;
+}
+
+.rir-schedule-info {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rir-schedule-info .helper-text {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* RIR Schedule buttons */
+.rir-schedule-display button,
+.load-feedback-section button,
+.load-progression-section button {
+  background: linear-gradient(135deg, #FF0000 0%, #cc0000 100%);
+  margin: 5px 0;
+  width: auto;
+  min-width: 180px;
+}
+
+/* --- Advanced Intelligence Section --- */
+.section-banner.advanced {
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.2) 0%, rgba(0, 123, 255, 0.1) 100%);
+  border-color: rgba(0, 123, 255, 0.3);
+}
+
+.section-content#advanced-content {
+  display: none;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.section-content#advanced-content.expanded {
+  display: block;
+  max-height: 3000px;
+}
+
+.live-session-controls {
+  margin-bottom: 20px;
+}
+
+.session-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.session-controls button {
+  flex: 1;
+  min-width: 140px;
+  margin: 0;
+}
+
+.live-monitor {
+  background: #1a202c;
+  color: #e2e8f0;
+  border-radius: 15px;
+  padding: 25px;
+  margin: 20px 0;
+  border: 1px solid rgba(99, 179, 237, 0.3);
+}
+
+.live-monitor h4 {
+  color: #63b3ed;
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+}
+
+.monitor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+.monitor-stat {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 10px;
   text-align: center;
 }
 
-.quick-start-content {
-  max-width: 600px;
-  margin: 0 auto;
+.monitor-stat .value {
+  font-size: 2em;
+  font-weight: bold;
+  color: #63b3ed;
+  display: block;
 }
 
-.quick-start-steps {
-  list-style: decimal;
-  margin: 0 0 20px 20px;
-  line-height: 1.8;
-  font-size: 1rem;
+.monitor-stat .label {
+  font-size: 0.9em;
+  opacity: 0.8;
+  margin-top: 5px;
 }
 
-.quick-start-steps li {
-  margin-bottom: 8px;
-  padding-left: 5px;
-}
-
-.quick-start-steps strong {
-  color: #FF6B6B;
-}
-
-.quick-start-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-.quick-start-btn {
-  background: linear-gradient(135deg, #FF0000 0%, #ff6b6b 100%);
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
+.intelligence-panel {
+  background: linear-gradient(135deg, #1a365d, #2c5282);
   color: white;
-  cursor: pointer;
+  border-radius: 15px;
+  padding: 25px;
+  margin: 20px 0;
+}
+
+.intelligence-panel h4 {
+  color: #63b3ed;
+  margin-bottom: 20px;
+}
+
+.intelligence-controls,
+.analytics-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.intelligence-controls button,
+.analytics-controls button {
+  margin: 0;
+  padding: 12px 16px;
   font-size: 0.95rem;
+}
+
+.system-status {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.system-status h4 {
+  color: #FF0000;
+  margin-bottom: 15px;
+}
+
+.system-status .status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+}
+
+.system-status .status-indicator {
+  text-align: center;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+}
+
+.system-status .status-indicator span:first-child {
+  font-size: 1.5em;
+  display: block;
+}
+
+.system-status .status-indicator span:last-child {
+  font-size: 0.8em;
+  color: #ccc;
+  margin-top: 5px;
+  display: block;
+}
+
+.recommendation {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 15px;
+  margin: 10px 0;
+  border-left: 4px solid #63b3ed;
+}
+
+.recommendation.high-priority {
+  border-left-color: #f56565;
+  background: rgba(245, 101, 101, 0.1);
+}
+
+.recommendation.medium-priority {
+  border-left-color: #ed8936;
+  background: rgba(237, 137, 54, 0.1);
+}
+
+.analytics-requirements {
+  margin: 15px 0;
+  padding: 15px;
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 8px;
+}
+
+.program-config {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.program-config .input-group {
+  margin: 0;
+}
+
+/* Advanced result panels */
+.result-panel {
+  margin-top: 15px;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.result-panel.success {
+  background: rgba(76, 175, 80, 0.1);
+  border-color: rgba(76, 175, 80, 0.3);
+}
+
+.result-panel.warning {
+  background: rgba(255, 152, 0, 0.1);
+  border-color: rgba(255, 152, 0, 0.3);
+}
+
+.result-panel.error {
+  background: rgba(244, 67, 54, 0.1);
+  border-color: rgba(244, 67, 54, 0.3);
+}
+
+.loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-radius: 50%;
+  border-top-color: #5a67d8;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* --- Utility Systems Styling --- */
+/* Performance Monitor Styles */
+.performance-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.performance-dashboard {
+  background: rgba(0, 123, 255, 0.1);
+  border: 1px solid rgba(0, 123, 255, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.metric-card {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.metric-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #63b3ed;
+  display: block;
+}
+
+.metric-label {
+  font-size: 0.8rem;
+  color: #ccc;
+  margin-top: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Data Export Styles */
+.export-controls {
+  margin: 20px 0;
+}
+
+.export-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+  margin: 15px 0;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+}
+
+.checkbox-label {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  margin: 0 !important;
+  cursor: pointer;
+}
+
+.export-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.export-actions button {
+  margin: 0 !important;
+  width: auto !important;
+}
+
+/* Feedback System Styles */
+.feedback-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.feedback-stats {
+  background: rgba(76, 175, 80, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.stat-item {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 8px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #4CAF50;
+  display: block;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #ccc;
+  margin-top: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Feedback Widget */
+.feedback-widget {
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  z-index: 1000;
+}
+
+.feedback-toggle {
+  background: linear-gradient(135deg, #FF0000 0%, #cc0000 100%);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 20px 0 0 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: -3px 0 10px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
 }
 
-.quick-start-btn:hover {
-  background: linear-gradient(135deg, #e60000 0%, #ff5252 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.3);
+.feedback-toggle:hover {
+  background: linear-gradient(135deg, #ff1a1a 0%, #e60000 100%);
+  transform: translateX(-5px);
 }
 
-.quick-start-checkbox {
+.feedback-panel {
+  position: absolute;
+  right: 100%;
+  top: 0;
+  width: 320px;
+  background: rgba(26, 26, 26, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: -5px 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.feedback-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  font-size: 0.9rem;
-  color: #cccccc;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.feedback-header h3 {
+  color: #FF0000;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.feedback-header button {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 1.5rem;
   cursor: pointer;
+  padding: 0;
+  margin: 0;
+  width: auto;
+  height: auto;
 }
 
-.quick-start-checkbox input[type="checkbox"] {
-  accent-color: #FF0000;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.quick-start-guide.hidden {
-  display: none;
-}
-
-/* === Original Modal Styles (kept for reference but unused) === */
-.modal-overlay {position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;
-                align-items:center;justify-content:center;z-index:1000;}
-.modal-dialog  {background:#1a1a1a;border:1px solid #ff0000;padding:2rem 2.5rem;
-                border-radius:16px;max-width:480px;width:90%;color:#fff;position:relative;}
-.modal-close   {position:absolute;top:12px;right:16px;font-size:1.8rem;background:none;
-                border:none;color:#fff;cursor:pointer;}
-.qs-list       {margin:1rem 0 1.5rem 1.2rem;line-height:1.6;}
-.qs-noshow     {display:flex;align-items:center;gap:.5rem;font-size:.9rem;margin-bottom:1rem;}
-.modal-btn     {background:#ff0000;border:none;padding:.75rem 1.5rem;border-radius:8px;
-                font-weight:600;cursor:pointer;}
-.modal-btn:hover {background:#e60000;}
+/* --- End of Styles --- */
 </style>
 </head>
 <body>
@@ -908,6 +1296,23 @@ button.small {
           <div class="helper-text">0=None, 1=Mild, 2=Moderate, 3=High</div>
         </div>
 
+        <!-- Enhanced Fatigue Detection -->
+        <div class="input-group">
+          <label for="jointAche">Joint ache level (0-3):</label>
+          <input type="number" id="jointAche" min="0" max="3" value="0">
+          <div class="helper-text">0=None, 1=Mild, 2=Moderate, 3=Pain</div>
+        </div>
+
+        <div class="input-group">
+          <label for="perfChange">Performance change:</label>
+          <select id="perfChange">
+            <option value="1">Personal Record (+1)</option>
+            <option value="0" selected>Same as last time (0)</option>
+            <option value="-1">Performance drop (-1)</option>
+          </select>
+          <div class="helper-text">Strength performance vs recent sessions</div>
+        </div>
+
         <!-- Autoregulation Section -->
         <div class="autoregulation-section">
           <h4>Effort Validation</h4>
@@ -963,6 +1368,31 @@ button.small {
         
         <button onclick="analyzeDeload()">Analyze Deload Need</button>
         <output id="deloadOut" class="result"></output>
+      </section>
+
+      <!-- Auto-Volume Progression -->
+      <section class="calculator" id="autoVolumeCard">
+        <h2>🤖 Auto-Volume Progression</h2>
+        
+        <div class="input-group">
+          <p class="helper-text">Automatically progress all muscles based on weekly feedback. System starts each muscle at MEV and adds +1-2 sets per week based on recovery indicators.</p>
+        </div>
+          <div class="input-group">
+          <h4>Progression Logic:</h4>
+          <ul style="font-size: 0.9rem; margin: 10px 0; padding-left: 20px;">
+            <li><strong>Start:</strong> All muscles begin at MEV</li>
+            <li><strong>+1 set:</strong> Good recovery (soreness ≤1, performance ≥0)</li>
+            <li><strong>+2 sets:</strong> At MEV or low stimulus (≤3)</li>
+            <li><strong>Hold volume:</strong> At MRV or fatigue present</li>
+            <li><strong>Deload:</strong> Most muscles at MRV</li>
+          </ul>
+        </div>
+          <div class="input-group" style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button type="button" class="small" onclick="initializeAllMusclesAtMEV()" style="background: linear-gradient(135deg, #4CAF50, #45a049); flex: 1; min-width: 150px;">🎯 Initialize at MEV</button>
+          <button type="button" class="small" onclick="advanceToNextWeek()" style="background: linear-gradient(135deg, #2196F3, #1976D2); flex: 1; min-width: 150px;">📅 Next Week</button>
+          <button onclick="runAutoVolumeProgression()" style="background: linear-gradient(135deg, #ff4444, #ff6666); font-weight: bold; flex: 2; min-width: 200px;">▶️ Run Weekly Auto-Progression</button>
+        </div>
+        <output id="autoVolumeOut" class="result"></o>
       </section>
 
       <!-- Frequency Optimization -->
@@ -1093,9 +1523,405 @@ button.small {
         <output id="mesoOut" class="result"></output>
       </section>
 
+      <!-- RIR Schedule & Load Feedback -->
+      <section class="calculator" id="rirScheduleCard">
+        <h2>RIR Schedule & Load Feedback</h2>
+        
+        <div class="input-group">
+          <label for="rirMesocycleLength">Mesocycle length (weeks):</label>
+          <input type="number" id="rirMesocycleLength" min="3" max="6" value="4">
+          <div class="helper-text">Standard progression: 4-6 weeks</div>
+        </div>
+        
+        <div class="input-group">
+          <label for="rirCurrentWeek">Current week:</label>
+          <input type="number" id="rirCurrentWeek" min="1" max="6" value="1">
+        </div>
+
+        <div class="rir-schedule-display">
+          <button onclick="showRIRSchedule()" class="small">Show RIR Schedule</button>
+          <div id="rirScheduleDisplay" class="result" style="display: none;">
+            <h4>Weekly RIR Targets</h4>
+            <div id="rirScheduleContent"></div>
+          </div>
+        </div>
+
+        <div class="load-feedback-section">
+          <h4>Weekly Load Adjustments</h4>
+          <div class="input-group">
+            <label>
+              <input type="checkbox" id="simulateRIRFeedback" checked>
+              Use simulated RIR feedback for demo
+            </label>
+            <div class="helper-text">Uncheck to manually input RIR values</div>
+          </div>
+          
+          <button onclick="runWeeklyLoadAdjustments()" class="small">Process Weekly Adjustments</button>
+          <div id="loadAdjustmentResults" class="result" style="display: none;">
+            <div class="feedback-results">
+              <div id="loadAdjustmentContent"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="load-progression-section">
+          <h4>Next Week Progression</h4>
+          <button onclick="showNextWeekLoadProgression()" class="small">Show Load Progression</button>
+          <div id="loadProgressionResults" class="result" style="display: none;">
+            <div class="feedback-results">
+              <div id="loadProgressionContent"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rir-schedule-info">
+          <div class="helper-text">
+            <strong>RIR Schedule System:</strong><br>
+            • Automatically progresses RIR targets weekly: [3, 2, 1, 0]<br>
+            • Processes feedback to adjust training loads (-15% to +15%)<br>
+            • Provides next week progression recommendations<br>
+            • Integrates with auto-progression system
+          </div>
+        </div>
+      </section>
+
     </div>
   </div>
 
+  <!-- Advanced Intelligence Section -->
+  <div class="section-banner advanced" onclick="toggleSection('advanced')">
+    <h3>Advanced Intelligence <span class="expand-icon">▼</span></h3>
+    <p>AI-powered training optimization and live performance monitoring</p>
+  </div>
+
+  <div class="section-content" id="advanced-content">
+    <div class="calculator-grid">
+
+      <!-- Live Performance Monitor -->
+      <section class="calculator" id="liveMonitorCard">
+        <h2>🔴 Live Performance Monitor</h2>
+        
+        <div class="input-group">
+          <p class="helper-text">Real-time feedback during training sessions with automatic performance analysis and next-set recommendations.</p>
+        </div>
+
+        <div class="live-session-controls">
+          <div class="input-group">
+            <label for="liveExercise">Exercise:</label>
+            <input type="text" id="liveExercise" placeholder="e.g. Barbell Bench Press" value="Barbell Bench Press">
+          </div>
+
+          <div class="input-group">
+            <label for="liveMuscle">Primary Muscle:</label>
+            <select id="liveMuscle">
+              <option value="Chest">Chest</option>
+              <option value="Back">Back</option>
+              <option value="Quads">Quads</option>
+              <option value="Hamstrings">Hamstrings</option>
+              <option value="Shoulders">Shoulders</option>
+              <option value="Biceps">Biceps</option>
+              <option value="Triceps">Triceps</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label for="plannedSets">Planned Sets:</label>
+            <input type="number" id="plannedSets" min="1" max="10" value="3">
+          </div>
+
+          <div class="session-controls">
+            <button id="startSessionBtn" onclick="startLiveSession()">🎮 Start Live Session</button>
+            <button id="logSetBtn" onclick="logTrainingSet()" style="display: none;">📊 Log Set</button>
+            <button id="endSessionBtn" onclick="endLiveSession()" style="display: none;">⏹️ End Session</button>
+          </div>
+        </div>
+
+        <!-- Live Monitor Dashboard -->
+        <div class="live-monitor" id="liveMonitor" style="display: none;">
+          <h4>🔴 Live Training Monitor</h4>
+          <div class="monitor-grid">
+            <div class="monitor-stat">
+              <div class="value" id="currentSet">0</div>
+              <div class="label">Current Set</div>
+            </div>
+            <div class="monitor-stat">
+              <div class="value" id="currentRIR">-</div>
+              <div class="label">Last RIR</div>
+            </div>
+            <div class="monitor-stat">
+              <div class="value" id="sessionProgress">0%</div>
+              <div class="label">Progress</div>
+            </div>
+            <div class="monitor-stat">
+              <div class="value" id="totalLoad">0</div>
+              <div class="label">Total Load</div>
+            </div>
+          </div>
+        </div>
+
+        <output id="liveMonitorOut" class="result"></output>
+      </section>
+
+      <!-- AI Training Intelligence -->
+      <section class="calculator" id="trainingIntelligenceCard">
+        <h2>🧠 Training Intelligence Hub</h2>
+        
+        <div class="input-group">
+          <p class="helper-text">Unified intelligence system that coordinates machine learning analytics, smart exercise selection, and performance optimization.</p>
+        </div>
+
+        <div class="intelligence-controls">
+          <button onclick="initializeIntelligence()">🚀 Initialize Intelligence</button>
+          <button onclick="getWeeklyIntelligence()">📈 Weekly Intelligence Report</button>
+          <button onclick="getOptimalExercises()">💡 Smart Exercise Selection</button>
+          <button onclick="assessTrainingRisk()">⚠️ Risk Assessment</button>
+        </div>
+
+        <!-- Intelligence Dashboard -->
+        <div class="intelligence-panel" id="intelligencePanel" style="display: none;">
+          <h4>🎯 Training Intelligence Dashboard</h4>
+          <div id="intelligenceContent"></div>
+        </div>
+
+        <!-- System Status -->
+        <div class="system-status">
+          <h4>⚙️ System Status</h4>
+          <div class="status-grid">
+            <div class="status-indicator">
+              <span id="analyticsStatus">❌</span>
+              <span>Analytics</span>
+            </div>
+            <div class="status-indicator">
+              <span id="exerciseStatus">✅</span>
+              <span>Exercise AI</span>
+            </div>
+            <div class="status-indicator">
+              <span id="liveStatus">✅</span>
+              <span>Live Monitor</span>
+            </div>
+            <div class="status-indicator">
+              <span id="hubStatus">✅</span>
+              <span>Intelligence Hub</span>
+            </div>
+          </div>
+        </div>
+
+        <output id="intelligenceOut" class="result"></output>
+      </section>
+
+      <!-- Predictive Analytics -->
+      <section class="calculator" id="analyticsCard">
+        <h2>📊 Predictive Analytics</h2>
+        
+        <div class="input-group">
+          <p class="helper-text">Machine learning powered insights for volume optimization, deload prediction, and plateau detection.</p>
+        </div>
+
+        <div class="analytics-controls">
+          <button onclick="optimizeVolumeLandmarks()">🎯 Optimize Volume Landmarks</button>
+          <button onclick="predictDeloadTiming()">🔮 Predict Deload Timing</button>
+          <button onclick="detectPlateaus()">📈 Plateau Analysis</button>
+          <button onclick="getAdaptiveRIR()">🎛️ Adaptive RIR Recommendations</button>
+        </div>
+
+        <div class="analytics-requirements" id="analyticsRequirements">
+          <div class="helper-text">
+            <strong>📊 Analytics Requirements:</strong><br>
+            • Minimum 4 weeks of training data needed<br>
+            • System learns from your session feedback<br>
+            • More data = Better predictions<br>
+            • Auto-enabled when sufficient data available
+          </div>
+        </div>
+
+        <output id="analyticsOut" class="result"></output>
+      </section>
+
+      <!-- Smart Program Generator -->
+      <section class="calculator" id="programGeneratorCard">
+        <h2>🏋️ Smart Program Generator</h2>
+        
+        <div class="input-group">
+          <p class="helper-text">AI-powered weekly program generation based on your preferences, equipment, and current fatigue levels.</p>
+        </div>
+
+        <div class="program-config">
+          <div class="input-group">
+            <label for="programDays">Days per week:</label>
+            <select id="programDays">
+              <option value="3">3 Days</option>
+              <option value="4" selected>4 Days</option>
+              <option value="5">5 Days</option>
+              <option value="6">6 Days</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label for="programSplit">Split Type:</label>
+            <select id="programSplit">
+              <option value="upper_lower" selected>Upper/Lower</option>
+              <option value="push_pull_legs">Push/Pull/Legs</option>
+              <option value="full_body">Full Body</option>
+              <option value="bro_split">Bro Split</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label for="sessionTime">Session Duration:</label>
+            <select id="sessionTime">
+              <option value="45">45 minutes</option>
+              <option value="60" selected>60 minutes</option>
+              <option value="75">75 minutes</option>
+              <option value="90">90 minutes</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label for="experienceLevel">Experience Level:</label>
+            <select id="experienceLevel">
+              <option value="beginner">Beginner</option>
+              <option value="intermediate" selected>Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </div>
+        </div>
+
+        <button onclick="generateWeeklyProgram()">📋 Generate Weekly Program</button>
+        <output id="programOut" class="result"></output>
+      </section>
+
+      <!-- Performance Monitor & Analytics -->
+      <section class="calculator" id="performanceCard">
+        <h2>⚡ Performance Monitor</h2>
+        
+        <div class="input-group">
+          <p class="helper-text">Real-time performance monitoring, optimization analytics, and system health tracking for optimal app performance.</p>
+        </div>
+
+        <div class="performance-controls">
+          <button onclick="performanceManager.initialize()">🚀 Initialize Monitoring</button>
+          <button onclick="performanceManager.generateReport()">📊 Performance Report</button>
+          <button onclick="performanceManager.optimizeApp()">⚙️ Optimize App</button>
+          <button onclick="performanceManager.clearCache()">🧹 Clear Cache</button>
+        </div>
+
+        <!-- Performance Dashboard -->
+        <div class="performance-dashboard" id="performanceDashboard" style="display: none;">
+          <h4>📈 Performance Metrics</h4>
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-value" id="loadTime">-</div>
+              <div class="metric-label">Load Time (ms)</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value" id="memoryUsage">-</div>
+              <div class="metric-label">Memory (MB)</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value" id="renderTime">-</div>
+              <div class="metric-label">Render Time (ms)</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value" id="fps">-</div>
+              <div class="metric-label">FPS</div>
+            </div>
+          </div>
+        </div>
+
+        <output id="performanceOut" class="result"></output>
+      </section>
+
+      <!-- Data Export & Backup -->
+      <section class="calculator" id="dataExportCard">
+        <h2>💾 Data Export & Backup</h2>
+        
+        <div class="input-group">
+          <p class="helper-text">Export your training data, create backups, and manage data in multiple formats for analysis and portability.</p>
+        </div>
+
+        <div class="export-controls">
+          <div class="input-group">
+            <label for="exportFormat">Export Format:</label>
+            <select id="exportFormat">
+              <option value="json" selected>JSON (Complete)</option>
+              <option value="csv">CSV (Spreadsheet)</option>
+              <option value="excel">Excel (Advanced)</option>
+            </select>
+          </div>
+
+          <div class="export-options">
+            <label class="checkbox-label">
+              <input type="checkbox" id="includePersonal" checked>
+              Include Personal Data
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="includeAnalytics" checked>
+              Include Analytics
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="includeWellness" checked>
+              Include Wellness Data
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" id="compressData" checked>
+              Compress Data
+            </label>
+          </div>
+
+          <div class="export-actions">
+            <button onclick="dataExportManager.exportAllData()">📤 Export All Data</button>
+            <button onclick="dataExportManager.createBackup()">💾 Create Backup</button>
+            <button onclick="dataExportManager.importData()">📥 Import Data</button>
+            <button onclick="dataExportManager.scheduleAutoBackup()">⏰ Auto Backup</button>
+          </div>
+        </div>
+
+        <output id="exportOut" class="result"></output>
+      </section>
+
+      <!-- User Feedback & Analytics -->
+      <section class="calculator" id="feedbackCard">
+        <h2>💬 Feedback & Analytics</h2>
+        
+        <div class="input-group">
+          <p class="helper-text">Share feedback, track usage analytics, and help improve the training system through smart data collection.</p>
+        </div>
+
+        <div class="feedback-controls">
+          <button onclick="userFeedbackManager.initializeFeedbackSystem()">🎯 Initialize Feedback</button>
+          <button onclick="userFeedbackManager.showFeedbackForm()">💭 Submit Feedback</button>
+          <button onclick="userFeedbackManager.viewAnalytics()">📊 View Analytics</button>
+          <button onclick="userFeedbackManager.exportFeedbackData()">📤 Export Feedback</button>
+        </div>
+
+        <!-- Feedback Stats -->
+        <div class="feedback-stats" id="feedbackStats" style="display: none;">
+          <h4>📈 Feedback Analytics</h4>
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-value" id="totalFeedback">0</div>
+              <div class="stat-label">Total Feedback</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="avgRating">-</div>
+              <div class="stat-label">Avg Rating</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="sessionsTracked">0</div>
+              <div class="stat-label">Sessions</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="improvementScore">-</div>
+              <div class="stat-label">Improvement</div>
+            </div>
+          </div>
+        </div>
+
+        <output id="feedbackOut" class="result"></output>
+      </section>
+
+    </div>
+  </div>
 </div>
 
 <!-- Load modules and initialize -->
@@ -1103,7 +1929,7 @@ button.small {
 // Initialize collapsible sections
 function initializeCollapsibleSections() {
   // Set up initial icon states
-  const sections = ['daily', 'weekly', 'setup'];
+  const sections = ['daily', 'weekly', 'setup', 'advanced'];
   
   sections.forEach(sectionId => {
     const content = document.getElementById(sectionId + '-content');
@@ -1144,6 +1970,45 @@ function initQuickStartGuide() {
     guide.classList.add('hidden');
   }
 }
+
+// Override any conflicting toggleSection functions that may be loaded
+window.toggleSection = function(sectionId) {
+  const content = document.getElementById(sectionId + '-content');
+  const banner = content.previousElementSibling;
+  const icon = banner.querySelector('.expand-icon');
+
+  const opening = !content.classList.contains('expanded');
+
+  // ------- EXPAND -------
+  if (opening) {
+    content.style.display = 'block';           // back in flow
+    // allow next paint, then add class so CSS transition plays
+    requestAnimationFrame(() => {
+      content.classList.add('expanded');
+      banner.classList.add('expanded');
+      // Update icon rotation
+      if (icon) {
+        icon.style.transform = 'rotate(180deg)';
+      }
+    });
+  }
+
+  // ------- COLLAPSE -------
+  else {
+    content.classList.remove('expanded');      // start transition
+    banner.classList.remove('expanded');
+    // Update icon rotation
+    if (icon) {
+      icon.style.transform = 'rotate(0deg)';
+    }
+
+    // when transition ends hide element to drop layout height
+    content.addEventListener('transitionend', function handler() {
+      content.style.display = 'none';
+      content.removeEventListener('transitionend', handler);
+    });
+  }
+};
 
 // Initialize sections immediately when DOM loads
 document.addEventListener('DOMContentLoaded', function() {
@@ -1206,7 +2071,7 @@ function updateAllDisplays() {
   initializeTrainingState();
 }
 
-// Update landmark displays when muscle changes
+// Update landmark displays when muscle changes (for landmark editing section)
 document.addEventListener('change', function(e) {
   if (e.target.id === 'landmarkMuscle') {
     const muscle = e.target.value;
@@ -1218,28 +2083,65 @@ document.addEventListener('change', function(e) {
     document.getElementById('mrv').value = landmarks.MRV;
   }
   
-  if (e.target.id === 'muscleSelect') {
-    const muscle = e.target.value;
-    document.getElementById('currentSets').value = trainingState.currentWeekSets[muscle] || 0;
-  }
+  // Note: muscleSelect dropdown is handled by volumeCardUI.js
 });
 
-// Auto-save on volume changes
-document.addEventListener('input', function(e) {
-  if (e.target.id === 'currentSets') {
-    const muscle = document.getElementById('muscleSelect').value;
-    const sets = parseInt(e.target.value, 10);
-    
-    if (!isNaN(sets) && sets >= 0) {
-      trainingState.updateWeeklySets(muscle, sets);
-      updateChart();
-    }
-  }
-});
+// Note: Auto-save on volume changes is handled by volumeCardUI.js
 
 </script>
 
 <script type="module" src="js/ui/globals.js"></script>
+<script type="module" src="js/ui/enhancedAdvancedUI.js"></script>
+
+<!-- Initialize Enhanced Advanced Features -->
+<script type="module">
+import { enhancedUI } from './js/ui/enhancedAdvancedUI.js';
+import { dataVisualizer } from './js/algorithms/dataVisualization.js';
+import { wellnessSystem } from './js/algorithms/wellnessIntegration.js';
+import { periodizationSystem } from './js/algorithms/periodizationSystem.js';
+
+// Import utility systems
+import { PerformanceManager } from './js/utils/performance.js';
+import { DataExportManager } from './js/utils/dataExport.js';
+import { UserFeedbackManager } from './js/utils/userFeedback.js';
+
+// Initialize utility managers
+const performanceManager = new PerformanceManager();
+const dataExportManager = new DataExportManager();
+const userFeedbackManager = new UserFeedbackManager();
+
+// Make modules globally available
+window.dataVisualizer = dataVisualizer;
+window.wellnessSystem = wellnessSystem;
+window.periodizationSystem = periodizationSystem;
+window.performanceManager = performanceManager;
+window.dataExportManager = dataExportManager;
+window.userFeedbackManager = userFeedbackManager;
+
+// Initialize enhanced UI on load
+document.addEventListener('DOMContentLoaded', () => {
+  // Add enhanced dashboard after existing content
+  const advancedSection = document.querySelector('#advanced-content');
+  if (advancedSection) {
+    const enhancedDashboard = enhancedUI.createAdvancedDashboard();
+    enhancedDashboard.id = 'enhanced-dashboard';
+    enhancedDashboard.style.marginTop = '40px';
+    advancedSection.appendChild(enhancedDashboard);
+    
+    // Initialize enhanced UI
+    enhancedUI.initializeEnhancedUI();
+    
+    // Initialize utility systems
+    performanceManager.initialize();
+    userFeedbackManager.initializeFeedbackSystem();
+    
+    console.log('🚀 Enhanced Advanced Intelligence Features Loaded');
+    console.log('⚡ Performance monitoring initialized');
+    console.log('💬 User feedback system ready');
+    console.log('💾 Data export system ready');
+  }
+});
+</script>
 
 <!-- Auto-resize: post height every 500 ms -->
 <script>

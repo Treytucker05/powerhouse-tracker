@@ -36,10 +36,14 @@ class TrainingState {
     this.currentWeekSets = {};
     this.lastWeekSets = {};
     
-    // Initialize current week sets at MEV
+    // Baseline strength tracking for fatigue detection
+    this.baselineStrength = {};
+    
+    // Initialize current week sets at MEV and baseline strength
     Object.keys(this.volumeLandmarks).forEach(muscle => {
       this.currentWeekSets[muscle] = this.volumeLandmarks[muscle].MEV;
       this.lastWeekSets[muscle] = this.volumeLandmarks[muscle].MEV;
+      this.baselineStrength[muscle] = 100; // Default baseline load (kg)
     });
 
     // Performance tracking for deload detection
@@ -96,7 +100,6 @@ class TrainingState {
     this.currentWeekSets[muscle] = Math.max(0, this.currentWeekSets[muscle]);
     this.saveState();
   }
-
   // Check if deload is needed
   shouldDeload() {
     // Check 1: Consecutive weeks at MRV
@@ -106,7 +109,15 @@ class TrainingState {
     const totalMuscles = Object.keys(this.volumeLandmarks).length;
     if (this.totalMusclesNeedingRecovery >= Math.ceil(totalMuscles / 2)) return true;
     
-    // Check 3: End of meso
+    // Check 3: Enhanced fatigue detection - if ≥1 major muscle hit MRV via fatigue this week
+    const majorMuscles = ['Chest', 'Back', 'Quads', 'Shoulders'];
+    const fatigueBasedMRV = majorMuscles.some(muscle => 
+      this.currentWeekSets[muscle] >= this.volumeLandmarks[muscle].MRV && 
+      this.totalMusclesNeedingRecovery > 0
+    );
+    if (fatigueBasedMRV) return true;
+    
+    // Check 4: End of meso
     if (this.weekNo >= this.mesoLen) return true;
     
     return false;
@@ -177,6 +188,55 @@ class TrainingState {
       this.currentWeekSets[muscle] = this.volumeLandmarks[muscle].MEV;
     });
     this.saveState();
+  }
+
+  // Auto-progression methods
+  
+  // Mark muscle as hitting MRV for deload tracking
+  hitMRV(muscle) {
+    this.totalMusclesNeedingRecovery++;
+    // Check if this muscle has been at MRV for consecutive weeks
+    const atMRV = this.currentWeekSets[muscle] >= this.volumeLandmarks[muscle].MRV;
+    if (atMRV) {
+      this.consecutiveMRVWeeks++;
+    }
+    this.saveState();
+  }
+
+  // Get current weekly sets for a muscle
+  getWeeklySets(muscle) {
+    return this.currentWeekSets[muscle] || this.volumeLandmarks[muscle].MEV;
+  }
+
+  // Initialize muscle at MEV (for new week or reset)
+  initializeMuscleAtMEV(muscle) {
+    this.currentWeekSets[muscle] = this.volumeLandmarks[muscle].MEV;
+    this.saveState();
+  }
+
+  // Check if most muscles are at MRV (deload trigger)
+  mostMusclesAtMRV() {
+    const muscles = Object.keys(this.volumeLandmarks);
+    const mrvCount = muscles.filter(muscle => 
+      this.currentWeekSets[muscle] >= this.volumeLandmarks[muscle].MRV
+    ).length;
+    return mrvCount >= Math.ceil(muscles.length * 0.5);
+  }
+
+  // Set baseline strength for a muscle (typically week 1 top set)
+  setBaselineStrength(muscle, load) {
+    this.baselineStrength[muscle] = load;
+    this.saveState();
+  }
+
+  // Check for rep strength drop (fatigue indicator)
+  repStrengthDrop(muscle, lastLoad) {
+    const baseline = this.baselineStrength[muscle];
+    if (!baseline || !lastLoad) return false;
+    
+    // Consider significant drop if last load < 97% of baseline
+    const strengthDropThreshold = 0.97;
+    return lastLoad < (baseline * strengthDropThreshold);
   }
 
   // Update volume landmarks for a muscle

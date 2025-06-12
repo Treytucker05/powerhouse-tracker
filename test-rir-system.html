@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RIR Schedule System Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        
+        .test-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        
+        .test-result {
+            background: #0a3d0a;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        
+        .error {
+            background: #3d0a0a;
+        }
+        
+        button {
+            background: #ff0000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: #cc0000;
+        }
+    </style>
+</head>
+<body>
+    <h1>RIR Schedule & Load Feedback System Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: RIR Schedule Generation</h2>
+        <button onclick="testRIRSchedule()">Run RIR Schedule Test</button>
+        <div id="rirScheduleTest" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: Load Adjustments Processing</h2>
+        <button onclick="testLoadAdjustments()">Run Load Adjustments Test</button>
+        <div id="loadAdjustmentsTest" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 3: Load Progression Recommendations</h2>
+        <button onclick="testLoadProgression()">Run Load Progression Test</button>
+        <div id="loadProgressionTest" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 4: Simulated Weekly Feedback</h2>
+        <button onclick="testSimulatedFeedback()">Run Simulated Feedback Test</button>
+        <div id="simulatedFeedbackTest" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 5: Integration Test</h2>
+        <button onclick="runFullIntegrationTest()">Run Full Integration Test</button>
+        <div id="integrationTest" class="test-result"></div>
+    </div>
+
+    <script type="module">
+        // Import the modules
+        import {
+            RIR_SCHEDULE,
+            getScheduledRIR,
+            processWeeklyLoadAdjustments,
+            getLoadProgression,
+            simulateWeeklyRIRFeedback
+        } from './js/algorithms/effort.js';
+
+        // Make functions global for button handlers
+        window.testRIRSchedule = function() {
+            const output = document.getElementById('rirScheduleTest');
+            let results = [];
+            
+            try {
+                // Test different mesocycle lengths
+                for (let mesoLength = 3; mesoLength <= 6; mesoLength++) {
+                    results.push(`\n=== ${mesoLength}-Week Mesocycle ===`);
+                    
+                    for (let week = 1; week <= mesoLength; week++) {
+                        const targetRIR = getScheduledRIR(week, mesoLength);
+                        results.push(`Week ${week}: Target RIR = ${targetRIR}`);
+                    }
+                }
+                
+                // Test edge cases
+                results.push('\n=== Edge Cases ===');
+                results.push(`Week 0: ${getScheduledRIR(0, 4)}`);
+                results.push(`Week 10: ${getScheduledRIR(10, 4)}`);
+                results.push(`Invalid meso: ${getScheduledRIR(1, 0)}`);
+                
+                output.innerHTML = results.join('<br>');
+                output.className = 'test-result';
+            } catch (error) {
+                output.innerHTML = `Error: ${error.message}`;
+                output.className = 'test-result error';
+            }
+        };
+
+        window.testLoadAdjustments = function() {
+            const output = document.getElementById('loadAdjustmentsTest');
+            let results = [];
+            
+            try {
+                // Test scenarios
+                const testCases = [
+                    { actualRIR: 3, targetRIR: 3, desc: 'Perfect match' },
+                    { actualRIR: 4, targetRIR: 3, desc: 'Too easy (under-stimulated)' },
+                    { actualRIR: 2, targetRIR: 3, desc: 'Too hard (over-stimulated)' },
+                    { actualRIR: 1, targetRIR: 2, desc: 'Slightly over-stimulated' },
+                    { actualRIR: 5, targetRIR: 2, desc: 'Way too easy' }
+                ];
+                
+                results.push('=== Load Adjustment Test Cases ===');
+                
+                testCases.forEach(testCase => {
+                    const mockFeedback = {
+                        'Chest': {
+                            actualRIR: testCase.actualRIR,
+                            targetRIR: testCase.targetRIR,
+                            currentLoad: 100
+                        }
+                    };
+                    
+                    const adjustments = processWeeklyLoadAdjustments(mockFeedback);
+                    const chestAdj = adjustments['Chest'];
+                    
+                    results.push(`\n${testCase.desc}:`);
+                    results.push(`  Actual: ${testCase.actualRIR} RIR, Target: ${testCase.targetRIR} RIR`);
+                    results.push(`  Load Adjustment: ${chestAdj.loadAdjustment}%`);
+                    results.push(`  New Load: ${chestAdj.newLoad}kg`);
+                    results.push(`  Reason: ${chestAdj.reasoning}`);
+                });
+                
+                output.innerHTML = results.join('<br>');
+                output.className = 'test-result';
+            } catch (error) {
+                output.innerHTML = `Error: ${error.message}`;
+                output.className = 'test-result error';
+            }
+        };
+
+        window.testLoadProgression = function() {
+            const output = document.getElementById('loadProgressionTest');
+            let results = [];
+            
+            try {
+                const testScenarios = [
+                    { week: 1, rirDrop: 0.5, volumeStatus: 'optimal', desc: 'Early week, good progress' },
+                    { week: 3, rirDrop: 1.0, volumeStatus: 'high', desc: 'Mid week, high volume' },
+                    { week: 4, rirDrop: 0.2, volumeStatus: 'moderate', desc: 'Final week, low RIR drop' },
+                    { week: 2, rirDrop: 1.5, volumeStatus: 'excessive', desc: 'High fatigue scenario' }
+                ];
+                
+                results.push('=== Load Progression Test Cases ===');
+                
+                testScenarios.forEach(scenario => {
+                    const progression = getLoadProgression(scenario.week, scenario.rirDrop, scenario.volumeStatus);
+                    
+                    results.push(`\n${scenario.desc}:`);
+                    results.push(`  Week: ${scenario.week}, RIR Drop: ${scenario.rirDrop}, Volume: ${scenario.volumeStatus}`);
+                    results.push(`  Recommendation: ${progression.recommendation}`);
+                    results.push(`  Load Change: ${progression.loadChange}%`);
+                    results.push(`  Reasoning: ${progression.reasoning}`);
+                });
+                
+                output.innerHTML = results.join('<br>');
+                output.className = 'test-result';
+            } catch (error) {
+                output.innerHTML = `Error: ${error.message}`;
+                output.className = 'test-result error';
+            }
+        };
+
+        window.testSimulatedFeedback = function() {
+            const output = document.getElementById('simulatedFeedbackTest');
+            let results = [];
+            
+            try {
+                const muscles = ['Chest', 'Back', 'Quads'];
+                const testWeeks = [1, 2, 3, 4];
+                
+                results.push('=== Simulated RIR Feedback ===');
+                
+                testWeeks.forEach(week => {
+                    results.push(`\nWeek ${week}:`);
+                    const targetRIR = getScheduledRIR(week, 4);
+                    results.push(`  Target RIR: ${targetRIR}`);
+                    
+                    const feedback = simulateWeeklyRIRFeedback(muscles, week, 4);
+                    
+                    muscles.forEach(muscle => {
+                        const muscleData = feedback[muscle];
+                        results.push(`  ${muscle}: Actual RIR ${muscleData.actualRIR} (${muscleData.volumeStatus} volume)`);
+                    });
+                });
+                
+                output.innerHTML = results.join('<br>');
+                output.className = 'test-result';
+            } catch (error) {
+                output.innerHTML = `Error: ${error.message}`;
+                output.className = 'test-result error';
+            }
+        };
+
+        window.runFullIntegrationTest = function() {
+            const output = document.getElementById('integrationTest');
+            let results = [];
+            
+            try {
+                results.push('=== Full Integration Test: 4-Week Mesocycle ===');
+                
+                const muscles = ['Chest', 'Back', 'Quads', 'Shoulders'];
+                const mesoLength = 4;
+                
+                for (let week = 1; week <= mesoLength; week++) {
+                    results.push(`\n--- Week ${week} ---`);
+                    
+                    // Get target RIR
+                    const targetRIR = getScheduledRIR(week, mesoLength);
+                    results.push(`Target RIR: ${targetRIR}`);
+                    
+                    // Simulate feedback
+                    const feedback = simulateWeeklyRIRFeedback(muscles, week, mesoLength);
+                    
+                    // Process load adjustments
+                    const adjustments = processWeeklyLoadAdjustments(feedback);
+                    
+                    // Show results for each muscle
+                    muscles.forEach(muscle => {
+                        const adj = adjustments[muscle];
+                        results.push(`${muscle}: ${adj.loadAdjustment}% adjustment → ${adj.newLoad}kg`);
+                    });
+                    
+                    // Get progression recommendation
+                    const avgRIRDrop = Object.values(feedback).reduce((sum, data) => sum + (data.targetRIR - data.actualRIR), 0) / muscles.length;
+                    const progression = getLoadProgression(week, Math.abs(avgRIRDrop), 'moderate');
+                    
+                    results.push(`Next week: ${progression.recommendation} (${progression.loadChange}%)`);
+                }
+                
+                output.innerHTML = results.join('<br>');
+                output.className = 'test-result';
+            } catch (error) {
+                output.innerHTML = `Error: ${error.message}`;
+                output.className = 'test-result error';
+            }
+        };
+    </script>
+</body>
+</html>

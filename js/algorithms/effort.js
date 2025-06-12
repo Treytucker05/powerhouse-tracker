@@ -6,6 +6,16 @@
 import trainingState from '../core/trainingState.js';
 
 /**
+ * Weekly RIR Schedule for Mesocycle Progression
+ * Standard RP approach: [3, 2, 1, 0] across 4-6 week mesocycle
+ */
+const RIR_SCHEDULE = {
+  4: [3, 2, 1, 0],        // 4-week meso
+  5: [3, 2.5, 2, 1, 0],   // 5-week meso  
+  6: [3, 2.5, 2, 1.5, 1, 0] // 6-week meso
+};
+
+/**
  * Calculate target RIR based on meso progression
  * @param {number} weekNumber - Current week (1-based)
  * @param {number} mesoLength - Total weeks in mesocycle
@@ -57,6 +67,27 @@ function calculateTargetRIR(weekNumber = null, mesoLength = null, startRIR = 3, 
     week,
     mesoLength: mesoLen
   };
+}
+
+/**
+ * Get scheduled RIR for specific week based on mesocycle length
+ * @param {number} week - Current week (1-based)
+ * @param {number} mesoLength - Total weeks in mesocycle
+ * @returns {number} - Target RIR for the week
+ */
+function getScheduledRIR(week, mesoLength) {
+  const schedule = RIR_SCHEDULE[mesoLength];
+  if (!schedule) {
+    // Fallback to linear progression for non-standard lengths
+    const startRIR = 3;
+    const endRIR = 0;
+    const progressionRate = (startRIR - endRIR) / (mesoLength - 1);
+    return Math.max(endRIR, startRIR - (progressionRate * (week - 1)));
+  }
+  
+  // Return scheduled RIR, clamping to valid week range
+  const weekIndex = Math.min(week - 1, schedule.length - 1);
+  return schedule[weekIndex];
 }
 
 /**
@@ -150,6 +181,163 @@ function getEffortProgression(muscle, lastSession) {
     projectedRIR,
     weightRecommendation,
     advice,
+    volumeStatus
+  };
+}
+
+/**
+ * Process weekly load adjustments based on RIR feedback
+ * @param {Object} weeklyFeedback - Feedback data for all muscles
+ * @returns {Object} - Load adjustment recommendations
+ */
+function processWeeklyLoadAdjustments(weeklyFeedback) {
+  const currentWeek = trainingState.weekNo;
+  const targetRIR = getScheduledRIR(currentWeek, trainingState.mesoLen);
+  const adjustments = {};
+  let totalMusclesAdjusted = 0;
+  
+  Object.keys(weeklyFeedback).forEach(muscle => {
+    const feedback = weeklyFeedback[muscle];
+    const avgActualRIR = feedback.averageRIR || targetRIR;
+    const rirDeviation = avgActualRIR - targetRIR;
+    
+    let loadAdjustment = 0; // Percentage change
+    let reason = '';
+    
+    // Determine load adjustment based on RIR deviation
+    if (Math.abs(rirDeviation) <= 0.5) {
+      // On target - small progressive increase
+      loadAdjustment = 2.5; // 2.5% increase
+      reason = 'On target - progressive overload';
+    } else if (rirDeviation > 0.5) {
+      // Too easy - increase load significantly
+      if (rirDeviation > 2) {
+        loadAdjustment = 10; // 10% increase
+        reason = 'Too easy - major increase needed';
+      } else if (rirDeviation > 1) {
+        loadAdjustment = 7.5; // 7.5% increase
+        reason = 'Too easy - moderate increase';
+      } else {
+        loadAdjustment = 5; // 5% increase
+        reason = 'Slightly easy - small increase';
+      }
+    } else {
+      // Too hard - decrease load
+      if (rirDeviation < -2) {
+        loadAdjustment = -10; // 10% decrease
+        reason = 'Too hard - major decrease needed';
+      } else if (rirDeviation < -1) {
+        loadAdjustment = -5; // 5% decrease
+        reason = 'Too hard - moderate decrease';
+      } else {
+        loadAdjustment = -2.5; // 2.5% decrease
+        reason = 'Slightly hard - small decrease';
+      }
+    }
+    
+    // Factor in performance trends
+    const performanceTrend = feedback.performanceTrend || 0; // -1, 0, 1
+    if (performanceTrend < 0) {
+      loadAdjustment -= 2.5; // Reduce load if performance declining
+      reason += ' (performance declining)';
+    } else if (performanceTrend > 0 && rirDeviation >= 0) {
+      loadAdjustment += 2.5; // Increase more if performance improving
+      reason += ' (performance improving)';
+    }
+    
+    // Cap adjustments at ±15%
+    loadAdjustment = Math.max(-15, Math.min(15, loadAdjustment));
+    
+    adjustments[muscle] = {
+      currentRIR: avgActualRIR,
+      targetRIR,
+      deviation: rirDeviation,
+      loadAdjustment,
+      reason,
+      urgency: Math.abs(rirDeviation) > 1.5 ? 'high' : 
+               Math.abs(rirDeviation) > 1 ? 'medium' : 'low'
+    };
+    
+    if (Math.abs(loadAdjustment) > 2.5) {
+      totalMusclesAdjusted++;
+    }
+  });
+  
+  return {
+    week: currentWeek,
+    targetRIR,
+    adjustments,
+    summary: {
+      totalMuscles: Object.keys(weeklyFeedback).length,
+      musclesAdjusted: totalMusclesAdjusted,
+      avgLoadChange: Object.values(adjustments).reduce((sum, adj) => sum + adj.loadAdjustment, 0) / Object.keys(adjustments).length
+    }
+  };
+}
+
+/**
+ * Generate load progression recommendations for next week
+ * @param {string} muscle - Muscle group
+ * @param {Object} sessionHistory - Recent session data
+ * @returns {Object} - Load progression recommendation
+ */
+function getLoadProgression(muscle, sessionHistory = {}) {
+  const currentWeek = trainingState.weekNo;
+  const nextWeek = currentWeek + 1;
+  const currentRIR = getScheduledRIR(currentWeek, trainingState.mesoLen);
+  const nextRIR = getScheduledRIR(nextWeek, trainingState.mesoLen);
+  
+  const rirDrop = currentRIR - nextRIR;
+  const recentPerformance = sessionHistory.averageRIR || currentRIR;
+  const performanceDeviation = recentPerformance - currentRIR;
+  
+  let loadIncrease = 0;
+  let recommendation = '';
+  
+  if (rirDrop > 0) {
+    // RIR is dropping - need to increase intensity
+    const baseIncrease = rirDrop * 5; // ~5% per RIR drop
+    
+    // Adjust based on recent performance
+    if (performanceDeviation > 1) {
+      // Performing too easy - can increase more aggressively
+      loadIncrease = baseIncrease + 5;
+      recommendation = `Increase load ${loadIncrease.toFixed(1)}% for Week ${nextWeek} (RIR ${nextRIR}) - currently too easy`;
+    } else if (performanceDeviation < -1) {
+      // Struggling - increase more conservatively
+      loadIncrease = baseIncrease * 0.5;
+      recommendation = `Conservative increase ${loadIncrease.toFixed(1)}% for Week ${nextWeek} (RIR ${nextRIR}) - struggling with current load`;
+    } else {
+      // On target - standard progression
+      loadIncrease = baseIncrease;
+      recommendation = `Standard increase ${loadIncrease.toFixed(1)}% for Week ${nextWeek} (RIR ${nextRIR})`;
+    }
+  } else if (rirDrop === 0) {
+    // Same RIR - small progressive overload
+    loadIncrease = 2.5;
+    recommendation = `Small progressive overload ${loadIncrease.toFixed(1)}% for Week ${nextWeek} (RIR ${nextRIR})`;
+  } else {
+    // RIR increasing (shouldn't happen in normal progression)
+    loadIncrease = 0;
+    recommendation = `Maintain current load for Week ${nextWeek} (RIR ${nextRIR})`;
+  }
+  
+  // Volume status considerations
+  const volumeStatus = trainingState.getVolumeStatus(muscle);
+  if (volumeStatus === 'maximum') {
+    loadIncrease *= 0.75; // Reduce load increases when at MRV
+    recommendation += ' (reduced due to MRV)';
+  }
+  
+  return {
+    muscle,
+    currentWeek,
+    nextWeek,
+    currentRIR,
+    nextRIR,
+    rirDrop,
+    loadIncrease: Math.round(loadIncrease * 10) / 10, // Round to 1 decimal
+    recommendation,
     volumeStatus
   };
 }
@@ -275,10 +463,88 @@ function getPhaseDescription(week, mesoLength) {
   }
 }
 
+/**
+ * Simulate weekly feedback for auto-progression demo
+ * @param {Array} muscles - List of muscle groups
+ * @param {number} week - Current week
+ * @returns {Object} - Simulated weekly feedback
+ */
+function simulateWeeklyRIRFeedback(muscles, week) {
+  const targetRIR = getScheduledRIR(week, trainingState.mesoLen);
+  const feedback = {};
+  
+  muscles.forEach(muscle => {
+    const volumeStatus = trainingState.getVolumeStatus(muscle);
+    
+    // Simulate realistic RIR deviation based on volume status and week
+    let rirDeviation = 0;
+    
+    if (volumeStatus === 'maximum') {
+      // At MRV - likely struggling more
+      rirDeviation = Math.random() * 1.5 - 0.5; // -0.5 to +1.0
+    } else if (week <= 2) {
+      // Early weeks - usually easier
+      rirDeviation = Math.random() * 1.5 + 0.5; // +0.5 to +2.0
+    } else if (week >= trainingState.mesoLen - 1) {
+      // Late weeks - getting harder
+      rirDeviation = Math.random() * 1.5 - 1.0; // -1.0 to +0.5
+    } else {
+      // Middle weeks - more variable
+      rirDeviation = Math.random() * 2 - 1; // -1.0 to +1.0
+    }
+      const simulatedRIR = Math.max(0, targetRIR + rirDeviation);
+    
+    // Generate enhanced fatigue indicators based on volume status
+    let jointAche = 0;
+    let perfChange = 0;
+    let lastLoad = 100; // Default baseline
+    let soreness = 1; // Default mild soreness
+    
+    if (volumeStatus === 'maximum') {
+      jointAche = Math.floor(Math.random() * 3) + 1; // 1-3 (mild to pain)
+      perfChange = Math.random() > 0.6 ? -1 : 0; // 40% chance of performance drop
+      lastLoad = trainingState.baselineStrength[muscle] * 0.95; // 5% strength drop
+      soreness = Math.floor(Math.random() * 2) + 2; // 2-3 (moderate to high)
+    } else if (volumeStatus === 'high') {
+      jointAche = Math.floor(Math.random() * 2); // 0-1 (none to mild)
+      perfChange = Math.random() > 0.8 ? -1 : (Math.random() > 0.5 ? 0 : 1); // Mixed performance
+      lastLoad = trainingState.baselineStrength[muscle] * 0.98; // 2% strength drop
+      soreness = Math.floor(Math.random() * 2) + 1; // 1-2 (mild to moderate)
+    } else {
+      jointAche = Math.floor(Math.random() * 2); // 0-1 (none to mild)
+      perfChange = Math.random() > 0.7 ? 1 : 0; // 30% chance of PR
+      lastLoad = trainingState.baselineStrength[muscle] * 1.02; // 2% strength increase
+      soreness = Math.floor(Math.random() * 2); // 0-1 (none to mild)
+    }
+    
+    feedback[muscle] = {
+      actualRIR: simulatedRIR,
+      targetRIR,
+      averageRIR: Math.round(simulatedRIR * 10) / 10,
+      performanceTrend: week > 1 ? (Math.random() > 0.7 ? (Math.random() > 0.5 ? 1 : -1) : 0) : 0,
+      sessions: 2, // Assume 2 sessions per week
+      volumeStatus,
+      // Enhanced fatigue detection fields
+      soreness,
+      jointAche,
+      perfChange,
+      lastLoad: Math.round(lastLoad * 10) / 10,
+      pump: Math.min(3, Math.floor(Math.random() * 3) + 1),
+      disruption: Math.min(3, Math.floor(Math.random() * 3) + 1)
+    };
+  });
+  
+  return feedback;
+}
+
 export {
   calculateTargetRIR,
   validateEffortLevel,
   getEffortProgression,
   getWeeklyEffortSummary,
-  getAutoregulationAdvice
+  getAutoregulationAdvice,
+  getScheduledRIR,
+  processWeeklyLoadAdjustments,
+  getLoadProgression,
+  simulateWeeklyRIRFeedback
 };

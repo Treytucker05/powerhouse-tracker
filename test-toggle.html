@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toggle Function Test</title>
+    <style>
+        .section-banner {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.2) 0%, rgba(255, 0, 0, 0.1) 100%);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 12px;
+            margin: 40px 0 20px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .section-banner:hover {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.3) 0%, rgba(255, 0, 0, 0.15) 100%);
+        }
+
+        .section-banner h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .expand-icon {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .section-banner.expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .section-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .section-content.expanded {
+            max-height: 3000px;
+        }
+
+        .calculator {
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 35px;
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            border-radius: 16px;
+            margin: 20px 0;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Toggle Section Test</h1>
+    
+    <div class="section-banner" onclick="toggleSection('daily')">
+        <h3>Daily Training <span class="expand-icon">▼</span></h3>
+        <p>Use during or right after your workout</p>
+    </div>
+
+    <div class="section-content" id="daily-content">
+        <div class="calculator">
+            <h2>Test Content</h2>
+            <p>This content should show/hide when clicking the banner above.</p>
+            <p>If this works, the toggle function is functioning correctly.</p>
+        </div>
+    </div>
+
+    <script>
+        // Test the toggleSection function
+        function toggleSection(sectionId) {
+            console.log('toggleSection called with:', sectionId);
+            
+            const content = document.getElementById(sectionId + '-content');
+            const banner = content.previousElementSibling;
+            const icon = banner.querySelector('.expand-icon');
+
+            if (!content || !banner || !icon) {
+                console.error('Missing elements:', { content, banner, icon });
+                return;
+            }
+
+            const opening = !content.classList.contains('expanded');
+            console.log('Opening:', opening);
+
+            // ------- EXPAND -------
+            if (opening) {
+                content.style.display = 'block';           // back in flow
+                // allow next paint, then add class so CSS transition plays
+                requestAnimationFrame(() => {
+                    content.classList.add('expanded');
+                    banner.classList.add('expanded');
+                    // Update icon rotation
+                    icon.style.transform = 'rotate(180deg)';
+                    console.log('Expanded section');
+                });
+            }
+
+            // ------- COLLAPSE -------
+            else {
+                content.classList.remove('expanded');      // start transition
+                banner.classList.remove('expanded');
+                // Update icon rotation
+                icon.style.transform = 'rotate(0deg)';
+
+                // when transition ends hide element to drop layout height
+                content.addEventListener('transitionend', function handler() {
+                    content.style.display = 'none';
+                    content.removeEventListener('transitionend', handler);
+                    console.log('Collapsed section');
+                });
+            }
+        }
+
+        // Test initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, testing toggleSection function');
+            
+            // Check if elements exist
+            const content = document.getElementById('daily-content');
+            const banner = content.previousElementSibling;
+            
+            console.log('Content element:', content);
+            console.log('Banner element:', banner);
+            
+            if (content && banner) {
+                console.log('Elements found successfully');
+            } else {
+                console.error('Elements not found!');
+            }
+        });
+    </script>
+</body>
+</html>

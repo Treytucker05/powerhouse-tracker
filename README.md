@@ -1,12 +1,33 @@
 # PowerHouseATX Renaissance Periodization Toolkit
 
-A comprehensive evidence-based training calculator implementing Renaissance Periodization methodology for optimal muscle building.
+A comprehensive evidence-based training calculator implementing Renaissance Periodization methodology with **automated volume progression**.
+
+## 🤖 Auto-Volume Progression System
+
+**🎉 NEW: Fully automated weekly volume progression** - No more manual "+ set" buttons!
+
+- **🎯 MEV Start:** All muscles begin at Minimum Effective Volume
+- **📈 Smart Progression:** +1-2 sets per week based on recovery feedback
+- **🛑 Auto-Deload:** Triggers when most muscles hit MRV
+- **🧠 Adaptive Logic:** Volume-dependent feedback simulation
+
+### Quick Demo
+1. Click **"🎯 Initialize at MEV"** → Sets all muscles to starting volumes
+2. Click **"▶️ Run Weekly Auto-Progression"** → Simulates weekly progression
+3. Click **"📅 Next Week"** → Advances training cycle
+4. System auto-triggers deload when needed
 
 ## 🎯 Features Implemented
 
-### ✅ Complete Task List Implementation
+### ✅ Complete Renaissance Periodization Implementation
 
-1. **📁 Refactored Structure**
+1. **🤖 Auto-Volume Progression System**
+   - `autoSetIncrement()` - Determines weekly set increases (+0, +1, +2)
+   - `processWeeklyVolumeProgression()` - Batch processes all muscles
+   - Automatic deload triggering based on MRV accumulation
+   - Volume-adaptive feedback generation for realistic progression
+
+2. **📁 Refactored Structure**
    - `/js/core/trainingState.js` - Central training state singleton
    - `/js/algorithms/volume.js` - RP volume management algorithms
    - `/js/algorithms/effort.js` - RIR progression and effort management
@@ -14,21 +35,18 @@ A comprehensive evidence-based training calculator implementing Renaissance Peri
    - `/js/algorithms/validation.js` - Load and input validation helpers
    - `/js/ui/` - Modular UI components
 
-2. **🔢 RP "MEV Stimulus Estimator" (Table 2.2)**
+3. **🔢 RP "MEV Stimulus Estimator" (Table 2.2)**
    - `scoreStimulus({mmc, pump, disruption})` → 0-9 score
    - Automatic advice: 0-3 = "Add 2 sets", 4-6 = "Keep sets", 7-9 = "Remove sets"
 
-3. **📈 RP "Set Progression Algorithm" (Table 2.3)**
+4. **📈 RP "Set Progression Algorithm" (Table 2.3)**
    - Matrix lookup: [soreness 0-3] × [performance 0-3]
    - Replaces legacy `calcSets()` with evidence-based recommendations
 
-4. **📊 Volume Landmarks System**
+5. **📊 Volume Landmarks System**
    - User-editable MV, MEV, MAV, MRV for all 12 muscle groups
    - Chart color coding: green (optimal), amber (high), red (maximum)
    - Sets seeded at MEV instead of arbitrary defaults
-
-5. **🏋️‍♂️ Progressive Overload Engine**
-   - Dynamic RIR targets: 4.5 → 0.5 over mesocycle
    - Real-time effort validation with ±1 RIR tolerance warnings
    - Autoregulation feedback system
 

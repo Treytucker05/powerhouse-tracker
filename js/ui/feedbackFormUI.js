@@ -70,9 +70,12 @@ function collectFeedbackData() {
   // Get performance rating from radio buttons
   const perfRadio = document.querySelector('input[name="perf"]:checked');
   const performance = perfRadio ? parseInt(perfRadio.value, 10) : 1;
-  
-  // Get soreness from weekly section if available
+    // Get soreness from weekly section if available
   const soreness = parseInt(document.getElementById('sore')?.value, 10) || 1;
+  
+  // Get enhanced fatigue detection inputs
+  const jointAche = parseInt(document.getElementById('jointAche')?.value, 10) || 0;
+  const perfChange = parseInt(document.getElementById('perfChange')?.value, 10) || 0;
   
   // Get actual RIR if provided
   const actualRIRInput = document.getElementById('actualRIR');
@@ -87,6 +90,8 @@ function collectFeedbackData() {
     stimulus: { mmc, pump, disruption },
     performance,
     soreness,
+    jointAche,
+    perfChange,
     actualRIR,
     hasIllness,
     timestamp: new Date().toISOString()

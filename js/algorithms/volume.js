@@ -4,6 +4,7 @@
  */
 
 import trainingState from '../core/trainingState.js';
+import { isHighFatigue } from './fatigue.js';
 
 /**
  * RP Table 2.2: MEV Stimulus Estimator
@@ -46,6 +47,115 @@ function scoreStimulus({ mmc, pump, disruption }) {
       pump: clampedPump,
       disruption: clampedDisruption
     }
+  };
+}
+
+/**
+ * Auto-Volume Progression System
+ * Automatically increments sets based on MEV/MRV status and recovery feedback
+ * @param {string} muscle - Target muscle group
+ * @param {Object} feedback - {stimulus: 0-9, soreness: 0-3, perf: -1 to 2, recoverySession: boolean}
+ * @param {Object} state - Training state singleton
+ * @returns {Object} - {add: boolean, delta: number, reason: string}
+ */
+function autoSetIncrement(muscle, feedback, state) {
+  const { MEV, MRV } = state.volumeLandmarks[muscle];
+  const currentSets = state.currentWeekSets[muscle] || MEV;
+  
+  const atMEV = currentSets <= MEV;
+  const atMRV = currentSets >= MRV;
+  const lowStimulus = feedback.stimulus <= 3;
+  const goodRecovery = feedback.soreness <= 1 && feedback.perf >= 0;
+  
+  // Don't add if at MRV or recovery session needed
+  if (atMRV || feedback.recoverySession) {
+    return { 
+      add: false, 
+      delta: 0, 
+      reason: atMRV ? 'At MRV - holding volume' : 'Recovery session needed' 
+    };
+  }
+  
+  // Add sets if at MEV or if low stimulus with good recovery
+  if (atMEV || (lowStimulus && goodRecovery)) {
+    const baseDelta = 1;
+    const mevBonus = atMEV ? 1 : 0; // Extra set boost when starting from MEV
+    const totalDelta = Math.min(baseDelta + mevBonus, 2); // Cap at +2 sets max
+    
+    return { 
+      add: true, 
+      delta: totalDelta,
+      reason: atMEV ? 'Starting from MEV - aggressive progression' : 'Low stimulus with good recovery'
+    };
+  }
+  
+  return { 
+    add: false, 
+    delta: 0, 
+    reason: 'Maintaining current volume' 
+  };
+}
+
+/**
+ * Process weekly auto-volume progression for all muscles
+ * @param {Object} weeklyFeedback - {muscle: {stimulus, soreness, perf, recoverySession}}
+ * @param {Object} state - Training state singleton
+ * @returns {Object} - Progression summary and deload recommendation
+ */
+function processWeeklyVolumeProgression(weeklyFeedback, state) {
+  const progressionLog = {};
+  let deloadTriggered = false;
+  let mrvHits = 0;
+  // Process each muscle's auto-progression
+  Object.keys(weeklyFeedback).forEach(muscle => {
+    const feedback = weeklyFeedback[muscle];
+    
+    // Check for high fatigue using enhanced detection
+    const high = isHighFatigue(muscle, feedback, state);
+    if (high) {
+      // Treat like MRV - trigger recovery
+      state.hitMRV(muscle);
+      mrvHits++;
+      console.log(`hitMRV: true (fatigue) - ${muscle}`);
+      
+      // Force recovery session
+      feedback.recoverySession = true;
+    }
+    
+    const increment = autoSetIncrement(muscle, feedback, state);
+    
+    // Apply set changes
+    if (increment.add) {
+      state.addSets(muscle, increment.delta);
+    }
+    
+    // Track MRV hits for deload logic
+    if (state.getWeeklySets(muscle) >= state.volumeLandmarks[muscle].MRV) {
+      state.hitMRV(muscle);
+      mrvHits++;
+    }
+    
+    progressionLog[muscle] = {
+      previousSets: state.lastWeekSets[muscle] || state.volumeLandmarks[muscle].MEV,
+      currentSets: state.getWeeklySets(muscle),
+      increment: increment.delta,
+      reason: increment.reason,
+      status: state.getVolumeStatus(muscle)
+    };
+  });
+
+  // Check deload conditions
+  if (state.shouldDeload()) {
+    state.startDeload();
+    deloadTriggered = true;
+  }
+
+  return {
+    progressionLog,
+    deloadTriggered,
+    mrvHits,
+    weekComplete: true,
+    recommendation: deloadTriggered ? 'Deload phase initiated' : 'Continue progression'
   };
 }
 
@@ -301,5 +411,7 @@ export {
   calculateRecoveryVolume,
   validateVolumeInput,
   getVolumeProgression,
-  analyzeDeloadNeed
+  analyzeDeloadNeed,
+  autoSetIncrement,
+  processWeeklyVolumeProgression
 };

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Fatigue & MRV Detection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        
+        .test-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        
+        .test-result {
+            background: #0a3d0a;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        
+        .error {
+            background: #3d0a0a;
+        }
+        
+        .warning {
+            background: #3d3d0a;
+        }
+        
+        button {
+            background: #ff0000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: #cc0000;
+        }
+        
+        .fatigue-indicator {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin: 2px;
+            font-weight: bold;
+        }
+        
+        .high-fatigue {
+            background: #ff4444;
+            color: white;
+        }
+        
+        .normal-fatigue {
+            background: #44ff44;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔥 Enhanced Fatigue & MRV Detection System Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: SFR (Stimulus-to-Fatigue Ratio) Calculation</h2>
+        <button onclick="testSFRCalculation()">Run SFR Test</button>
+        <div id="sfrTest" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: Rep Strength Drop Detection</h2>
+        <button onclick="testStrengthDrop()">Run Strength Drop Test</button>
+        <div id="strengthDropTest" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 3: Enhanced Fatigue Detection Integration</h2>
+        <button onclick="testFatigueIntegration()">Run Integration Test</button>
+        <div id="fatigueIntegrationTest" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 4: Early Deload Triggering</h2>
+        <button onclick="testEarlyDeload()">Run Early Deload Test</button>
+        <div id="earlyDeloadTest" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 5: Complete Fatigue System Demo</h2>
+        <button onclick="runCompleteFatigueDemo()">Run Complete Demo</button>
+        <div id="completeFatigueDemo" class="test-result"></div>
+    </div>
+
+    <script type="module">
+        // Import the enhanced modules
+        import trainingState from './js/core/trainingState.js';
+        import { isHighFatigue } from './js/algorithms/fatigue.js';
+        import { processWeeklyVolumeProgression } from './js/algorithms/volume.js';
+
+        // Make functions global for button handlers
+        window.testSFRCalculation = function() {
+            const output = document.getElementById('sfrTest');
+            let results = [];
+            
+            try {
+                results.push('=== SFR (Stimulus-to-Fatigue Ratio) Tests ===\\n');
+                
+                const testCases = [
+                    { soreness: 1, jointAche: 0, perfChange: 0, pump: 2, disruption: 2, desc: 'Normal training' },
+                    { soreness: 2, jointAche: 1, perfChange: -1, pump: 2, disruption: 2, desc: 'Moderate fatigue' },
+                    { soreness: 3, jointAche: 2, perfChange: -1, pump: 1, disruption: 1, desc: 'High fatigue, low stimulus' },
+                    { soreness: 1, jointAche: 0, perfChange: 1, pump: 3, disruption: 3, desc: 'Low fatigue, high stimulus' },
+                    { soreness: 2, jointAche: 3, perfChange: -1, pump: 2, disruption: 2, desc: 'Joint pain scenario' }
+                ];
+                
+                testCases.forEach(testCase => {
+                    const fatigue = testCase.soreness + testCase.jointAche + (testCase.perfChange < 0 ? 2 : 0);
+                    const stimulus = testCase.pump + testCase.disruption;
+                    const SFR = stimulus / (fatigue || 1);
+                    const highFatigue = SFR <= 1;
+                    
+                    results.push(\`\\n\${testCase.desc}:\`);
+                    results.push(\`  Fatigue: \${fatigue} (soreness:\${testCase.soreness} + jointAche:\${testCase.jointAche} + perfPenalty:\${testCase.perfChange < 0 ? 2 : 0})\`);
+                    results.push(\`  Stimulus: \${stimulus} (pump:\${testCase.pump} + disruption:\${testCase.disruption})\`);
+                    results.push(\`  SFR: \${SFR.toFixed(2)}\`);
+                    results.push(\`  High Fatigue: \${highFatigue ? '🔴 YES' : '🟢 NO'}\`);
+                });
+                
+                output.innerHTML = results.join('<br>');
+                output.className = 'test-result';
+            } catch (error) {
+                output.innerHTML = \`Error: \${error.message}\`;
+                output.className = 'test-result error';
+            }
+        };
+
+        window.testStrengthDrop = function() {
+            const output = document.getElementById('strengthDropTest');
+            let results = [];
+            
+            try {
+                results.push('=== Rep Strength Drop Detection Tests ===\\n');
+                
+                // Set baseline strengths
+                trainingState.setBaselineStrength('Chest', 100);
+                trainingState.setBaselineStrength('Back', 120);
+                trainingState.setBaselineStrength('Quads', 150);
+                
+                const testCases = [
+                    { muscle: 'Chest', lastLoad: 100, expected: false, desc: 'Same as baseline' },
+                    { muscle: 'Chest', lastLoad: 98, expected: false, desc: '2% drop (within threshold)' },
+                    { muscle: 'Chest', lastLoad: 96, expected: true, desc: '4% drop (exceeds 3% threshold)' },
+                    { muscle: 'Back', lastLoad: 115, expected: true, desc: '4.2% drop from 120kg baseline' },
+                    { muscle: 'Quads', lastLoad: 145, expected: true, desc: '3.3% drop from 150kg baseline' },
+                    { muscle: 'Quads', lastLoad: 146, expected: false, desc: '2.7% drop (within threshold)' }
+                ];
+                
+                testCases.forEach(testCase => {
+                    const baseline = trainingState.baselineStrength[testCase.muscle];
+                    const dropDetected = trainingState.repStrengthDrop(testCase.muscle, testCase.lastLoad);
+                    const actualDrop = ((baseline - testCase.lastLoad) / baseline) * 100;
+                    
+                    results.push(\`\\n\${testCase.desc}:\`);
+                    results.push(\`  Baseline: \${baseline}kg\`);
+                    results.push(\`  Last Load: \${testCase.lastLoad}kg\`);
+                    results.push(\`  Actual Drop: \${actualDrop.toFixed(1)}%\`);
+                    results.push(\`  Strength Drop Detected: \${dropDetected ? '🔴 YES' : '🟢 NO'}\`);
+                    results.push(\`  Expected: \${testCase.expected ? 'YES' : 'NO'} - \${dropDetected === testCase.expected ? '✅ PASS' : '❌ FAIL'}\`);
+                });
+                
+                output.innerHTML = results.join('<br>');
+                output.className = 'test-result';
+            } catch (error) {
+                output.innerHTML = \`Error: \${error.message}\`;
+                output.className = 'test-result error';
+            }
+        };
+
+        window.testFatigueIntegration = function() {
+            const output = document.getElementById('fatigueIntegrationTest');
+            let results = [];
+            
+            try {
+                results.push('=== Enhanced Fatigue Detection Integration Tests ===\\n');
+                
+                // Set baseline strengths
+                trainingState.setBaselineStrength('Chest', 100);
+                
+                const scenarios = [
+                    {
+                        name: 'Scenario 1: SFR Trigger',
+                        feedback: { soreness: 3, jointAche: 2, perfChange: -1, pump: 1, disruption: 1, lastLoad: 100 },
+                        expected: true
+                    },
+                    {
+                        name: 'Scenario 2: Strength Drop Trigger', 
+                        feedback: { soreness: 1, jointAche: 0, perfChange: 0, pump: 2, disruption: 2, lastLoad: 95 },
+                        expected: true
+                    },
+                    {
+                        name: 'Scenario 3: Both Triggers',
+                        feedback: { soreness: 3, jointAche: 3, perfChange: -1, pump: 1, disruption: 1, lastLoad: 95 },
+                        expected: true
+                    },
+                    {
+                        name: 'Scenario 4: No Triggers',
+                        feedback: { soreness: 1, jointAche: 0, perfChange: 1, pump: 3, disruption: 3, lastLoad: 102 },
+                        expected: false
+                    }
+                ];
+                
+                scenarios.forEach(scenario => {
+                    const fatigue = scenario.feedback.soreness + scenario.feedback.jointAche + (scenario.feedback.perfChange < 0 ? 2 : 0);
+                    const stimulus = scenario.feedback.pump + scenario.feedback.disruption;
+                    const SFR = stimulus / (fatigue || 1);
+                    const strengthDrop = trainingState.repStrengthDrop('Chest', scenario.feedback.lastLoad);
+                    const highFatigueDetected = isHighFatigue('Chest', scenario.feedback, trainingState);
+                    
+                    results.push(\`\\n\${scenario.name}:\`);
+                    results.push(\`  SFR: \${SFR.toFixed(2)} (≤1: \${SFR <= 1 ? 'YES' : 'NO'})\`);
+                    results.push(\`  Strength Drop: \${strengthDrop ? 'YES' : 'NO'}\`);
+                    results.push(\`  High Fatigue Detected: \${highFatigueDetected ? '🔴 YES' : '🟢 NO'}\`);
+                    results.push(\`  Expected: \${scenario.expected ? 'YES' : 'NO'} - \${highFatigueDetected === scenario.expected ? '✅ PASS' : '❌ FAIL'}\`);
+                });
+                
+                output.innerHTML = results.join('<br>');
+                output.className = 'test-result';
+            } catch (error) {
+                output.innerHTML = \`Error: \${error.message}\`;
+                output.className = 'test-result error';
+            }
+        };
+
+        window.testEarlyDeload = function() {
+            const output = document.getElementById('earlyDeloadTest');
+            let results = [];
+            
+            try {
+                results.push('=== Early Deload Triggering Tests ===\\n');
+                
+                // Reset training state
+                trainingState.weekNo = 1;
+                trainingState.consecutiveMRVWeeks = 0;
+                trainingState.totalMusclesNeedingRecovery = 0;
+                
+                // Set one major muscle at MRV
+                trainingState.currentWeekSets['Chest'] = trainingState.volumeLandmarks['Chest'].MRV;
+                
+                results.push('Initial state:');
+                results.push(\`  Week: \${trainingState.weekNo}\`);
+                results.push(\`  Chest sets: \${trainingState.currentWeekSets['Chest']} (MRV: \${trainingState.volumeLandmarks['Chest'].MRV})\`);
+                results.push(\`  Should deload (before): \${trainingState.shouldDeload()}\`);
+                
+                // Simulate high fatigue feedback
+                const highFatigueFeedback = {
+                    'Chest': {
+                        soreness: 3,
+                        jointAche: 2,
+                        perfChange: -1,
+                        pump: 1,
+                        disruption: 1,
+                        lastLoad: 95,
+                        stimulus: 2
+                    }
+                };
+                
+                // Process the feedback (this should trigger hitMRV via fatigue)
+                const result = processWeeklyVolumeProgression(highFatigueFeedback, trainingState);
+                
+                results.push('\\nAfter processing high fatigue feedback:');
+                results.push(\`  Deload triggered: \${result.deloadTriggered ? '🔴 YES' : '🟢 NO'}\`);
+                results.push(\`  MRV hits: \${result.mrvHits}\`);
+                results.push(\`  Total muscles needing recovery: \${trainingState.totalMusclesNeedingRecovery}\`);
+                results.push(\`  Should deload (after): \${trainingState.shouldDeload()}\`);
+                
+                // Test early deload trigger (one bad week)
+                const earlyDeloadExpected = result.deloadTriggered && trainingState.weekNo === 1;
+                results.push(\`\\n🎯 Early Deload Test: \${earlyDeloadExpected ? '✅ PASS - Deload fired after ONE bad week' : '❌ FAIL - Should have triggered deload'}\`);
+                
+                output.innerHTML = results.join('<br>');
+                output.className = earlyDeloadExpected ? 'test-result' : 'test-result warning';
+            } catch (error) {
+                output.innerHTML = \`Error: \${error.message}\`;
+                output.className = 'test-result error';
+            }
+        };
+
+        window.runCompleteFatigueDemo = function() {
+            const output = document.getElementById('completeFatigueDemo');
+            let results = [];
+            
+            try {
+                results.push('=== Complete Enhanced Fatigue System Demo ===\\n');
+                
+                // Reset and initialize
+                trainingState.weekNo = 1;
+                trainingState.consecutiveMRVWeeks = 0;
+                trainingState.totalMusclesNeedingRecovery = 0;
+                
+                const muscles = ['Chest', 'Back', 'Quads'];
+                muscles.forEach(muscle => {
+                    trainingState.setBaselineStrength(muscle, 100);
+                    trainingState.currentWeekSets[muscle] = trainingState.volumeLandmarks[muscle].MEV;
+                });
+                
+                results.push('Week 1 - Starting fresh:');
+                results.push(\`  All muscles at MEV\`);
+                results.push(\`  Baseline strength: 100kg for all muscles\`);
+                
+                // Simulate progressive fatigue buildup over weeks
+                for (let week = 1; week <= 4; week++) {
+                    results.push(\`\\n--- Week \${week} ---\`);
+                    
+                    const weeklyFeedback = {};
+                    muscles.forEach(muscle => {
+                        // Simulate progressive fatigue buildup
+                        const fatigueLevel = week - 1; // 0, 1, 2, 3
+                        const soreness = Math.min(3, fatigueLevel);
+                        const jointAche = Math.min(3, Math.max(0, fatigueLevel - 1));
+                        const perfChange = week >= 3 ? -1 : 0;
+                        const lastLoad = 100 - (week * 1.5); // Progressive strength decline
+                        
+                        weeklyFeedback[muscle] = {
+                            soreness,
+                            jointAche,
+                            perfChange,
+                            lastLoad,
+                            pump: Math.max(1, 4 - fatigueLevel),
+                            disruption: Math.max(1, 4 - fatigueLevel),
+                            stimulus: Math.max(2, 8 - fatigueLevel * 2)
+                        };
+                        
+                        const fatigue = soreness + jointAche + (perfChange < 0 ? 2 : 0);
+                        const stimulus = weeklyFeedback[muscle].pump + weeklyFeedback[muscle].disruption;
+                        const SFR = stimulus / (fatigue || 1);
+                        const strengthDrop = trainingState.repStrengthDrop(muscle, lastLoad);
+                        const highFatigue = isHighFatigue(muscle, weeklyFeedback[muscle], trainingState);
+                        
+                        results.push(\`  \${muscle}: SFR=\${SFR.toFixed(2)}, StrDrop=\${strengthDrop}, Fatigue=\${highFatigue ? '🔴' : '🟢'}\`);
+                    });
+                    
+                    // Process the week
+                    trainingState.weekNo = week;
+                    const result = processWeeklyVolumeProgression(weeklyFeedback, trainingState);
+                    
+                    if (result.deloadTriggered) {
+                        results.push(\`  🛑 DELOAD TRIGGERED - Enhanced fatigue system detected overreaching\`);
+                        break;
+                    } else {
+                        results.push(\`  📈 Progression continues\`);
+                    }
+                }
+                
+                results.push('\\n✅ Enhanced Fatigue & MRV Detection System is operational!');
+                results.push('Features demonstrated:');
+                results.push('  • SFR calculation (Stimulus-to-Fatigue Ratio)');
+                results.push('  • Rep strength drop detection (<97% baseline)');
+                results.push('  • Joint ache scale integration');
+                results.push('  • Performance change tracking');
+                results.push('  • Early deload triggering (one bad week)');
+                results.push('  • Console logging: "hitMRV: true (fatigue)"');
+                
+                output.innerHTML = results.join('<br>');
+                output.className = 'test-result';
+            } catch (error) {
+                output.innerHTML = \`Error: \${error.message}\`;
+                output.className = 'test-result error';
+            }
+        };
+    </script>
+</body>
+</html>

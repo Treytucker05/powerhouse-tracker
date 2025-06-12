@@ -390,7 +390,37 @@ function calculateOptimalFrequency(muscle, constraints = {}) {
   };
 }
 
+/**
+ * Enhanced fatigue detection using SFR and rep strength drop
+ * @param {string} muscle - Muscle group
+ * @param {Object} feedback - Feedback data with soreness, jointAche, perfChange, stimulus, lastLoad
+ * @param {Object} state - Training state singleton
+ * @returns {boolean} - True if high fatigue detected
+ */
+function isHighFatigue(muscle, feedback, state) {
+  // Calculate total fatigue score
+  const soreness = feedback.soreness || 0;
+  const jointAche = feedback.jointAche || 0;
+  const perfChange = feedback.perfChange || 0;
+  
+  // Fatigue components: soreness + joint ache + performance decline penalty
+  const fatigue = soreness + jointAche + (perfChange < 0 ? 2 : 0);
+  
+  // Stimulus components: pump + disruption (mind-muscle connection less relevant for fatigue)
+  const stimulus = (feedback.pump || 0) + (feedback.disruption || 0);
+  
+  // Calculate Stimulus-to-Fatigue Ratio (SFR)
+  const SFR = stimulus / (fatigue || 1); // Avoid zero division
+  
+  // Check for rep strength drop
+  const strengthDrop = feedback.lastLoad ? state.repStrengthDrop(muscle, feedback.lastLoad) : false;
+  
+  // High fatigue if SFR ≤ 1 OR strength drop detected
+  return (SFR <= 1) || strengthDrop;
+}
+
 export {
   analyzeFrequency,
-  calculateOptimalFrequency
+  calculateOptimalFrequency,
+  isHighFatigue
 };

@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Training Intelligence Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #5a67d8;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+            border-color: #5a67d8;
+        }
+
+        .feature-card h3 {
+            color: #5a67d8;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-icon {
+            font-size: 1.5em;
+        }
+
+        .demo-button {
+            background: linear-gradient(135deg, #5a67d8, #667eea);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin: 5px;
+            font-weight: 600;
+        }
+
+        .demo-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(90, 103, 216, 0.3);
+        }
+
+        .demo-button:active {
+            transform: translateY(0);
+        }
+
+        .result-panel {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #5a67d8;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .result-panel.success {
+            border-left-color: #48bb78;
+            background: #f0fff4;
+        }
+
+        .result-panel.warning {
+            border-left-color: #ed8936;
+            background: #fffaf0;
+        }
+
+        .result-panel.error {
+            border-left-color: #f56565;
+            background: #fed7d7;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.active {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-badge.inactive {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .live-monitor {
+            background: #1a202c;
+            color: #e2e8f0;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .live-monitor h3 {
+            color: #63b3ed;
+            margin-bottom: 20px;
+        }
+
+        .monitor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .monitor-stat {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .monitor-stat .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #63b3ed;
+        }
+
+        .monitor-stat .label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .intelligence-panel {
+            background: linear-gradient(135deg, #1a365d, #2c5282);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .intelligence-panel h3 {
+            color: #63b3ed;
+            margin-bottom: 20px;
+        }
+
+        .recommendation {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #63b3ed;
+        }
+
+        .recommendation.high-priority {
+            border-left-color: #f56565;
+            background: rgba(245, 101, 101, 0.1);
+        }
+
+        .recommendation.medium-priority {
+            border-left-color: #ed8936;
+            background: rgba(237, 137, 54, 0.1);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-radius: 50%;
+            border-top-color: #5a67d8;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            border-color: #5a67d8;
+            transform: scale(1.05);
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #5a67d8;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 Advanced Training Intelligence</h1>
+        
+        <div class="feature-grid">
+            <!-- Machine Learning Analytics -->
+            <div class="feature-card">
+                <h3><span class="feature-icon">📊</span> Machine Learning Analytics</h3>
+                <p>Predictive modeling for volume landmarks, deload timing, and plateau detection using historical training data.</p>
+                
+                <button class="demo-button" onclick="testVolumeOptimization()">🎯 Optimize Volume Landmarks</button>
+                <button class="demo-button" onclick="testDeloadPrediction()">🔮 Predict Deload Timing</button>
+                <button class="demo-button" onclick="testPlateauDetection()">📈 Detect Plateaus</button>
+                
+                <div id="analyticsResults" class="result-panel" style="display: none;"></div>
+            </div>
+
+            <!-- Exercise Selection AI -->
+            <div class="feature-card">
+                <h3><span class="feature-icon">🏋️</span> Smart Exercise Selection</h3>
+                <p>AI-powered exercise recommendations based on equipment, goals, fatigue levels, and individual response patterns.</p>
+                
+                <button class="demo-button" onclick="testExerciseSelection()">💡 Get Exercise Recommendations</button>
+                <button class="demo-button" onclick="testProgramGeneration()">📋 Generate Weekly Program</button>
+                
+                <div id="exerciseResults" class="result-panel" style="display: none;"></div>
+            </div>
+
+            <!-- Live Performance Monitoring -->
+            <div class="feature-card">
+                <h3><span class="feature-icon">⚡</span> Live Performance Tracking</h3>
+                <p>Real-time feedback during training sessions with automatic performance analysis and next-set recommendations.</p>
+                
+                <button class="demo-button" onclick="startLiveSession()">🎮 Start Live Session</button>
+                <button class="demo-button" onclick="simulateTrainingSet()">📊 Simulate Training Set</button>
+                <button class="demo-button" onclick="endLiveSession()">⏹️ End Session</button>
+                
+                <div id="liveResults" class="result-panel" style="display: none;"></div>
+            </div>
+
+            <!-- Intelligence Hub -->
+            <div class="feature-card">
+                <h3><span class="feature-icon">🧠</span> Training Intelligence Hub</h3>
+                <p>Unified intelligence system that coordinates all advanced features for comprehensive training optimization.</p>
+                
+                <button class="demo-button" onclick="initializeIntelligence()">🚀 Initialize Intelligence</button>
+                <button class="demo-button" onclick="getWeeklyIntelligence()">📈 Get Weekly Intelligence</button>
+                <button class="demo-button" onclick="assessTrainingRisk()">⚠️ Assess Risk</button>
+                
+                <div id="intelligenceResults" class="result-panel" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Live Monitor Dashboard -->
+        <div class="live-monitor" id="liveMonitor" style="display: none;">
+            <h3>🔴 Live Training Monitor</h3>
+            <div class="monitor-grid">
+                <div class="monitor-stat">
+                    <div class="value" id="currentSet">0</div>
+                    <div class="label">Current Set</div>
+                </div>
+                <div class="monitor-stat">
+                    <div class="value" id="currentRIR">-</div>
+                    <div class="label">Last RIR</div>
+                </div>
+                <div class="monitor-stat">
+                    <div class="value" id="sessionProgress">0%</div>
+                    <div class="label">Progress</div>
+                </div>
+                <div class="monitor-stat">
+                    <div class="value" id="totalLoad">0</div>
+                    <div class="label">Total Load</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Intelligence Dashboard -->
+        <div class="intelligence-panel" id="intelligencePanel" style="display: none;">
+            <h3>🎯 Training Intelligence Dashboard</h3>
+            <div id="intelligenceContent"></div>
+        </div>
+
+        <!-- System Status -->
+        <div class="feature-card">
+            <h3><span class="feature-icon">⚙️</span> System Status</h3>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="analyticsStatus">❌</div>
+                    <div class="metric-label">Analytics</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="exerciseStatus">✅</div>
+                    <div class="metric-label">Exercise AI</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="liveStatus">✅</div>
+                    <div class="metric-label">Live Monitor</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="hubStatus">✅</div>
+                    <div class="metric-label">Intelligence Hub</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import modules -->
+    <script type="module">
+        import trainingState from './js/core/trainingState.js';
+        import { optimizeVolumeLandmarks, predictDeloadTiming, adaptiveRIRRecommendations, detectTrainingPlateaus } from './js/algorithms/analytics.js';
+        import { selectOptimalExercises, generateWeeklyProgram } from './js/algorithms/exerciseSelection.js';
+        import { liveMonitor } from './js/algorithms/livePerformance.js';
+        import { advancedIntelligence } from './js/algorithms/intelligenceHub.js';
+
+        // Make functions globally available
+        window.trainingState = trainingState;
+        window.optimizeVolumeLandmarks = optimizeVolumeLandmarks;
+        window.predictDeloadTiming = predictDeloadTiming;
+        window.adaptiveRIRRecommendations = adaptiveRIRRecommendations;
+        window.detectTrainingPlateaus = detectTrainingPlateaus;
+        window.selectOptimalExercises = selectOptimalExercises;
+        window.generateWeeklyProgram = generateWeeklyProgram;
+        window.liveMonitor = liveMonitor;
+        window.advancedIntelligence = advancedIntelligence;
+
+        // Initialize system
+        console.log('🚀 Advanced Training Intelligence System Loading...');
+        
+        // Set up live monitor event handlers
+        liveMonitor.on('sessionStarted', (data) => {
+            document.getElementById('liveMonitor').style.display = 'block';
+            updateLiveDisplay(data);
+        });
+
+        liveMonitor.on('setCompleted', (data) => {
+            updateLiveDisplay(data);
+            showSetFeedback(data);
+        });
+
+        liveMonitor.on('sessionEnded', (data) => {
+            document.getElementById('liveMonitor').style.display = 'none';
+            showSessionSummary(data);
+        });
+
+        function updateLiveDisplay(data) {
+            if (data.sessionProgress) {
+                document.getElementById('currentSet').textContent = data.sessionProgress.completedSets;
+                document.getElementById('sessionProgress').textContent = Math.round(data.sessionProgress.progressPercentage) + '%';
+                document.getElementById('totalLoad').textContent = data.sessionProgress.totalLoad;
+            }
+            if (data.setInfo) {
+                document.getElementById('currentRIR').textContent = data.setInfo.rir;
+            }
+        }
+
+        function showSetFeedback(data) {
+            const output = document.getElementById('liveResults');
+            output.style.display = 'block';
+            output.className = `result-panel ${data.feedback.type}`;
+            
+            let html = `<strong>Set ${data.setInfo.setNumber} Feedback:</strong><br>`;
+            html += `${data.feedback.message}<br><br>`;
+            
+            if (data.nextSetRecommendations.rationale.length > 0) {
+                html += `<strong>Next Set Recommendations:</strong><br>`;
+                html += `Weight: ${data.nextSetRecommendations.weight}kg<br>`;
+                html += `Rest: ${data.nextSetRecommendations.rest}<br>`;
+                html += `Strategy: ${data.nextSetRecommendations.strategy}<br>`;
+                html += `Rationale: ${data.nextSetRecommendations.rationale.join(', ')}<br>`;
+            }
+            
+            output.innerHTML = html;
+        }
+
+        function showSessionSummary(data) {
+            const output = document.getElementById('liveResults');
+            output.className = 'result-panel success';
+            
+            let html = `<strong>🎯 Session Complete!</strong><br><br>`;
+            html += `<strong>Performance Grade:</strong> ${data.performance.targetAchievement.grade}<br>`;
+            html += `<strong>Consistency Rating:</strong> ${data.performance.consistency.rating}<br>`;
+            html += `<strong>Total Load:</strong> ${data.progress.totalLoad}<br>`;
+            html += `<strong>Duration:</strong> ${data.progress.duration} minutes<br><br>`;
+            
+            if (data.recommendations.length > 0) {
+                html += `<strong>Recommendations:</strong><br>`;
+                data.recommendations.forEach(rec => {
+                    html += `• ${rec.message}<br>`;
+                });
+            }
+            
+            output.innerHTML = html;
+        }
+
+        console.log('✅ Advanced Training Intelligence System Ready!');
+    </script>
+
+    <script>
+        // Analytics Testing Functions
+        function testVolumeOptimization() {
+            const output = document.getElementById('analyticsResults');
+            output.style.display = 'block';
+            output.className = 'result-panel';
+            output.innerHTML = '<div class="loading"></div> Analyzing historical data for volume optimization...';
+            
+            setTimeout(() => {
+                // Simulate historical data
+                const mockHistoricalData = [
+                    { sets: 8, avgStimulus: 7, avgFatigue: 2, performanceChange: 1 },
+                    { sets: 10, avgStimulus: 8, avgFatigue: 3, performanceChange: 1 },
+                    { sets: 12, avgStimulus: 8, avgFatigue: 4, performanceChange: 0 },
+                    { sets: 14, avgStimulus: 7, avgFatigue: 6, performanceChange: -1 },
+                    { sets: 16, avgStimulus: 6, avgFatigue: 8, performanceChange: -1 }
+                ];
+                
+                const optimized = optimizeVolumeLandmarks('chest', mockHistoricalData);
+                
+                let html = '<strong>📊 Volume Landmark Optimization Results:</strong><br><br>';
+                html += `<strong>Current Landmarks:</strong><br>`;
+                html += `MEV: ${trainingState.volumeLandmarks.chest.MEV} sets<br>`;
+                html += `MAV: ${trainingState.volumeLandmarks.chest.MAV} sets<br>`;
+                html += `MRV: ${trainingState.volumeLandmarks.chest.MRV} sets<br><br>`;
+                
+                html += `<strong>🎯 Optimized Landmarks:</strong><br>`;
+                html += `MEV: ${optimized.MEV} sets (${optimized.MEV - trainingState.volumeLandmarks.chest.MEV > 0 ? '+' : ''}${optimized.MEV - trainingState.volumeLandmarks.chest.MEV})<br>`;
+                html += `MAV: ${optimized.MAV} sets (${optimized.MAV - trainingState.volumeLandmarks.chest.MAV > 0 ? '+' : ''}${optimized.MAV - trainingState.volumeLandmarks.chest.MAV})<br>`;
+                html += `MRV: ${optimized.MRV} sets (${optimized.MRV - trainingState.volumeLandmarks.chest.MRV > 0 ? '+' : ''}${optimized.MRV - trainingState.volumeLandmarks.chest.MRV})<br><br>`;
+                
+                html += `<strong>Confidence:</strong> ${optimized.confidence}%<br>`;
+                html += `<strong>Last Optimized:</strong> ${new Date(optimized.lastOptimized).toLocaleString()}<br>`;
+                
+                output.className = 'result-panel success';
+                output.innerHTML = html;
+            }, 2000);
+        }
+        
+        function testDeloadPrediction() {
+            const output = document.getElementById('analyticsResults');
+            output.style.display = 'block';
+            output.className = 'result-panel';
+            output.innerHTML = '<div class="loading"></div> Analyzing fatigue patterns and performance trends...';
+            
+            setTimeout(() => {
+                // Mock current metrics
+                const mockMetrics = {
+                    weeklyFatigueScore: [3, 4, 6, 7],
+                    performanceTrend: [85, 82, 78, 75],
+                    volumeProgression: [40, 44, 48, 52],
+                    motivationLevel: 6,
+                    sleepQuality: 7
+                };
+                
+                const prediction = predictDeloadTiming(mockMetrics);
+                
+                let html = '<strong>🔮 Deload Prediction Analysis:</strong><br><br>';
+                html += `<strong>Weeks Until Deload:</strong> ${prediction.weeksUntilDeload}<br>`;
+                html += `<strong>Confidence:</strong> ${prediction.confidence}%<br>`;
+                html += `<strong>Primary Indicator:</strong> ${prediction.primaryIndicator}<br>`;
+                html += `<strong>Recommended Action:</strong> ${prediction.recommendedAction}<br><br>`;
+                
+                html += `<strong>📈 Fatigue Projection:</strong><br>`;
+                html += `Slope: ${prediction.fatigueProjection.slope.toFixed(2)} points/week<br>`;
+                html += `Current Level: ${prediction.fatigueProjection.intercept.toFixed(1)} points<br><br>`;
+                
+                html += `<strong>📉 Performance Projection:</strong><br>`;
+                html += `Slope: ${prediction.performanceProjection.slope.toFixed(2)}%/week<br>`;
+                html += `Current Level: ${prediction.performanceProjection.intercept.toFixed(1)}%<br>`;
+                
+                const urgency = prediction.weeksUntilDeload <= 2 ? 'warning' : 'success';
+                output.className = `result-panel ${urgency}`;
+                output.innerHTML = html;
+            }, 2500);
+        }
+        
+        function testPlateauDetection() {
+            const output = document.getElementById('analyticsResults');
+            output.style.display = 'block';
+            output.className = 'result-panel';
+            output.innerHTML = '<div class="loading"></div> Analyzing training plateaus and stagnation patterns...';
+            
+            setTimeout(() => {
+                // Mock training data showing plateau
+                const mockTrainingData = {
+                    weeklyPerformance: [85, 84, 83, 83, 82, 82],
+                    weeklyVolume: [45, 47, 48, 48, 48, 48],
+                    weeklyIntensity: [7, 7.5, 8, 8, 8, 8],
+                    weeklyFatigue: [3, 4, 5, 6, 7, 8]
+                };
+                
+                const plateauAnalysis = detectTrainingPlateaus(mockTrainingData);
+                
+                let html = '<strong>📈 Plateau Detection Results:</strong><br><br>';
+                
+                if (plateauAnalysis.plateauDetected) {
+                    html += `<strong>🚨 Plateau Detected:</strong> ${plateauAnalysis.plateauType}<br>`;
+                    html += `<strong>Urgency Level:</strong> ${plateauAnalysis.urgency}<br><br>`;
+                    
+                    html += `<strong>📊 Analysis Details:</strong><br>`;
+                    html += `Performance Stagnant: ${plateauAnalysis.analysisDetails.performanceStagnant ? 'Yes' : 'No'}<br>`;
+                    html += `Volume Stagnant: ${plateauAnalysis.analysisDetails.volumeStagnant ? 'Yes' : 'No'}<br>`;
+                    html += `Fatigue Accumulating: ${plateauAnalysis.analysisDetails.fatigueAccumulating ? 'Yes' : 'No'}<br><br>`;
+                    
+                    html += `<strong>💡 Recommended Interventions:</strong><br>`;
+                    plateauAnalysis.interventions.forEach(intervention => {
+                        html += `• ${intervention}<br>`;
+                    });
+                    
+                    output.className = 'result-panel warning';
+                } else {
+                    html += `<strong>✅ No Plateau Detected</strong><br>`;
+                    html += `Training progression appears healthy.<br><br>`;
+                    html += `Continue current program with monitoring.`;
+                    output.className = 'result-panel success';
+                }
+                
+                output.innerHTML = html;
+            }, 2000);
+        }
+        
+        // Exercise Selection Testing
+        function testExerciseSelection() {
+            const output = document.getElementById('exerciseResults');
+            output.style.display = 'block';
+            output.className = 'result-panel';
+            output.innerHTML = '<div class="loading"></div> Analyzing optimal exercises for current training state...';
+            
+            setTimeout(() => {
+                const exercises = selectOptimalExercises('chest', {
+                    availableEquipment: ['barbell', 'dumbbells', 'cables'],
+                    trainingGoal: 'hypertrophy',
+                    experienceLevel: 'intermediate',
+                    fatigueLevel: 5,
+                    timeConstraint: 'moderate',
+                    preferredStyle: 'balanced'
+                });
+                
+                let html = '<strong>🏋️ Optimal Exercise Recommendations for Chest:</strong><br><br>';
+                
+                exercises.forEach((exercise, index) => {
+                    html += `<strong>${index + 1}. ${exercise.name}</strong> (Score: ${exercise.score})<br>`;
+                    html += `Sets: ${exercise.sets}, Reps: ${exercise.repRange[0]}-${exercise.repRange[1]}, Rest: ${exercise.rest}<br>`;
+                    html += `Reasoning: ${exercise.reasoning.join(', ')}<br><br>`;
+                });
+                
+                output.className = 'result-panel success';
+                output.innerHTML = html;
+            }, 1500);
+        }
+        
+        function testProgramGeneration() {
+            const output = document.getElementById('exerciseResults');
+            output.style.display = 'block';
+            output.className = 'result-panel';
+            output.innerHTML = '<div class="loading"></div> Generating intelligent weekly program...';
+            
+            setTimeout(() => {
+                const program = generateWeeklyProgram({
+                    daysPerWeek: 4,
+                    splitType: 'upper_lower',
+                    experienceLevel: 'intermediate',
+                    timePerSession: 60
+                });
+                
+                let html = '<strong>📋 Generated Weekly Program:</strong><br><br>';
+                html += `<strong>Split Type:</strong> ${program.splitType}<br>`;
+                html += `<strong>Days Per Week:</strong> ${program.daysPerWeek}<br><br>`;
+                
+                program.sessions.forEach(session => {
+                    html += `<strong>Day ${session.day}: ${session.name}</strong><br>`;
+                    session.exercises.forEach(exercise => {
+                        html += `• ${exercise.exercise} - ${exercise.sets} sets x ${exercise.reps[0]}-${exercise.reps[1]} reps<br>`;
+                    });
+                    html += '<br>';
+                });
+                
+                output.className = 'result-panel success';
+                output.innerHTML = html;
+            }, 2000);
+        }
+        
+        // Live Monitoring Functions
+        let sessionActive = false;
+        let currentSetNumber = 0;
+        
+        function startLiveSession() {
+            const output = document.getElementById('liveResults');
+            output.style.display = 'block';
+            output.className = 'result-panel success';
+            
+            const result = liveMonitor.startSession({
+                muscle: 'chest',
+                exercise: 'Barbell Bench Press',
+                plannedSets: 3,
+                targetRIR: 2
+            });
+            
+            sessionActive = true;
+            currentSetNumber = 0;
+            
+            output.innerHTML = `<strong>🎮 Live Session Started!</strong><br>${result.message}<br><br>Target RIR: 2<br>Planned Sets: 3`;
+        }
+        
+        function simulateTrainingSet() {
+            if (!sessionActive) {
+                alert('Please start a session first!');
+                return;
+            }
+            
+            currentSetNumber++;
+            
+            // Simulate realistic set data
+            const setData = {
+                weight: 80 + (Math.random() * 10 - 5), // 75-85kg range
+                reps: 8 + Math.floor(Math.random() * 3), // 8-10 reps
+                rir: 1.5 + (Math.random() * 1), // 1.5-2.5 RIR
+                rpe: null,
+                techniqueRating: 7 + Math.floor(Math.random() * 3), // 7-9 rating
+                notes: `Set ${currentSetNumber} - simulated`
+            };
+            
+            const result = liveMonitor.logSet(setData);
+            
+            // Result is automatically displayed via event handler
+        }
+        
+        function endLiveSession() {
+            if (!sessionActive) {
+                alert('No active session to end!');
+                return;
+            }
+            
+            const summary = liveMonitor.endSession();
+            sessionActive = false;
+            currentSetNumber = 0;
+            
+            // Summary is automatically displayed via event handler
+        }
+        
+        // Intelligence Hub Functions
+        function initializeIntelligence() {
+            const output = document.getElementById('intelligenceResults');
+            output.style.display = 'block';
+            output.className = 'result-panel';
+            output.innerHTML = '<div class="loading"></div> Initializing Advanced Training Intelligence...';
+            
+            setTimeout(() => {
+                const result = advancedIntelligence.initialize();
+                
+                let html = '<strong>🧠 Intelligence System Initialized!</strong><br><br>';
+                html += `<strong>Analytics:</strong> ${result.analytics ? '✅ Enabled' : '❌ Disabled (need more data)'}<br>`;
+                html += `<strong>Exercise Selection:</strong> ${result.exerciseSelection ? '✅ Enabled' : '❌ Disabled'}<br>`;
+                html += `<strong>Live Monitoring:</strong> ${result.liveMonitoring ? '✅ Enabled' : '❌ Disabled'}<br><br>`;
+                html += `<strong>Status:</strong> ${result.message}`;
+                
+                // Update status indicators
+                document.getElementById('analyticsStatus').textContent = result.analytics ? '✅' : '❌';
+                
+                output.className = 'result-panel success';
+                output.innerHTML = html;
+            }, 1500);
+        }
+        
+        function getWeeklyIntelligence() {
+            const output = document.getElementById('intelligenceResults');
+            output.style.display = 'block';
+            output.className = 'result-panel';
+            output.innerHTML = '<div class="loading"></div> Generating weekly intelligence report...';
+            
+            setTimeout(() => {
+                const intelligence = advancedIntelligence.getWeeklyIntelligence();
+                
+                let html = '<strong>📈 Weekly Intelligence Report</strong><br><br>';
+                html += `<strong>Week:</strong> ${intelligence.week}, Block: ${intelligence.block}<br><br>`;
+                
+                if (intelligence.recommendations.length > 0) {
+                    html += '<strong>🎯 Recommendations:</strong><br>';
+                    intelligence.recommendations.forEach(rec => {
+                        html += `• [${rec.urgency.toUpperCase()}] ${rec.message}<br>`;
+                    });
+                    html += '<br>';
+                }
+                
+                if (intelligence.optimizations.length > 0) {
+                    html += '<strong>🔧 Available Optimizations:</strong><br>';
+                    intelligence.optimizations.forEach(opt => {
+                        html += `• ${opt.type}: ${opt.recommendation || opt.muscle}<br>`;
+                    });
+                    html += '<br>';
+                }
+                
+                if (intelligence.riskAssessment) {
+                    html += `<strong>⚠️ Risk Level:</strong> ${intelligence.riskAssessment.riskLevel.toUpperCase()}<br>`;
+                    html += `<strong>Risk Score:</strong> ${intelligence.riskAssessment.riskScore}/100<br>`;
+                }
+                
+                // Show in intelligence panel
+                document.getElementById('intelligencePanel').style.display = 'block';
+                document.getElementById('intelligenceContent').innerHTML = `
+                    <div class="recommendation">
+                        <strong>📊 Current Assessment</strong><br>
+                        Week ${intelligence.week} analysis shows ${intelligence.recommendations.length} active recommendations
+                        and ${intelligence.optimizations.length} optimization opportunities.
+                    </div>
+                `;
+                
+                output.className = 'result-panel success';
+                output.innerHTML = html;
+            }, 2000);
+        }
+        
+        function assessTrainingRisk() {
+            const output = document.getElementById('intelligenceResults');
+            output.style.display = 'block';
+            output.className = 'result-panel';
+            output.innerHTML = '<div class="loading"></div> Assessing training risk factors...';
+            
+            setTimeout(() => {
+                // Mock risk assessment
+                const riskAssessment = {
+                    riskScore: 35,
+                    riskLevel: 'moderate',
+                    riskFactors: [
+                        '2 muscles showing high fatigue',
+                        'Rapid volume progression detected'
+                    ],
+                    recommendations: [
+                        'Monitor fatigue indicators closely',
+                        'Ensure adequate recovery between sessions'
+                    ]
+                };
+                
+                let html = '<strong>⚠️ Training Risk Assessment</strong><br><br>';
+                html += `<strong>Risk Score:</strong> ${riskAssessment.riskScore}/100<br>`;
+                html += `<strong>Risk Level:</strong> ${riskAssessment.riskLevel.toUpperCase()}<br><br>`;
+                
+                if (riskAssessment.riskFactors.length > 0) {
+                    html += '<strong>🔍 Risk Factors:</strong><br>';
+                    riskAssessment.riskFactors.forEach(factor => {
+                        html += `• ${factor}<br>`;
+                    });
+                    html += '<br>';
+                }
+                
+                if (riskAssessment.recommendations.length > 0) {
+                    html += '<strong>💡 Recommendations:</strong><br>';
+                    riskAssessment.recommendations.forEach(rec => {
+                        html += `• ${rec}<br>`;
+                    });
+                }
+                
+                const urgency = riskAssessment.riskLevel === 'high' || riskAssessment.riskLevel === 'critical' ? 'warning' : 'success';
+                output.className = `result-panel ${urgency}`;
+                output.innerHTML = html;
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
