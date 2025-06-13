@@ -1,11 +1,12 @@
 {
   "name": "powerhouse-rp-toolkit",
   "version": "1.0.0",
-  "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",
-  "scripts": {
+  "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",  "scripts": {
     "start": "node server.js",
     "build": "parcel build index.html --dist-dir docs --public-url ./ --no-scope-hoist && xcopy \"partials\" \"docs\\partials\" /E /I /Y",
-    "deploy": "npm run build && git add docs && git commit -m \"deploy\" && git push"
+    "deploy": "npm run build && git add docs && git commit -m \"deploy\" && git push",
+    "lint": "eslint \"js/**\"",
+    "format": "prettier -w \"**/*.{js,html,css}\""
   },
   "keywords": [
     "fitness",
