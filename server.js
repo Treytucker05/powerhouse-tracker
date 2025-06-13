@@ -2,11 +2,11 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 const mimeTypes = {
   '.html': 'text/html',
-  '.js': 'text/javascript',
+  '.js': 'application/javascript',
   '.css': 'text/css',
   '.json': 'application/json',
   '.png': 'image/png',
@@ -17,9 +17,13 @@ const mimeTypes = {
 };
 
 const server = http.createServer((req, res) => {
-  let filePath = '.' + req.url;
-  if (filePath === './') {
-    filePath = './index.html';
+  let filePath = path.join(__dirname, req.url);
+  if (req.url === '/' || req.url === '') {
+    filePath = path.join(__dirname, 'index.html');
+  }
+  if (!filePath.startsWith(__dirname)) {
+    res.writeHead(400);
+    return res.end('Bad Request');
   }
 
   const extname = String(path.extname(filePath)).toLowerCase();
