@@ -46,16 +46,13 @@ class TrainingState {  constructor(opts = {}) {
     
     // Initialize current week sets at MEV and baseline strength
     Object.keys(this.volumeLandmarks).forEach(muscle => {
-      this.currentWeekSets[muscle] = this.volumeLandmarks[muscle].MEV;
-      this.lastWeekSets[muscle] = this.volumeLandmarks[muscle].MEV;
+      this.currentWeekSets[muscle] = this.volumeLandmarks[muscle].MEV;      this.lastWeekSets[muscle] = this.volumeLandmarks[muscle].MEV;
       this.baselineStrength[muscle] = 100; // Default baseline load (kg)
-    });    // Performance tracking for deload detection
+    });
+    
+    // Performance tracking for deload detection
     this.consecutiveMRVWeeks = 0;
     
-    // Feature flags and settings
-    this.settings = {
-      enableAdvancedDashboard: false
-    };
     this.recoverySessionsThisWeek = 0;
     this.totalMusclesNeedingRecovery = 0;
 
