@@ -104,7 +104,11 @@ targetRIR = 4.5 - ((4.0) / (mesoLength - 1)) * (week - 1)
 ## 🚀 Getting Started
 
 1. **Open `index.html`** in a modern browser
-2. **Create a `.env` file** based on `.env.example` and add your `SUPABASE_URL` and `SUPABASE_ANON_KEY`.
+2. **Create a `.env` file** based on `.env.example` and add your `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+   ```
+   VITE_SUPABASE_URL=https://your-project.supabase.co
+   VITE_SUPABASE_ANON_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxx
+   ```
 3. **Run `npm run build`** so Parcel injects your Supabase credentials into the bundle.
 4. **Set Volume Landmarks**: Configure MV/MEV/MAV/MRV for each muscle
 5. **Daily Use**: Submit set feedback after each exercise
