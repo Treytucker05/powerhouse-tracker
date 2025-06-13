@@ -1,11 +1,4 @@
-// Try bare import (works when bundled); fall back to CDN for direct load
-let createClient;
-try {
-  ({ createClient } = await import('@supabase/supabase-js'));
-} catch {
-  console.warn('Falling back to CDN for Supabase');
-  ({ createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'));
-}
+import { createClient } from '@supabase/supabase-js';
 
 const supa = createClient(
   'https://cqjzvbvmpcqohjarcydg.supabase.co',

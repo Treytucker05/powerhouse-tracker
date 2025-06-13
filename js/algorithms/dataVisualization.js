@@ -710,3 +710,6 @@ export {
 
 // Create singleton instance
 export const dataVisualizer = new AdvancedDataVisualizer();
+
+// Add default export for the class
+export default AdvancedDataVisualizer;

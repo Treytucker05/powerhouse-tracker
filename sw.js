@@ -103,11 +103,18 @@ self.addEventListener('activate', event => {
   );
 });
 
+// Check if a request is cacheable (same-origin + http/https)
+const isCacheableRequest = req =>
+  req.url.startsWith(self.location.origin) &&       // same-origin
+  (req.url.startsWith('http://') || req.url.startsWith('https://'));
+
 // Fetch event - serve cached content or fetch from network
 self.addEventListener('fetch', event => {
   const { request } = event;
-  const url = new URL(request.url);
-  
+
+  // ➜ Skip EVERYTHING that isn't http/https & same-origin
+  if (!isCacheableRequest(request)) return;  // Let the network handle it
+
   // Handle different types of requests
   if (request.method === 'GET') {
     if (isStaticFile(request.url)) {
@@ -125,6 +132,12 @@ self.addEventListener('fetch', event => {
 // Cache first strategy - for static files
 async function cacheFirst(request) {
   try {
+    // isCacheableRequest has already filtered at the fetch listener level,
+    // but we keep a guard just in case this function is called directly
+    if (!isCacheableRequest(request)) {
+      return fetch(request);
+    }
+    
     const cachedResponse = await caches.match(request);
     if (cachedResponse) {
       return cachedResponse;
@@ -132,8 +145,12 @@ async function cacheFirst(request) {
     
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
-      const cache = await caches.open(STATIC_CACHE);
-      cache.put(request, networkResponse.clone());
+      try {
+        const cache = await caches.open(STATIC_CACHE);
+        await cache.put(request, networkResponse.clone());
+      } catch (err) {
+        console.warn('SW cache put failed:', err.message);
+      }
     }
     
     return networkResponse;
@@ -146,10 +163,15 @@ async function cacheFirst(request) {
 // Network first strategy - for dynamic content
 async function networkFirst(request) {
   try {
+    // isCacheableRequest already checked at fetch listener
     const networkResponse = await fetch(request);
     if (networkResponse.ok) {
-      const cache = await caches.open(DYNAMIC_CACHE);
-      cache.put(request, networkResponse.clone());
+      try {
+        const cache = await caches.open(DYNAMIC_CACHE);
+        await cache.put(request, networkResponse.clone());
+      } catch (err) {
+        console.warn('SW dynamic cache put failed:', err.message);
+      }
     }
     return networkResponse;
   } catch (error) {
@@ -161,12 +183,17 @@ async function networkFirst(request) {
 
 // Stale while revalidate - for general content
 async function staleWhileRevalidate(request) {
+  // isCacheableRequest already checked at fetch listener
   const cache = await caches.open(DYNAMIC_CACHE);
   const cachedResponse = await cache.match(request);
   
   const fetchPromise = fetch(request).then(networkResponse => {
     if (networkResponse.ok) {
-      cache.put(request, networkResponse.clone());
+      try {
+        cache.put(request, networkResponse.clone());
+      } catch (err) {
+        console.warn('SW stale-while-revalidate cache put failed:', err.message);
+      }
     }
     return networkResponse;
   }).catch(error => {
@@ -179,11 +206,13 @@ async function staleWhileRevalidate(request) {
 
 // Handle analytics requests (can work offline)
 async function handleAnalyticsRequest(request) {
+  // isCacheableRequest already checked at fetch listener
+  const url = new URL(request.url);
+  
   try {
     return await fetch(request);
   } catch (error) {
     // Store analytics data locally when offline
-    const url = new URL(request.url);
     const analyticsData = {
       url: url.pathname,
       timestamp: Date.now(),
