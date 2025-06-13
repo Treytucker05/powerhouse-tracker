@@ -1145,6 +1145,7 @@ button.small {
   max-width: 480px;        /* comfortable line length */
   padding-left: 1.4rem;    /* slight indent for numbers */
   list-style-position: inside;
+  text-align: left;        /* align numbers with text */
 }
 
 /* --- End of Styles --- */
