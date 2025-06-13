@@ -1,11 +1,11 @@
 {
   "name": "powerhouse-rp-toolkit",
   "version": "1.0.0",
-  "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",
-  "scripts": {
+  "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",  "scripts": {
     "dev":    "parcel index.html --port 1234 --no-cache --open",
     "lint":   "eslint \"js/**\"",
-    "format": "prettier -w \"**/*.{js,html,css}\""
+    "format": "prettier -w \"**/*.{js,html,css}\"",
+    "test":   "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "keywords": [
     "fitness",
@@ -14,12 +14,12 @@
     "workout"
   ],
   "author": "PowerHouseATX",
-  "license": "MIT",
-  "devDependencies": {
+  "license": "MIT",  "devDependencies": {
     "@parcel/packager-raw-url": "^2.15.2",
     "@parcel/transformer-webmanifest": "^2.15.2",
     "buffer": "^6.0.3",
     "eslint": "^8.57.1",
+    "jest": "^30.0.0",
     "parcel": "^2.15.2",
     "prettier": "^3.5.3"
   },
