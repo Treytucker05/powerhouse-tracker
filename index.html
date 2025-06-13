@@ -9,11 +9,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#667eea">
 <meta name="description" content="Advanced AI-powered training intelligence system for optimal workout programming and progression">
-
-<!-- Preload critical resources -->
-<link rel="preload" href="js/core/trainingState.js" as="script">
-<link rel="preload" href="js/algorithms/volume.js" as="script">
-<link rel="preload" href="css/enhancedAdvanced.css" as="style">
+<link rel="icon" href="/assets/favicon.ico" />
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="stylesheet" href="css/enhancedAdvanced.css">
@@ -1160,10 +1156,9 @@ button.small {
 
 /* --- End of Styles --- */
 </style>
-</head>
-<body>
 
-<div class="container">  <header class="header-section">
+<div class="container">
+  <header class="header-section">
     <h1>PowerHouseATX</h1>
     <div class="page-title">Workout Calculator</div>
     <p class="subtitle">Evidence-Based Muscle Building</p>
@@ -1178,9 +1173,8 @@ button.small {
           <li><strong>Log a workout</strong> → use "Set Feedback" after each exercise</li>
           <li><strong>End of week</strong> → tick "Last workout" & review Weekly analysis</li>
           <li><strong>Start next week</strong> → follow the new RIR target</li>
-        </ol>
-        <div class="quick-start-actions">
-          <button class="quick-start-btn" onclick="dismissQuickStart()">Got it, hide this guide</button>
+        </ol>        <div class="quick-start-actions">
+          <button class="quick-start-btn" onclick="document.getElementById('quickStartGuide').style.display = 'none'; return false;" style="cursor: pointer; font-weight: bold;">GOT IT, HIDE THIS GUIDE</button>
           <label class="quick-start-checkbox">
             <input type="checkbox" id="dontShowQuickStart"> Don't show again
           </label>
@@ -1262,7 +1256,7 @@ button.small {
         </div>
 
         <div class="input-group">
-          <label>Stimulus Quality (RP Table 2.2):</label>
+          <label>Workload (RP Table 2.2):</label>
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
             <div>
               <label for="mmc" style="font-size: 0.8rem;">Mind-Muscle (0-3):</label>
@@ -1272,12 +1266,11 @@ button.small {
               <label for="pump" style="font-size: 0.8rem;">Pump (0-3):</label>
               <input type="number" id="pump" min="0" max="3" value="2">
             </div>
-            <div>
-              <label for="dis" style="font-size: 0.8rem;">Disruption (0-3):</label>
+            <div>              <label for="dis" style="font-size: 0.8rem;">Workload (0-3):</label>
               <input type="number" id="dis" min="0" max="3" value="2">
             </div>
           </div>
-          <div class="helper-text">Rate the quality of your last exercise (0=poor, 3=excellent)</div>
+          <div class="helper-text">Rate your workout quality factors (0=poor, 3=excellent)</div>
         </div>
 
         <div class="input-group">
@@ -2090,10 +2083,59 @@ document.addEventListener('change', function(e) {
 
 </script>
 
-<script type="module" src="js/ui/globals.js"></script>
-<script type="module" src="js/ui/enhancedAdvancedUI.js"></script>
+<!-- Login Modal -->
+<div id="authModal" class="modal hidden">
+  <div class="modal-content">
+    <h2>Login / Sign-up</h2>    <form id="authForm" onsubmit="event.preventDefault(); handleSignIn();">
+      <input id="authEmail" type="email" placeholder="Email" autocomplete="email">
+      <input id="authPass" type="password" placeholder="Password" autocomplete="current-password">
+      <button type="submit" id="btnLogin">LOGIN</button>
+      <button type="button" id="btnSignUp" onclick="handleSignUp()">SIGN UP</button>
+    </form>
+  </div>
+</div>
+<style>
+#authModal{
+  position:fixed;
+  inset:0;
+  background:#000a;        /* semi-transparent backdrop */
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:10000;           /* keep it above everything */
+}
+
+#authModal.hidden{display:none;}
+
+.modal-content{background:#222;padding:2rem;border-radius:8px;width:300px}
+
+#authForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#authForm input, #authForm button {
+  margin-bottom: 10px;
+}
+.modal-content input, .modal-content button{width:100%;margin:6px 0;padding:8px}
+</style>
+
+<!-- Initialize auth modal on page load -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Initially show the auth modal until we know user is authenticated
+  document.getElementById('authModal').classList.remove('hidden');
+  // Auth state will be handled by onAuth in globals.js
+});
+</script>
+
+<!-- then scripts -->
+<!-- <script type="module" src="js/ui/enhancedAdvancedUI.js"></script> -->
+<!-- <script type="module" src="js/algorithms/dataVisualization.js"></script> -->
 
 <!-- Initialize Enhanced Advanced Features -->
+<!-- 
 <script type="module">
 import { enhancedUI } from './js/ui/enhancedAdvancedUI.js';
 import { dataVisualizer } from './js/algorithms/dataVisualization.js';
@@ -2141,6 +2183,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('💾 Data export system ready');
   }
 });
+-->
 </script>
 
 <!-- Auto-resize: post height every 500 ms -->
@@ -2154,6 +2197,15 @@ document.addEventListener('DOMContentLoaded', () => {
   setInterval(postHeight, 500);   // heartbeat
 })();
 </script>
+
+<script>
+// Ensure hideGuide function is directly available
+function hideGuide() {
+  document.getElementById('quickStartGuide').style.display = 'none';
+}
+</script>
+
+<script type="module" src="js/ui/globals.js"></script>
 
 </body>
 </html>

@@ -3,11 +3,16 @@
  * Manages all training state including volume landmarks, meso progression, and deload logic
  */
 
-class TrainingState {
-  constructor() {
+class TrainingState {  constructor(opts = {}) {
     if (TrainingState.instance) {
       return TrainingState.instance;
     }
+
+    // Settings and feature flags
+    this.settings = {
+      enableAdvancedDashboard: false,
+      ...opts.settings
+    };
 
     // Core RP Volume Landmarks (defaults from RP literature)
     this.volumeLandmarks = {
@@ -44,10 +49,13 @@ class TrainingState {
       this.currentWeekSets[muscle] = this.volumeLandmarks[muscle].MEV;
       this.lastWeekSets[muscle] = this.volumeLandmarks[muscle].MEV;
       this.baselineStrength[muscle] = 100; // Default baseline load (kg)
-    });
-
-    // Performance tracking for deload detection
+    });    // Performance tracking for deload detection
     this.consecutiveMRVWeeks = 0;
+    
+    // Feature flags and settings
+    this.settings = {
+      enableAdvancedDashboard: false
+    };
     this.recoverySessionsThisWeek = 0;
     this.totalMusclesNeedingRecovery = 0;
 
@@ -343,6 +351,15 @@ class TrainingState {
 
 // Export singleton instance
 const trainingState = new TrainingState();
+// Initialize advanced features conditionally
+if (trainingState.settings.enableAdvancedDashboard) {
+  import('../ui/dataVisualization.js')
+    .then(({ default: AdvancedDataVisualizer }) => {
+      trainingState.dataVisualizer = new AdvancedDataVisualizer();
+      console.log('Advanced dashboard initialized');
+    })
+    .catch(err => console.error('Dashboard init failed:', err));
+}
 export default trainingState;
 
 // Also make available globally for legacy compatibility
