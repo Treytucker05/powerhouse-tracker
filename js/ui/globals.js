@@ -1,3 +1,5 @@
+console.log('globals.js loaded');
+
 /*  Maps module functions onto window so legacy inline onclick="" handlers keep working */
 
 import { 
@@ -42,6 +44,12 @@ import trainingState from '../core/trainingState.js';
 
 /* ----- expose key objects ----- */
 window.trainingState = trainingState;
+
+/* ----- UI utility functions ----- */
+function hideGuide() {
+  document.getElementById('quickStartGuide').style.display = 'none';
+}
+window.hideGuide = hideGuide;
 
 /* ----- expose chart functions ----- */
 window.updateChart = updateChart;
@@ -161,29 +169,25 @@ window.userFeedbackManager = userFeedbackManager;
 window.performanceManager = performanceManager;
 
 /* ----- main UI handlers for buttons ----- */
-window.submitFeedback = function() {
-  const muscle = document.getElementById('muscleSelect').value;
+window.submitFeedback = function() {  const muscle = document.getElementById('muscleSelect').value;
   const mmc = parseInt(document.getElementById('mmc').value, 10);
   const pump = parseInt(document.getElementById('pump').value, 10);
-  const disruption = parseInt(document.getElementById('dis').value, 10);
+  const workload = parseInt(document.getElementById('dis').value, 10);
   const soreness = parseInt(document.getElementById('sore').value, 10);
   const actualRIR = document.getElementById('actualRIR').value;
   
   const perfRadio = document.querySelector('input[name="perf"]:checked');
   const performance = perfRadio ? parseInt(perfRadio.value, 10) : 2;
-  
-  // Validate inputs
-  if (!muscle || isNaN(mmc) || isNaN(pump) || isNaN(disruption)) {
+    // Validate inputs
+  if (!muscle || isNaN(mmc) || isNaN(pump) || isNaN(workload)) {
     alert('Please fill in all required fields');
     return;
   }
-  
-  // Process with RP algorithms
-  const stimulusResult = scoreStimulus({ mmc, pump, disruption });
+    // Process with RP algorithms
+  const stimulusResult = scoreStimulus({ mmc, pump, disruption: workload });
   const progressionResult = setProgressionAlgorithm(soreness, performance);
-  
-  const volumeProgression = getVolumeProgression(muscle, {
-    stimulus: { mmc, pump, disruption },
+    const volumeProgression = getVolumeProgression(muscle, {
+    stimulus: { mmc, pump, disruption: workload },
     soreness,
     performance,
     hasIllness: false
@@ -489,9 +493,8 @@ window.runAutoVolumeProgression = function() {
       perf,
       jointAche,
       perfChange,
-      lastLoad,
-      pump: Math.floor(stimulus / 3), // Derive pump from stimulus
-      disruption: Math.floor(stimulus / 3), // Derive disruption from stimulus
+      lastLoad,      pump: Math.floor(stimulus / 3), // Derive pump from stimulus
+      disruption: Math.floor(stimulus / 3), // Derive workload from stimulus
       recoverySession: soreness >= 3 || (volumeStatus === 'maximum' && Math.random() < 0.3)
     };
   });
@@ -1213,60 +1216,47 @@ window.getUserAnalytics = function() {
   }
   
   const output = document.getElementById('analyticsResults') || createSystemOutput('analyticsResults');
-  output.innerHTML = html;
-  output.className = 'result active';
+  output.innerHTML = html;  output.className = 'result active';
 };
 
-// System utility functions
-function showSystemMessage(message, type = 'info') {
-  const existingMessage = document.querySelector('.system-message');
-  if (existingMessage) {
-    existingMessage.remove();
-  }
-  
-  const messageEl = document.createElement('div');
-  messageEl.className = `system-message ${type}`;
-  messageEl.style.cssText = `
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 15px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    z-index: 1000;
-    max-width: 400px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    ${type === 'success' ? 'background: #d1fae5; color: #065f46; border: 1px solid #10b981;' : ''}
-    ${type === 'error' ? 'background: #fee2e2; color: #991b1b; border: 1px solid #ef4444;' : ''}
-    ${type === 'info' ? 'background: #dbeafe; color: #1e40af; border: 1px solid #3b82f6;' : ''}
-  `;
-  messageEl.textContent = message;
-  
-  document.body.appendChild(messageEl);
-  
-  setTimeout(() => messageEl.remove(), 5000);
-}
+// Authentication handlers
+import { signIn, signUp, onAuth, supa } from '../core/db.js';
 
-function createSystemOutput(id) {
-  let output = document.getElementById(id);
-  if (!output) {
-    output = document.createElement('div');
-    output.id = id;
-    output.className = 'result';
-    
-    // Try to append to appropriate section
-    const sections = ['advanced-content', 'setup-content', 'feedback-content'];
-    for (const sectionId of sections) {
-      const section = document.getElementById(sectionId);
-      if (section) {
-        section.appendChild(output);
-        break;
-      }
-    }
-    
-    if (!output.parentNode) {
-      document.body.appendChild(output);
-    }
+/**
+ * Handle user sign in
+ * Uses email/password from auth form fields
+ */
+window.handleSignIn = async function(){
+  const email=document.getElementById('authEmail').value;
+  const pass =document.getElementById('authPass').value;
+  const {error}=await signIn(email,pass);
+  if(error){
+    console.error('Supabase auth error:', error);
+    alert(error.message);
+  }else{
+    console.log('Logged-in session:', (await supa.auth.getSession()).data);
   }
-  return output;
-}
+};
+
+/**
+ * Handle user sign up
+ * Uses email/password from auth form fields
+ */
+window.handleSignUp = async function(){
+  const email=document.getElementById('authEmail').value;  const pass =document.getElementById('authPass').value;
+  const {error}=await signUp(email,pass);
+  if(error){
+    console.error('Supabase auth error:', error);
+    alert(error.message);
+  }else{
+    console.log('Logged-in session:', (await supa.auth.getSession()).data);
+  }
+};
+
+// Handle authentication state changes
+onAuth(sess=>{
+  document.getElementById('authModal').classList.toggle('hidden', !!sess);
+  console.log('Auth session',sess);
+});
+
+console.log('globals loaded – auth handlers ready');
