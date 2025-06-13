@@ -1138,4 +1138,13 @@ button.small {
   height: auto;
 }
 
+/* ─── Quick-Start Guide list alignment ──────────────────────────── */
+#quickStartGuide ol,
+.quick-start-guide ol {
+  margin: 0 auto;          /* center container */
+  max-width: 480px;        /* comfortable line length */
+  padding-left: 1.4rem;    /* slight indent for numbers */
+  list-style-position: inside;
+}
+
 /* --- End of Styles --- */
