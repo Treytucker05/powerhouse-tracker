@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supaUrl = process.env.SUPABASE_URL ||
-  (typeof window !== 'undefined' ? window.SUPABASE_URL : undefined);
-const supaKey = process.env.SUPABASE_ANON_KEY ||
-  (typeof window !== 'undefined' ? window.SUPABASE_ANON_KEY : undefined);
-const supa = createClient(supaUrl, supaKey);
+// Load from Parcel-exposed env vars
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
+
+export const supa = createClient(supabaseUrl, supabaseKey);
 
 /* ---------- Auth helpers ---------- */
 export async function signUp(email, password) {
@@ -22,5 +22,3 @@ export async function signOut() {
 export function onAuth(callback) {
   return supa.auth.onAuthStateChange((_event, session) => callback(session));
 }
-
-export { supa };

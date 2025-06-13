@@ -1225,45 +1225,42 @@ window.getUserAnalytics = function() {
 // Authentication handlers
 import { signIn, signUp, signOut, onAuth, supa } from '../core/db.js';
 
+// DOM elements for auth
+const authEmail = document.getElementById('authEmail');
+const authPass = document.getElementById('authPass');
+const authModal = document.getElementById('authModal');
+
 /**
- * Handle user sign in
- * Uses email/password from auth form fields
+ * Handle user sign in * Uses email/password from auth form fields
  */
-window.handleSignIn = async function(){
-  const email=document.getElementById('authEmail').value;
-  const pass =document.getElementById('authPass').value;
-  const {error}=await signIn(email,pass);
-  if(error){
-    console.error('Supabase auth error:', error);
-    alert(error.message);
-  }else{
-    console.log('Logged-in session:', (await supa.auth.getSession()).data);
-  }
+window.handleSignIn = async function() {
+  const email = authEmail.value.trim();
+  const pass  = authPass.value;
+  const { error, data } = await signIn(email, pass);
+  if (error) return alert(error.message);
+  authModal.classList.add('hidden');       // hide modal on success
+  console.log('Logged-in session:', data);
 };
 
 /**
  * Handle user sign up
  * Uses email/password from auth form fields
  */
-window.handleSignUp = async function(){
-  const email=document.getElementById('authEmail').value;  const pass =document.getElementById('authPass').value;
-  const {error}=await signUp(email,pass);
-  if(error){
-    console.error('Supabase auth error:', error);
-    alert(error.message);
-  }else{
-    console.log('Logged-in session:', (await supa.auth.getSession()).data);
-  }
+window.handleSignUp = async function() {
+  const email = authEmail.value.trim();
+  const pass  = authPass.value;
+  const { error, data } = await signUp(email, pass);
+  if (error) return alert(error.message);
+  authModal.classList.add('hidden');
+  console.log('Signed-up session:', data);
 };
 
 /**
  * Handle user sign out
  */
-window.handleSignOut = async function(){
-  const { error } = await signOut();
-  if(error){
-    console.error('Supabase signOut error:', error);
-  }
+window.handleSignOut = async function() {
+  await supa.auth.signOut();
+  authModal.classList.remove('hidden');
 };
 
 // Handle authentication state changes
