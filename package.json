@@ -2,9 +2,7 @@
   "name": "powerhouse-rp-toolkit",
   "version": "1.0.0",
   "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",  "scripts": {
-    "start": "node server.js",
-    "build": "parcel build index.html --dist-dir docs --public-url ./ --no-scope-hoist && xcopy \"partials\" \"docs\\partials\" /E /I /Y",
-    "deploy": "npm run build && git add docs && git commit -m \"deploy\" && git push",
+    "dev": "parcel index.html --port 1234 --no-cache --open",
     "lint": "eslint \"js/**\"",
     "format": "prettier -w \"**/*.{js,html,css}\""
   },
