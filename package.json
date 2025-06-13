@@ -2,8 +2,8 @@
   "name": "powerhouse-rp-toolkit",
   "version": "1.0.0",
   "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",  "scripts": {
-    "dev":    "parcel index.html --port 1234 --no-cache --open",
-    "lint":   "eslint \"js/**\"",
+    "dev": "parcel index.html --port 1234 --no-cache --open",
+    "lint": "eslint \"js/**\"",
     "format": "prettier -w \"**/*.{js,html,css}\""
   },
   "keywords": [
