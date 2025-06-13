@@ -1223,7 +1223,7 @@ window.getUserAnalytics = function() {
 };
 
 // Authentication handlers
-import { signIn, signUp, onAuth, supa } from '../core/db.js';
+import { signIn, signUp, signOut, onAuth, supa } from '../core/db.js';
 
 /**
  * Handle user sign in
@@ -1253,6 +1253,16 @@ window.handleSignUp = async function(){
     alert(error.message);
   }else{
     console.log('Logged-in session:', (await supa.auth.getSession()).data);
+  }
+};
+
+/**
+ * Handle user sign out
+ */
+window.handleSignOut = async function(){
+  const { error } = await signOut();
+  if(error){
+    console.error('Supabase signOut error:', error);
   }
 };
 
