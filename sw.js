@@ -439,32 +439,4 @@ function registerBackgroundSync(tag) {
   return self.registration.sync.register(tag);
 }
 
-// Performance monitoring
-self.addEventListener('fetch', event => {
-  const start = performance.now();
-  
-  event.respondWith(
-    handleRequest(event.request).then(response => {
-      const duration = performance.now() - start;
-      
-      // Log performance metrics
-      if (duration > 1000) { // Log slow requests
-        console.log(`🐌 Slow request: ${event.request.url} took ${duration}ms`);
-      }
-      
-      return response;
-    })
-  );
-});
-
-async function handleRequest(request) {
-  // Default request handling logic
-  try {
-    return await fetch(request);
-  } catch (error) {
-    const cachedResponse = await caches.match(request);
-    return cachedResponse || new Response('Offline', { status: 503 });
-  }
-}
-
 console.log('🚀 PowerHouseATX Service Worker loaded');
