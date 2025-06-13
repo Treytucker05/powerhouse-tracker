@@ -558,14 +558,13 @@ class AdvancedTrainingIntelligence {
    * Extract fatigue data from session
    * @param {Object} sessionData - Session data
    * @returns {Object} - Fatigue data
-   */
-  extractFatigueFromSession(sessionData) {
+   */  extractFatigueFromSession(sessionData) {
     return {
       soreness: sessionData.performance.consistency.rating === 'poor' ? 3 : 1,
       jointAche: 0, // Would need user input
       perfChange: sessionData.performance.targetAchievement.grade === 'A' ? 1 : 0,
       pump: sessionData.progress.totalLoad > 1000 ? 3 : 2,
-      disruption: sessionData.progress.totalLoad > 1000 ? 3 : 2,
+      disruption: sessionData.progress.totalLoad > 1000 ? 3 : 2, // Using workload metric
       lastLoad: Math.max(...sessionData.sets.map(set => set.weight))
     };
   }

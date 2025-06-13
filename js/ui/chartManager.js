@@ -5,6 +5,9 @@
 
 import trainingState from '../core/trainingState.js';
 
+// Conditionally import advanced visualizations
+let dataVisualizer = null;
+
 let weeklyChart = null;
 const muscles = Object.keys(trainingState.volumeLandmarks);
 
@@ -28,10 +31,19 @@ function initChart() {
     console.error('Chart.js not loaded');
     return null;
   }
-
   const chartData = muscles.map(muscle => trainingState.currentWeekSets[muscle] || 0);
   const backgroundColors = muscles.map(muscle => trainingState.getVolumeColor(muscle));
-    weeklyChart = new Chart(ctx, {
+  
+  // Initialize advanced visualizations if enabled
+  if (trainingState.settings?.enableAdvancedDashboard) {
+    import('../algorithms/dataVisualization.js').then(module => {
+      dataVisualizer = new module.AdvancedDataVisualizer();
+      console.log('Advanced chart visualization initialized');
+    }).catch(err => {
+      console.error('Failed to initialize advanced chart visualization:', err);
+    });
+  }
+  weeklyChart = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: muscles,

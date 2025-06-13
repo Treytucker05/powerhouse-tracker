@@ -405,8 +405,7 @@ function isHighFatigue(muscle, feedback, state) {
   
   // Fatigue components: soreness + joint ache + performance decline penalty
   const fatigue = soreness + jointAche + (perfChange < 0 ? 2 : 0);
-  
-  // Stimulus components: pump + disruption (mind-muscle connection less relevant for fatigue)
+    // Stimulus components: pump + workload (mind-muscle connection less relevant for fatigue)
   const stimulus = (feedback.pump || 0) + (feedback.disruption || 0);
   
   // Calculate Stimulus-to-Fatigue Ratio (SFR)

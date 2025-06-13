@@ -342,7 +342,7 @@ class DataExportManager {
     // Feedback CSV
     if (data.feedback.length > 0) {
       csv += 'FEEDBACK DATA\n';
-      csv += 'Date,Muscle,Current Sets,MMC,Pump,Disruption,Performance,Soreness,Recommendation\n';
+      csv += 'Date,Muscle,Current Sets,MMC,Pump,Workload,Performance,Soreness,Recommendation\n';
       
       data.feedback.forEach(feedback => {
         csv += `${feedback.timestamp},${feedback.muscle},${feedback.currentSets},${feedback.stimulus?.mmc || ''},${feedback.stimulus?.pump || ''},${feedback.stimulus?.disruption || ''},${feedback.performance},${feedback.soreness},${feedback.results?.recommendedAction?.advice || ''}\n`;

@@ -8,7 +8,7 @@ import { isHighFatigue } from './fatigue.js';
 
 /**
  * RP Table 2.2: MEV Stimulus Estimator
- * Scores stimulus quality based on mind-muscle connection, pump, and disruption
+ * Scores stimulus quality based on mind-muscle connection, pump, and workload
  * @param {Object} feedback - {mmc: 0-3, pump: 0-3, disruption: 0-3}
  * @returns {Object} - {score: 0-9, advice: string, action: string}
  */
@@ -17,9 +17,9 @@ function scoreStimulus({ mmc, pump, disruption }) {
   const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
   const clampedMmc = clamp(mmc, 0, 3);
   const clampedPump = clamp(pump, 0, 3);
-  const clampedDisruption = clamp(disruption, 0, 3);
+  const clampedWorkload = clamp(disruption, 0, 3);
   
-  const totalScore = clampedMmc + clampedPump + clampedDisruption;
+  const totalScore = clampedMmc + clampedPump + clampedWorkload;
   
   let advice, action, setChange;
   
@@ -36,8 +36,7 @@ function scoreStimulus({ mmc, pump, disruption }) {
     action = 'reduce_sets';
     setChange = -1;
   }
-  
-  return {
+    return {
     score: totalScore,
     advice,
     action,
@@ -45,7 +44,7 @@ function scoreStimulus({ mmc, pump, disruption }) {
     breakdown: {
       mmc: clampedMmc,
       pump: clampedPump,
-      disruption: clampedDisruption
+      disruption: clampedWorkload
     }
   };
 }
@@ -59,41 +58,16 @@ function scoreStimulus({ mmc, pump, disruption }) {
  * @returns {Object} - {add: boolean, delta: number, reason: string}
  */
 function autoSetIncrement(muscle, feedback, state) {
-  const { MEV, MRV } = state.volumeLandmarks[muscle];
-  const currentSets = state.currentWeekSets[muscle] || MEV;
-  
-  const atMEV = currentSets <= MEV;
-  const atMRV = currentSets >= MRV;
-  const lowStimulus = feedback.stimulus <= 3;
-  const goodRecovery = feedback.soreness <= 1 && feedback.perf >= 0;
-  
-  // Don't add if at MRV or recovery session needed
-  if (atMRV || feedback.recoverySession) {
-    return { 
-      add: false, 
-      delta: 0, 
-      reason: atMRV ? 'At MRV - holding volume' : 'Recovery session needed' 
-    };
-  }
-  
-  // Add sets if at MEV or if low stimulus with good recovery
-  if (atMEV || (lowStimulus && goodRecovery)) {
-    const baseDelta = 1;
-    const mevBonus = atMEV ? 1 : 0; // Extra set boost when starting from MEV
-    const totalDelta = Math.min(baseDelta + mevBonus, 2); // Cap at +2 sets max
-    
-    return { 
-      add: true, 
-      delta: totalDelta,
-      reason: atMEV ? 'Starting from MEV - aggressive progression' : 'Low stimulus with good recovery'
-    };
-  }
-  
-  return { 
-    add: false, 
-    delta: 0, 
-    reason: 'Maintaining current volume' 
-  };
+  const vStat = state.getVolumeStatus(muscle);
+  const fb = feedback || {};
+  const atMRV = state.isAtMRV(muscle);
+  const lowStim = stimulusScore(currentSets,运动.sps) < 0.8;
+  const goodRec = fb.recoveryMuscle === 'recovered' || fb.recoveryMuscle === 'fully recovered';
+
+  if (atMRV || fb.recoverySession || ['maintenance','optimal','high','maximum'].includes(vStat)) return {add:false,delta:0};
+  if (['low'].includes(vStat) && lowStim) return {add:true,delta:1};
+  if (vStat==='suboptimal' && lowStim && goodRec) return {add:true,delta:1};
+  return {add:false,delta:0};
 }
 
 /**
@@ -317,6 +291,14 @@ function validateVolumeInput(muscle, proposedSets) {
 function getVolumeProgression(muscle, feedback) {
   const currentSets = trainingState.currentWeekSets[muscle];
   const volumeAnalysis = analyzeVolumeStatus(muscle);
+  const vStat = trainingState.getVolumeStatus(muscle);
+  if (['optimal','high','maximum'].includes(vStat)) return {
+    deltaSets: 0,
+    headline: 'Maintain current sets next session',
+    currentSets: currentSets,
+    nextSets: currentSets,
+    notes: 'Volume already optimal'
+  };
   
   // Get stimulus score
   const stimulusResult = scoreStimulus(feedback.stimulus);

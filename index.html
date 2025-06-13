@@ -2190,8 +2190,15 @@ document.addEventListener('DOMContentLoaded', () => {
 <script>
 (function () {
   function postHeight () {
-    const h = document.documentElement.getBoundingClientRect().height;
-    window.parent.postMessage({ phxHeight: h }, '*');
+    // Only send message if we're in an iframe
+    if (window.parent && window.parent !== window) {
+      try {
+        const h = document.documentElement.getBoundingClientRect().height;
+        window.parent.postMessage({ phxHeight: h }, '*');
+      } catch (err) {
+        console.debug('Frame messaging error:', err.message);
+      }
+    }
   }
   window.addEventListener('load', postHeight);
   setInterval(postHeight, 500);   // heartbeat

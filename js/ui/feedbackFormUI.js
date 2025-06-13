@@ -60,12 +60,11 @@ function handleFeedbackSubmission() {
 /**
  * Collect feedback data from form
  */
-function collectFeedbackData() {
-  const muscle = document.getElementById('muscleSelect')?.value;
+function collectFeedbackData() {  const muscle = document.getElementById('muscleSelect')?.value;
   const currentSets = parseInt(document.getElementById('currentSets')?.value, 10);
   const mmc = parseInt(document.getElementById('mmc')?.value, 10);
   const pump = parseInt(document.getElementById('pump')?.value, 10);
-  const disruption = parseInt(document.getElementById('dis')?.value, 10);
+  const workload = parseInt(document.getElementById('dis')?.value, 10);
   
   // Get performance rating from radio buttons
   const perfRadio = document.querySelector('input[name="perf"]:checked');
@@ -83,11 +82,10 @@ function collectFeedbackData() {
   
   // Check for illness/injury
   const hasIllness = document.getElementById('illness2')?.checked || false;
-
   return {
     muscle,
     currentSets,
-    stimulus: { mmc, pump, disruption },
+    stimulus: { mmc, pump, disruption: workload },
     performance,
     soreness,
     jointAche,
@@ -119,9 +117,8 @@ function validateFeedbackData(data) {
   if (isNaN(data.stimulus.pump) || data.stimulus.pump < 0 || data.stimulus.pump > 3) {
     errors.push('Pump rating must be 0-3');
   }
-
   if (isNaN(data.stimulus.disruption) || data.stimulus.disruption < 0 || data.stimulus.disruption > 3) {
-    errors.push('Disruption rating must be 0-3');
+    errors.push('Workload rating must be 0-3');
   }
 
   if (errors.length > 0) {
@@ -173,7 +170,7 @@ function determineRecommendedAction(stimulusResult, progressionResult) {
   let setChange = progressionResult.setChange;
   let advice = progressionResult.advice;
   
-  // But consider stimulus quality for additional context
+  // But consider workload for additional context
   if (stimulusResult.action === 'reduce_sets' && progressionResult.action === 'add_sets') {
     advice += ' (But consider technique - stimulus was high)';
   }
@@ -239,12 +236,14 @@ function displayFeedbackResults(results) {
   if (!output) return;
 
   const { stimulus, volumeProgression, rirValidation } = results;
+    const title = volumeProgression.headline ?? `${volumeProgression.muscle} Recommendation`;
+  const subtitle = volumeProgression.notes ?? volumeProgression.advice ?? '';
   
   let resultHTML = `
     <div class="feedback-results">
       <div class="main-recommendation">
-        <h4>${volumeProgression.muscle} Recommendation</h4>
-        <p class="advice">${volumeProgression.advice}</p>
+        <h4>${title}</h4>
+        <p class="advice">${subtitle}</p>
         <p class="sets-info">
           Current: ${volumeProgression.currentSets} sets → 
           Next week: ${volumeProgression.projectedSets} sets
@@ -254,7 +253,7 @@ function displayFeedbackResults(results) {
       
       <div class="algorithm-details">
         <div class="stimulus-score">
-          <strong>Stimulus Quality:</strong> ${stimulus.score}/9 
+          <strong>Workload:</strong> ${stimulus.score}/9 
           <span class="stimulus-${stimulus.action}">(${stimulus.action.replace('_', ' ')})</span>
         </div>
         <div class="volume-status">

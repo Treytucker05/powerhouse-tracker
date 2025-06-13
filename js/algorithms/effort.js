@@ -530,7 +530,7 @@ function simulateWeeklyRIRFeedback(muscles, week) {
       perfChange,
       lastLoad: Math.round(lastLoad * 10) / 10,
       pump: Math.min(3, Math.floor(Math.random() * 3) + 1),
-      disruption: Math.min(3, Math.floor(Math.random() * 3) + 1)
+      disruption: Math.min(3, Math.floor(Math.random() * 3) + 1) // Workload metric
     };
   });
   

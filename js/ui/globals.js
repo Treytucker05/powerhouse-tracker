@@ -96,12 +96,15 @@ window.toggleSection = function(sectionId) {
       postHeight();                            // send shorter height
     });
   }
-
   // helper sends current height to parent iframe
   function postHeight() {
-    if (!window.parent) return;
-    const h = document.documentElement.getBoundingClientRect().height;
-    window.parent.postMessage({ phxHeight: h }, '*');
+    if (!window.parent || window.parent === window) return;
+    try {
+      const h = document.documentElement.getBoundingClientRect().height;
+      window.parent.postMessage({ phxHeight: h }, '*');
+    } catch (err) {
+      console.debug('Frame messaging error:', err.message);
+    }
   }
 };
 

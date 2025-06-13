@@ -590,14 +590,11 @@ class PerformanceManager {
         img.style.height = 'auto';
       }
     });
-  }
-
-  /**
+  }  /**
    * Setup service worker
-   */
-  setupServiceWorker() {
+   */  setupServiceWorker() {
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
+      navigator.serviceWorker.register(new URL('../../sw.js', import.meta.url))
         .then(registration => {
           console.log('✅ Service Worker registered');
         })

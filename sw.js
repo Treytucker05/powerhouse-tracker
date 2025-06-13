@@ -40,24 +40,44 @@ const NETWORK_FIRST = [
   '/js/utils/dataExport.js'
 ];
 
-// Install event - cache static files
+// Filter to only same-origin assets to avoid CORS issues
+const getSameOriginAssets = () => {
+  return STATIC_FILES.filter(url => {
+    try {
+      const urlObj = new URL(url, self.location.href);
+      return urlObj.origin === self.location.origin || url === 'https://cdn.jsdelivr.net/npm/chart.js';
+    } catch (e) {
+      return false;
+    }
+  }).filter(url => !NETWORK_FIRST.includes(url));
+};
+
+// Install event - cache static files individually to prevent one failure from rejecting all
 self.addEventListener('install', event => {
   console.log('🔧 Service Worker installing...');
   
   event.waitUntil(
-    Promise.all([
-      caches.open(STATIC_CACHE).then(cache => {
-        console.log('📦 Caching static files...');
-        return cache.addAll(STATIC_FILES.filter(url => !NETWORK_FIRST.includes(url)));
-      }),
-      caches.open(DYNAMIC_CACHE).then(cache => {
-        console.log('🔄 Dynamic cache initialized');
-        return cache;
-      })
-    ]).then(() => {
+    (async () => {
+      const staticCache = await caches.open(STATIC_CACHE);
+      console.log('📦 Caching static files...');
+      
+      const sameOriginAssets = getSameOriginAssets();
+      for (const asset of sameOriginAssets) {
+        try {
+          const req = new Request(asset, { mode: 'same-origin' });
+          await staticCache.add(req);
+          console.log('✓ Cached:', asset);
+        } catch (err) {
+          console.warn('SW skip asset (cache fail):', asset, err.message);
+        }
+      }
+      
+      const dynamicCache = await caches.open(DYNAMIC_CACHE);
+      console.log('🔄 Dynamic cache initialized');
+      
       console.log('✅ Service Worker installation complete');
       return self.skipWaiting();
-    })
+    })()
   );
 });
 

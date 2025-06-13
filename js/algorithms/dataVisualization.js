@@ -296,6 +296,248 @@ class AdvancedDataVisualizer {
     };
   }
 
+  /**
+   * Get performance chart configuration
+   * @param {Array} data - Optional data array
+   * @returns {Object} - Chart configuration
+   */
+  getPerformanceChartConfig(data = []) {
+    return {
+      type: 'line',
+      data: {
+        labels: data.map(d => `Week ${d.weekNo || '?'}`),
+        datasets: [{
+          label: 'Performance %',
+          data: data.map(d => d.performance || 0),
+          borderColor: 'rgb(54, 162, 235)',
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            title: {
+              display: true,
+              text: 'Performance %'
+            },
+            min: 0,
+            max: 100
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Training Period'
+            }
+          }
+        }
+      }
+    };
+  }
+
+  /**
+   * Get volume chart configuration
+   * @param {Array} data - Optional data array
+   * @returns {Object} - Chart configuration
+   */
+  getVolumeChartConfig(data = []) {
+    return {
+      type: 'bar',
+      data: {
+        labels: data.map(d => `Week ${d.weekNo || '?'}`),
+        datasets: [{
+          label: 'Weekly Volume (sets)',
+          data: data.map(d => d.totalSets || 0),
+          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+          borderColor: 'rgb(75, 192, 192)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            title: {
+              display: true,
+              text: 'Sets'
+            },
+            beginAtZero: true
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Training Period'
+            }
+          }
+        }
+      }
+    };
+  }
+
+  /**
+   * Get fatigue chart configuration
+   * @param {Array} data - Optional data array
+   * @returns {Object} - Chart configuration
+   */
+  getFatigueChartConfig(data = []) {
+    return {
+      type: 'line',
+      data: {
+        labels: data.map(d => `Week ${d.weekNo || '?'}`),
+        datasets: [{
+          label: 'Fatigue Level',
+          data: data.map(d => d.fatigueScore || 0),
+          borderColor: 'rgb(255, 99, 132)',
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          tension: 0.2,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            title: {
+              display: true,
+              text: 'Fatigue Level'
+            },
+            min: 0,
+            max: 10
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Training Period'
+            }
+          }
+        }
+      }
+    };
+  }
+
+  /**
+   * Get intelligence chart configuration
+   * @param {Array} data - Optional data array
+   * @returns {Object} - Chart configuration
+   */
+  getIntelligenceChartConfig(data = []) {
+    const defaultDataPoint = {
+      technique: 7,
+      mindMuscle: 6, 
+      tempo: 5,
+      rangeOfMotion: 7,
+      consistency: 8
+    };
+    
+    const dataPoint = data.length > 0 ? data[data.length - 1] : defaultDataPoint;
+    
+    return {
+      type: 'radar',
+      data: {
+        labels: ['Technique', 'Mind-Muscle', 'Tempo', 'ROM', 'Consistency'],
+        datasets: [{
+          label: 'Training Intelligence',
+          data: [
+            dataPoint.technique || 0,
+            dataPoint.mindMuscle || 0,
+            dataPoint.tempo || 0,
+            dataPoint.rangeOfMotion || 0,
+            dataPoint.consistency || 0
+          ],
+          borderColor: 'rgb(153, 102, 255)',
+          backgroundColor: 'rgba(153, 102, 255, 0.2)',
+          pointBackgroundColor: 'rgb(153, 102, 255)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgb(153, 102, 255)'
+        }]
+      },
+      options: this.getRadarChartOptions()
+    };
+  }
+
+  /**
+   * Get radar chart options
+   * @returns {Object} - Chart options
+   */
+  getRadarChartOptions() {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top'
+        },
+        title: {
+          display: true,
+          text: 'Training Intelligence Analysis'
+        }
+      },
+      scales: {
+        r: {
+          min: 0,
+          max: 10,
+          ticks: {
+            stepSize: 2
+          }
+        }
+      }
+    };
+  }
+
+  /**
+   * Get heatmap configuration
+   * @param {Array} data - Optional data array
+   * @returns {Object} - Heatmap configuration
+   */
+  getHeatmapConfig(data = []) {
+    return {
+      type: 'matrix',
+      data: {
+        datasets: [{
+          label: 'Heatmap',
+          data: data,
+          backgroundColor: (ctx) => {
+            // Placeholder for future color logic
+            return 'rgba(75, 192, 192, 0.6)';
+          }
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true
+          },
+          tooltip: {
+            enabled: true
+          }
+        },
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Week'
+            }
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Muscle Group'
+            }
+          }
+        }
+      }
+    };
+  }
+
   // Helper methods for calculations and configurations
 
   calculateTrendLine(points) {

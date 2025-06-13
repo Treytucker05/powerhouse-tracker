@@ -591,7 +591,7 @@ class LivePerformanceMonitor {
       jointAche: 0, // Would need user input
       perfChange: maxLoad > currentBaseline ? 1 : 0,
       pump: sessionData.progress.totalLoad > 1000 ? 3 : 2,
-      disruption: sessionData.progress.totalLoad > 1000 ? 3 : 2,
+      disruption: sessionData.progress.totalLoad > 1000 ? 3 : 2, // Workload metric
       lastLoad: maxLoad
     };
     
