@@ -4,7 +4,7 @@
   "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",
   "scripts": {
     "start": "node server.js",
-    "build": "parcel build index.html --dist-dir docs --public-url ./ --no-scope-hoist",
+    "build": "parcel build index.html --dist-dir docs --public-url ./ --no-scope-hoist && xcopy \"partials\" \"docs\\partials\" /E /I /Y",
     "deploy": "npm run build && git add docs && git commit -m \"deploy\" && git push"
   },
   "keywords": [
@@ -19,10 +19,23 @@
     "@parcel/packager-raw-url": "^2.15.2",
     "@parcel/transformer-webmanifest": "^2.15.2",
     "buffer": "^6.0.3",
-    "parcel": "^2.15.2"
+    "eslint": "^8.57.1",
+    "parcel": "^2.15.2",
+    "prettier": "^3.5.3"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.50.0",
     "chart.js": "^4.4.9"
+  },
+  "targets": {
+    "default": {
+      "sourceMap": true,
+      "engines": {
+        "browsers": "> 0.5%, not dead"
+      },
+      "env": {
+        "includeNodeEnv": true
+      }
+    }
   }
 }
