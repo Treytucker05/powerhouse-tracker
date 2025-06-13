@@ -57,14 +57,15 @@ function scoreStimulus({ mmc, pump, disruption }) {
  * @param {Object} state - Training state singleton
  * @returns {Object} - {add: boolean, delta: number, reason: string}
  */
-function autoSetIncrement(muscle, feedback, state) {
+function autoSetIncrement(muscle, feedback = {}, state) {
+  const currentSets = state.getWeeklySets(muscle);
+  const atMRV = currentSets >= state.volumeLandmarks[muscle].MRV;
   const vStat = state.getVolumeStatus(muscle);
-  const fb = feedback || {};
-  const atMRV = state.isAtMRV(muscle);
-  const lowStim = stimulusScore(currentSets,运动.sps) < 0.8;
-  const goodRec = fb.recoveryMuscle === 'recovered' || fb.recoveryMuscle === 'fully recovered';
+  const stim = scoreStimulus(feedback.stimulus || { mmc: 0, pump: 0, disruption: 0 });
+  const lowStim = stim.score <= 3;
+  const goodRec = feedback.recoveryMuscle === 'recovered' || feedback.recoveryMuscle === 'fully recovered';
 
-  if (atMRV || fb.recoverySession || ['maintenance','optimal','high','maximum'].includes(vStat)) return {add:false,delta:0};
+  if (atMRV || feedback.recoverySession || ['maintenance','optimal','high','maximum'].includes(vStat)) return {add:false,delta:0};
   if (['low'].includes(vStat) && lowStim) return {add:true,delta:1};
   if (vStat==='suboptimal' && lowStim && goodRec) return {add:true,delta:1};
   return {add:false,delta:0};
