@@ -3,6 +3,7 @@
  * Handles all chart rendering and interactions
  */
 
+import Chart from 'chart.js/auto';
 import trainingState from '../core/trainingState.js';
 
 // Conditionally import advanced visualizations
