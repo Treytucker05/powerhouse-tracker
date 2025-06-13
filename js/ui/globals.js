@@ -1230,13 +1230,26 @@ const authEmail = document.getElementById('authEmail');
 const authPass = document.getElementById('authPass');
 const authModal = document.getElementById('authModal');
 
+// Helper function for auth loading state
+function setAuthLoading(isLoading) {
+  const spinner = document.getElementById('authSpinner');
+  const btnLogin = document.getElementById('btnLogin');
+  const btnSignUp = document.getElementById('btnSignUp');
+  if (!spinner || !btnLogin || !btnSignUp) return;
+  spinner.style.display = isLoading ? 'inline' : 'none';
+  btnLogin.disabled  = isLoading;
+  btnSignUp.disabled = isLoading;
+}
+
 /**
  * Handle user sign in * Uses email/password from auth form fields
  */
 window.handleSignIn = async function() {
   const email = authEmail.value.trim();
   const pass  = authPass.value;
+  setAuthLoading(true);
   const { error, data } = await signIn(email, pass);
+  setAuthLoading(false);
   if (error) return alert(error.message);
   authModal.classList.add('hidden');       // hide modal on success
   console.log('Logged-in session:', data);
@@ -1249,7 +1262,9 @@ window.handleSignIn = async function() {
 window.handleSignUp = async function() {
   const email = authEmail.value.trim();
   const pass  = authPass.value;
+  setAuthLoading(true);
   const { error, data } = await signUp(email, pass);
+  setAuthLoading(false);
   if (error) return alert(error.message);
   authModal.classList.add('hidden');
   console.log('Signed-up session:', data);

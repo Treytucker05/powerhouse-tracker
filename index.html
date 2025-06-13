@@ -2094,9 +2094,9 @@ document.addEventListener('change', function(e) {
   <div class="modal-content">
     <h2>Login / Sign-up</h2>    <form id="authForm" onsubmit="event.preventDefault(); handleSignIn();">
       <input id="authEmail" type="email" placeholder="Email" autocomplete="email">
-      <input id="authPass" type="password" placeholder="Password" autocomplete="current-password">
-      <button type="submit" id="btnLogin">LOGIN</button>
+      <input id="authPass" type="password" placeholder="Password" autocomplete="current-password">      <button type="submit" id="btnLogin">LOGIN</button>
       <button type="button" id="btnSignUp" onclick="handleSignUp()">SIGN UP</button>
+      <span id="authSpinner" style="display:none; margin-left:8px;">⏳</span>
     </form>
   </div>
 </div>
