@@ -276,22 +276,10 @@ class PerformanceManager {
 
   /**
    * Preload critical resources
-   */
-  preloadCriticalResources() {
-    const criticalResources = [
-      '/js/core/trainingState.js',
-      '/js/algorithms/volume.js',
-      '/js/ui/globals.js',
-      '/css/enhancedAdvanced.css'
-    ];
-
-    criticalResources.forEach(resource => {
-      const link = document.createElement('link');
-      link.rel = 'preload';
-      link.href = resource;
-      link.as = resource.endsWith('.js') ? 'script' : 'style';
-      document.head.appendChild(link);
-    });
+   */  preloadCriticalResources() {
+    // All critical resources are now bundled by Parcel
+    // No need to manually preload individual files
+    console.log('📦 Using Parcel bundling - individual preloads not needed');
   }
 
   /**
