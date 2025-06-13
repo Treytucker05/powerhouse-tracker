@@ -1266,6 +1266,10 @@ window.handleSignOut = async function() {
 // Handle authentication state changes
 onAuth(sess=>{
   document.getElementById('authModal').classList.toggle('hidden', !!sess);
+  
+  const signOutBtn = document.getElementById('signOutBtn');
+  if (signOutBtn) signOutBtn.style.display = sess ? 'inline-block' : 'none';
+  
   console.log('Auth session',sess);
 });
 
