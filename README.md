@@ -104,10 +104,11 @@ targetRIR = 4.5 - ((4.0) / (mesoLength - 1)) * (week - 1)
 ## 🚀 Getting Started
 
 1. **Open `index.html`** in a modern browser
-2. **Set Volume Landmarks**: Configure MV/MEV/MAV/MRV for each muscle
-3. **Daily Use**: Submit set feedback after each exercise
-4. **Weekly Review**: Check deload need and frequency optimization
-5. **Export Data**: Generate summaries for tracking progress
+2. **Create a `.env` file** based on `.env.example` and add your `SUPABASE_URL` and `SUPABASE_ANON_KEY`.
+3. **Set Volume Landmarks**: Configure MV/MEV/MAV/MRV for each muscle
+4. **Daily Use**: Submit set feedback after each exercise
+5. **Weekly Review**: Check deload need and frequency optimization
+6. **Export Data**: Generate summaries for tracking progress
 
 ## 📱 User Interface
 

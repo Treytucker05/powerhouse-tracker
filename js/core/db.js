@@ -1,9 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supa = createClient(
-  'https://cqjzvbvmpcqohjarcydg.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxanp2YnZtcGNxb2hqYXJjeWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3NzExNzksImV4cCI6MjA2NTM0NzE3OX0.wioeITJitSKZ9HrZ2iRPmC3xHHj-bL4xDYtT1iXws44'
-);
+const supaUrl = process.env.SUPABASE_URL;
+const supaKey = process.env.SUPABASE_ANON_KEY;
+const supa = createClient(supaUrl, supaKey);
 
 /* ---------- Auth helpers ---------- */
 export async function signUp(email, password) {
@@ -12,6 +11,10 @@ export async function signUp(email, password) {
 
 export async function signIn(email, password) {
   return supa.auth.signInWithPassword({ email, password });
+}
+
+export async function signOut() {
+  return supa.auth.signOut();
 }
 
 export function onAuth(callback) {
