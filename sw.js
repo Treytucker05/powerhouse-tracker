@@ -11,10 +11,9 @@ const DYNAMIC_CACHE = 'powerhouseatx-dynamic-v2.0.0';
 const STATIC_FILES = [
   '/',
   '/index.html',
-  '/test-next-generation.html',
-  '/test-advanced-intelligence.html',
   '/css/enhancedAdvanced.css',
   '/js/core/trainingState.js',
+  '/js/core/db.js',
   '/js/algorithms/volume.js',
   '/js/algorithms/effort.js',
   '/js/algorithms/fatigue.js',
@@ -28,10 +27,13 @@ const STATIC_FILES = [
   '/js/ui/feedbackFormUI.js',
   '/js/ui/globals.js',
   '/js/ui/enhancedAdvancedUI.js',
+  '/js/ui/chartManager.js',
   '/js/utils/dataExport.js',
   '/js/utils/userFeedback.js',
+  '/js/utils/performance.js',
   '/manifest.json',
-  'https://cdn.jsdelivr.net/npm/chart.js'
+  '/main.js',
+  '/assets/favicon.ico'
 ];
 
 // Files that should always be fetched fresh
@@ -40,17 +42,18 @@ const NETWORK_FIRST = [
   '/js/utils/dataExport.js'
 ];
 
-// Filter to only same-origin assets to avoid CORS issues
-const getSameOriginAssets = () => {
-  return STATIC_FILES.filter(url => {
-    try {
-      const urlObj = new URL(url, self.location.href);
-      return urlObj.origin === self.location.origin || url === 'https://cdn.jsdelivr.net/npm/chart.js';
-    } catch (e) {
-      return false;
-    }
-  }).filter(url => !NETWORK_FIRST.includes(url));
-};
+// FILTER any cross-origin URLs & experimental test pages
+const cacheableAssets = STATIC_FILES.filter(a => {
+  try {
+    const url = new URL(a, self.location);
+    const sameOrigin = url.origin === self.location.origin;
+    const isExperimental = url.pathname.startsWith('/test-');
+    return sameOrigin && !isExperimental;
+  } catch (e) {
+    console.warn('Invalid URL in static assets:', a, e.message);
+    return false;
+  }
+}).filter(url => !NETWORK_FIRST.includes(url));
 
 // Install event - cache static files individually to prevent one failure from rejecting all
 self.addEventListener('install', event => {
@@ -58,14 +61,12 @@ self.addEventListener('install', event => {
   
   event.waitUntil(
     (async () => {
-      const staticCache = await caches.open(STATIC_CACHE);
+      const cache = await caches.open(STATIC_CACHE);
       console.log('📦 Caching static files...');
       
-      const sameOriginAssets = getSameOriginAssets();
-      for (const asset of sameOriginAssets) {
+      for (const asset of cacheableAssets) {
         try {
-          const req = new Request(asset, { mode: 'same-origin' });
-          await staticCache.add(req);
+          await cache.add(asset);
           console.log('✓ Cached:', asset);
         } catch (err) {
           console.warn('SW skip asset (cache fail):', asset, err.message);
