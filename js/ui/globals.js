@@ -1363,7 +1363,7 @@ window.handleSignIn = async function () {
   const { error, data } = await signIn(email, pass);
   setAuthLoading(false);
   if (error) return alert(error.message);
-  authModal?.classList.add("hidden"); // hide modal on success
+  document.getElementById("authModal")?.classList.add("hidden"); // hide modal on success
   console.log("Logged-in session:", data);
 };
 
@@ -1378,7 +1378,7 @@ window.handleSignUp = async function () {
   const { error, data } = await signUp(email, pass);
   setAuthLoading(false);
   if (error) return alert(error.message);
-  authModal?.classList.add("hidden");
+  document.getElementById("authModal")?.classList.add("hidden");
   console.log("Signed-up session:", data);
 };
 
