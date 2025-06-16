@@ -6799,17 +6799,14 @@
               });
           }
           loadAdvancedFeatures() {
-            if (
-              !window.Chart &&
-              !document.querySelector('script[src*="chart.js"]')
-            ) {
-              let e = document.createElement("script");
-              (e.src = "https://cdn.jsdelivr.net/npm/chart.js"),
-                (e.onload = () => {
-                  console.log("\uD83D\uDCC8 Chart.js loaded on demand"),
+            if (!window.Chart) {
+              import("chart.js/auto")
+                .then((e) => {
+                  (window.Chart = e.default),
+                    console.log("\uD83D\uDCC8 Chart.js loaded on demand"),
                     this.initializeCharts();
-                }),
-                document.head.appendChild(e);
+                })
+                .catch((e) => console.error("Failed to load Chart.js", e));
             }
           }
           optimizeDOMChanges(e) {
