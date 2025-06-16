@@ -3,7 +3,7 @@
  * Gathers user feedback and usage analytics to improve the training system
  */
 
-import trainingState from '../core/trainingState.js';
+import trainingState from "../core/trainingState.js";
 
 /**
  * User Feedback Manager Class
@@ -12,12 +12,12 @@ import trainingState from '../core/trainingState.js';
 class UserFeedbackManager {
   constructor() {
     this.feedbackCategories = [
-      'usability',
-      'accuracy',
-      'features',
-      'performance',
-      'mobile',
-      'suggestions'
+      "usability",
+      "accuracy",
+      "features",
+      "performance",
+      "mobile",
+      "suggestions",
     ];
     this.analyticsEnabled = true;
     this.privacyMode = true; // No personal data collected
@@ -36,9 +36,9 @@ class UserFeedbackManager {
    * Create feedback widget
    */
   createFeedbackWidget() {
-    const widget = document.createElement('div');
-    widget.id = 'feedback-widget';
-    widget.className = 'feedback-widget';
+    const widget = document.createElement("div");
+    widget.id = "feedback-widget";
+    widget.className = "feedback-widget";
     widget.innerHTML = `
       <div class="feedback-toggle" onclick="userFeedbackManager.toggleFeedbackPanel()">
         💬 Feedback
@@ -64,7 +64,7 @@ class UserFeedbackManager {
           <div class="feedback-rating">
             <label>Overall satisfaction (1-5):</label>
             <div class="rating-stars" id="satisfactionRating">
-              ${[1,2,3,4,5].map(i => `<span class="star" data-rating="${i}">⭐</span>`).join('')}
+              ${[1, 2, 3, 4, 5].map((i) => `<span class="star" data-rating="${i}">⭐</span>`).join("")}
             </div>
           </div>
           
@@ -98,8 +98,8 @@ class UserFeedbackManager {
    */
   setupFeedbackEvents() {
     // Rating stars
-    document.querySelectorAll('.star').forEach(star => {
-      star.addEventListener('click', (e) => {
+    document.querySelectorAll(".star").forEach((star) => {
+      star.addEventListener("click", (e) => {
         const rating = parseInt(e.target.dataset.rating);
         this.setRating(rating);
       });
@@ -111,13 +111,13 @@ class UserFeedbackManager {
    * @param {number} rating - Rating value (1-5)
    */
   setRating(rating) {
-    document.querySelectorAll('.star').forEach((star, index) => {
+    document.querySelectorAll(".star").forEach((star, index) => {
       if (index < rating) {
-        star.style.opacity = '1';
-        star.style.transform = 'scale(1.2)';
+        star.style.opacity = "1";
+        star.style.transform = "scale(1.2)";
       } else {
-        star.style.opacity = '0.3';
-        star.style.transform = 'scale(1)';
+        star.style.opacity = "0.3";
+        star.style.transform = "scale(1)";
       }
     });
     this.currentRating = rating;
@@ -127,9 +127,9 @@ class UserFeedbackManager {
    * Toggle feedback panel
    */
   toggleFeedbackPanel() {
-    const panel = document.getElementById('feedbackPanel');
-    const isVisible = panel.style.display !== 'none';
-    
+    const panel = document.getElementById("feedbackPanel");
+    const isVisible = panel.style.display !== "none";
+
     if (isVisible) {
       this.closeFeedbackPanel();
     } else {
@@ -141,31 +141,31 @@ class UserFeedbackManager {
    * Open feedback panel
    */
   openFeedbackPanel() {
-    const panel = document.getElementById('feedbackPanel');
-    panel.style.display = 'block';
-    
+    const panel = document.getElementById("feedbackPanel");
+    panel.style.display = "block";
+
     // Populate usage context
     this.populateUsageContext();
-    
+
     // Track feedback panel opened
-    this.trackEvent('feedback_panel_opened');
+    this.trackEvent("feedback_panel_opened");
   }
 
   /**
    * Close feedback panel
    */
   closeFeedbackPanel() {
-    const panel = document.getElementById('feedbackPanel');
-    panel.style.display = 'none';
+    const panel = document.getElementById("feedbackPanel");
+    panel.style.display = "none";
   }
 
   /**
    * Populate usage context
    */
   populateUsageContext() {
-    const context = document.getElementById('usageContext');
+    const context = document.getElementById("usageContext");
     const usage = this.getUsageContext();
-    
+
     context.innerHTML = `
       <div class="usage-context">
         <h4>📊 Your Usage Context (helps us improve):</h4>
@@ -176,7 +176,7 @@ class UserFeedbackManager {
           </div>
           <div class="context-item">
             <span class="context-label">Features Used:</span>
-            <span class="context-value">${usage.featuresUsed.join(', ')}</span>
+            <span class="context-value">${usage.featuresUsed.join(", ")}</span>
           </div>
           <div class="context-item">
             <span class="context-label">Device:</span>
@@ -200,7 +200,7 @@ class UserFeedbackManager {
    */
   getUsageContext() {
     const usage = this.getStoredUsage();
-    
+
     return {
       currentWeek: trainingState.weekNo,
       currentBlock: trainingState.blockNo,
@@ -208,7 +208,7 @@ class UserFeedbackManager {
       deviceType: this.getDeviceType(),
       sessionCount: usage.sessionCount || 0,
       lastActive: usage.lastActive || new Date().toISOString(),
-      averageSessionDuration: usage.averageSessionDuration || 0
+      averageSessionDuration: usage.averageSessionDuration || 0,
     };
   }
 
@@ -216,12 +216,12 @@ class UserFeedbackManager {
    * Submit feedback
    */
   async submitFeedback() {
-    const category = document.getElementById('feedbackCategory').value;
-    const text = document.getElementById('feedbackText').value;
+    const category = document.getElementById("feedbackCategory").value;
+    const text = document.getElementById("feedbackText").value;
     const rating = this.currentRating || 0;
-    
+
     if (!text.trim()) {
-      this.showFeedbackMessage('Please provide some feedback text', 'warning');
+      this.showFeedbackMessage("Please provide some feedback text", "warning");
       return;
     }
 
@@ -232,28 +232,34 @@ class UserFeedbackManager {
       rating,
       text: text.trim(),
       context: this.getUsageContext(),
-      appVersion: '2.0.0',
-      userAgent: navigator.userAgent
+      appVersion: "2.0.0",
+      userAgent: navigator.userAgent,
     };
 
     try {
       const result = await this.processFeedback(feedback);
-      
+
       if (result.success) {
-        this.showFeedbackMessage('Thank you! Your feedback helps us improve 🙏', 'success');
+        this.showFeedbackMessage(
+          "Thank you! Your feedback helps us improve 🙏",
+          "success",
+        );
         this.resetFeedbackForm();
-        
+
         // Auto-close after 2 seconds
         setTimeout(() => this.closeFeedbackPanel(), 2000);
-        
+
         // Track successful submission
-        this.trackEvent('feedback_submitted', { category, rating });
+        this.trackEvent("feedback_submitted", { category, rating });
       } else {
-        this.showFeedbackMessage('Feedback saved locally. Thank you! 💾', 'info');
+        this.showFeedbackMessage(
+          "Feedback saved locally. Thank you! 💾",
+          "info",
+        );
       }
     } catch (error) {
-      console.error('Feedback submission error:', error);
-      this.showFeedbackMessage('Feedback saved locally. Thank you! 💾', 'info');
+      console.error("Feedback submission error:", error);
+      this.showFeedbackMessage("Feedback saved locally. Thank you! 💾", "info");
     }
   }
 
@@ -266,16 +272,16 @@ class UserFeedbackManager {
     // Always store locally
     const localKey = `feedback-user-${feedback.id}`;
     localStorage.setItem(localKey, JSON.stringify(feedback));
-    
+
     // Store in feedback analytics
     this.updateFeedbackAnalytics(feedback);
-    
+
     // In a real implementation, you might send to a server here
     // For now, we'll just process locally
     return {
       success: true,
-      stored: 'local',
-      id: feedback.id
+      stored: "local",
+      id: feedback.id,
     };
   }
 
@@ -285,29 +291,29 @@ class UserFeedbackManager {
    */
   updateFeedbackAnalytics(feedback) {
     const analytics = this.getFeedbackAnalytics();
-    
+
     // Update categories
     if (!analytics.categories[feedback.category]) {
       analytics.categories[feedback.category] = {
         count: 0,
         averageRating: 0,
-        totalRating: 0
+        totalRating: 0,
       };
     }
-    
+
     const category = analytics.categories[feedback.category];
     category.count++;
     category.totalRating += feedback.rating;
     category.averageRating = category.totalRating / category.count;
-    
+
     // Update overall metrics
     analytics.totalFeedback++;
     analytics.totalRating += feedback.rating;
     analytics.averageRating = analytics.totalRating / analytics.totalFeedback;
     analytics.lastFeedback = feedback.timestamp;
-    
+
     // Store updated analytics
-    localStorage.setItem('feedback-analytics', JSON.stringify(analytics));
+    localStorage.setItem("feedback-analytics", JSON.stringify(analytics));
   }
 
   /**
@@ -315,18 +321,18 @@ class UserFeedbackManager {
    * @returns {Object} - Feedback analytics
    */
   getFeedbackAnalytics() {
-    const stored = localStorage.getItem('feedback-analytics');
+    const stored = localStorage.getItem("feedback-analytics");
     if (stored) {
       return JSON.parse(stored);
     }
-    
+
     return {
       totalFeedback: 0,
       averageRating: 0,
       totalRating: 0,
       categories: {},
       lastFeedback: null,
-      trends: []
+      trends: [],
     };
   }
 
@@ -335,16 +341,16 @@ class UserFeedbackManager {
    */
   setupUsageTracking() {
     // Track page loads
-    this.trackEvent('app_loaded');
-    
+    this.trackEvent("app_loaded");
+
     // Track feature usage
     this.setupFeatureTracking();
-    
+
     // Track session duration
     this.trackSessionStart();
-    
+
     // Track before unload
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener("beforeunload", () => {
       this.trackSessionEnd();
     });
   }
@@ -355,27 +361,27 @@ class UserFeedbackManager {
   setupFeatureTracking() {
     // Track button clicks for major features
     const trackableButtons = [
-      'submitFeedbackBtn',
-      'runAutoVolumeProgression',
-      'initializeIntelligence',
-      'startLiveSession',
-      'optimizeVolumeLandmarks',
-      'predictDeloadTiming'
+      "submitFeedbackBtn",
+      "runAutoVolumeProgression",
+      "initializeIntelligence",
+      "startLiveSession",
+      "optimizeVolumeLandmarks",
+      "predictDeloadTiming",
     ];
-    
-    trackableButtons.forEach(buttonId => {
+
+    trackableButtons.forEach((buttonId) => {
       const button = document.getElementById(buttonId);
       if (button) {
-        button.addEventListener('click', () => {
+        button.addEventListener("click", () => {
           this.trackFeatureUsage(buttonId);
         });
       }
     });
-    
+
     // Track section expansions
-    document.querySelectorAll('.section-banner').forEach(banner => {
-      banner.addEventListener('click', () => {
-        const sectionName = banner.textContent.trim().split(' ')[0];
+    document.querySelectorAll(".section-banner").forEach((banner) => {
+      banner.addEventListener("click", () => {
+        const sectionName = banner.textContent.trim().split(" ")[0];
         this.trackFeatureUsage(`section_${sectionName.toLowerCase()}`);
       });
     });
@@ -387,25 +393,25 @@ class UserFeedbackManager {
    */
   trackFeatureUsage(feature) {
     const usage = this.getStoredUsage();
-    
+
     if (!usage.featuresUsed) {
       usage.featuresUsed = [];
     }
-    
+
     if (!usage.featuresUsed.includes(feature)) {
       usage.featuresUsed.push(feature);
     }
-    
+
     if (!usage.featureCount) {
       usage.featureCount = {};
     }
-    
+
     usage.featureCount[feature] = (usage.featureCount[feature] || 0) + 1;
     usage.lastFeatureUsed = feature;
     usage.lastActivity = new Date().toISOString();
-    
+
     this.storeUsage(usage);
-    this.trackEvent('feature_used', { feature });
+    this.trackEvent("feature_used", { feature });
   }
 
   /**
@@ -413,7 +419,7 @@ class UserFeedbackManager {
    */
   trackSessionStart() {
     this.sessionStartTime = Date.now();
-    this.trackEvent('session_started');
+    this.trackEvent("session_started");
   }
 
   /**
@@ -423,14 +429,15 @@ class UserFeedbackManager {
     if (this.sessionStartTime) {
       const duration = Date.now() - this.sessionStartTime;
       const usage = this.getStoredUsage();
-      
+
       usage.sessionCount = (usage.sessionCount || 0) + 1;
       usage.totalSessionTime = (usage.totalSessionTime || 0) + duration;
-      usage.averageSessionDuration = usage.totalSessionTime / usage.sessionCount;
+      usage.averageSessionDuration =
+        usage.totalSessionTime / usage.sessionCount;
       usage.lastSession = new Date().toISOString();
-      
+
       this.storeUsage(usage);
-      this.trackEvent('session_ended', { duration });
+      this.trackEvent("session_ended", { duration });
     }
   }
 
@@ -441,24 +448,24 @@ class UserFeedbackManager {
    */
   trackEvent(event, data = {}) {
     if (!this.analyticsEnabled) return;
-    
+
     const eventData = {
       event,
       timestamp: new Date().toISOString(),
       data,
-      sessionId: this.getSessionId()
+      sessionId: this.getSessionId(),
     };
-    
+
     // Store event locally
     const events = this.getStoredEvents();
     events.push(eventData);
-    
+
     // Keep only last 100 events
     if (events.length > 100) {
       events.splice(0, events.length - 100);
     }
-    
-    localStorage.setItem('usage-events', JSON.stringify(events));
+
+    localStorage.setItem("usage-events", JSON.stringify(events));
   }
 
   /**
@@ -467,10 +474,11 @@ class UserFeedbackManager {
   schedulePeriodicFeedback() {
     const usage = this.getStoredUsage();
     const lastFeedbackRequest = usage.lastFeedbackRequest;
-    const daysSinceLastRequest = lastFeedbackRequest ? 
-      (Date.now() - new Date(lastFeedbackRequest).getTime()) / (1000 * 60 * 60 * 24) : 
-      Infinity;
-    
+    const daysSinceLastRequest = lastFeedbackRequest
+      ? (Date.now() - new Date(lastFeedbackRequest).getTime()) /
+        (1000 * 60 * 60 * 24)
+      : Infinity;
+
     // Request feedback after significant usage milestones
     if (usage.sessionCount >= 10 && daysSinceLastRequest > 7) {
       setTimeout(() => this.showFeedbackPrompt(), 30000); // After 30 seconds
@@ -482,8 +490,12 @@ class UserFeedbackManager {
    */
   showFeedbackPrompt() {
     const usage = this.getStoredUsage();
-    
-    if (confirm(`💪 You've used PowerHouseATX for ${usage.sessionCount} sessions! Would you like to share feedback to help us improve?`)) {
+
+    if (
+      confirm(
+        `💪 You've used PowerHouseATX for ${usage.sessionCount} sessions! Would you like to share feedback to help us improve?`,
+      )
+    ) {
       this.openFeedbackPanel();
     } else {
       this.laterReminder();
@@ -508,28 +520,30 @@ class UserFeedbackManager {
     const usage = this.getStoredUsage();
     const feedback = this.getFeedbackAnalytics();
     const events = this.getStoredEvents();
-    
+
     return {
       usage: {
         totalSessions: usage.sessionCount || 0,
-        averageSessionDuration: Math.round((usage.averageSessionDuration || 0) / 1000 / 60), // minutes
+        averageSessionDuration: Math.round(
+          (usage.averageSessionDuration || 0) / 1000 / 60,
+        ), // minutes
         totalTimeSpent: Math.round((usage.totalSessionTime || 0) / 1000 / 60), // minutes
         featuresUsed: usage.featuresUsed?.length || 0,
         mostUsedFeature: this.getMostUsedFeature(usage.featureCount),
-        lastActive: usage.lastActivity
+        lastActive: usage.lastActivity,
       },
       feedback: {
         totalFeedback: feedback.totalFeedback,
         averageRating: Math.round(feedback.averageRating * 10) / 10,
         categoryBreakdown: feedback.categories,
-        lastFeedback: feedback.lastFeedback
+        lastFeedback: feedback.lastFeedback,
       },
       events: {
         totalEvents: events.length,
         recentEvents: events.slice(-10),
-        eventTypes: this.getEventTypeBreakdown(events)
+        eventTypes: this.getEventTypeBreakdown(events),
       },
-      insights: this.generateInsights(usage, feedback, events)
+      insights: this.generateInsights(usage, feedback, events),
     };
   }
 
@@ -542,57 +556,61 @@ class UserFeedbackManager {
    */
   generateInsights(usage, feedback, events) {
     const insights = [];
-    
+
     // Usage insights
     if (usage.sessionCount > 20) {
       insights.push({
-        type: 'milestone',
+        type: "milestone",
         message: `🎉 Power user! You've completed ${usage.sessionCount} sessions`,
-        action: 'Consider sharing your experience'
+        action: "Consider sharing your experience",
       });
     }
-    
-    if (usage.averageSessionDuration > 30 * 60 * 1000) { // > 30 minutes
+
+    if (usage.averageSessionDuration > 30 * 60 * 1000) {
+      // > 30 minutes
       insights.push({
-        type: 'usage',
-        message: '⏱️ Your sessions are comprehensive and detailed',
-        action: 'Great attention to training detail!'
+        type: "usage",
+        message: "⏱️ Your sessions are comprehensive and detailed",
+        action: "Great attention to training detail!",
       });
     }
-    
+
     // Feedback insights
     if (feedback.averageRating >= 4.5) {
       insights.push({
-        type: 'satisfaction',
-        message: '⭐ High satisfaction rating - thank you!',
-        action: 'Your feedback helps us improve'
+        type: "satisfaction",
+        message: "⭐ High satisfaction rating - thank you!",
+        action: "Your feedback helps us improve",
       });
     }
-    
+
     // Feature usage insights
-    if (usage.featuresUsed?.includes('analytics') || usage.featuresUsed?.includes('intelligence')) {
+    if (
+      usage.featuresUsed?.includes("analytics") ||
+      usage.featuresUsed?.includes("intelligence")
+    ) {
       insights.push({
-        type: 'advanced',
-        message: '🧠 Advanced features user detected',
-        action: 'Perfect for the next-generation updates!'
+        type: "advanced",
+        message: "🧠 Advanced features user detected",
+        action: "Perfect for the next-generation updates!",
       });
     }
-    
+
     return insights;
   }
 
   // Utility methods
   getStoredUsage() {
-    const stored = localStorage.getItem('usage-analytics');
+    const stored = localStorage.getItem("usage-analytics");
     return stored ? JSON.parse(stored) : {};
   }
 
   storeUsage(usage) {
-    localStorage.setItem('usage-analytics', JSON.stringify(usage));
+    localStorage.setItem("usage-analytics", JSON.stringify(usage));
   }
 
   getStoredEvents() {
-    const stored = localStorage.getItem('usage-events');
+    const stored = localStorage.getItem("usage-events");
     return stored ? JSON.parse(stored) : [];
   }
 
@@ -605,25 +623,25 @@ class UserFeedbackManager {
 
   getDeviceType() {
     const width = window.innerWidth;
-    if (width < 768) return 'Mobile';
-    if (width < 1024) return 'Tablet';
-    return 'Desktop';
+    if (width < 768) return "Mobile";
+    if (width < 1024) return "Tablet";
+    return "Desktop";
   }
 
   getMostUsedFeature(featureCount) {
-    if (!featureCount) return 'None';
-    
+    if (!featureCount) return "None";
+
     const features = Object.entries(featureCount);
-    if (features.length === 0) return 'None';
-    
-    return features.reduce((max, current) => 
-      current[1] > max[1] ? current : max
+    if (features.length === 0) return "None";
+
+    return features.reduce((max, current) =>
+      current[1] > max[1] ? current : max,
     )[0];
   }
 
   getEventTypeBreakdown(events) {
     const breakdown = {};
-    events.forEach(event => {
+    events.forEach((event) => {
       breakdown[event.event] = (breakdown[event.event] || 0) + 1;
     });
     return breakdown;
@@ -634,24 +652,24 @@ class UserFeedbackManager {
   }
 
   resetFeedbackForm() {
-    document.getElementById('feedbackText').value = '';
-    document.getElementById('feedbackCategory').selectedIndex = 0;
+    document.getElementById("feedbackText").value = "";
+    document.getElementById("feedbackCategory").selectedIndex = 0;
     this.setRating(0);
   }
 
-  showFeedbackMessage(message, type = 'info') {
-    const existingMessage = document.querySelector('.feedback-message');
+  showFeedbackMessage(message, type = "info") {
+    const existingMessage = document.querySelector(".feedback-message");
     if (existingMessage) {
       existingMessage.remove();
     }
-    
-    const messageEl = document.createElement('div');
+
+    const messageEl = document.createElement("div");
     messageEl.className = `feedback-message ${type}`;
     messageEl.textContent = message;
-    
-    const panel = document.getElementById('feedbackPanel');
+
+    const panel = document.getElementById("feedbackPanel");
     panel.appendChild(messageEl);
-    
+
     setTimeout(() => messageEl.remove(), 3000);
   }
 }
@@ -912,14 +930,11 @@ const feedbackCSS = `
 `;
 
 // Inject CSS
-const style = document.createElement('style');
+const style = document.createElement("style");
 style.textContent = feedbackCSS;
 document.head.appendChild(style);
 
 // Create singleton instance
 const userFeedbackManager = new UserFeedbackManager();
 
-export {
-  UserFeedbackManager,
-  userFeedbackManager
-};
+export { UserFeedbackManager, userFeedbackManager };

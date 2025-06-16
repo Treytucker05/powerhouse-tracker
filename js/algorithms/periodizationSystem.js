@@ -3,9 +3,9 @@
  * Intelligent long-term training planning and periodization
  */
 
-import trainingState from '../core/trainingState.js';
-import { wellnessSystem } from './wellnessIntegration.js';
-import { advancedIntelligence } from './intelligenceHub.js';
+import trainingState from "../core/trainingState.js";
+import { wellnessSystem } from "./wellnessIntegration.js";
+import { advancedIntelligence } from "./intelligenceHub.js";
 
 /**
  * Advanced Periodization System
@@ -24,50 +24,63 @@ class AdvancedPeriodizationSystem {
   initializePeriodizationModels() {
     return {
       linear: {
-        name: 'Linear Periodization',
-        description: 'Progressive volume increase with intensity modulation',
-        phases: ['Accumulation', 'Intensification', 'Realization', 'Deload'],
+        name: "Linear Periodization",
+        description: "Progressive volume increase with intensity modulation",
+        phases: ["Accumulation", "Intensification", "Realization", "Deload"],
         volumeProgression: [100, 120, 110, 60],
         intensityProgression: [70, 75, 85, 60],
         duration: 4, // weeks
-        applications: ['Beginners', 'Strength focus', 'Competition prep']
+        applications: ["Beginners", "Strength focus", "Competition prep"],
       },
       undulating: {
-        name: 'Undulating Periodization',
-        description: 'Frequent variation in volume and intensity',
-        phases: ['High Volume', 'High Intensity', 'Moderate', 'Deload'],
+        name: "Undulating Periodization",
+        description: "Frequent variation in volume and intensity",
+        phases: ["High Volume", "High Intensity", "Moderate", "Deload"],
         volumeProgression: [130, 80, 100, 60],
         intensityProgression: [70, 90, 80, 60],
         duration: 4,
-        applications: ['Intermediate/Advanced', 'Hypertrophy', 'Avoiding plateaus']
+        applications: [
+          "Intermediate/Advanced",
+          "Hypertrophy",
+          "Avoiding plateaus",
+        ],
       },
       block: {
-        name: 'Block Periodization',
-        description: 'Focused training blocks with specific adaptations',
-        phases: ['Accumulation', 'Intensification', 'Realization'],
+        name: "Block Periodization",
+        description: "Focused training blocks with specific adaptations",
+        phases: ["Accumulation", "Intensification", "Realization"],
         volumeProgression: [120, 90, 70],
         intensityProgression: [75, 85, 95],
         duration: 3,
-        applications: ['Advanced athletes', 'Sport-specific', 'Competition cycles']
+        applications: [
+          "Advanced athletes",
+          "Sport-specific",
+          "Competition cycles",
+        ],
       },
       conjugate: {
-        name: 'Conjugate Method',
-        description: 'Simultaneous development of multiple qualities',
-        phases: ['Max Effort', 'Dynamic Effort', 'Repetition Method'],
+        name: "Conjugate Method",
+        description: "Simultaneous development of multiple qualities",
+        phases: ["Max Effort", "Dynamic Effort", "Repetition Method"],
         volumeProgression: [90, 110, 120],
         intensityProgression: [95, 70, 80],
         duration: 3,
-        applications: ['Powerlifting', 'Strength athletes', 'Advanced training']
+        applications: [
+          "Powerlifting",
+          "Strength athletes",
+          "Advanced training",
+        ],
       },
       autoregulated: {
-        name: 'Autoregulated Training',
-        description: 'AI-driven adaptive periodization based on real-time feedback',
-        phases: ['Adaptive', 'Responsive', 'Predictive'],
-        volumeProgression: 'dynamic',
-        intensityProgression: 'dynamic',
-        duration: 'variable',
-        applications: ['All levels', 'Optimal adaptation', 'Injury prevention']
-      }
+        name: "Autoregulated Training",
+        description:
+          "AI-driven adaptive periodization based on real-time feedback",
+        phases: ["Adaptive", "Responsive", "Predictive"],
+        volumeProgression: "dynamic",
+        intensityProgression: "dynamic",
+        duration: "variable",
+        applications: ["All levels", "Optimal adaptation", "Injury prevention"],
+      },
     };
   }
 
@@ -77,119 +90,119 @@ class AdvancedPeriodizationSystem {
   initializePlanningTemplates() {
     return {
       hypertrophy12Week: {
-        name: '12-Week Hypertrophy Specialization',
+        name: "12-Week Hypertrophy Specialization",
         duration: 12,
         phases: [
           {
-            name: 'Foundation Building',
+            name: "Foundation Building",
             weeks: 4,
-            focus: 'Volume accumulation and movement quality',
+            focus: "Volume accumulation and movement quality",
             volumeMultiplier: 1.0,
             intensityRange: [70, 80],
-            exercises: 'compound and isolation mix'
+            exercises: "compound and isolation mix",
           },
           {
-            name: 'Progressive Overload',
+            name: "Progressive Overload",
             weeks: 4,
-            focus: 'Systematic volume and intensity increase',
+            focus: "Systematic volume and intensity increase",
             volumeMultiplier: 1.2,
             intensityRange: [75, 85],
-            exercises: 'add complexity and variety'
+            exercises: "add complexity and variety",
           },
           {
-            name: 'Peak Volume',
+            name: "Peak Volume",
             weeks: 3,
-            focus: 'Maximum tolerable volume',
+            focus: "Maximum tolerable volume",
             volumeMultiplier: 1.4,
             intensityRange: [70, 80],
-            exercises: 'isolation focus for weak points'
+            exercises: "isolation focus for weak points",
           },
           {
-            name: 'Deload & Assessment',
+            name: "Deload & Assessment",
             weeks: 1,
-            focus: 'Recovery and progress evaluation',
+            focus: "Recovery and progress evaluation",
             volumeMultiplier: 0.6,
             intensityRange: [60, 70],
-            exercises: 'movement quality and mobility'
-          }
-        ]
+            exercises: "movement quality and mobility",
+          },
+        ],
       },
       strength16Week: {
-        name: '16-Week Strength Specialization',
+        name: "16-Week Strength Specialization",
         duration: 16,
         phases: [
           {
-            name: 'General Preparation',
+            name: "General Preparation",
             weeks: 4,
-            focus: 'Movement patterns and base building',
+            focus: "Movement patterns and base building",
             volumeMultiplier: 1.1,
             intensityRange: [70, 80],
-            exercises: 'compound movements with accessories'
+            exercises: "compound movements with accessories",
           },
           {
-            name: 'Specific Preparation',
+            name: "Specific Preparation",
             weeks: 6,
-            focus: 'Strength development in competition lifts',
+            focus: "Strength development in competition lifts",
             volumeMultiplier: 1.0,
             intensityRange: [80, 90],
-            exercises: 'competition lifts and close variants'
+            exercises: "competition lifts and close variants",
           },
           {
-            name: 'Competition Preparation',
+            name: "Competition Preparation",
             weeks: 4,
-            focus: 'Peak strength and competition readiness',
+            focus: "Peak strength and competition readiness",
             volumeMultiplier: 0.8,
             intensityRange: [85, 100],
-            exercises: 'competition lifts only'
+            exercises: "competition lifts only",
           },
           {
-            name: 'Peaking',
+            name: "Peaking",
             weeks: 2,
-            focus: 'Peak performance',
+            focus: "Peak performance",
             volumeMultiplier: 0.5,
             intensityRange: [90, 105],
-            exercises: 'competition lifts with opener/attempts'
-          }
-        ]
+            exercises: "competition lifts with opener/attempts",
+          },
+        ],
       },
       powerbuilding20Week: {
-        name: '20-Week Powerbuilding Program',
+        name: "20-Week Powerbuilding Program",
         duration: 20,
         phases: [
           {
-            name: 'Hypertrophy Block',
+            name: "Hypertrophy Block",
             weeks: 8,
-            focus: 'Muscle mass and volume tolerance',
+            focus: "Muscle mass and volume tolerance",
             volumeMultiplier: 1.3,
             intensityRange: [65, 80],
-            exercises: 'high volume, pump-focused'
+            exercises: "high volume, pump-focused",
           },
           {
-            name: 'Strength Block',
+            name: "Strength Block",
             weeks: 8,
-            focus: 'Maximal strength development',
+            focus: "Maximal strength development",
             volumeMultiplier: 0.9,
             intensityRange: [80, 95],
-            exercises: 'compound movements, heavy loads'
+            exercises: "compound movements, heavy loads",
           },
           {
-            name: 'Power Block',
+            name: "Power Block",
             weeks: 3,
-            focus: 'Power and speed development',
+            focus: "Power and speed development",
             volumeMultiplier: 0.7,
             intensityRange: [70, 85],
-            exercises: 'explosive movements, plyometrics'
+            exercises: "explosive movements, plyometrics",
           },
           {
-            name: 'Deload',
+            name: "Deload",
             weeks: 1,
-            focus: 'Recovery and reassessment',
+            focus: "Recovery and reassessment",
             volumeMultiplier: 0.5,
             intensityRange: [60, 70],
-            exercises: 'movement quality and mobility'
-          }
-        ]
-      }
+            exercises: "movement quality and mobility",
+          },
+        ],
+      },
     };
   }
 
@@ -201,23 +214,23 @@ class AdvancedPeriodizationSystem {
       volumeAdaptation: {
         minIncrease: 0.05, // 5% minimum
         maxIncrease: 0.25, // 25% maximum
-        baseIncrease: 0.10, // 10% standard
+        baseIncrease: 0.1, // 10% standard
         fatigueThreshold: 7,
-        recoveryThreshold: 5
+        recoveryThreshold: 5,
       },
       intensityAdaptation: {
         minIncrease: 0.025, // 2.5% minimum
-        maxIncrease: 0.10, // 10% maximum  
+        maxIncrease: 0.1, // 10% maximum
         baseIncrease: 0.05, // 5% standard
         performanceThreshold: 80,
-        plateauThreshold: 75
+        plateauThreshold: 75,
       },
       frequencyAdaptation: {
         minFrequency: 1,
         maxFrequency: 4,
         recoveryFactor: 0.8,
-        volumeFactor: 1.2
-      }
+        volumeFactor: 1.2,
+      },
     };
   }
 
@@ -230,10 +243,14 @@ class AdvancedPeriodizationSystem {
   createLongTermPlan(goals, duration = 16) {
     const userProfile = this.analyzeUserProfile();
     const selectedModel = this.selectOptimalPeriodization(goals, userProfile);
-    const planStructure = this.generatePlanStructure(selectedModel, duration, goals);
+    const planStructure = this.generatePlanStructure(
+      selectedModel,
+      duration,
+      goals,
+    );
     const weeklyPlans = this.generateWeeklyPlans(planStructure);
     const progressionPlan = this.createProgressionPlan(weeklyPlans);
-    
+
     return {
       overview: {
         duration,
@@ -241,14 +258,14 @@ class AdvancedPeriodizationSystem {
         goals: goals,
         userProfile,
         startDate: new Date(),
-        estimatedCompletion: this.calculateCompletionDate(duration)
+        estimatedCompletion: this.calculateCompletionDate(duration),
       },
       structure: planStructure,
       weeklyPlans,
       progressionPlan,
       adaptationTriggers: this.defineAdaptationTriggers(),
       milestones: this.definePlanMilestones(duration, goals),
-      contingencyPlans: this.createContingencyPlans()
+      contingencyPlans: this.createContingencyPlans(),
     };
   }
 
@@ -260,14 +277,14 @@ class AdvancedPeriodizationSystem {
     const historicalData = this.getHistoricalTrainingData();
     const currentCapacity = this.assessCurrentCapacity();
     const responsePatterns = this.analyzeResponsePatterns(historicalData);
-    
+
     return {
       experience: this.determineExperienceLevel(historicalData),
       capacity: currentCapacity,
       responsePatterns,
       preferences: this.analyzeTrainingPreferences(historicalData),
       limitingFactors: this.identifyLimitingFactors(),
-      adaptationRate: this.calculateAdaptationRate(historicalData)
+      adaptationRate: this.calculateAdaptationRate(historicalData),
     };
   }
 
@@ -279,31 +296,61 @@ class AdvancedPeriodizationSystem {
    */
   selectOptimalPeriodization(goals, profile) {
     const scores = {};
-    
+
     // Score each model based on goals and profile
     Object.entries(this.periodizationModels).forEach(([key, model]) => {
       let score = 0;
-      
+
       // Goal alignment
-      if (goals.primary === 'hypertrophy' && model.applications.includes('Hypertrophy')) score += 3;
-      if (goals.primary === 'strength' && model.applications.includes('Strength focus')) score += 3;
-      if (goals.primary === 'powerlifting' && model.applications.includes('Powerlifting')) score += 3;
-      
+      if (
+        goals.primary === "hypertrophy" &&
+        model.applications.includes("Hypertrophy")
+      )
+        score += 3;
+      if (
+        goals.primary === "strength" &&
+        model.applications.includes("Strength focus")
+      )
+        score += 3;
+      if (
+        goals.primary === "powerlifting" &&
+        model.applications.includes("Powerlifting")
+      )
+        score += 3;
+
       // Experience level alignment
-      if (profile.experience === 'beginner' && model.applications.includes('Beginners')) score += 2;
-      if (profile.experience === 'intermediate' && model.applications.includes('Intermediate/Advanced')) score += 2;
-      if (profile.experience === 'advanced' && model.applications.includes('Advanced athletes')) score += 2;
-      
+      if (
+        profile.experience === "beginner" &&
+        model.applications.includes("Beginners")
+      )
+        score += 2;
+      if (
+        profile.experience === "intermediate" &&
+        model.applications.includes("Intermediate/Advanced")
+      )
+        score += 2;
+      if (
+        profile.experience === "advanced" &&
+        model.applications.includes("Advanced athletes")
+      )
+        score += 2;
+
       // Adaptation patterns
-      if (profile.adaptationRate === 'fast' && key === 'undulating') score += 1;
-      if (profile.adaptationRate === 'slow' && key === 'linear') score += 1;
-      if (profile.responsePatterns.variabilityTolerance === 'high' && key === 'conjugate') score += 1;
-      
+      if (profile.adaptationRate === "fast" && key === "undulating") score += 1;
+      if (profile.adaptationRate === "slow" && key === "linear") score += 1;
+      if (
+        profile.responsePatterns.variabilityTolerance === "high" &&
+        key === "conjugate"
+      )
+        score += 1;
+
       scores[key] = score;
     });
-    
+
     // Select highest scoring model
-    const selectedKey = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+    const selectedKey = Object.keys(scores).reduce((a, b) =>
+      scores[a] > scores[b] ? a : b,
+    );
     return this.periodizationModels[selectedKey];
   }
 
@@ -315,15 +362,15 @@ class AdvancedPeriodizationSystem {
   generateWeeklyPlans(planStructure) {
     const weeklyPlans = [];
     let currentWeek = 1;
-    
-    planStructure.phases.forEach(phase => {
+
+    planStructure.phases.forEach((phase) => {
       for (let week = 0; week < phase.weeks; week++) {
         const weekPlan = this.generateWeekPlan(phase, week, currentWeek);
         weeklyPlans.push(weekPlan);
         currentWeek++;
       }
     });
-    
+
     return weeklyPlans;
   }
 
@@ -337,29 +384,33 @@ class AdvancedPeriodizationSystem {
   generateWeekPlan(phase, weekInPhase, absoluteWeek) {
     const muscles = Object.keys(trainingState.volumeLandmarks);
     const weekProgression = (weekInPhase + 1) / phase.weeks;
-    
+
     const plan = {
       week: absoluteWeek,
       phase: phase.name,
       focus: phase.focus,
       progressionFactor: weekProgression,
-      muscles: {}
+      muscles: {},
     };
-    
-    muscles.forEach(muscle => {
+
+    muscles.forEach((muscle) => {
       const baseLandmarks = trainingState.volumeLandmarks[muscle];
-      const adjustedLandmarks = this.adjustLandmarksForPhase(baseLandmarks, phase, weekProgression);
-      
+      const adjustedLandmarks = this.adjustLandmarksForPhase(
+        baseLandmarks,
+        phase,
+        weekProgression,
+      );
+
       plan.muscles[muscle] = {
         landmarks: adjustedLandmarks,
         targetSets: this.calculateTargetSets(adjustedLandmarks, phase),
         intensityRange: phase.intensityRange,
         exerciseSelection: this.selectPhaseExercises(muscle, phase),
         loadProgression: this.calculateLoadProgression(phase, weekProgression),
-        recoveryRequirements: this.calculateRecoveryRequirements(muscle, phase)
+        recoveryRequirements: this.calculateRecoveryRequirements(muscle, phase),
       };
     });
-    
+
     return plan;
   }
 
@@ -375,7 +426,7 @@ class AdvancedPeriodizationSystem {
       exerciseProgression: this.createExerciseProgression(weeklyPlans),
       deloadTriggers: this.defineDeloadTriggers(),
       adaptationChecks: this.scheduleAdaptationChecks(weeklyPlans),
-      autoAdjustmentRules: this.defineAutoAdjustmentRules()
+      autoAdjustmentRules: this.defineAutoAdjustmentRules(),
     };
   }
 
@@ -392,37 +443,51 @@ class AdvancedPeriodizationSystem {
       frequencyAdjustment: 1.0,
       exerciseModifications: [],
       phaseModifications: [],
-      reasoning: []
+      reasoning: [],
     };
-    
+
     // Analyze performance trends
     const performanceTrend = this.analyzePerformanceTrend(recentPerformance);
     const fatigueStatus = this.assessFatigueStatus(recentPerformance);
     const wellnessImpact = this.assessWellnessImpact();
-    
+
     // Apply adaptations based on analysis
-    if (performanceTrend.direction === 'declining' && performanceTrend.significance > 0.7) {
+    if (
+      performanceTrend.direction === "declining" &&
+      performanceTrend.significance > 0.7
+    ) {
       adaptations.volumeAdjustment = 0.85;
       adaptations.intensityAdjustment = 0.9;
-      adaptations.reasoning.push('Performance decline detected - reducing training stress');
+      adaptations.reasoning.push(
+        "Performance decline detected - reducing training stress",
+      );
     }
-    
-    if (fatigueStatus.level === 'high' && fatigueStatus.duration >= 3) {
+
+    if (fatigueStatus.level === "high" && fatigueStatus.duration >= 3) {
       adaptations.volumeAdjustment *= 0.8;
-      adaptations.reasoning.push('Sustained high fatigue - additional volume reduction');
+      adaptations.reasoning.push(
+        "Sustained high fatigue - additional volume reduction",
+      );
     }
-    
+
     if (wellnessImpact.readiness < 60) {
       adaptations.frequencyAdjustment = 0.8;
-      adaptations.reasoning.push('Low wellness readiness - reducing training frequency');
+      adaptations.reasoning.push(
+        "Low wellness readiness - reducing training frequency",
+      );
     }
-    
+
     // Positive adaptations
-    if (performanceTrend.direction === 'improving' && fatigueStatus.level === 'low') {
+    if (
+      performanceTrend.direction === "improving" &&
+      fatigueStatus.level === "low"
+    ) {
       adaptations.volumeAdjustment = 1.1;
-      adaptations.reasoning.push('Strong performance with low fatigue - increasing volume');
+      adaptations.reasoning.push(
+        "Strong performance with low fatigue - increasing volume",
+      );
     }
-    
+
     return this.applyPlanAdaptations(currentPlan, adaptations);
   }
 
@@ -435,7 +500,7 @@ class AdvancedPeriodizationSystem {
     const deloadIntensity = this.calculateDeloadIntensity(currentStatus);
     const deloadDuration = this.calculateDeloadDuration(currentStatus);
     const deloadActivities = this.selectDeloadActivities(currentStatus);
-    
+
     return {
       type: this.determineDeloadType(currentStatus),
       intensity: deloadIntensity,
@@ -445,7 +510,7 @@ class AdvancedPeriodizationSystem {
       intensityReduction: this.calculateIntensityReduction(deloadIntensity),
       focusAreas: this.identifyDeloadFocusAreas(currentStatus),
       returnCriteria: this.defineReturnCriteria(currentStatus),
-      monitoring: this.defineDeloadMonitoring()
+      monitoring: this.defineDeloadMonitoring(),
     };
   }
 
@@ -459,7 +524,7 @@ class AdvancedPeriodizationSystem {
     const peakingPhases = this.definePeakingPhases(weeksOut);
     const tapering = this.createTaperingPlan(weeksOut);
     const competitionPrep = this.createCompetitionPrep(competition);
-    
+
     return {
       phases: peakingPhases,
       tapering,
@@ -468,7 +533,7 @@ class AdvancedPeriodizationSystem {
       keyWorkouts: this.scheduleKeyWorkouts(weeksOut),
       recoveryProtocol: this.createPeakingRecoveryProtocol(),
       nutritionGuidance: this.createPeakingNutritionPlan(),
-      mentalPreparation: this.createMentalPrepPlan()
+      mentalPreparation: this.createMentalPrepPlan(),
     };
   }
 
@@ -478,10 +543,10 @@ class AdvancedPeriodizationSystem {
     const totalWeeks = data.length;
     const consistencyScore = this.calculateConsistency(data);
     const progressionRate = this.calculateProgressionRate(data);
-    
-    if (totalWeeks < 12 || consistencyScore < 60) return 'beginner';
-    if (totalWeeks < 52 || progressionRate > 0.8) return 'intermediate';
-    return 'advanced';
+
+    if (totalWeeks < 12 || consistencyScore < 60) return "beginner";
+    if (totalWeeks < 52 || progressionRate > 0.8) return "intermediate";
+    return "advanced";
   }
 
   assessCurrentCapacity() {
@@ -490,12 +555,12 @@ class AdvancedPeriodizationSystem {
       const landmarks = trainingState.volumeLandmarks[muscle];
       return sum + landmarks.MRV;
     }, 0);
-    
+
     return {
       totalVolume: totalCapacity,
       muscleDistribution: this.analyzeMuscleDistribution(),
       recoveryCapacity: this.assessRecoveryCapacity(),
-      adaptationPotential: this.assessAdaptationPotential()
+      adaptationPotential: this.assessAdaptationPotential(),
     };
   }
 
@@ -509,12 +574,12 @@ class AdvancedPeriodizationSystem {
     const data = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && key.startsWith('session-')) {
+      if (key && key.startsWith("session-")) {
         try {
           const sessionData = JSON.parse(localStorage.getItem(key));
           data.push(sessionData);
         } catch (e) {
-          console.warn('Failed to parse session data:', key);
+          console.warn("Failed to parse session data:", key);
         }
       }
     }
@@ -524,15 +589,13 @@ class AdvancedPeriodizationSystem {
   calculateCompletionDate(duration) {
     const today = new Date();
     const completion = new Date(today);
-    completion.setDate(completion.getDate() + (duration * 7));
+    completion.setDate(completion.getDate() + duration * 7);
     return completion;
   }
 }
 
 // Export for use in main application
-export {
-  AdvancedPeriodizationSystem
-};
+export { AdvancedPeriodizationSystem };
 
 // Create singleton instance
 export const periodizationSystem = new AdvancedPeriodizationSystem();

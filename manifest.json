@@ -7,7 +7,8 @@
   "background_color": "#0a0a0a",
   "theme_color": "#667eea",
   "orientation": "portrait-primary",
-  "scope": "/",  "categories": ["fitness", "health", "productivity", "sports"],
+  "scope": "/",
+  "categories": ["fitness", "health", "productivity", "sports"],
   "lang": "en-US",
   "dir": "ltr",
   "features": [

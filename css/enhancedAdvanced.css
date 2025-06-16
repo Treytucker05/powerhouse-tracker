@@ -101,8 +101,14 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* === OVERVIEW TAB === */
@@ -112,8 +118,11 @@
   gap: 24px;
 }
 
-.metric-panel, .chart-panel, .achievements-panel, 
-.action-panel, .status-panel {
+.metric-panel,
+.chart-panel,
+.achievements-panel,
+.action-panel,
+.status-panel {
   background: white;
   border-radius: 12px;
   padding: 24px;
@@ -122,7 +131,8 @@
   transition: all 0.3s ease;
 }
 
-.metric-panel:hover, .chart-panel:hover {
+.metric-panel:hover,
+.chart-panel:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
@@ -397,8 +407,10 @@
   gap: 24px;
 }
 
-.ai-insights-panel, .performance-analysis-panel, 
-.predictions-panel, .risk-assessment-panel {
+.ai-insights-panel,
+.performance-analysis-panel,
+.predictions-panel,
+.risk-assessment-panel {
   background: white;
   border-radius: 12px;
   padding: 30px;
@@ -478,8 +490,14 @@
 }
 
 @keyframes slideInRight {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .notification.success {
@@ -526,11 +544,11 @@
   .overview-grid {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .planning-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .wellness-grid {
     grid-template-columns: 1fr;
   }
@@ -541,46 +559,46 @@
     flex-direction: column;
     gap: 16px;
   }
-  
+
   .dashboard-controls {
     width: 100%;
     justify-content: center;
   }
-  
+
   .tab-navigation {
     flex-wrap: wrap;
     justify-content: center;
   }
-  
+
   .tab-btn {
     padding: 12px 16px;
     font-size: 0.9em;
   }
-  
+
   .dashboard-content {
     padding: 20px;
   }
-  
+
   .overview-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .metrics-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .wellness-scores {
     flex-direction: column;
   }
-  
+
   .insights-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .analytics-controls {
     flex-direction: column;
   }
-  
+
   .notification-area {
     left: 20px;
     right: 20px;
@@ -624,8 +642,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* === DARK MODE SUPPORT === */
@@ -633,19 +655,25 @@
   .advanced-dashboard {
     background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
   }
-  
-  .metric-panel, .chart-panel, .achievements-panel,
-  .action-panel, .status-panel,
+
+  .metric-panel,
+  .chart-panel,
+  .achievements-panel,
+  .action-panel,
+  .status-panel,
   .analytics-section,
-  .wellness-input-panel, .wellness-dashboard,
+  .wellness-input-panel,
+  .wellness-dashboard,
   .plan-creation-panel,
-  .ai-insights-panel, .performance-analysis-panel,
-  .predictions-panel, .risk-assessment-panel {
+  .ai-insights-panel,
+  .performance-analysis-panel,
+  .predictions-panel,
+  .risk-assessment-panel {
     background: #1e293b;
     border-color: #334155;
     color: #f1f5f9;
   }
-  
+
   .notification {
     background: #1e293b;
     border-color: #334155;

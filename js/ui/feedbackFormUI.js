@@ -3,32 +3,40 @@
  * Manages set feedback submission and RP algorithm integration
  */
 
-import trainingState from '../core/trainingState.js';
-import { updateChart } from './chartManager.js';
-import { scoreStimulus, setProgressionAlgorithm, getVolumeProgression } from '../algorithms/volume.js';
-import { validateEffortLevel, getAutoregulationAdvice } from '../algorithms/effort.js';
+import trainingState from "../core/trainingState.js";
+import { updateChart } from "./chartManager.js";
+import {
+  scoreStimulus,
+  setProgressionAlgorithm,
+  getVolumeProgression,
+} from "../algorithms/volume.js";
+import {
+  validateEffortLevel,
+  getAutoregulationAdvice,
+} from "../algorithms/effort.js";
 
 /**
  * Initialize feedback form interactions
  */
 export function initFeedbackForm() {
-  const submitButton = document.getElementById('submitFeedbackBtn') || 
-                      document.querySelector('#mevCard button');
-  
+  const submitButton =
+    document.getElementById("submitFeedbackBtn") ||
+    document.querySelector("#mevCard button");
+
   if (submitButton) {
-    submitButton.addEventListener('click', handleFeedbackSubmission);
+    submitButton.addEventListener("click", handleFeedbackSubmission);
   }
 
   // Real-time RIR validation
   const rirInputs = document.querySelectorAll('input[name="actualRIR"]');
-  rirInputs.forEach(input => {
-    input.addEventListener('input', validateRIRInput);
+  rirInputs.forEach((input) => {
+    input.addEventListener("input", validateRIRInput);
   });
 
   // Auto-populate current sets
-  const muscleSelect = document.getElementById('muscleSelect');
+  const muscleSelect = document.getElementById("muscleSelect");
   if (muscleSelect) {
-    muscleSelect.addEventListener('change', updateCurrentSetsFromState);
+    muscleSelect.addEventListener("change", updateCurrentSetsFromState);
     updateCurrentSetsFromState();
   }
 }
@@ -38,20 +46,20 @@ export function initFeedbackForm() {
  */
 function handleFeedbackSubmission() {
   const formData = collectFeedbackData();
-  
+
   if (!validateFeedbackData(formData)) {
     return;
   }
 
   // Process with RP algorithms
   const results = processFeedbackWithRP(formData);
-  
+
   // Update training state
   updateTrainingState(formData, results);
-  
+
   // Display results
   displayFeedbackResults(results);
-  
+
   // Update UI
   updateChart();
   updateCurrentSetsFromState();
@@ -60,28 +68,34 @@ function handleFeedbackSubmission() {
 /**
  * Collect feedback data from form
  */
-function collectFeedbackData() {  const muscle = document.getElementById('muscleSelect')?.value;
-  const currentSets = parseInt(document.getElementById('currentSets')?.value, 10);
-  const mmc = parseInt(document.getElementById('mmc')?.value, 10);
-  const pump = parseInt(document.getElementById('pump')?.value, 10);
-  const workload = parseInt(document.getElementById('dis')?.value, 10);
-  
+function collectFeedbackData() {
+  const muscle = document.getElementById("muscleSelect")?.value;
+  const currentSets = parseInt(
+    document.getElementById("currentSets")?.value,
+    10,
+  );
+  const mmc = parseInt(document.getElementById("mmc")?.value, 10);
+  const pump = parseInt(document.getElementById("pump")?.value, 10);
+  const workload = parseInt(document.getElementById("dis")?.value, 10);
+
   // Get performance rating from radio buttons
   const perfRadio = document.querySelector('input[name="perf"]:checked');
   const performance = perfRadio ? parseInt(perfRadio.value, 10) : 1;
-    // Get soreness from weekly section if available
-  const soreness = parseInt(document.getElementById('sore')?.value, 10) || 1;
-  
+  // Get soreness from weekly section if available
+  const soreness = parseInt(document.getElementById("sore")?.value, 10) || 1;
+
   // Get enhanced fatigue detection inputs
-  const jointAche = parseInt(document.getElementById('jointAche')?.value, 10) || 0;
-  const perfChange = parseInt(document.getElementById('perfChange')?.value, 10) || 0;
-  
+  const jointAche =
+    parseInt(document.getElementById("jointAche")?.value, 10) || 0;
+  const perfChange =
+    parseInt(document.getElementById("perfChange")?.value, 10) || 0;
+
   // Get actual RIR if provided
-  const actualRIRInput = document.getElementById('actualRIR');
+  const actualRIRInput = document.getElementById("actualRIR");
   const actualRIR = actualRIRInput ? parseFloat(actualRIRInput.value) : null;
-  
+
   // Check for illness/injury
-  const hasIllness = document.getElementById('illness2')?.checked || false;
+  const hasIllness = document.getElementById("illness2")?.checked || false;
   return {
     muscle,
     currentSets,
@@ -92,7 +106,7 @@ function collectFeedbackData() {  const muscle = document.getElementById('muscle
     perfChange,
     actualRIR,
     hasIllness,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 }
 
@@ -103,26 +117,38 @@ function validateFeedbackData(data) {
   const errors = [];
 
   if (!data.muscle) {
-    errors.push('Please select a muscle group');
+    errors.push("Please select a muscle group");
   }
 
   if (isNaN(data.currentSets) || data.currentSets < 0) {
-    errors.push('Please enter a valid number of sets');
+    errors.push("Please enter a valid number of sets");
   }
 
-  if (isNaN(data.stimulus.mmc) || data.stimulus.mmc < 0 || data.stimulus.mmc > 3) {
-    errors.push('Mind-muscle connection must be 0-3');
+  if (
+    isNaN(data.stimulus.mmc) ||
+    data.stimulus.mmc < 0 ||
+    data.stimulus.mmc > 3
+  ) {
+    errors.push("Mind-muscle connection must be 0-3");
   }
 
-  if (isNaN(data.stimulus.pump) || data.stimulus.pump < 0 || data.stimulus.pump > 3) {
-    errors.push('Pump rating must be 0-3');
+  if (
+    isNaN(data.stimulus.pump) ||
+    data.stimulus.pump < 0 ||
+    data.stimulus.pump > 3
+  ) {
+    errors.push("Pump rating must be 0-3");
   }
-  if (isNaN(data.stimulus.disruption) || data.stimulus.disruption < 0 || data.stimulus.disruption > 3) {
-    errors.push('Workload rating must be 0-3');
+  if (
+    isNaN(data.stimulus.disruption) ||
+    data.stimulus.disruption < 0 ||
+    data.stimulus.disruption > 3
+  ) {
+    errors.push("Workload rating must be 0-3");
   }
 
   if (errors.length > 0) {
-    showFeedbackError(errors.join('\n'));
+    showFeedbackError(errors.join("\n"));
     return false;
   }
 
@@ -135,16 +161,19 @@ function validateFeedbackData(data) {
 function processFeedbackWithRP(data) {
   // Get stimulus score
   const stimulusResult = scoreStimulus(data.stimulus);
-  
+
   // Get set progression recommendation
-  const progressionResult = setProgressionAlgorithm(data.soreness, data.performance);
-  
+  const progressionResult = setProgressionAlgorithm(
+    data.soreness,
+    data.performance,
+  );
+
   // Get volume progression (combines both algorithms)
   const volumeProgression = getVolumeProgression(data.muscle, {
     stimulus: data.stimulus,
     soreness: data.soreness,
     performance: data.performance,
-    hasIllness: data.hasIllness
+    hasIllness: data.hasIllness,
   });
 
   // Validate RIR if provided
@@ -158,7 +187,10 @@ function processFeedbackWithRP(data) {
     progression: progressionResult,
     volumeProgression,
     rirValidation,
-    recommendedAction: determineRecommendedAction(stimulusResult, progressionResult)
+    recommendedAction: determineRecommendedAction(
+      stimulusResult,
+      progressionResult,
+    ),
   };
 }
 
@@ -169,21 +201,27 @@ function determineRecommendedAction(stimulusResult, progressionResult) {
   // Progression algorithm takes priority for set changes
   let setChange = progressionResult.setChange;
   let advice = progressionResult.advice;
-  
+
   // But consider workload for additional context
-  if (stimulusResult.action === 'reduce_sets' && progressionResult.action === 'add_sets') {
-    advice += ' (But consider technique - stimulus was high)';
+  if (
+    stimulusResult.action === "reduce_sets" &&
+    progressionResult.action === "add_sets"
+  ) {
+    advice += " (But consider technique - stimulus was high)";
   }
-  
-  if (stimulusResult.action === 'add_sets' && progressionResult.action === 'maintain') {
-    advice += ' (Stimulus was low - focus on connection)';
+
+  if (
+    stimulusResult.action === "add_sets" &&
+    progressionResult.action === "maintain"
+  ) {
+    advice += " (Stimulus was low - focus on connection)";
   }
 
   return {
     setChange,
     advice,
-    primaryReason: 'RP Set Progression Algorithm',
-    secondaryFactor: `Stimulus Score: ${stimulusResult.score}/9`
+    primaryReason: "RP Set Progression Algorithm",
+    secondaryFactor: `Stimulus Score: ${stimulusResult.score}/9`,
   };
 }
 
@@ -193,22 +231,22 @@ function determineRecommendedAction(stimulusResult, progressionResult) {
 function updateTrainingState(data, results) {
   const { muscle } = data;
   const { setChange } = results.recommendedAction;
-  
+
   // Apply set change if not a recovery session
   if (setChange !== -99) {
     trainingState.addSets(muscle, setChange);
   }
-  
+
   // Track if this was a recovery session
-  if (results.progression.action === 'recovery') {
+  if (results.progression.action === "recovery") {
     trainingState.recoverySessionsThisWeek++;
-    
+
     // Check if this muscle needs to be counted for deload consideration
-    if (results.volumeProgression.volumeStatus === 'maximum') {
+    if (results.volumeProgression.volumeStatus === "maximum") {
       trainingState.totalMusclesNeedingRecovery++;
     }
   }
-  
+
   // Store feedback for trend analysis
   storeFeedbackForTrends(data, results);
 }
@@ -222,9 +260,9 @@ function storeFeedbackForTrends(data, results) {
     ...data,
     results,
     weekNo: trainingState.weekNo,
-    blockNo: trainingState.blockNo
+    blockNo: trainingState.blockNo,
   };
-  
+
   localStorage.setItem(key, JSON.stringify(feedbackData));
 }
 
@@ -232,13 +270,14 @@ function storeFeedbackForTrends(data, results) {
  * Display feedback results
  */
 function displayFeedbackResults(results) {
-  const output = document.getElementById('mevOut');
+  const output = document.getElementById("mevOut");
   if (!output) return;
 
   const { stimulus, volumeProgression, rirValidation } = results;
-    const title = volumeProgression.headline ?? `${volumeProgression.muscle} Recommendation`;
-  const subtitle = volumeProgression.notes ?? volumeProgression.advice ?? '';
-  
+  const title =
+    volumeProgression.headline ?? `${volumeProgression.muscle} Recommendation`;
+  const subtitle = volumeProgression.notes ?? volumeProgression.advice ?? "";
+
   let resultHTML = `
     <div class="feedback-results">
       <div class="main-recommendation">
@@ -247,14 +286,14 @@ function displayFeedbackResults(results) {
         <p class="sets-info">
           Current: ${volumeProgression.currentSets} sets → 
           Next week: ${volumeProgression.projectedSets} sets
-          ${volumeProgression.setChange !== 0 ? `(${volumeProgression.setChange > 0 ? '+' : ''}${volumeProgression.setChange})` : ''}
+          ${volumeProgression.setChange !== 0 ? `(${volumeProgression.setChange > 0 ? "+" : ""}${volumeProgression.setChange})` : ""}
         </p>
       </div>
       
       <div class="algorithm-details">
         <div class="stimulus-score">
           <strong>Workload:</strong> ${stimulus.score}/9 
-          <span class="stimulus-${stimulus.action}">(${stimulus.action.replace('_', ' ')})</span>
+          <span class="stimulus-${stimulus.action}">(${stimulus.action.replace("_", " ")})</span>
         </div>
         <div class="volume-status">
           <strong>Volume Status:</strong> ${volumeProgression.volumeStatus}
@@ -265,7 +304,7 @@ function displayFeedbackResults(results) {
       </div>
     </div>
   `;
-  
+
   // Add RIR validation if provided
   if (rirValidation) {
     resultHTML += `
@@ -275,7 +314,7 @@ function displayFeedbackResults(results) {
       </div>
     `;
   }
-  
+
   // Add deload warning if needed
   if (volumeProgression.deloadRecommended) {
     resultHTML += `
@@ -284,7 +323,7 @@ function displayFeedbackResults(results) {
       </div>
     `;
   }
-  
+
   output.innerHTML = resultHTML;
   output.className = getResultClass(determineResultType(results));
 }
@@ -293,22 +332,26 @@ function displayFeedbackResults(results) {
  * Determine result type for styling
  */
 function determineResultType(results) {
-  if (results.volumeProgression.deloadRecommended) return 'warning';
-  if (results.progression.action === 'recovery') return 'danger';
-  if (results.volumeProgression.setChange > 0) return 'success';
-  return 'info';
+  if (results.volumeProgression.deloadRecommended) return "warning";
+  if (results.progression.action === "recovery") return "danger";
+  if (results.volumeProgression.setChange > 0) return "success";
+  return "info";
 }
 
 /**
  * Get result class for styling
  */
 function getResultClass(type) {
-  const baseClass = 'result active';
-  switch(type) {
-    case 'success': return `${baseClass} success`;
-    case 'warning': return `${baseClass} warning`;
-    case 'danger': return `${baseClass} danger`;
-    default: return baseClass;
+  const baseClass = "result active";
+  switch (type) {
+    case "success":
+      return `${baseClass} success`;
+    case "warning":
+      return `${baseClass} warning`;
+    case "danger":
+      return `${baseClass} danger`;
+    default:
+      return baseClass;
   }
 }
 
@@ -316,11 +359,11 @@ function getResultClass(type) {
  * Update current sets from training state
  */
 function updateCurrentSetsFromState() {
-  const muscleSelect = document.getElementById('muscleSelect');
-  const currentSetsInput = document.getElementById('currentSets');
-  
+  const muscleSelect = document.getElementById("muscleSelect");
+  const currentSetsInput = document.getElementById("currentSets");
+
   if (!muscleSelect || !currentSetsInput) return;
-  
+
   const muscle = muscleSelect.value;
   const currentSets = trainingState.currentWeekSets[muscle] || 0;
   currentSetsInput.value = currentSets;
@@ -333,22 +376,22 @@ function validateRIRInput(event) {
   const input = event.target;
   const value = parseFloat(input.value);
   const targetRIR = trainingState.getTargetRIR();
-  
+
   if (isNaN(value)) return;
-  
+
   const validation = validateEffortLevel(value, targetRIR);
-  
+
   // Visual feedback
-  input.classList.remove('rir-good', 'rir-warning', 'rir-danger');
-  
+  input.classList.remove("rir-good", "rir-warning", "rir-danger");
+
   if (validation.isWithinTolerance) {
-    input.classList.add('rir-good');
-  } else if (validation.urgency === 'medium') {
-    input.classList.add('rir-warning');
+    input.classList.add("rir-good");
+  } else if (validation.urgency === "medium") {
+    input.classList.add("rir-warning");
   } else {
-    input.classList.add('rir-danger');
+    input.classList.add("rir-danger");
   }
-  
+
   // Show tooltip with feedback
   showRIRTooltip(input, validation);
 }
@@ -358,44 +401,44 @@ function validateRIRInput(event) {
  */
 function showRIRTooltip(input, validation) {
   // Remove existing tooltip
-  const existingTooltip = input.parentNode.querySelector('.rir-tooltip');
+  const existingTooltip = input.parentNode.querySelector(".rir-tooltip");
   if (existingTooltip) {
     existingTooltip.remove();
   }
-  
+
   // Create new tooltip
-  const tooltip = document.createElement('div');
+  const tooltip = document.createElement("div");
   tooltip.className = `rir-tooltip ${validation.urgency}`;
   tooltip.textContent = validation.feedback;
-  
+
   // Position tooltip
   Object.assign(tooltip.style, {
-    position: 'absolute',
-    bottom: '100%',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    padding: '8px 12px',
-    borderRadius: '6px',
-    fontSize: '12px',
-    fontWeight: '600',
-    color: 'white',
-    zIndex: '1000',
-    whiteSpace: 'nowrap',
-    marginBottom: '5px'
+    position: "absolute",
+    bottom: "100%",
+    left: "50%",
+    transform: "translateX(-50%)",
+    padding: "8px 12px",
+    borderRadius: "6px",
+    fontSize: "12px",
+    fontWeight: "600",
+    color: "white",
+    zIndex: "1000",
+    whiteSpace: "nowrap",
+    marginBottom: "5px",
   });
-  
+
   // Color based on urgency
   const colors = {
-    normal: '#4CAF50',
-    medium: '#ff9800',
-    high: '#f44336'
+    normal: "#4CAF50",
+    medium: "#ff9800",
+    high: "#f44336",
   };
   tooltip.style.backgroundColor = colors[validation.urgency] || colors.normal;
-  
+
   // Add to DOM
-  input.parentNode.style.position = 'relative';
+  input.parentNode.style.position = "relative";
   input.parentNode.appendChild(tooltip);
-  
+
   // Remove after delay
   setTimeout(() => {
     if (tooltip.parentNode) {
@@ -408,10 +451,10 @@ function showRIRTooltip(input, validation) {
  * Show feedback error
  */
 function showFeedbackError(message) {
-  const output = document.getElementById('mevOut');
+  const output = document.getElementById("mevOut");
   if (output) {
     output.innerHTML = `<div class="error-message">❌ ${message}</div>`;
-    output.className = 'result danger active';
+    output.className = "result danger active";
   }
 }
 
@@ -419,7 +462,7 @@ function showFeedbackError(message) {
  * Add autoregulation features to feedback form
  */
 export function addAutoregulationFeatures() {
-  const feedbackForm = document.getElementById('mevCard');
+  const feedbackForm = document.getElementById("mevCard");
   if (!feedbackForm) return;
 
   const autoregHTML = `
@@ -436,16 +479,16 @@ export function addAutoregulationFeatures() {
       </div>
     </div>
   `;
-  
+
   // Insert before submit button
-  const submitButton = feedbackForm.querySelector('button');
+  const submitButton = feedbackForm.querySelector("button");
   if (submitButton) {
-    submitButton.insertAdjacentHTML('beforebegin', autoregHTML);
+    submitButton.insertAdjacentHTML("beforebegin", autoregHTML);
   }
 }
 
 export {
   handleFeedbackSubmission,
   updateCurrentSetsFromState,
-  validateRIRInput
+  validateRIRInput,
 };

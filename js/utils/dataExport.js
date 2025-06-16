@@ -3,7 +3,7 @@
  * Provides comprehensive data export, import, and backup capabilities
  */
 
-import trainingState from '../core/trainingState.js';
+import trainingState from "../core/trainingState.js";
 
 /**
  * Data Export Manager Class
@@ -11,7 +11,7 @@ import trainingState from '../core/trainingState.js';
  */
 class DataExportManager {
   constructor() {
-    this.exportFormats = ['json', 'csv', 'excel'];
+    this.exportFormats = ["json", "csv", "excel"];
     this.compressionEnabled = true;
     this.encryptionEnabled = false; // Future enhancement
   }
@@ -22,13 +22,13 @@ class DataExportManager {
    * @param {Object} options - Export options
    * @returns {Object} - Export result
    */
-  exportAllData(format = 'json', options = {}) {
+  exportAllData(format = "json", options = {}) {
     const {
       includePersonalData = true,
       includeAnalytics = true,
       includeWellness = true,
       dateRange = null,
-      compress = this.compressionEnabled
+      compress = this.compressionEnabled,
     } = options;
 
     try {
@@ -36,25 +36,25 @@ class DataExportManager {
         includePersonalData,
         includeAnalytics,
         includeWellness,
-        dateRange
+        dateRange,
       });
 
       switch (format.toLowerCase()) {
-        case 'json':
+        case "json":
           return this.exportAsJSON(exportData, compress);
-        case 'csv':
+        case "csv":
           return this.exportAsCSV(exportData);
-        case 'excel':
+        case "excel":
           return this.exportAsExcel(exportData);
         default:
           throw new Error(`Unsupported export format: ${format}`);
       }
     } catch (error) {
-      console.error('Export failed:', error);
+      console.error("Export failed:", error);
       return {
         success: false,
         error: error.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
@@ -69,22 +69,22 @@ class DataExportManager {
       includePersonalData,
       includeAnalytics,
       includeWellness,
-      dateRange
+      dateRange,
     } = options;
 
     const exportData = {
       metadata: {
         exportDate: new Date().toISOString(),
-        appVersion: '2.0.0',
-        exportType: 'full',
-        dataPoints: 0
+        appVersion: "2.0.0",
+        exportType: "full",
+        dataPoints: 0,
       },
       trainingState: null,
       sessionHistory: [],
       feedback: [],
       analytics: null,
       wellness: null,
-      preferences: null
+      preferences: null,
     };
 
     // Core training state
@@ -130,7 +130,7 @@ class DataExportManager {
       currentPhase: trainingState.getCurrentPhase(),
       stateHistory: trainingState.getStateHistory(),
       totalMusclesNeedingRecovery: trainingState.totalMusclesNeedingRecovery,
-      recoverySessionsThisWeek: trainingState.recoverySessionsThisWeek
+      recoverySessionsThisWeek: trainingState.recoverySessionsThisWeek,
     };
   }
 
@@ -141,17 +141,17 @@ class DataExportManager {
    */
   gatherSessionHistory(dateRange) {
     const sessions = [];
-    
+
     // Gather all session data from localStorage
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && key.startsWith('session-')) {
+      if (key && key.startsWith("session-")) {
         try {
           const sessionData = JSON.parse(localStorage.getItem(key));
           if (this.isWithinDateRange(sessionData.timestamp, dateRange)) {
             sessions.push({
               sessionId: key,
-              ...sessionData
+              ...sessionData,
             });
           }
         } catch (error) {
@@ -160,7 +160,9 @@ class DataExportManager {
       }
     }
 
-    return sessions.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    return sessions.sort(
+      (a, b) => new Date(a.timestamp) - new Date(b.timestamp),
+    );
   }
 
   /**
@@ -170,16 +172,16 @@ class DataExportManager {
    */
   gatherFeedbackData(dateRange) {
     const feedback = [];
-    
+
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && key.startsWith('feedback-')) {
+      if (key && key.startsWith("feedback-")) {
         try {
           const feedbackData = JSON.parse(localStorage.getItem(key));
           if (this.isWithinDateRange(feedbackData.timestamp, dateRange)) {
             feedback.push({
               feedbackId: key,
-              ...feedbackData
+              ...feedbackData,
             });
           }
         } catch (error) {
@@ -188,7 +190,9 @@ class DataExportManager {
       }
     }
 
-    return feedback.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    return feedback.sort(
+      (a, b) => new Date(a.timestamp) - new Date(b.timestamp),
+    );
   }
 
   /**
@@ -201,21 +205,24 @@ class DataExportManager {
       volumeOptimizations: [],
       deloadPredictions: [],
       plateauAnalyses: [],
-      performanceMetrics: []
+      performanceMetrics: [],
     };
 
     // Gather analytics data from localStorage
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && (key.startsWith('analytics-') || key.startsWith('optimization-'))) {
+      if (
+        key &&
+        (key.startsWith("analytics-") || key.startsWith("optimization-"))
+      ) {
         try {
           const analyticsData = JSON.parse(localStorage.getItem(key));
           if (this.isWithinDateRange(analyticsData.timestamp, dateRange)) {
-            if (key.includes('volume')) {
+            if (key.includes("volume")) {
               analytics.volumeOptimizations.push(analyticsData);
-            } else if (key.includes('deload')) {
+            } else if (key.includes("deload")) {
               analytics.deloadPredictions.push(analyticsData);
-            } else if (key.includes('plateau')) {
+            } else if (key.includes("plateau")) {
               analytics.plateauAnalyses.push(analyticsData);
             }
           }
@@ -235,10 +242,10 @@ class DataExportManager {
    */
   gatherWellnessData(dateRange) {
     const wellness = [];
-    
+
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && key.startsWith('wellness-')) {
+      if (key && key.startsWith("wellness-")) {
         try {
           const wellnessData = JSON.parse(localStorage.getItem(key));
           if (this.isWithinDateRange(wellnessData.date, dateRange)) {
@@ -259,11 +266,12 @@ class DataExportManager {
    */
   gatherUserPreferences() {
     return {
-      theme: localStorage.getItem('user-theme') || 'dark',
-      units: localStorage.getItem('user-units') || 'metric',
-      notifications: localStorage.getItem('user-notifications') || 'enabled',
-      autoProgression: localStorage.getItem('user-auto-progression') || 'enabled',
-      analyticsEnabled: localStorage.getItem('analytics-enabled') || 'true'
+      theme: localStorage.getItem("user-theme") || "dark",
+      units: localStorage.getItem("user-units") || "metric",
+      notifications: localStorage.getItem("user-notifications") || "enabled",
+      autoProgression:
+        localStorage.getItem("user-auto-progression") || "enabled",
+      analyticsEnabled: localStorage.getItem("analytics-enabled") || "true",
     };
   }
 
@@ -276,18 +284,18 @@ class DataExportManager {
   exportAsJSON(data, compress = false) {
     try {
       const jsonString = JSON.stringify(data, null, compress ? 0 : 2);
-      const blob = new Blob([jsonString], { type: 'application/json' });
+      const blob = new Blob([jsonString], { type: "application/json" });
       const filename = `powerhouseatx-backup-${this.getDateString()}.json`;
-      
+
       this.downloadBlob(blob, filename);
-      
+
       return {
         success: true,
         filename,
         size: blob.size,
-        format: 'JSON',
+        format: "JSON",
         dataPoints: data.metadata.dataPoints,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       throw new Error(`JSON export failed: ${error.message}`);
@@ -302,18 +310,18 @@ class DataExportManager {
   exportAsCSV(data) {
     try {
       const csvData = this.convertToCSV(data);
-      const blob = new Blob([csvData], { type: 'text/csv' });
+      const blob = new Blob([csvData], { type: "text/csv" });
       const filename = `powerhouseatx-data-${this.getDateString()}.csv`;
-      
+
       this.downloadBlob(blob, filename);
-      
+
       return {
         success: true,
         filename,
         size: blob.size,
-        format: 'CSV',
+        format: "CSV",
         dataPoints: data.metadata.dataPoints,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       throw new Error(`CSV export failed: ${error.message}`);
@@ -326,37 +334,39 @@ class DataExportManager {
    * @returns {string} - CSV string
    */
   convertToCSV(data) {
-    let csv = '';
-    
+    let csv = "";
+
     // Sessions CSV
     if (data.sessionHistory.length > 0) {
-      csv += 'SESSION DATA\n';
-      csv += 'Date,Muscle,Exercise,Sets,Reps,Weight,RIR,Performance,Duration\n';
-      
-      data.sessionHistory.forEach(session => {
-        csv += `${session.timestamp},${session.muscle || ''},${session.exercise || ''},${session.sets || ''},${session.reps || ''},${session.weight || ''},${session.rir || ''},${session.performance || ''},${session.duration || ''}\n`;
+      csv += "SESSION DATA\n";
+      csv += "Date,Muscle,Exercise,Sets,Reps,Weight,RIR,Performance,Duration\n";
+
+      data.sessionHistory.forEach((session) => {
+        csv += `${session.timestamp},${session.muscle || ""},${session.exercise || ""},${session.sets || ""},${session.reps || ""},${session.weight || ""},${session.rir || ""},${session.performance || ""},${session.duration || ""}\n`;
       });
-      csv += '\n';
+      csv += "\n";
     }
 
     // Feedback CSV
     if (data.feedback.length > 0) {
-      csv += 'FEEDBACK DATA\n';
-      csv += 'Date,Muscle,Current Sets,MMC,Pump,Workload,Performance,Soreness,Recommendation\n';
-      
-      data.feedback.forEach(feedback => {
-        csv += `${feedback.timestamp},${feedback.muscle},${feedback.currentSets},${feedback.stimulus?.mmc || ''},${feedback.stimulus?.pump || ''},${feedback.stimulus?.disruption || ''},${feedback.performance},${feedback.soreness},${feedback.results?.recommendedAction?.advice || ''}\n`;
+      csv += "FEEDBACK DATA\n";
+      csv +=
+        "Date,Muscle,Current Sets,MMC,Pump,Workload,Performance,Soreness,Recommendation\n";
+
+      data.feedback.forEach((feedback) => {
+        csv += `${feedback.timestamp},${feedback.muscle},${feedback.currentSets},${feedback.stimulus?.mmc || ""},${feedback.stimulus?.pump || ""},${feedback.stimulus?.disruption || ""},${feedback.performance},${feedback.soreness},${feedback.results?.recommendedAction?.advice || ""}\n`;
       });
-      csv += '\n';
+      csv += "\n";
     }
 
     // Wellness CSV
     if (data.wellness && data.wellness.length > 0) {
-      csv += 'WELLNESS DATA\n';
-      csv += 'Date,Recovery Score,Readiness Score,Sleep Duration,Sleep Quality,Stress Level\n';
-      
-      data.wellness.forEach(wellness => {
-        csv += `${wellness.date},${wellness.recoveryScore},${wellness.readinessScore},${wellness.sleep?.duration || ''},${wellness.sleep?.quality || ''},${wellness.stress?.overall || ''}\n`;
+      csv += "WELLNESS DATA\n";
+      csv +=
+        "Date,Recovery Score,Readiness Score,Sleep Duration,Sleep Quality,Stress Level\n";
+
+      data.wellness.forEach((wellness) => {
+        csv += `${wellness.date},${wellness.recoveryScore},${wellness.readinessScore},${wellness.sleep?.duration || ""},${wellness.sleep?.quality || ""},${wellness.stress?.overall || ""}\n`;
       });
     }
 
@@ -371,17 +381,17 @@ class DataExportManager {
    */
   async importData(file, options = {}) {
     const { overwrite = false, merge = true } = options;
-    
+
     try {
       const fileContent = await this.readFile(file);
       let importData;
 
-      if (file.name.endsWith('.json')) {
+      if (file.name.endsWith(".json")) {
         importData = JSON.parse(fileContent);
-      } else if (file.name.endsWith('.csv')) {
+      } else if (file.name.endsWith(".csv")) {
         importData = this.parseCSV(fileContent);
       } else {
-        throw new Error('Unsupported file format');
+        throw new Error("Unsupported file format");
       }
 
       return this.processImportData(importData, { overwrite, merge });
@@ -389,7 +399,7 @@ class DataExportManager {
       return {
         success: false,
         error: error.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
@@ -409,10 +419,10 @@ class DataExportManager {
         sessions: 0,
         feedback: 0,
         wellness: 0,
-        analytics: 0
+        analytics: 0,
       },
       warnings: [],
-      errors: []
+      errors: [],
     };
 
     try {
@@ -424,33 +434,44 @@ class DataExportManager {
         } else if (merge) {
           this.mergeTrainingState(data.trainingState);
           result.imported.trainingState = true;
-          result.warnings.push('Training state merged with existing data');
+          result.warnings.push("Training state merged with existing data");
         }
       }
 
       // Import session history
       if (data.sessionHistory) {
-        result.imported.sessions = this.importSessionHistory(data.sessionHistory, overwrite);
+        result.imported.sessions = this.importSessionHistory(
+          data.sessionHistory,
+          overwrite,
+        );
       }
 
       // Import feedback
       if (data.feedback) {
-        result.imported.feedback = this.importFeedback(data.feedback, overwrite);
+        result.imported.feedback = this.importFeedback(
+          data.feedback,
+          overwrite,
+        );
       }
 
       // Import wellness
       if (data.wellness) {
-        result.imported.wellness = this.importWellness(data.wellness, overwrite);
+        result.imported.wellness = this.importWellness(
+          data.wellness,
+          overwrite,
+        );
       }
 
       // Import analytics
       if (data.analytics) {
-        result.imported.analytics = this.importAnalytics(data.analytics, overwrite);
+        result.imported.analytics = this.importAnalytics(
+          data.analytics,
+          overwrite,
+        );
       }
 
       result.timestamp = new Date().toISOString();
       return result;
-
     } catch (error) {
       result.success = false;
       result.errors.push(error.message);
@@ -466,31 +487,31 @@ class DataExportManager {
     const backupData = this.gatherExportData({
       includePersonalData: true,
       includeAnalytics: true,
-      includeWellness: true
+      includeWellness: true,
     });
 
     // Store in localStorage as compressed backup
     const backupKey = `backup-${this.getDateString()}`;
     const compressedData = JSON.stringify(backupData);
-    
+
     try {
       localStorage.setItem(backupKey, compressedData);
-      
+
       // Clean old backups (keep last 5)
       this.cleanOldBackups();
-      
+
       return {
         success: true,
         backupKey,
         size: compressedData.length,
         dataPoints: backupData.metadata.dataPoints,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (error) {
       return {
         success: false,
         error: error.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
@@ -501,19 +522,19 @@ class DataExportManager {
    */
   getAvailableBackups() {
     const backups = [];
-    
+
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && key.startsWith('backup-')) {
+      if (key && key.startsWith("backup-")) {
         try {
           const backupData = localStorage.getItem(key);
           const metadata = JSON.parse(backupData).metadata;
-          
+
           backups.push({
             key,
             date: metadata.exportDate,
             dataPoints: metadata.dataPoints,
-            size: backupData.length
+            size: backupData.length,
           });
         } catch (error) {
           console.warn(`Failed to parse backup: ${key}`, error);
@@ -533,7 +554,7 @@ class DataExportManager {
     try {
       const backupData = localStorage.getItem(backupKey);
       if (!backupData) {
-        throw new Error('Backup not found');
+        throw new Error("Backup not found");
       }
 
       const data = JSON.parse(backupData);
@@ -542,7 +563,7 @@ class DataExportManager {
       return {
         success: false,
         error: error.message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
@@ -553,27 +574,29 @@ class DataExportManager {
     const checkDate = new Date(date);
     const startDate = dateRange.start ? new Date(dateRange.start) : null;
     const endDate = dateRange.end ? new Date(dateRange.end) : null;
-    
+
     if (startDate && checkDate < startDate) return false;
     if (endDate && checkDate > endDate) return false;
     return true;
   }
 
   calculateDataPoints(data) {
-    return (data.sessionHistory?.length || 0) +
-           (data.feedback?.length || 0) +
-           (data.wellness?.length || 0) +
-           (data.analytics?.volumeOptimizations?.length || 0) +
-           (data.analytics?.deloadPredictions?.length || 0);
+    return (
+      (data.sessionHistory?.length || 0) +
+      (data.feedback?.length || 0) +
+      (data.wellness?.length || 0) +
+      (data.analytics?.volumeOptimizations?.length || 0) +
+      (data.analytics?.deloadPredictions?.length || 0)
+    );
   }
 
   getDateString() {
-    return new Date().toISOString().split('T')[0];
+    return new Date().toISOString().split("T")[0];
   }
 
   downloadBlob(blob, filename) {
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = filename;
     document.body.appendChild(a);
@@ -585,8 +608,8 @@ class DataExportManager {
   readFile(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onload = e => resolve(e.target.result);
-      reader.onerror = e => reject(new Error('Failed to read file'));
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = (e) => reject(new Error("Failed to read file"));
       reader.readAsText(file);
     });
   }
@@ -595,29 +618,33 @@ class DataExportManager {
     const backups = this.getAvailableBackups();
     if (backups.length > 5) {
       const toDelete = backups.slice(5);
-      toDelete.forEach(backup => {
+      toDelete.forEach((backup) => {
         localStorage.removeItem(backup.key);
       });
     }
   }
 
   importTrainingState(stateData) {
-    Object.keys(stateData.volumeLandmarks).forEach(muscle => {
-      trainingState.updateVolumeLandmarks(muscle, stateData.volumeLandmarks[muscle]);
+    Object.keys(stateData.volumeLandmarks).forEach((muscle) => {
+      trainingState.updateVolumeLandmarks(
+        muscle,
+        stateData.volumeLandmarks[muscle],
+      );
     });
-    
-    Object.keys(stateData.currentSets).forEach(muscle => {
+
+    Object.keys(stateData.currentSets).forEach((muscle) => {
       trainingState.setSets(muscle, stateData.currentSets[muscle]);
     });
-    
+
     trainingState.weekNo = stateData.weekNo;
     trainingState.blockNo = stateData.blockNo;
   }
 
   importSessionHistory(sessions, overwrite) {
     let imported = 0;
-    sessions.forEach(session => {
-      const key = session.sessionId || `session-imported-${Date.now()}-${imported}`;
+    sessions.forEach((session) => {
+      const key =
+        session.sessionId || `session-imported-${Date.now()}-${imported}`;
       if (overwrite || !localStorage.getItem(key)) {
         localStorage.setItem(key, JSON.stringify(session));
         imported++;
@@ -628,8 +655,9 @@ class DataExportManager {
 
   importFeedback(feedback, overwrite) {
     let imported = 0;
-    feedback.forEach(item => {
-      const key = item.feedbackId || `feedback-imported-${Date.now()}-${imported}`;
+    feedback.forEach((item) => {
+      const key =
+        item.feedbackId || `feedback-imported-${Date.now()}-${imported}`;
       if (overwrite || !localStorage.getItem(key)) {
         localStorage.setItem(key, JSON.stringify(item));
         imported++;
@@ -640,7 +668,7 @@ class DataExportManager {
 
   importWellness(wellness, overwrite) {
     let imported = 0;
-    wellness.forEach(item => {
+    wellness.forEach((item) => {
       const key = `wellness-${item.date}`;
       if (overwrite || !localStorage.getItem(key)) {
         localStorage.setItem(key, JSON.stringify(item));
@@ -660,7 +688,4 @@ class DataExportManager {
 // Create singleton instance
 const dataExportManager = new DataExportManager();
 
-export {
-  DataExportManager,
-  dataExportManager
-};
+export { DataExportManager, dataExportManager };

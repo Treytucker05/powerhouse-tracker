@@ -3,8 +3,8 @@
  * Handles all chart rendering and interactions
  */
 
-import Chart from 'chart.js/auto';
-import trainingState from '../core/trainingState.js';
+import Chart from "chart.js/auto";
+import trainingState from "../core/trainingState.js";
 
 // Conditionally import advanced visualizations
 let dataVisualizer = null;
@@ -16,65 +16,84 @@ const muscles = Object.keys(trainingState.volumeLandmarks);
  * Initialize the weekly volume chart
  */
 function initChart() {
-  const canvas = document.getElementById('weeklyChart');
+  const canvas = document.getElementById("weeklyChart");
   if (!canvas) {
-    console.error('Chart canvas not found');
+    console.error("Chart canvas not found");
     return null;
   }
-  
-  const ctx = canvas.getContext('2d');
+
+  const ctx = canvas.getContext("2d");
   if (!ctx) {
-    console.error('Cannot get canvas context');
+    console.error("Cannot get canvas context");
     return null;
   }
-  
-  if (typeof Chart === 'undefined') {
-    console.error('Chart.js not loaded');
+
+  if (typeof Chart === "undefined") {
+    console.error("Chart.js not loaded");
     return null;
   }
-  const chartData = muscles.map(muscle => trainingState.currentWeekSets[muscle] || 0);
-  const backgroundColors = muscles.map(muscle => trainingState.getVolumeColor(muscle));
-  
+  const chartData = muscles.map(
+    (muscle) => trainingState.currentWeekSets[muscle] || 0,
+  );
+  const backgroundColors = muscles.map((muscle) =>
+    trainingState.getVolumeColor(muscle),
+  );
+
   // Initialize advanced visualizations if enabled
   if (trainingState.settings?.enableAdvancedDashboard) {
-    import('../algorithms/dataVisualization.js').then(module => {
-      dataVisualizer = new module.AdvancedDataVisualizer();
-      console.log('Advanced chart visualization initialized');
-    }).catch(err => {
-      console.error('Failed to initialize advanced chart visualization:', err);
-    });
+    import("../algorithms/dataVisualization.js")
+      .then((module) => {
+        dataVisualizer = new module.AdvancedDataVisualizer();
+        console.log("Advanced chart visualization initialized");
+      })
+      .catch((err) => {
+        console.error(
+          "Failed to initialize advanced chart visualization:",
+          err,
+        );
+      });
   }
   weeklyChart = new Chart(ctx, {
-    type: 'bar',
+    type: "bar",
     data: {
       labels: muscles,
-      datasets: [{
-        label: 'Current Sets',
-        data: chartData,
-        backgroundColor: backgroundColors,
-        borderColor: backgroundColors.map(color => color.replace('0.6', '1')),
-        borderWidth: 2
-      }, {
-        label: 'MEV',
-        data: muscles.map(muscle => trainingState.volumeLandmarks[muscle].MEV),
-        type: 'line',
-        borderColor: 'rgba(255, 255, 0, 0.8)',
-        backgroundColor: 'transparent',
-        borderWidth: 2,
-        pointRadius: 3,
-        pointBackgroundColor: 'rgba(255, 255, 0, 1)',
-        borderDash: [5, 5]
-      }, {
-        label: 'MRV',
-        data: muscles.map(muscle => trainingState.volumeLandmarks[muscle].MRV),
-        type: 'line',
-        borderColor: 'rgba(255, 0, 0, 0.8)',
-        backgroundColor: 'transparent',
-        borderWidth: 2,
-        pointRadius: 3,
-        pointBackgroundColor: 'rgba(255, 0, 0, 1)',
-        borderDash: [10, 5]
-      }]
+      datasets: [
+        {
+          label: "Current Sets",
+          data: chartData,
+          backgroundColor: backgroundColors,
+          borderColor: backgroundColors.map((color) =>
+            color.replace("0.6", "1"),
+          ),
+          borderWidth: 2,
+        },
+        {
+          label: "MEV",
+          data: muscles.map(
+            (muscle) => trainingState.volumeLandmarks[muscle].MEV,
+          ),
+          type: "line",
+          borderColor: "rgba(255, 255, 0, 0.8)",
+          backgroundColor: "transparent",
+          borderWidth: 2,
+          pointRadius: 3,
+          pointBackgroundColor: "rgba(255, 255, 0, 1)",
+          borderDash: [5, 5],
+        },
+        {
+          label: "MRV",
+          data: muscles.map(
+            (muscle) => trainingState.volumeLandmarks[muscle].MRV,
+          ),
+          type: "line",
+          borderColor: "rgba(255, 0, 0, 0.8)",
+          backgroundColor: "transparent",
+          borderWidth: 2,
+          pointRadius: 3,
+          pointBackgroundColor: "rgba(255, 0, 0, 1)",
+          borderDash: [10, 5],
+        },
+      ],
     },
     options: {
       responsive: true,
@@ -82,47 +101,48 @@ function initChart() {
       plugins: {
         legend: {
           labels: {
-            color: '#fff'
-          }
+            color: "#fff",
+          },
         },
         tooltip: {
           callbacks: {
-            afterLabel: function(context) {
+            afterLabel: function (context) {
               const muscle = context.label;
               const sets = context.parsed.y;
               const landmarks = trainingState.volumeLandmarks[muscle];
               const status = trainingState.getVolumeStatus(muscle, sets);
-                return [
+              return [
                 `Status: ${status}`,
                 `MEV: ${landmarks.MEV} | MRV: ${landmarks.MRV}`,
-                `Target RIR: ${trainingState.getTargetRIR()}`
+                `Target RIR: ${trainingState.getTargetRIR()}`,
               ];
-            }
-          }
-        }
-      },      scales: {
+            },
+          },
+        },
+      },
+      scales: {
         y: {
           beginAtZero: true,
           grid: {
-            color: 'rgba(255, 255, 255, 0.1)'
+            color: "rgba(255, 255, 255, 0.1)",
           },
           ticks: {
-            color: '#fff',
-            stepSize: 1  // Show every 1 set on Y-axis
-          }
+            color: "#fff",
+            stepSize: 1, // Show every 1 set on Y-axis
+          },
         },
         x: {
           grid: {
-            color: 'rgba(255, 255, 255, 0.1)'
+            color: "rgba(255, 255, 255, 0.1)",
           },
           ticks: {
-            color: '#fff'
-          }
-        }
-      }
-    }
+            color: "#fff",
+          },
+        },
+      },
+    },
   });
-  
+
   return weeklyChart;
 }
 
@@ -131,19 +151,29 @@ function initChart() {
  */
 function updateChart() {
   if (!weeklyChart) return;
-  
-  const newData = muscles.map(muscle => trainingState.currentWeekSets[muscle] || 0);
-  const newColors = muscles.map(muscle => trainingState.getVolumeColor(muscle));
-  
+
+  const newData = muscles.map(
+    (muscle) => trainingState.currentWeekSets[muscle] || 0,
+  );
+  const newColors = muscles.map((muscle) =>
+    trainingState.getVolumeColor(muscle),
+  );
+
   // Update current sets data
   weeklyChart.data.datasets[0].data = newData;
   weeklyChart.data.datasets[0].backgroundColor = newColors;
-  weeklyChart.data.datasets[0].borderColor = newColors.map(color => color.replace('0.6', '1'));
-  
+  weeklyChart.data.datasets[0].borderColor = newColors.map((color) =>
+    color.replace("0.6", "1"),
+  );
+
   // Update landmark lines
-  weeklyChart.data.datasets[1].data = muscles.map(muscle => trainingState.volumeLandmarks[muscle].MEV);
-  weeklyChart.data.datasets[2].data = muscles.map(muscle => trainingState.volumeLandmarks[muscle].MRV);
-  
+  weeklyChart.data.datasets[1].data = muscles.map(
+    (muscle) => trainingState.volumeLandmarks[muscle].MEV,
+  );
+  weeklyChart.data.datasets[2].data = muscles.map(
+    (muscle) => trainingState.volumeLandmarks[muscle].MRV,
+  );
+
   weeklyChart.update();
 }
 
@@ -151,8 +181,11 @@ function updateChart() {
  * Reset chart data
  */
 function resetChart() {
-  muscles.forEach(muscle => {
-    trainingState.updateWeeklySets(muscle, trainingState.volumeLandmarks[muscle].MEV);
+  muscles.forEach((muscle) => {
+    trainingState.updateWeeklySets(
+      muscle,
+      trainingState.volumeLandmarks[muscle].MEV,
+    );
   });
   updateChart();
 }
@@ -162,19 +195,22 @@ function resetChart() {
  */
 function showDeloadVisualization() {
   if (!weeklyChart) return;
-  
+
   // Temporarily show 50% volume
-  const deloadData = muscles.map(muscle => 
-    Math.round(trainingState.volumeLandmarks[muscle].MEV * 0.5)
+  const deloadData = muscles.map((muscle) =>
+    Math.round(trainingState.volumeLandmarks[muscle].MEV * 0.5),
   );
-  
+
   weeklyChart.data.datasets[0].data = deloadData;
-  weeklyChart.data.datasets[0].backgroundColor = muscles.map(() => 'rgba(100, 100, 100, 0.6)');
+  weeklyChart.data.datasets[0].backgroundColor = muscles.map(
+    () => "rgba(100, 100, 100, 0.6)",
+  );
   weeklyChart.update();
-  
+
   // Reset after 3 seconds
   setTimeout(() => {
-    updateChart();  }, 3000);
+    updateChart();
+  }, 3000);
 }
 
 /**
@@ -182,10 +218,10 @@ function showDeloadVisualization() {
  */
 function addVolumeLandmarks() {
   if (!weeklyChart) return;
-  
+
   // Landmarks are already built into the chart
   // This function maintains compatibility with existing code
-  console.log('Volume landmarks are permanently displayed on chart');
+  console.log("Volume landmarks are permanently displayed on chart");
 }
 
 /**
@@ -193,26 +229,26 @@ function addVolumeLandmarks() {
  */
 function exportChartImage() {
   if (!weeklyChart) {
-    console.warn('No chart available for export');
+    console.warn("No chart available for export");
     return null;
   }
-  
+
   try {
     // Get chart as base64 image
-    const base64Image = weeklyChart.toBase64Image('image/png', 1);
-    
+    const base64Image = weeklyChart.toBase64Image("image/png", 1);
+
     // Create download link
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.download = `workout-volume-chart-week-${trainingState.weekNo}.png`;
     link.href = base64Image;
-    
+
     // Trigger download
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    
+
     // Show success message
-    const notification = document.createElement('div');
+    const notification = document.createElement("div");
     notification.style.cssText = `
       position: fixed;
       top: 20px;
@@ -224,19 +260,19 @@ function exportChartImage() {
       z-index: 10000;
       font-weight: 600;
     `;
-    notification.textContent = 'Chart exported successfully!';
+    notification.textContent = "Chart exported successfully!";
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
       document.body.removeChild(notification);
     }, 3000);
-    
+
     return base64Image;
   } catch (e) {
-    console.error('Chart export failed:', e);
-    
+    console.error("Chart export failed:", e);
+
     // Show error message
-    const notification = document.createElement('div');
+    const notification = document.createElement("div");
     notification.style.cssText = `
       position: fixed;
       top: 20px;
@@ -248,13 +284,13 @@ function exportChartImage() {
       z-index: 10000;
       font-weight: 600;
     `;
-    notification.textContent = 'Export failed. Please try again.';
+    notification.textContent = "Export failed. Please try again.";
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
       document.body.removeChild(notification);
     }, 3000);
-    
+
     return null;
   }
 }
@@ -267,5 +303,5 @@ export {
   addVolumeLandmarks,
   exportChartImage,
   showDeloadVisualization,
-  weeklyChart
+  weeklyChart,
 };

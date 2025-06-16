@@ -1,798 +1,1047 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PowerHouseATX Workout Calculator - Advanced Intelligence</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PowerHouseATX Workout Calculator - Advanced Intelligence</title>
 
-<!-- PWA Configuration -->
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#667eea">
-<meta name="description" content="Advanced AI-powered training intelligence system for optimal workout programming and progression">
-<link rel="icon" href="/assets/favicon.ico" />
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#667eea" />
+    <meta
+      name="description"
+      content="Advanced AI-powered training intelligence system for optimal workout programming and progression"
+    />
+    <link rel="icon" href="/assets/favicon.ico" />
 
-<link rel="stylesheet" href="css/main.css" />
-<link rel="stylesheet" href="css/enhancedAdvanced.css">
-</head>
-<body>
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/enhancedAdvanced.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="header-section">
+        <h1>PowerHouseATX</h1>
+        <div class="page-title">Workout Calculator</div>
+        <p class="subtitle">Evidence-Based Muscle Building</p>
+        <button
+          id="signOutBtn"
+          class="small"
+          onclick="handleSignOut()"
+          style="float: right; display: none"
+        >
+          Sign Out
+        </button>
 
-
-<div class="container">
-  <header class="header-section">
-    <h1>PowerHouseATX</h1>
-    <div class="page-title">Workout Calculator</div>
-    <p class="subtitle">Evidence-Based Muscle Building</p>
-    <button id="signOutBtn"
-            class="small"
-            onclick="handleSignOut()"
-            style="float:right; display:none">
-      Sign Out
-    </button>
-    
-    <!-- Quick Start Guide -->
-    <div class="quick-start-guide" id="quickStartGuide">
-      <h3>🚀 First-Time Quick-Start Guide</h3>
-      <div class="quick-start-content">
-        <ol class="quick-start-steps">
-          <li><strong>Set volume landmarks</strong> → open "Program Setup" section below</li>
-          <li><strong>Track daily volume</strong> → use "Daily Volume" for each muscle group</li>
-          <li><strong>Log a workout</strong> → use "Set Feedback" after each exercise</li>
-          <li><strong>End of week</strong> → tick "Last workout" & review Weekly analysis</li>
-          <li><strong>Start next week</strong> → follow the new RIR target</li>
-        </ol>        <div class="quick-start-actions">
-          <button class="quick-start-btn" onclick="document.getElementById('quickStartGuide').style.display = 'none'; return false;" style="cursor: pointer; font-weight: bold;">GOT IT, HIDE THIS GUIDE</button>
-          <label class="quick-start-checkbox">
-            <input type="checkbox" id="dontShowQuickStart"> Don't show again
-          </label>
-        </div>
-      </div>
-    </div>
-    
-    <!-- RP Training Status -->
-    <div class="rp-status">
-      <h3>Current Training Status</h3>
-      <div class="status-grid">
-        <div class="status-item">
-          <div class="status-value" id="currentWeek">1</div>
-          <div class="status-label">Week</div>
-        </div>
-        <div class="status-item">
-          <div class="status-value" id="currentMeso">4</div>
-          <div class="status-label">Meso Length</div>
-        </div>
-        <div class="status-item">
-          <div class="status-value" id="currentBlock">1</div>
-          <div class="status-label">Block</div>
-        </div>
-        <div class="status-item">
-          <div class="status-value" id="targetRIR">4.5</div>
-          <div class="status-label">Target RIR</div>
-        </div>
-        <div class="status-item">
-          <div class="status-value" id="currentPhase">Accumulation</div>
-          <div class="status-label">Phase</div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- Weekly Volume Chart -->
-  <div class="chart-section">    <div class="chart-header">
-      <h2>Weekly Volume by Muscle</h2>
-      <div class="chart-controls">
-        <button class="small" onclick="resetWeeklyData()">Reset Week</button>
-        <button class="small" onclick="exportSummary()">📊 Export Chart</button>
-      </div>
-    </div>
-    <canvas id="weeklyChart"></canvas>
-  </div>  <div class="section-banner" onclick="toggleSection('daily')">
-    <h3>Daily Training <span class="expand-icon">▼</span></h3>
-    <p>Use during or right after your workout</p>
-  </div>
-
-  <div class="section-content" id="daily-content">
-    <div class="calculator-grid">
-      
-      <!-- Set Feedback with RP Algorithms -->
-      <section class="calculator" id="mevCard">
-        <h2>Set Feedback (RP Algorithms)</h2>
-        
-        <div class="input-group">
-          <label for="muscleSelect">Muscle group:</label>
-          <select id="muscleSelect">
-            <option value="Chest">Chest</option>
-            <option value="Back">Back</option>
-            <option value="Quads">Quads</option>
-            <option value="Hamstrings">Hamstrings</option>
-            <option value="Shoulders">Shoulders</option>
-            <option value="Biceps">Biceps</option>
-            <option value="Triceps">Triceps</option>
-            <option value="Calves">Calves</option>
-            <option value="Abs">Abs</option>
-            <option value="Forearms">Forearms</option>
-            <option value="Neck">Neck</option>
-            <option value="Traps">Traps</option>
-          </select>
-        </div>
-
-        <div class="input-group">
-          <label for="currentSets">Current weekly sets:</label>
-          <input type="number" id="currentSets" min="0" value="0">
-          <div class="helper-text">Click to edit inline</div>
-        </div>
-
-        <div class="input-group">
-          <label>Workload (RP Table 2.2):</label>
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
-            <div>
-              <label for="mmc" style="font-size: 0.8rem;">Mind-Muscle (0-3):</label>
-              <input type="number" id="mmc" min="0" max="3" value="2">
-            </div>
-            <div>
-              <label for="pump" style="font-size: 0.8rem;">Pump (0-3):</label>
-              <input type="number" id="pump" min="0" max="3" value="2">
-            </div>
-            <div>              <label for="dis" style="font-size: 0.8rem;">Workload (0-3):</label>
-              <input type="number" id="dis" min="0" max="3" value="2">
-            </div>
-          </div>
-          <div class="helper-text">Rate your workout quality factors (0=poor, 3=excellent)</div>
-        </div>
-
-        <div class="input-group">
-          <label>Performance vs last time:</label>
-          <div class="radio-group">
-            <label><input type="radio" name="perf" value="3"> Much Better</label>
-            <label><input type="radio" name="perf" value="2" checked> Better</label>
-            <label><input type="radio" name="perf" value="1"> Same</label>
-            <label><input type="radio" name="perf" value="0"> Worse</label>
-          </div>
-        </div>
-
-        <div class="input-group">
-          <label for="sore">Current soreness level (0-3):</label>
-          <input type="number" id="sore" min="0" max="3" value="1">
-          <div class="helper-text">0=None, 1=Mild, 2=Moderate, 3=High</div>
-        </div>
-
-        <!-- Enhanced Fatigue Detection -->
-        <div class="input-group">
-          <label for="jointAche">Joint ache level (0-3):</label>
-          <input type="number" id="jointAche" min="0" max="3" value="0">
-          <div class="helper-text">0=None, 1=Mild, 2=Moderate, 3=Pain</div>
-        </div>
-
-        <div class="input-group">
-          <label for="perfChange">Performance change:</label>
-          <select id="perfChange">
-            <option value="1">Personal Record (+1)</option>
-            <option value="0" selected>Same as last time (0)</option>
-            <option value="-1">Performance drop (-1)</option>
-          </select>
-          <div class="helper-text">Strength performance vs recent sessions</div>
-        </div>
-
-        <!-- Autoregulation Section -->
-        <div class="autoregulation-section">
-          <h4>Effort Validation</h4>
-          <div class="input-group">
-            <label for="actualRIR">Actual RIR this set:</label>
-            <input type="number" id="actualRIR" min="0" max="10" step="0.5" placeholder="e.g. 2.5">
-            <div class="helper-text">How many more reps could you have done? (Target: <span id="targetRIRDisplay">4.5</span>)</div>
-          </div>
-        </div>
-
-        <button onclick="submitFeedback()">Process with RP Algorithms</button>
-        <output id="mevOut" class="result"></output>
-      </section>
-
-    </div>
-  </div>
-
-  <div class="section-banner" onclick="toggleSection('weekly')">
-    <h3>Weekly Planning <span class="expand-icon">▼</span></h3>
-    <p>End-of-week review and next week setup</p>
-  </div>
-
-  <div class="section-content" id="weekly-content">
-    <div class="calculator-grid">
-
-      <!-- Deload Check -->
-      <section class="calculator" id="deloadCard">
-        <h2>Deload Analysis</h2>
-        
-        <div class="input-group">
-          <label>
-            <input type="checkbox" id="halfMuscles"> Most muscles needed recovery (≥6 muscle groups)
-          </label>
-        </div>
-        
-        <div class="input-group">
-          <label>
-            <input type="checkbox" id="mrvBreach"> Hit MRV twice in a row
-          </label>
-        </div>
-        
-        <div class="input-group">
-          <label>
-            <input type="checkbox" id="illness"> Illness / Minor Injury
-          </label>
-        </div>
-
-        <div class="input-group">
-          <label>
-            <input type="checkbox" id="lowMotivation"> Low motivation/enjoyment
-          </label>
-        </div>
-        
-        <button onclick="analyzeDeload()">Analyze Deload Need</button>
-        <output id="deloadOut" class="result"></output>
-      </section>
-
-      <!-- Auto-Volume Progression -->
-      <section class="calculator" id="autoVolumeCard">
-        <h2>🤖 Auto-Volume Progression</h2>
-        
-        <div class="input-group">
-          <p class="helper-text">Automatically progress all muscles based on weekly feedback. System starts each muscle at MEV and adds +1-2 sets per week based on recovery indicators.</p>
-        </div>
-          <div class="input-group">
-          <h4>Progression Logic:</h4>
-          <ul style="font-size: 0.9rem; margin: 10px 0; padding-left: 20px;">
-            <li><strong>Start:</strong> All muscles begin at MEV</li>
-            <li><strong>+1 set:</strong> Good recovery (soreness ≤1, performance ≥0)</li>
-            <li><strong>+2 sets:</strong> At MEV or low stimulus (≤3)</li>
-            <li><strong>Hold volume:</strong> At MRV or fatigue present</li>
-            <li><strong>Deload:</strong> Most muscles at MRV</li>
-          </ul>
-        </div>
-          <div class="input-group" style="display: flex; gap: 10px; flex-wrap: wrap;">
-          <button type="button" class="small" onclick="initializeAllMusclesAtMEV()" style="background: linear-gradient(135deg, #4CAF50, #45a049); flex: 1; min-width: 150px;">🎯 Initialize at MEV</button>
-          <button type="button" class="small" onclick="advanceToNextWeek()" style="background: linear-gradient(135deg, #2196F3, #1976D2); flex: 1; min-width: 150px;">📅 Next Week</button>          <button onclick="runAutoVolumeProgression()" style="background: linear-gradient(135deg, #ff4444, #ff6666); font-weight: bold; flex: 2; min-width: 200px;">▶️ Run Weekly Auto-Progression</button>
-        </div>
-        <output id="autoVolumeOut" class="result"></output>
-      </section>
-
-      <!-- Frequency Optimization -->
-      <section class="calculator" id="freqCard">
-        <h2>Frequency Optimization</h2>
-        
-        <div class="input-group">
-          <label for="soreDays">Days until soreness gone:</label>
-          <input type="number" id="soreDays" min="0" value="2">
-        </div>
-        
-        <div class="input-group">
-          <label for="sessionGap">Current session gap (days):</label>
-          <input type="number" id="sessionGap" min="1" value="3">
-        </div>
-        
-        <div class="input-group">
-          <label for="trainingAge">Training experience:</label>
-          <select id="trainingAge">
-            <option value="beginner">Beginner (< 1 year)</option>
-            <option value="intermediate" selected>Intermediate (1-3 years)</option>
-            <option value="advanced">Advanced (> 3 years)</option>
-          </select>
-        </div>
-        
-        <button onclick="analyzeFrequency()">Optimize Frequency</button>
-        <output id="freqOut" class="result"></output>
-      </section>
-
-    </div>
-  </div>
-
-  <div class="section-banner" onclick="toggleSection('setup')">
-    <h3>Program Setup <span class="expand-icon">▼</span></h3>
-    <p>Configure volume landmarks and training blocks</p>
-  </div>
-
-  <div class="section-content" id="setup-content">
-    <div class="calculator-grid">
-
-      <!-- Volume Landmarks Setup -->
-      <section class="calculator" id="volumeCard">
-        <h2>Volume Landmarks (RP Method)</h2>
-        
-        <div class="input-group">
-          <label for="landmarkMuscle">Muscle to configure:</label>
-          <select id="landmarkMuscle">
-            <option value="Chest">Chest</option>
-            <option value="Back">Back</option>
-            <option value="Quads">Quads</option>
-            <option value="Hamstrings">Hamstrings</option>
-            <option value="Shoulders">Shoulders</option>
-            <option value="Biceps">Biceps</option>
-            <option value="Triceps">Triceps</option>
-            <option value="Calves">Calves</option>
-            <option value="Abs">Abs</option>
-            <option value="Forearms">Forearms</option>
-            <option value="Neck">Neck</option>
-            <option value="Traps">Traps</option>
-          </select>
-        </div>
-
-        <div class="landmark-grid">
-          <div class="input-group">
-            <label for="mv">MV (Maintenance Volume):</label>
-            <input type="number" id="mv" min="0" value="4">
-            <div class="helper-text">Minimum to maintain muscle</div>
-          </div>
-          
-          <div class="input-group">
-            <label for="mev">MEV (Minimum Effective):</label>
-            <input type="number" id="mev" min="0" value="8">
-            <div class="helper-text">Minimum for growth</div>
-          </div>
-          
-          <div class="input-group">
-            <label for="mav">MAV (Maximum Adaptive):</label>
-            <input type="number" id="mav" min="0" value="16">
-            <div class="helper-text">Best volume for adaptation</div>
-          </div>
-          
-          <div class="input-group">
-            <label for="mrv">MRV (Maximum Recoverable):</label>
-            <input type="number" id="mrv" min="0" value="22">
-            <div class="helper-text">Maximum you can recover from</div>
-          </div>
-        </div>
-
-        <div class="input-group">
-          <button type="button" class="small" onclick="applyVolumePreset('beginner')">Beginner Preset</button>
-          <button type="button" class="small" onclick="applyVolumePreset('intermediate')">Intermediate Preset</button>
-          <button type="button" class="small" onclick="applyVolumePreset('advanced')">Advanced Preset</button>
-        </div>
-        
-        <button onclick="saveLandmarks()">Save Volume Landmarks</button>
-        <output id="volumeOut" class="result"></output>
-
-        <!-- Volume Status Display -->
-        <div id="volumeStatus" class="volume-status"></div>
-      </section>
-
-      <!-- Mesocycle Setup -->
-      <section class="calculator" id="mesoCard">
-        <h2>Mesocycle Setup</h2>
-        
-        <div class="input-group">
-          <label for="mesoLength">Mesocycle length (weeks):</label>
-          <input type="number" id="mesoLength" min="2" max="8" value="4">
-          <div class="helper-text">Typical range: 3-6 weeks</div>
-        </div>
-        
-        <div class="input-group">
-          <label for="currentWeekNum">Current week number:</label>
-          <input type="number" id="currentWeekNum" min="1" value="1">
-        </div>
-
-        <div class="input-group">
-          <label for="trainingGoal">Primary goal:</label>
-          <select id="trainingGoal">
-            <option value="hypertrophy" selected>Hypertrophy</option>
-            <option value="strength">Strength</option>
-            <option value="power">Power</option>
-            <option value="endurance">Endurance</option>
-          </select>
-        </div>
-        
-        <button onclick="setupMeso()">Setup Mesocycle</button>
-        <output id="mesoOut" class="result"></output>
-      </section>
-
-      <!-- RIR Schedule & Load Feedback -->
-      <section class="calculator" id="rirScheduleCard">
-        <h2>RIR Schedule & Load Feedback</h2>
-        
-        <div class="input-group">
-          <label for="rirMesocycleLength">Mesocycle length (weeks):</label>
-          <input type="number" id="rirMesocycleLength" min="3" max="6" value="4">
-          <div class="helper-text">Standard progression: 4-6 weeks</div>
-        </div>
-        
-        <div class="input-group">
-          <label for="rirCurrentWeek">Current week:</label>
-          <input type="number" id="rirCurrentWeek" min="1" max="6" value="1">
-        </div>
-
-        <div class="rir-schedule-display">
-          <button onclick="showRIRSchedule()" class="small">Show RIR Schedule</button>
-          <div id="rirScheduleDisplay" class="result" style="display: none;">
-            <h4>Weekly RIR Targets</h4>
-            <div id="rirScheduleContent"></div>
-          </div>
-        </div>
-
-        <div class="load-feedback-section">
-          <h4>Weekly Load Adjustments</h4>
-          <div class="input-group">
-            <label>
-              <input type="checkbox" id="simulateRIRFeedback" checked>
-              Use simulated RIR feedback for demo
-            </label>
-            <div class="helper-text">Uncheck to manually input RIR values</div>
-          </div>
-          
-          <button onclick="runWeeklyLoadAdjustments()" class="small">Process Weekly Adjustments</button>
-          <div id="loadAdjustmentResults" class="result" style="display: none;">
-            <div class="feedback-results">
-              <div id="loadAdjustmentContent"></div>
+        <!-- Quick Start Guide -->
+        <div class="quick-start-guide" id="quickStartGuide">
+          <h3>🚀 First-Time Quick-Start Guide</h3>
+          <div class="quick-start-content">
+            <ol class="quick-start-steps">
+              <li>
+                <strong>Set volume landmarks</strong> → open "Program Setup"
+                section below
+              </li>
+              <li>
+                <strong>Track daily volume</strong> → use "Daily Volume" for
+                each muscle group
+              </li>
+              <li>
+                <strong>Log a workout</strong> → use "Set Feedback" after each
+                exercise
+              </li>
+              <li>
+                <strong>End of week</strong> → tick "Last workout" & review
+                Weekly analysis
+              </li>
+              <li>
+                <strong>Start next week</strong> → follow the new RIR target
+              </li>
+            </ol>
+            <div class="quick-start-actions">
+              <button
+                class="quick-start-btn"
+                onclick="document.getElementById('quickStartGuide').style.display = 'none'; return false;"
+                style="cursor: pointer; font-weight: bold"
+              >
+                GOT IT, HIDE THIS GUIDE
+              </button>
+              <label class="quick-start-checkbox">
+                <input type="checkbox" id="dontShowQuickStart" /> Don't show
+                again
+              </label>
             </div>
           </div>
         </div>
 
-        <div class="load-progression-section">
-          <h4>Next Week Progression</h4>
-          <button onclick="showNextWeekLoadProgression()" class="small">Show Load Progression</button>
-          <div id="loadProgressionResults" class="result" style="display: none;">
-            <div class="feedback-results">
-              <div id="loadProgressionContent"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="rir-schedule-info">
-          <div class="helper-text">
-            <strong>RIR Schedule System:</strong><br>
-            • Automatically progresses RIR targets weekly: [3, 2, 1, 0]<br>
-            • Processes feedback to adjust training loads (-15% to +15%)<br>
-            • Provides next week progression recommendations<br>
-            • Integrates with auto-progression system
-          </div>
-        </div>
-      </section>
-
-    </div>
-  </div>
-
-  <!-- Advanced Intelligence Section -->
-  <div class="section-banner advanced" onclick="toggleSection('advanced')">
-    <h3>Advanced Intelligence <span class="expand-icon">▼</span></h3>
-    <p>AI-powered training optimization and live performance monitoring</p>
-  </div>
-
-  <div class="section-content" id="advanced-content">
-    <div class="calculator-grid">
-
-      <!-- Live Performance Monitor -->
-      <section class="calculator" id="liveMonitorCard">
-        <h2>🔴 Live Performance Monitor</h2>
-        
-        <div class="input-group">
-          <p class="helper-text">Real-time feedback during training sessions with automatic performance analysis and next-set recommendations.</p>
-        </div>
-
-        <div class="live-session-controls">
-          <div class="input-group">
-            <label for="liveExercise">Exercise:</label>
-            <input type="text" id="liveExercise" placeholder="e.g. Barbell Bench Press" value="Barbell Bench Press">
-          </div>
-
-          <div class="input-group">
-            <label for="liveMuscle">Primary Muscle:</label>
-            <select id="liveMuscle">
-              <option value="Chest">Chest</option>
-              <option value="Back">Back</option>
-              <option value="Quads">Quads</option>
-              <option value="Hamstrings">Hamstrings</option>
-              <option value="Shoulders">Shoulders</option>
-              <option value="Biceps">Biceps</option>
-              <option value="Triceps">Triceps</option>
-            </select>
-          </div>
-
-          <div class="input-group">
-            <label for="plannedSets">Planned Sets:</label>
-            <input type="number" id="plannedSets" min="1" max="10" value="3">
-          </div>
-
-          <div class="session-controls">
-            <button id="startSessionBtn" onclick="startLiveSession()">🎮 Start Live Session</button>
-            <button id="logSetBtn" onclick="logTrainingSet()" style="display: none;">📊 Log Set</button>
-            <button id="endSessionBtn" onclick="endLiveSession()" style="display: none;">⏹️ End Session</button>
-          </div>
-        </div>
-
-        <!-- Live Monitor Dashboard -->
-        <div class="live-monitor" id="liveMonitor" style="display: none;">
-          <h4>🔴 Live Training Monitor</h4>
-          <div class="monitor-grid">
-            <div class="monitor-stat">
-              <div class="value" id="currentSet">0</div>
-              <div class="label">Current Set</div>
-            </div>
-            <div class="monitor-stat">
-              <div class="value" id="currentRIR">-</div>
-              <div class="label">Last RIR</div>
-            </div>
-            <div class="monitor-stat">
-              <div class="value" id="sessionProgress">0%</div>
-              <div class="label">Progress</div>
-            </div>
-            <div class="monitor-stat">
-              <div class="value" id="totalLoad">0</div>
-              <div class="label">Total Load</div>
-            </div>
-          </div>
-        </div>
-
-        <output id="liveMonitorOut" class="result"></output>
-      </section>
-
-      <!-- AI Training Intelligence -->
-      <section class="calculator" id="trainingIntelligenceCard">
-        <h2>🧠 Training Intelligence Hub</h2>
-        
-        <div class="input-group">
-          <p class="helper-text">Unified intelligence system that coordinates machine learning analytics, smart exercise selection, and performance optimization.</p>
-        </div>
-
-        <div class="intelligence-controls">
-          <button onclick="initializeIntelligence()">🚀 Initialize Intelligence</button>
-          <button onclick="getWeeklyIntelligence()">📈 Weekly Intelligence Report</button>
-          <button onclick="getOptimalExercises()">💡 Smart Exercise Selection</button>
-          <button onclick="assessTrainingRisk()">⚠️ Risk Assessment</button>
-        </div>
-
-        <!-- Intelligence Dashboard -->
-        <div class="intelligence-panel" id="intelligencePanel" style="display: none;">
-          <h4>🎯 Training Intelligence Dashboard</h4>
-          <div id="intelligenceContent"></div>
-        </div>
-
-        <!-- System Status -->
-        <div class="system-status">
-          <h4>⚙️ System Status</h4>
+        <!-- RP Training Status -->
+        <div class="rp-status">
+          <h3>Current Training Status</h3>
           <div class="status-grid">
-            <div class="status-indicator">
-              <span id="analyticsStatus">❌</span>
-              <span>Analytics</span>
+            <div class="status-item">
+              <div class="status-value" id="currentWeek">1</div>
+              <div class="status-label">Week</div>
             </div>
-            <div class="status-indicator">
-              <span id="exerciseStatus">✅</span>
-              <span>Exercise AI</span>
+            <div class="status-item">
+              <div class="status-value" id="currentMeso">4</div>
+              <div class="status-label">Meso Length</div>
             </div>
-            <div class="status-indicator">
-              <span id="liveStatus">✅</span>
-              <span>Live Monitor</span>
+            <div class="status-item">
+              <div class="status-value" id="currentBlock">1</div>
+              <div class="status-label">Block</div>
             </div>
-            <div class="status-indicator">
-              <span id="hubStatus">✅</span>
-              <span>Intelligence Hub</span>
+            <div class="status-item">
+              <div class="status-value" id="targetRIR">4.5</div>
+              <div class="status-label">Target RIR</div>
             </div>
-          </div>
-        </div>
-
-        <output id="intelligenceOut" class="result"></output>
-      </section>
-
-      <!-- Predictive Analytics -->
-      <section class="calculator" id="analyticsCard">
-        <h2>📊 Predictive Analytics</h2>
-        
-        <div class="input-group">
-          <p class="helper-text">Machine learning powered insights for volume optimization, deload prediction, and plateau detection.</p>
-        </div>
-
-        <div class="analytics-controls">
-          <button onclick="optimizeVolumeLandmarks()">🎯 Optimize Volume Landmarks</button>
-          <button onclick="predictDeloadTiming()">🔮 Predict Deload Timing</button>
-          <button onclick="detectPlateaus()">📈 Plateau Analysis</button>
-          <button onclick="getAdaptiveRIR()">🎛️ Adaptive RIR Recommendations</button>
-        </div>
-
-        <div class="analytics-requirements" id="analyticsRequirements">
-          <div class="helper-text">
-            <strong>📊 Analytics Requirements:</strong><br>
-            • Minimum 4 weeks of training data needed<br>
-            • System learns from your session feedback<br>
-            • More data = Better predictions<br>
-            • Auto-enabled when sufficient data available
-          </div>
-        </div>
-
-        <output id="analyticsOut" class="result"></output>
-      </section>
-
-      <!-- Smart Program Generator -->
-      <section class="calculator" id="programGeneratorCard">
-        <h2>🏋️ Smart Program Generator</h2>
-        
-        <div class="input-group">
-          <p class="helper-text">AI-powered weekly program generation based on your preferences, equipment, and current fatigue levels.</p>
-        </div>
-
-        <div class="program-config">
-          <div class="input-group">
-            <label for="programDays">Days per week:</label>
-            <select id="programDays">
-              <option value="3">3 Days</option>
-              <option value="4" selected>4 Days</option>
-              <option value="5">5 Days</option>
-              <option value="6">6 Days</option>
-            </select>
-          </div>
-
-          <div class="input-group">
-            <label for="programSplit">Split Type:</label>
-            <select id="programSplit">
-              <option value="upper_lower" selected>Upper/Lower</option>
-              <option value="push_pull_legs">Push/Pull/Legs</option>
-              <option value="full_body">Full Body</option>
-              <option value="bro_split">Bro Split</option>
-            </select>
-          </div>
-
-          <div class="input-group">
-            <label for="sessionTime">Session Duration:</label>
-            <select id="sessionTime">
-              <option value="45">45 minutes</option>
-              <option value="60" selected>60 minutes</option>
-              <option value="75">75 minutes</option>
-              <option value="90">90 minutes</option>
-            </select>
-          </div>
-
-          <div class="input-group">
-            <label for="experienceLevel">Experience Level:</label>
-            <select id="experienceLevel">
-              <option value="beginner">Beginner</option>
-              <option value="intermediate" selected>Intermediate</option>
-              <option value="advanced">Advanced</option>
-            </select>
-          </div>
-        </div>
-
-        <button onclick="generateWeeklyProgram()">📋 Generate Weekly Program</button>
-        <output id="programOut" class="result"></output>
-      </section>
-
-      <!-- Performance Monitor & Analytics -->
-      <section class="calculator" id="performanceCard">
-        <h2>⚡ Performance Monitor</h2>
-        
-        <div class="input-group">
-          <p class="helper-text">Real-time performance monitoring, optimization analytics, and system health tracking for optimal app performance.</p>
-        </div>
-
-        <div class="performance-controls">
-          <button onclick="performanceManager.initialize()">🚀 Initialize Monitoring</button>
-          <button onclick="performanceManager.generateReport()">📊 Performance Report</button>
-          <button onclick="performanceManager.optimizeApp()">⚙️ Optimize App</button>
-          <button onclick="performanceManager.clearCache()">🧹 Clear Cache</button>
-        </div>
-
-        <!-- Performance Dashboard -->
-        <div class="performance-dashboard" id="performanceDashboard" style="display: none;">
-          <h4>📈 Performance Metrics</h4>
-          <div class="metrics-grid">
-            <div class="metric-card">
-              <div class="metric-value" id="loadTime">-</div>
-              <div class="metric-label">Load Time (ms)</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-value" id="memoryUsage">-</div>
-              <div class="metric-label">Memory (MB)</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-value" id="renderTime">-</div>
-              <div class="metric-label">Render Time (ms)</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-value" id="fps">-</div>
-              <div class="metric-label">FPS</div>
+            <div class="status-item">
+              <div class="status-value" id="currentPhase">Accumulation</div>
+              <div class="status-label">Phase</div>
             </div>
           </div>
         </div>
+      </header>
 
-        <output id="performanceOut" class="result"></output>
-      </section>
-
-      <!-- Data Export & Backup -->
-      <section class="calculator" id="dataExportCard">
-        <h2>💾 Data Export & Backup</h2>
-        
-        <div class="input-group">
-          <p class="helper-text">Export your training data, create backups, and manage data in multiple formats for analysis and portability.</p>
-        </div>
-
-        <div class="export-controls">
-          <div class="input-group">
-            <label for="exportFormat">Export Format:</label>
-            <select id="exportFormat">
-              <option value="json" selected>JSON (Complete)</option>
-              <option value="csv">CSV (Spreadsheet)</option>
-              <option value="excel">Excel (Advanced)</option>
-            </select>
-          </div>
-
-          <div class="export-options">
-            <label class="checkbox-label">
-              <input type="checkbox" id="includePersonal" checked>
-              Include Personal Data
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="includeAnalytics" checked>
-              Include Analytics
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="includeWellness" checked>
-              Include Wellness Data
-            </label>
-            <label class="checkbox-label">
-              <input type="checkbox" id="compressData" checked>
-              Compress Data
-            </label>
-          </div>
-
-          <div class="export-actions">
-            <button onclick="dataExportManager.exportAllData()">📤 Export All Data</button>
-            <button onclick="dataExportManager.createBackup()">💾 Create Backup</button>
-            <button onclick="dataExportManager.importData()">📥 Import Data</button>
-            <button onclick="dataExportManager.scheduleAutoBackup()">⏰ Auto Backup</button>
+      <!-- Weekly Volume Chart -->
+      <div class="chart-section">
+        <div class="chart-header">
+          <h2>Weekly Volume by Muscle</h2>
+          <div class="chart-controls">
+            <button class="small" onclick="resetWeeklyData()">
+              Reset Week
+            </button>
+            <button class="small" onclick="exportSummary()">
+              📊 Export Chart
+            </button>
           </div>
         </div>
+        <canvas id="weeklyChart"></canvas>
+      </div>
+      <div class="section-banner" onclick="toggleSection('daily')">
+        <h3>Daily Training <span class="expand-icon">▼</span></h3>
+        <p>Use during or right after your workout</p>
+      </div>
 
-        <output id="exportOut" class="result"></output>
-      </section>
+      <div class="section-content" id="daily-content">
+        <div class="calculator-grid">
+          <!-- Set Feedback with RP Algorithms -->
+          <section class="calculator" id="mevCard">
+            <h2>Set Feedback (RP Algorithms)</h2>
 
-      <!-- User Feedback & Analytics -->
-      <section class="calculator" id="feedbackCard">
-        <h2>💬 Feedback & Analytics</h2>
-        
-        <div class="input-group">
-          <p class="helper-text">Share feedback, track usage analytics, and help improve the training system through smart data collection.</p>
+            <div class="input-group">
+              <label for="muscleSelect">Muscle group:</label>
+              <select id="muscleSelect">
+                <option value="Chest">Chest</option>
+                <option value="Back">Back</option>
+                <option value="Quads">Quads</option>
+                <option value="Hamstrings">Hamstrings</option>
+                <option value="Shoulders">Shoulders</option>
+                <option value="Biceps">Biceps</option>
+                <option value="Triceps">Triceps</option>
+                <option value="Calves">Calves</option>
+                <option value="Abs">Abs</option>
+                <option value="Forearms">Forearms</option>
+                <option value="Neck">Neck</option>
+                <option value="Traps">Traps</option>
+              </select>
+            </div>
+
+            <div class="input-group">
+              <label for="currentSets">Current weekly sets:</label>
+              <input type="number" id="currentSets" min="0" value="0" />
+              <div class="helper-text">Click to edit inline</div>
+            </div>
+
+            <div class="input-group">
+              <label>Workload (RP Table 2.2):</label>
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(3, 1fr);
+                  gap: 15px;
+                "
+              >
+                <div>
+                  <label for="mmc" style="font-size: 0.8rem"
+                    >Mind-Muscle (0-3):</label
+                  >
+                  <input type="number" id="mmc" min="0" max="3" value="2" />
+                </div>
+                <div>
+                  <label for="pump" style="font-size: 0.8rem"
+                    >Pump (0-3):</label
+                  >
+                  <input type="number" id="pump" min="0" max="3" value="2" />
+                </div>
+                <div>
+                  <label for="dis" style="font-size: 0.8rem"
+                    >Workload (0-3):</label
+                  >
+                  <input type="number" id="dis" min="0" max="3" value="2" />
+                </div>
+              </div>
+              <div class="helper-text">
+                Rate your workout quality factors (0=poor, 3=excellent)
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label>Performance vs last time:</label>
+              <div class="radio-group">
+                <label
+                  ><input type="radio" name="perf" value="3" /> Much
+                  Better</label
+                >
+                <label
+                  ><input type="radio" name="perf" value="2" checked />
+                  Better</label
+                >
+                <label><input type="radio" name="perf" value="1" /> Same</label>
+                <label
+                  ><input type="radio" name="perf" value="0" /> Worse</label
+                >
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label for="sore">Current soreness level (0-3):</label>
+              <input type="number" id="sore" min="0" max="3" value="1" />
+              <div class="helper-text">0=None, 1=Mild, 2=Moderate, 3=High</div>
+            </div>
+
+            <!-- Enhanced Fatigue Detection -->
+            <div class="input-group">
+              <label for="jointAche">Joint ache level (0-3):</label>
+              <input type="number" id="jointAche" min="0" max="3" value="0" />
+              <div class="helper-text">0=None, 1=Mild, 2=Moderate, 3=Pain</div>
+            </div>
+
+            <div class="input-group">
+              <label for="perfChange">Performance change:</label>
+              <select id="perfChange">
+                <option value="1">Personal Record (+1)</option>
+                <option value="0" selected>Same as last time (0)</option>
+                <option value="-1">Performance drop (-1)</option>
+              </select>
+              <div class="helper-text">
+                Strength performance vs recent sessions
+              </div>
+            </div>
+
+            <!-- Autoregulation Section -->
+            <div class="autoregulation-section">
+              <h4>Effort Validation</h4>
+              <div class="input-group">
+                <label for="actualRIR">Actual RIR this set:</label>
+                <input
+                  type="number"
+                  id="actualRIR"
+                  min="0"
+                  max="10"
+                  step="0.5"
+                  placeholder="e.g. 2.5"
+                />
+                <div class="helper-text">
+                  How many more reps could you have done? (Target:
+                  <span id="targetRIRDisplay">4.5</span>)
+                </div>
+              </div>
+            </div>
+
+            <button onclick="submitFeedback()">
+              Process with RP Algorithms
+            </button>
+            <output id="mevOut" class="result"></output>
+          </section>
         </div>
+      </div>
 
-        <div class="feedback-controls">
-          <button onclick="userFeedbackManager.initializeFeedbackSystem()">🎯 Initialize Feedback</button>
-          <button onclick="userFeedbackManager.showFeedbackForm()">💭 Submit Feedback</button>
-          <button onclick="userFeedbackManager.viewAnalytics()">📊 View Analytics</button>
-          <button onclick="userFeedbackManager.exportFeedbackData()">📤 Export Feedback</button>
+      <div class="section-banner" onclick="toggleSection('weekly')">
+        <h3>Weekly Planning <span class="expand-icon">▼</span></h3>
+        <p>End-of-week review and next week setup</p>
+      </div>
+
+      <div class="section-content" id="weekly-content">
+        <div class="calculator-grid">
+          <!-- Deload Check -->
+          <section class="calculator" id="deloadCard">
+            <h2>Deload Analysis</h2>
+
+            <div class="input-group">
+              <label>
+                <input type="checkbox" id="halfMuscles" /> Most muscles needed
+                recovery (≥6 muscle groups)
+              </label>
+            </div>
+
+            <div class="input-group">
+              <label>
+                <input type="checkbox" id="mrvBreach" /> Hit MRV twice in a row
+              </label>
+            </div>
+
+            <div class="input-group">
+              <label>
+                <input type="checkbox" id="illness" /> Illness / Minor Injury
+              </label>
+            </div>
+
+            <div class="input-group">
+              <label>
+                <input type="checkbox" id="lowMotivation" /> Low
+                motivation/enjoyment
+              </label>
+            </div>
+
+            <button onclick="analyzeDeload()">Analyze Deload Need</button>
+            <output id="deloadOut" class="result"></output>
+          </section>
+
+          <!-- Auto-Volume Progression -->
+          <section class="calculator" id="autoVolumeCard">
+            <h2>🤖 Auto-Volume Progression</h2>
+
+            <div class="input-group">
+              <p class="helper-text">
+                Automatically progress all muscles based on weekly feedback.
+                System starts each muscle at MEV and adds +1-2 sets per week
+                based on recovery indicators.
+              </p>
+            </div>
+            <div class="input-group">
+              <h4>Progression Logic:</h4>
+              <ul style="font-size: 0.9rem; margin: 10px 0; padding-left: 20px">
+                <li><strong>Start:</strong> All muscles begin at MEV</li>
+                <li>
+                  <strong>+1 set:</strong> Good recovery (soreness ≤1,
+                  performance ≥0)
+                </li>
+                <li><strong>+2 sets:</strong> At MEV or low stimulus (≤3)</li>
+                <li><strong>Hold volume:</strong> At MRV or fatigue present</li>
+                <li><strong>Deload:</strong> Most muscles at MRV</li>
+              </ul>
+            </div>
+            <div
+              class="input-group"
+              style="display: flex; gap: 10px; flex-wrap: wrap"
+            >
+              <button
+                type="button"
+                class="small"
+                onclick="initializeAllMusclesAtMEV()"
+                style="
+                  background: linear-gradient(135deg, #4caf50, #45a049);
+                  flex: 1;
+                  min-width: 150px;
+                "
+              >
+                🎯 Initialize at MEV
+              </button>
+              <button
+                type="button"
+                class="small"
+                onclick="advanceToNextWeek()"
+                style="
+                  background: linear-gradient(135deg, #2196f3, #1976d2);
+                  flex: 1;
+                  min-width: 150px;
+                "
+              >
+                📅 Next Week
+              </button>
+              <button
+                onclick="runAutoVolumeProgression()"
+                style="
+                  background: linear-gradient(135deg, #ff4444, #ff6666);
+                  font-weight: bold;
+                  flex: 2;
+                  min-width: 200px;
+                "
+              >
+                ▶️ Run Weekly Auto-Progression
+              </button>
+            </div>
+            <output id="autoVolumeOut" class="result"></output>
+          </section>
+
+          <!-- Frequency Optimization -->
+          <section class="calculator" id="freqCard">
+            <h2>Frequency Optimization</h2>
+
+            <div class="input-group">
+              <label for="soreDays">Days until soreness gone:</label>
+              <input type="number" id="soreDays" min="0" value="2" />
+            </div>
+
+            <div class="input-group">
+              <label for="sessionGap">Current session gap (days):</label>
+              <input type="number" id="sessionGap" min="1" value="3" />
+            </div>
+
+            <div class="input-group">
+              <label for="trainingAge">Training experience:</label>
+              <select id="trainingAge">
+                <option value="beginner">Beginner (< 1 year)</option>
+                <option value="intermediate" selected>
+                  Intermediate (1-3 years)
+                </option>
+                <option value="advanced">Advanced (> 3 years)</option>
+              </select>
+            </div>
+
+            <button onclick="analyzeFrequency()">Optimize Frequency</button>
+            <output id="freqOut" class="result"></output>
+          </section>
         </div>
+      </div>
 
-        <!-- Feedback Stats -->
-        <div class="feedback-stats" id="feedbackStats" style="display: none;">
-          <h4>📈 Feedback Analytics</h4>
-          <div class="stats-grid">
-            <div class="stat-item">
-              <div class="stat-value" id="totalFeedback">0</div>
-              <div class="stat-label">Total Feedback</div>
+      <div class="section-banner" onclick="toggleSection('setup')">
+        <h3>Program Setup <span class="expand-icon">▼</span></h3>
+        <p>Configure volume landmarks and training blocks</p>
+      </div>
+
+      <div class="section-content" id="setup-content">
+        <div class="calculator-grid">
+          <!-- Volume Landmarks Setup -->
+          <section class="calculator" id="volumeCard">
+            <h2>Volume Landmarks (RP Method)</h2>
+
+            <div class="input-group">
+              <label for="landmarkMuscle">Muscle to configure:</label>
+              <select id="landmarkMuscle">
+                <option value="Chest">Chest</option>
+                <option value="Back">Back</option>
+                <option value="Quads">Quads</option>
+                <option value="Hamstrings">Hamstrings</option>
+                <option value="Shoulders">Shoulders</option>
+                <option value="Biceps">Biceps</option>
+                <option value="Triceps">Triceps</option>
+                <option value="Calves">Calves</option>
+                <option value="Abs">Abs</option>
+                <option value="Forearms">Forearms</option>
+                <option value="Neck">Neck</option>
+                <option value="Traps">Traps</option>
+              </select>
             </div>
-            <div class="stat-item">
-              <div class="stat-value" id="avgRating">-</div>
-              <div class="stat-label">Avg Rating</div>
+
+            <div class="landmark-grid">
+              <div class="input-group">
+                <label for="mv">MV (Maintenance Volume):</label>
+                <input type="number" id="mv" min="0" value="4" />
+                <div class="helper-text">Minimum to maintain muscle</div>
+              </div>
+
+              <div class="input-group">
+                <label for="mev">MEV (Minimum Effective):</label>
+                <input type="number" id="mev" min="0" value="8" />
+                <div class="helper-text">Minimum for growth</div>
+              </div>
+
+              <div class="input-group">
+                <label for="mav">MAV (Maximum Adaptive):</label>
+                <input type="number" id="mav" min="0" value="16" />
+                <div class="helper-text">Best volume for adaptation</div>
+              </div>
+
+              <div class="input-group">
+                <label for="mrv">MRV (Maximum Recoverable):</label>
+                <input type="number" id="mrv" min="0" value="22" />
+                <div class="helper-text">Maximum you can recover from</div>
+              </div>
             </div>
-            <div class="stat-item">
-              <div class="stat-value" id="sessionsTracked">0</div>
-              <div class="stat-label">Sessions</div>
+
+            <div class="input-group">
+              <button
+                type="button"
+                class="small"
+                onclick="applyVolumePreset('beginner')"
+              >
+                Beginner Preset
+              </button>
+              <button
+                type="button"
+                class="small"
+                onclick="applyVolumePreset('intermediate')"
+              >
+                Intermediate Preset
+              </button>
+              <button
+                type="button"
+                class="small"
+                onclick="applyVolumePreset('advanced')"
+              >
+                Advanced Preset
+              </button>
             </div>
-            <div class="stat-item">
-              <div class="stat-value" id="improvementScore">-</div>
-              <div class="stat-label">Improvement</div>
+
+            <button onclick="saveLandmarks()">Save Volume Landmarks</button>
+            <output id="volumeOut" class="result"></output>
+
+            <!-- Volume Status Display -->
+            <div id="volumeStatus" class="volume-status"></div>
+          </section>
+
+          <!-- Mesocycle Setup -->
+          <section class="calculator" id="mesoCard">
+            <h2>Mesocycle Setup</h2>
+
+            <div class="input-group">
+              <label for="mesoLength">Mesocycle length (weeks):</label>
+              <input type="number" id="mesoLength" min="2" max="8" value="4" />
+              <div class="helper-text">Typical range: 3-6 weeks</div>
             </div>
-          </div>
+
+            <div class="input-group">
+              <label for="currentWeekNum">Current week number:</label>
+              <input type="number" id="currentWeekNum" min="1" value="1" />
+            </div>
+
+            <div class="input-group">
+              <label for="trainingGoal">Primary goal:</label>
+              <select id="trainingGoal">
+                <option value="hypertrophy" selected>Hypertrophy</option>
+                <option value="strength">Strength</option>
+                <option value="power">Power</option>
+                <option value="endurance">Endurance</option>
+              </select>
+            </div>
+
+            <button onclick="setupMeso()">Setup Mesocycle</button>
+            <output id="mesoOut" class="result"></output>
+          </section>
+
+          <!-- RIR Schedule & Load Feedback -->
+          <section class="calculator" id="rirScheduleCard">
+            <h2>RIR Schedule & Load Feedback</h2>
+
+            <div class="input-group">
+              <label for="rirMesocycleLength">Mesocycle length (weeks):</label>
+              <input
+                type="number"
+                id="rirMesocycleLength"
+                min="3"
+                max="6"
+                value="4"
+              />
+              <div class="helper-text">Standard progression: 4-6 weeks</div>
+            </div>
+
+            <div class="input-group">
+              <label for="rirCurrentWeek">Current week:</label>
+              <input
+                type="number"
+                id="rirCurrentWeek"
+                min="1"
+                max="6"
+                value="1"
+              />
+            </div>
+
+            <div class="rir-schedule-display">
+              <button onclick="showRIRSchedule()" class="small">
+                Show RIR Schedule
+              </button>
+              <div id="rirScheduleDisplay" class="result" style="display: none">
+                <h4>Weekly RIR Targets</h4>
+                <div id="rirScheduleContent"></div>
+              </div>
+            </div>
+
+            <div class="load-feedback-section">
+              <h4>Weekly Load Adjustments</h4>
+              <div class="input-group">
+                <label>
+                  <input type="checkbox" id="simulateRIRFeedback" checked />
+                  Use simulated RIR feedback for demo
+                </label>
+                <div class="helper-text">
+                  Uncheck to manually input RIR values
+                </div>
+              </div>
+
+              <button onclick="runWeeklyLoadAdjustments()" class="small">
+                Process Weekly Adjustments
+              </button>
+              <div
+                id="loadAdjustmentResults"
+                class="result"
+                style="display: none"
+              >
+                <div class="feedback-results">
+                  <div id="loadAdjustmentContent"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="load-progression-section">
+              <h4>Next Week Progression</h4>
+              <button onclick="showNextWeekLoadProgression()" class="small">
+                Show Load Progression
+              </button>
+              <div
+                id="loadProgressionResults"
+                class="result"
+                style="display: none"
+              >
+                <div class="feedback-results">
+                  <div id="loadProgressionContent"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rir-schedule-info">
+              <div class="helper-text">
+                <strong>RIR Schedule System:</strong><br />
+                • Automatically progresses RIR targets weekly: [3, 2, 1, 0]<br />
+                • Processes feedback to adjust training loads (-15% to +15%)<br />
+                • Provides next week progression recommendations<br />
+                • Integrates with auto-progression system
+              </div>
+            </div>
+          </section>
         </div>
+      </div>
 
-        <output id="feedbackOut" class="result"></output>
-      </section>
+      <!-- Advanced Intelligence Section -->
+      <div class="section-banner advanced" onclick="toggleSection('advanced')">
+        <h3>Advanced Intelligence <span class="expand-icon">▼</span></h3>
+        <p>AI-powered training optimization and live performance monitoring</p>
+      </div>
 
+      <div class="section-content" id="advanced-content">
+        <div class="calculator-grid">
+          <!-- Live Performance Monitor -->
+          <section class="calculator" id="liveMonitorCard">
+            <h2>🔴 Live Performance Monitor</h2>
+
+            <div class="input-group">
+              <p class="helper-text">
+                Real-time feedback during training sessions with automatic
+                performance analysis and next-set recommendations.
+              </p>
+            </div>
+
+            <div class="live-session-controls">
+              <div class="input-group">
+                <label for="liveExercise">Exercise:</label>
+                <input
+                  type="text"
+                  id="liveExercise"
+                  placeholder="e.g. Barbell Bench Press"
+                  value="Barbell Bench Press"
+                />
+              </div>
+
+              <div class="input-group">
+                <label for="liveMuscle">Primary Muscle:</label>
+                <select id="liveMuscle">
+                  <option value="Chest">Chest</option>
+                  <option value="Back">Back</option>
+                  <option value="Quads">Quads</option>
+                  <option value="Hamstrings">Hamstrings</option>
+                  <option value="Shoulders">Shoulders</option>
+                  <option value="Biceps">Biceps</option>
+                  <option value="Triceps">Triceps</option>
+                </select>
+              </div>
+
+              <div class="input-group">
+                <label for="plannedSets">Planned Sets:</label>
+                <input
+                  type="number"
+                  id="plannedSets"
+                  min="1"
+                  max="10"
+                  value="3"
+                />
+              </div>
+
+              <div class="session-controls">
+                <button id="startSessionBtn" onclick="startLiveSession()">
+                  🎮 Start Live Session
+                </button>
+                <button
+                  id="logSetBtn"
+                  onclick="logTrainingSet()"
+                  style="display: none"
+                >
+                  📊 Log Set
+                </button>
+                <button
+                  id="endSessionBtn"
+                  onclick="endLiveSession()"
+                  style="display: none"
+                >
+                  ⏹️ End Session
+                </button>
+              </div>
+            </div>
+
+            <!-- Live Monitor Dashboard -->
+            <div class="live-monitor" id="liveMonitor" style="display: none">
+              <h4>🔴 Live Training Monitor</h4>
+              <div class="monitor-grid">
+                <div class="monitor-stat">
+                  <div class="value" id="currentSet">0</div>
+                  <div class="label">Current Set</div>
+                </div>
+                <div class="monitor-stat">
+                  <div class="value" id="currentRIR">-</div>
+                  <div class="label">Last RIR</div>
+                </div>
+                <div class="monitor-stat">
+                  <div class="value" id="sessionProgress">0%</div>
+                  <div class="label">Progress</div>
+                </div>
+                <div class="monitor-stat">
+                  <div class="value" id="totalLoad">0</div>
+                  <div class="label">Total Load</div>
+                </div>
+              </div>
+            </div>
+
+            <output id="liveMonitorOut" class="result"></output>
+          </section>
+
+          <!-- AI Training Intelligence -->
+          <section class="calculator" id="trainingIntelligenceCard">
+            <h2>🧠 Training Intelligence Hub</h2>
+
+            <div class="input-group">
+              <p class="helper-text">
+                Unified intelligence system that coordinates machine learning
+                analytics, smart exercise selection, and performance
+                optimization.
+              </p>
+            </div>
+
+            <div class="intelligence-controls">
+              <button onclick="initializeIntelligence()">
+                🚀 Initialize Intelligence
+              </button>
+              <button onclick="getWeeklyIntelligence()">
+                📈 Weekly Intelligence Report
+              </button>
+              <button onclick="getOptimalExercises()">
+                💡 Smart Exercise Selection
+              </button>
+              <button onclick="assessTrainingRisk()">⚠️ Risk Assessment</button>
+            </div>
+
+            <!-- Intelligence Dashboard -->
+            <div
+              class="intelligence-panel"
+              id="intelligencePanel"
+              style="display: none"
+            >
+              <h4>🎯 Training Intelligence Dashboard</h4>
+              <div id="intelligenceContent"></div>
+            </div>
+
+            <!-- System Status -->
+            <div class="system-status">
+              <h4>⚙️ System Status</h4>
+              <div class="status-grid">
+                <div class="status-indicator">
+                  <span id="analyticsStatus">❌</span>
+                  <span>Analytics</span>
+                </div>
+                <div class="status-indicator">
+                  <span id="exerciseStatus">✅</span>
+                  <span>Exercise AI</span>
+                </div>
+                <div class="status-indicator">
+                  <span id="liveStatus">✅</span>
+                  <span>Live Monitor</span>
+                </div>
+                <div class="status-indicator">
+                  <span id="hubStatus">✅</span>
+                  <span>Intelligence Hub</span>
+                </div>
+              </div>
+            </div>
+
+            <output id="intelligenceOut" class="result"></output>
+          </section>
+
+          <!-- Predictive Analytics -->
+          <section class="calculator" id="analyticsCard">
+            <h2>📊 Predictive Analytics</h2>
+
+            <div class="input-group">
+              <p class="helper-text">
+                Machine learning powered insights for volume optimization,
+                deload prediction, and plateau detection.
+              </p>
+            </div>
+
+            <div class="analytics-controls">
+              <button onclick="optimizeVolumeLandmarks()">
+                🎯 Optimize Volume Landmarks
+              </button>
+              <button onclick="predictDeloadTiming()">
+                🔮 Predict Deload Timing
+              </button>
+              <button onclick="detectPlateaus()">📈 Plateau Analysis</button>
+              <button onclick="getAdaptiveRIR()">
+                🎛️ Adaptive RIR Recommendations
+              </button>
+            </div>
+
+            <div class="analytics-requirements" id="analyticsRequirements">
+              <div class="helper-text">
+                <strong>📊 Analytics Requirements:</strong><br />
+                • Minimum 4 weeks of training data needed<br />
+                • System learns from your session feedback<br />
+                • More data = Better predictions<br />
+                • Auto-enabled when sufficient data available
+              </div>
+            </div>
+
+            <output id="analyticsOut" class="result"></output>
+          </section>
+
+          <!-- Smart Program Generator -->
+          <section class="calculator" id="programGeneratorCard">
+            <h2>🏋️ Smart Program Generator</h2>
+
+            <div class="input-group">
+              <p class="helper-text">
+                AI-powered weekly program generation based on your preferences,
+                equipment, and current fatigue levels.
+              </p>
+            </div>
+
+            <div class="program-config">
+              <div class="input-group">
+                <label for="programDays">Days per week:</label>
+                <select id="programDays">
+                  <option value="3">3 Days</option>
+                  <option value="4" selected>4 Days</option>
+                  <option value="5">5 Days</option>
+                  <option value="6">6 Days</option>
+                </select>
+              </div>
+
+              <div class="input-group">
+                <label for="programSplit">Split Type:</label>
+                <select id="programSplit">
+                  <option value="upper_lower" selected>Upper/Lower</option>
+                  <option value="push_pull_legs">Push/Pull/Legs</option>
+                  <option value="full_body">Full Body</option>
+                  <option value="bro_split">Bro Split</option>
+                </select>
+              </div>
+
+              <div class="input-group">
+                <label for="sessionTime">Session Duration:</label>
+                <select id="sessionTime">
+                  <option value="45">45 minutes</option>
+                  <option value="60" selected>60 minutes</option>
+                  <option value="75">75 minutes</option>
+                  <option value="90">90 minutes</option>
+                </select>
+              </div>
+
+              <div class="input-group">
+                <label for="experienceLevel">Experience Level:</label>
+                <select id="experienceLevel">
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate" selected>Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </select>
+              </div>
+            </div>
+
+            <button onclick="generateWeeklyProgram()">
+              📋 Generate Weekly Program
+            </button>
+            <output id="programOut" class="result"></output>
+          </section>
+
+          <!-- Performance Monitor & Analytics -->
+          <section class="calculator" id="performanceCard">
+            <h2>⚡ Performance Monitor</h2>
+
+            <div class="input-group">
+              <p class="helper-text">
+                Real-time performance monitoring, optimization analytics, and
+                system health tracking for optimal app performance.
+              </p>
+            </div>
+
+            <div class="performance-controls">
+              <button onclick="performanceManager.initialize()">
+                🚀 Initialize Monitoring
+              </button>
+              <button onclick="performanceManager.generateReport()">
+                📊 Performance Report
+              </button>
+              <button onclick="performanceManager.optimizeApp()">
+                ⚙️ Optimize App
+              </button>
+              <button onclick="performanceManager.clearCache()">
+                🧹 Clear Cache
+              </button>
+            </div>
+
+            <!-- Performance Dashboard -->
+            <div
+              class="performance-dashboard"
+              id="performanceDashboard"
+              style="display: none"
+            >
+              <h4>📈 Performance Metrics</h4>
+              <div class="metrics-grid">
+                <div class="metric-card">
+                  <div class="metric-value" id="loadTime">-</div>
+                  <div class="metric-label">Load Time (ms)</div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-value" id="memoryUsage">-</div>
+                  <div class="metric-label">Memory (MB)</div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-value" id="renderTime">-</div>
+                  <div class="metric-label">Render Time (ms)</div>
+                </div>
+                <div class="metric-card">
+                  <div class="metric-value" id="fps">-</div>
+                  <div class="metric-label">FPS</div>
+                </div>
+              </div>
+            </div>
+
+            <output id="performanceOut" class="result"></output>
+          </section>
+
+          <!-- Data Export & Backup -->
+          <section class="calculator" id="dataExportCard">
+            <h2>💾 Data Export & Backup</h2>
+
+            <div class="input-group">
+              <p class="helper-text">
+                Export your training data, create backups, and manage data in
+                multiple formats for analysis and portability.
+              </p>
+            </div>
+
+            <div class="export-controls">
+              <div class="input-group">
+                <label for="exportFormat">Export Format:</label>
+                <select id="exportFormat">
+                  <option value="json" selected>JSON (Complete)</option>
+                  <option value="csv">CSV (Spreadsheet)</option>
+                  <option value="excel">Excel (Advanced)</option>
+                </select>
+              </div>
+
+              <div class="export-options">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="includePersonal" checked />
+                  Include Personal Data
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="includeAnalytics" checked />
+                  Include Analytics
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="includeWellness" checked />
+                  Include Wellness Data
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="compressData" checked />
+                  Compress Data
+                </label>
+              </div>
+
+              <div class="export-actions">
+                <button onclick="dataExportManager.exportAllData()">
+                  📤 Export All Data
+                </button>
+                <button onclick="dataExportManager.createBackup()">
+                  💾 Create Backup
+                </button>
+                <button onclick="dataExportManager.importData()">
+                  📥 Import Data
+                </button>
+                <button onclick="dataExportManager.scheduleAutoBackup()">
+                  ⏰ Auto Backup
+                </button>
+              </div>
+            </div>
+
+            <output id="exportOut" class="result"></output>
+          </section>
+
+          <!-- User Feedback & Analytics -->
+          <section class="calculator" id="feedbackCard">
+            <h2>💬 Feedback & Analytics</h2>
+
+            <div class="input-group">
+              <p class="helper-text">
+                Share feedback, track usage analytics, and help improve the
+                training system through smart data collection.
+              </p>
+            </div>
+
+            <div class="feedback-controls">
+              <button onclick="userFeedbackManager.initializeFeedbackSystem()">
+                🎯 Initialize Feedback
+              </button>
+              <button onclick="userFeedbackManager.showFeedbackForm()">
+                💭 Submit Feedback
+              </button>
+              <button onclick="userFeedbackManager.viewAnalytics()">
+                📊 View Analytics
+              </button>
+              <button onclick="userFeedbackManager.exportFeedbackData()">
+                📤 Export Feedback
+              </button>
+            </div>
+
+            <!-- Feedback Stats -->
+            <div
+              class="feedback-stats"
+              id="feedbackStats"
+              style="display: none"
+            >
+              <h4>📈 Feedback Analytics</h4>
+              <div class="stats-grid">
+                <div class="stat-item">
+                  <div class="stat-value" id="totalFeedback">0</div>
+                  <div class="stat-label">Total Feedback</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value" id="avgRating">-</div>
+                  <div class="stat-label">Avg Rating</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value" id="sessionsTracked">0</div>
+                  <div class="stat-label">Sessions</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value" id="improvementScore">-</div>
+                  <div class="stat-label">Improvement</div>
+                </div>
+              </div>
+            </div>
+
+            <output id="feedbackOut" class="result"></output>
+          </section>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- Load modules and initialize -->
+    <!-- Load modules and initialize -->
 
-<!-- Auth Modal Container -->
-<div id="authRoot"></div>
+    <!-- Auth Modal Container -->
+    <div id="authRoot"></div>
 
-<!-- then scripts -->
-<!-- <script type="module" src="js/ui/enhancedAdvancedUI.js"></script> -->
-<!-- <script type="module" src="js/algorithms/dataVisualization.js"></script> -->
+    <!-- then scripts -->
+    <!-- <script type="module" src="js/ui/enhancedAdvancedUI.js"></script> -->
+    <!-- <script type="module" src="js/algorithms/dataVisualization.js"></script> -->
 
-<script type="module" src="./js/ui/loadPartials.js"></script>
-<script type="module" src="./main.js"></script>
-
-</body>
+    <script type="module" src="./js/ui/loadPartials.js"></script>
+    <script type="module" src="./main.js"></script>
+  </body>
 </html>

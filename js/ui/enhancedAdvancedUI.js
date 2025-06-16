@@ -3,10 +3,10 @@
  * Sophisticated interface for next-level features
  */
 
-import { dataVisualizer } from '../algorithms/dataVisualization.js';
-import { wellnessSystem } from '../algorithms/wellnessIntegration.js';
-import { periodizationSystem } from '../algorithms/periodizationSystem.js';
-import { advancedIntelligence } from '../algorithms/intelligenceHub.js';
+import { dataVisualizer } from "../algorithms/dataVisualization.js";
+import { wellnessSystem } from "../algorithms/wellnessIntegration.js";
+import { periodizationSystem } from "../algorithms/periodizationSystem.js";
+import { advancedIntelligence } from "../algorithms/intelligenceHub.js";
 
 /**
  * Enhanced Advanced UI System
@@ -24,12 +24,12 @@ class EnhancedAdvancedUI {
    */
   initializeDashboardState() {
     return {
-      activeTab: 'overview',
+      activeTab: "overview",
       chartConfigs: new Map(),
       refreshRate: 5000, // 5 seconds
       autoRefresh: false,
       fullscreen: false,
-      theme: 'light'
+      theme: "light",
     };
   }
 
@@ -41,12 +41,12 @@ class EnhancedAdvancedUI {
       queue: [],
       displayed: new Set(),
       types: {
-        info: { icon: 'ℹ️', color: '#3b82f6' },
-        success: { icon: '✅', color: '#10b981' },
-        warning: { icon: '⚠️', color: '#f59e0b' },
-        error: { icon: '❌', color: '#ef4444' },
-        insight: { icon: '💡', color: '#8b5cf6' }
-      }
+        info: { icon: "ℹ️", color: "#3b82f6" },
+        success: { icon: "✅", color: "#10b981" },
+        warning: { icon: "⚠️", color: "#f59e0b" },
+        error: { icon: "❌", color: "#ef4444" },
+        insight: { icon: "💡", color: "#8b5cf6" },
+      },
     };
   }
 
@@ -54,8 +54,8 @@ class EnhancedAdvancedUI {
    * Create comprehensive training dashboard
    */
   createAdvancedDashboard() {
-    const dashboard = document.createElement('div');
-    dashboard.className = 'advanced-dashboard';
+    const dashboard = document.createElement("div");
+    dashboard.className = "advanced-dashboard";
     dashboard.innerHTML = `
       <div class="dashboard-header">
         <h2>🎯 Advanced Training Dashboard</h2>
@@ -510,8 +510,8 @@ class EnhancedAdvancedUI {
     this.initializeCharts();
     this.startAutoRefresh();
     this.loadDashboardData();
-    
-    console.log('🚀 Enhanced Advanced UI System Initialized');
+
+    console.log("🚀 Enhanced Advanced UI System Initialized");
   }
 
   /**
@@ -519,9 +519,9 @@ class EnhancedAdvancedUI {
    */
   setupEventListeners() {
     // Range input event listeners for real-time updates
-    document.addEventListener('input', (event) => {
-      if (event.target.type === 'range') {
-        const valueSpan = document.getElementById(event.target.id + 'Value');
+    document.addEventListener("input", (event) => {
+      if (event.target.type === "range") {
+        const valueSpan = document.getElementById(event.target.id + "Value");
         if (valueSpan) {
           valueSpan.textContent = event.target.value;
         }
@@ -529,15 +529,15 @@ class EnhancedAdvancedUI {
     });
 
     // Tab navigation
-    document.addEventListener('click', (event) => {
-      if (event.target.classList.contains('tab-btn')) {
+    document.addEventListener("click", (event) => {
+      if (event.target.classList.contains("tab-btn")) {
         this.handleTabClick(event.target);
       }
     });
 
     // Auto-save wellness data
-    document.addEventListener('change', (event) => {
-      if (event.target.closest('#wellnessForm')) {
+    document.addEventListener("change", (event) => {
+      if (event.target.closest("#wellnessForm")) {
         this.autoSaveWellnessData();
       }
     });
@@ -548,16 +548,22 @@ class EnhancedAdvancedUI {
    */
   switchTab(tabName) {
     // Update tab buttons
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`.tab-btn[onclick*="${tabName}"]`).classList.add('active');
+    document
+      .querySelectorAll(".tab-btn")
+      .forEach((btn) => btn.classList.remove("active"));
+    document
+      .querySelector(`.tab-btn[onclick*="${tabName}"]`)
+      .classList.add("active");
 
     // Update tab content
-    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-    document.getElementById(`${tabName}-tab`).classList.add('active');
+    document
+      .querySelectorAll(".tab-content")
+      .forEach((content) => content.classList.remove("active"));
+    document.getElementById(`${tabName}-tab`).classList.add("active");
 
     // Load tab-specific data
     this.loadTabData(tabName);
-    
+
     this.dashboardState.activeTab = tabName;
   }
 
@@ -566,19 +572,19 @@ class EnhancedAdvancedUI {
    */
   loadTabData(tabName) {
     switch (tabName) {
-      case 'overview':
+      case "overview":
         this.loadOverviewData();
         break;
-      case 'analytics':
+      case "analytics":
         this.loadAnalyticsData();
         break;
-      case 'wellness':
+      case "wellness":
         this.loadWellnessData();
         break;
-      case 'planning':
+      case "planning":
         this.loadPlanningData();
         break;
-      case 'insights':
+      case "insights":
         this.loadInsightsData();
         break;
     }
@@ -589,48 +595,50 @@ class EnhancedAdvancedUI {
    */
   generateAIInsights() {
     const insights = advancedIntelligence.getWeeklyIntelligence();
-    const content = document.getElementById('aiInsightsContent');
-    
+    const content = document.getElementById("aiInsightsContent");
+
     let html = '<div class="insights-list">';
-    
+
     if (insights.recommendations.length > 0) {
-      html += '<h4>🎯 Recommendations</h4>';
-      insights.recommendations.forEach(rec => {
+      html += "<h4>🎯 Recommendations</h4>";
+      insights.recommendations.forEach((rec) => {
         html += `<div class="insight-item ${rec.urgency}">
           <strong>${rec.type}:</strong> ${rec.message}
         </div>`;
       });
     }
-    
+
     if (insights.analytics) {
-      html += '<h4>📊 Analytics Insights</h4>';
-      Object.entries(insights.analytics.volumeLandmarkOptimizations || {}).forEach(([muscle, opt]) => {
+      html += "<h4>📊 Analytics Insights</h4>";
+      Object.entries(
+        insights.analytics.volumeLandmarkOptimizations || {},
+      ).forEach(([muscle, opt]) => {
         html += `<div class="insight-item success">
           <strong>${muscle}:</strong> Volume landmarks can be optimized (${opt.confidence}% confidence)
         </div>`;
       });
     }
-    
-    html += '</div>';
+
+    html += "</div>";
     content.innerHTML = html;
-    
-    this.showNotification('AI insights generated successfully', 'success');
+
+    this.showNotification("AI insights generated successfully", "success");
   }
 
   /**
    * Show notification
    */
-  showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
+  showNotification(message, type = "info") {
+    const notification = document.createElement("div");
     notification.className = `notification ${type}`;
     notification.innerHTML = `
       <span class="notification-icon">${this.notifications.types[type].icon}</span>
       <span class="notification-message">${message}</span>
       <button class="notification-close" onclick="this.parentElement.remove()">×</button>
     `;
-    
-    document.getElementById('notificationArea').appendChild(notification);
-    
+
+    document.getElementById("notificationArea").appendChild(notification);
+
     // Auto-remove after 5 seconds
     setTimeout(() => {
       if (notification.parentElement) {
@@ -646,17 +654,19 @@ class EnhancedAdvancedUI {
     const dashboardData = this.collectDashboardData();
     const exportData = {
       timestamp: new Date().toISOString(),
-      data: dashboardData
+      data: dashboardData,
     };
-    
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: "application/json",
+    });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `training-dashboard-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `training-dashboard-${new Date().toISOString().split("T")[0]}.json`;
     a.click();
-    
-    this.showNotification('Dashboard data exported successfully', 'success');
+
+    this.showNotification("Dashboard data exported successfully", "success");
   }
 
   /**
@@ -668,7 +678,7 @@ class EnhancedAdvancedUI {
       analytics: this.getAnalyticsData(),
       wellness: this.getWellnessData(),
       planning: this.getPlanningData(),
-      insights: this.getInsightsData()
+      insights: this.getInsightsData(),
     };
   }
 }
@@ -679,7 +689,4 @@ const enhancedUI = new EnhancedAdvancedUI();
 // Make globally available
 window.enhancedUI = enhancedUI;
 
-export {
-  EnhancedAdvancedUI,
-  enhancedUI
-};
+export { EnhancedAdvancedUI, enhancedUI };
