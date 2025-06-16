@@ -3,6 +3,7 @@
  * Implements RP Table 2.2 (MEV Stimulus Estimator) and Table 2.3 (Set Progression Algorithm)
  */
 
+import Chart from 'chart.js/auto';
 import trainingState from "../core/trainingState.js";
 import { isHighFatigue } from "./fatigue.js";
 
