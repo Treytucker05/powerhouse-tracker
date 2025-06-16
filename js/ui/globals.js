@@ -1400,4 +1400,15 @@ onAuth((sess) => {
   console.log("Auth session", sess);
 });
 
+/* Temporary stubs to satisfy ESLint — replace with real logic */
+export function showSystemMessage(msg = '') {
+  console.warn('showSystemMessage stub:', msg);
+}
+export function createSystemOutput(data = {}) {
+  console.warn('createSystemOutput stub:', data);
+}
+export function updateAllDisplays() {
+  /* TODO: refresh UI widgets when state changes */
+}
+
 console.log("globals loaded – auth handlers ready");
