@@ -619,8 +619,15 @@ class PerformanceManager {
   /**
    * Setup service worker
   */ setupServiceWorker() {
-    // avoid interfering with Parcel dev server
-    if (location.hostname === "localhost") return;
+    const isLocal = ["localhost", "127.0.0.1"].includes(location.hostname);
+
+    if (isLocal && "serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .getRegistrations()
+        .then((regs) => regs.forEach((r) => r.unregister()));
+    }
+
+    if (isLocal) return;
 
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
