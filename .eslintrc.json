@@ -10,5 +10,14 @@
     "showSystemMessage": "readonly",
     "createSystemOutput": "readonly",
     "updateAllDisplays": "readonly"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["**/__tests__/**"],
+      "rules": {
+        "no-unused-vars": "off",
+        "no-undef": "off"
+      }
+    }
+  ]
 }
