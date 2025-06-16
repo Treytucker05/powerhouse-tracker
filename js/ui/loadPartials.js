@@ -5,4 +5,4 @@ async function loadPartial(id, url) {
 }
 
 // load auth modal
-loadPartial("authRoot", "partials/authModal.html");
+// loadPartial("authRoot", "partials/authModal.html");
