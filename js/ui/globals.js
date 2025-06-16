@@ -1364,7 +1364,7 @@ window.handleSignIn = async function () {
   if (error) return alert(error.message);
   const modal = document.getElementById("authModal");
   console.log("signIn authModal:", modal, "ready:", document.readyState);
-  modal?.classList.add("hidden"); // hide modal on success
+  // modal?.classList.add("hidden"); // hide modal on success
   console.log("Logged-in session:", data);
 };
 
@@ -1381,7 +1381,7 @@ window.handleSignUp = async function () {
   if (error) return alert(error.message);
   const modal = document.getElementById("authModal");
   console.log("signUp authModal:", modal, "ready:", document.readyState);
-  modal?.classList.add("hidden");
+  // modal?.classList.add("hidden");
   console.log("Signed-up session:", data);
 };
 
@@ -1392,7 +1392,7 @@ window.handleSignOut = async function () {
   await supa.auth.signOut();
   const modal = document.getElementById("authModal");
   console.log("signOut authModal:", modal, "ready:", document.readyState);
-  modal?.classList.remove("hidden");
+  // modal?.classList.remove("hidden");
 };
 
 // Handle authentication state changes
@@ -1400,7 +1400,7 @@ onAuth((sess) => {
   try {
     const modal = document.getElementById("authModal");
     console.log("onAuth authModal:", modal, "ready:", document.readyState);
-    if (modal) modal.classList.toggle("hidden", !!sess);
+    // if (modal) modal.classList.toggle("hidden", !!sess);
     else console.warn("authModal missing in onAuth");
     const signOutBtn = document.getElementById("signOutBtn");
     if (signOutBtn) signOutBtn.style.display = sess ? "inline-block" : "none";
