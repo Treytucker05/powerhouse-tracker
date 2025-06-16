@@ -2,6 +2,13 @@
 import "./js/core/db.js";
 import "./js/ui/globals.js";
 import "./js/core/trainingState.js";
+import { initChart } from "./js/ui/chartManager.js";
 
 // App initialization
 console.log("RP Toolkit initialized");
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initChart);
+} else {
+  initChart();
+}
