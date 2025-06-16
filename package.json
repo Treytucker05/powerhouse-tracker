@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.50.0",
-    "chart.js": "^4.4.9"
+    "chart.js": "^4.5.0"
   },
   "targets": {
     "default": {
