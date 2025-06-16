@@ -396,5 +396,10 @@ export {
   getVolumeProgression,
   analyzeDeloadNeed,
   autoSetIncrement,
-  processWeeklyVolumeProgression
+  processWeeklyVolumeProgression,
+  weeklyVolume
 };
+
+export function weeklyVolume(weekArray) {
+  return weekArray.reduce((sum, day) => sum + (day.sets ?? 0), 0);
+}
