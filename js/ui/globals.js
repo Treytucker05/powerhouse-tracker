@@ -1401,14 +1401,29 @@ onAuth((sess) => {
 });
 
 /* Temporary stubs to satisfy ESLint — replace with real logic */
-export function showSystemMessage(msg = '') {
-  console.warn('showSystemMessage stub:', msg);
+export function showSystemMessage(msg = "") {
+  console.warn("showSystemMessage stub:", msg);
 }
 export function createSystemOutput(data = {}) {
-  console.warn('createSystemOutput stub:', data);
+  console.warn("createSystemOutput stub:", data);
 }
 export function updateAllDisplays() {
-  /* TODO: refresh UI widgets when state changes */
+  const c = document.querySelector('[data-muscle="chest"]');
+  const d = trainingState.weeklyVolume?.Chest;
+  if (!c || !d) return;
+  const b = c.querySelector(".vol-badge");
+  b.textContent = `${d.current} sets`;
+  c.querySelector(".volume-fill").style.width =
+    `${Math.min((d.current / d.MRV) * 100, 100)}%`;
+  const col =
+    d.current >= d.MRV
+      ? "#ef4444"
+      : d.current >= d.MAV
+        ? "#f59e0b"
+        : d.current >= d.MEV
+          ? "#10b981"
+          : "#6b7280";
+  b.style.backgroundColor = col;
 }
 
 console.log("globals loaded – auth handlers ready");
