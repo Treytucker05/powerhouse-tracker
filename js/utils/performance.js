@@ -618,11 +618,14 @@ class PerformanceManager {
   }
   /**
    * Setup service worker
-   */ setupServiceWorker() {
+  */ setupServiceWorker() {
+    // avoid interfering with Parcel dev server
+    if (location.hostname === "localhost") return;
+
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker
         .register(new URL("../../sw.js", import.meta.url))
-        .then((registration) => {
+        .then(() => {
           console.log("✅ Service Worker registered");
         })
         .catch((error) => {
