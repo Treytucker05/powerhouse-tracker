@@ -1,12 +1,19 @@
 console.log("AUTH SYSTEM NUKED");
-/* global process */
-import { createClient } from "@supabase/supabase-js";
 
-// Load from Parcel-exposed env vars
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
-
-export const supa = createClient(supabaseUrl, supabaseKey);
+// Provide a minimal stub so anything expecting the Supabase client
+// won't throw errors when auth is disabled. This avoids DOM access
+// during initialization which previously caused crashes.
+export const supa = {
+  auth: {
+    signUp: async () => ({ data: null, error: new Error("Auth disabled") }),
+    signInWithPassword: async () => ({ data: null, error: new Error("Auth disabled") }),
+    signOut: async () => ({ error: new Error("Auth disabled") }),
+    onAuthStateChange: () => {
+      console.log("Auth system disabled; onAuthStateChange ignored.");
+      return { data: null };
+    },
+  },
+};
 
 /* ---------- Auth helpers ---------- */
 // export async function signUp(email, password) {
