@@ -289,7 +289,7 @@ window.analyzeDeload = function () {
     output.innerHTML = `
       <strong>Deload Recommended</strong><br>
       Reasons: ${analysis.reasons.join(", ")}<br>
-      <em>Take 1 week at 50% volume + 25-50% load reduction</em>
+      <em>Take 1 week at 50% volume and 50% of normal load</em>
     `;
     output.className = "result warning active";
 
@@ -297,7 +297,7 @@ window.analyzeDeload = function () {
     setTimeout(() => {
       if (
         confirm(
-          "Start deload phase now? This will reduce all muscle volumes to 50% of MEV.",
+          "Start deload phase now? This will reduce all muscle volumes to 50% of MEV and loads to 50% of normal.",
         )
       ) {
         trainingState.startDeload();

@@ -17,9 +17,10 @@ class TrainingState {
 
     // Core RP Volume Landmarks (defaults from RP literature)
     this.volumeLandmarks = {
-      Chest: { MV: 4, MEV: 8, MAV: 16, MRV: 22 },
+      Chest: { MV: 4, MEV: 6, MAV: 16, MRV: 22 },
       Back: { MV: 6, MEV: 10, MAV: 20, MRV: 25 },
-      Quads: { MV: 6, MEV: 10, MAV: 20, MRV: 25 },
+      Quads: { MV: 6, MEV: 10, MAV: 16, MRV: 20 },
+      Glutes: { MV: 0, MEV: 2, MAV: 12, MRV: 25 },
       Hamstrings: { MV: 4, MEV: 6, MAV: 16, MRV: 20 },
       Shoulders: { MV: 4, MEV: 8, MAV: 16, MRV: 20 },
       Biceps: { MV: 4, MEV: 6, MAV: 14, MRV: 20 },
@@ -37,6 +38,7 @@ class TrainingState {
     this.blockNo = 1;
     this.deloadPhase = false;
     this.resensitizationPhase = false;
+    this.loadReduction = 1;
 
     // Current week data
     this.currentWeekSets = {};
@@ -156,6 +158,7 @@ class TrainingState {
   // Start deload phase
   startDeload() {
     this.deloadPhase = true;
+    this.loadReduction = 0.5;
     // Reduce all sets to 50% of MEV
     Object.keys(this.volumeLandmarks).forEach((muscle) => {
       const deloadSets = Math.round(this.volumeLandmarks[muscle].MEV * 0.5);
@@ -167,6 +170,7 @@ class TrainingState {
   // Start resensitization phase
   startResensitization() {
     this.resensitizationPhase = true;
+    this.loadReduction = 1;
     // Set all muscles to MV
     Object.keys(this.volumeLandmarks).forEach((muscle) => {
       this.currentWeekSets[muscle] = this.volumeLandmarks[muscle].MV;
@@ -193,6 +197,12 @@ class TrainingState {
 
     // Progress week
     this.weekNo++;
+
+    // End deload after one week
+    if (this.deloadPhase) {
+      this.deloadPhase = false;
+      this.loadReduction = 1;
+    }
 
     // Check for meso completion
     if (this.weekNo > this.mesoLen) {
@@ -294,6 +304,7 @@ class TrainingState {
       blockNo: this.blockNo,
       deloadPhase: this.deloadPhase,
       resensitizationPhase: this.resensitizationPhase,
+      loadReduction: this.loadReduction,
       currentWeekSets: this.currentWeekSets,
       lastWeekSets: this.lastWeekSets,
       weeklyVolume: this.weeklyVolume,
@@ -312,6 +323,9 @@ class TrainingState {
       try {
         const state = JSON.parse(saved);
         Object.assign(this, state);
+        if (state.loadReduction !== undefined) {
+          this.loadReduction = state.loadReduction;
+        }
       } catch (e) {
         console.warn("Failed to load training state, using defaults");
       }
