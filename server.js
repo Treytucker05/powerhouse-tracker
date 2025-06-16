@@ -1,46 +1,46 @@
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
+const http = require("http");
+const fs = require("fs");
+const path = require("path");
 
 const port = process.env.PORT || 3000;
 
 const mimeTypes = {
-  '.html': 'text/html',
-  '.js': 'application/javascript',
-  '.css': 'text/css',
-  '.json': 'application/json',
-  '.png': 'image/png',
-  '.jpg': 'image/jpg',
-  '.gif': 'image/gif',
-  '.ico': 'image/x-icon',
-  '.svg': 'image/svg+xml'
+  ".html": "text/html",
+  ".js": "application/javascript",
+  ".css": "text/css",
+  ".json": "application/json",
+  ".png": "image/png",
+  ".jpg": "image/jpg",
+  ".gif": "image/gif",
+  ".ico": "image/x-icon",
+  ".svg": "image/svg+xml",
 };
 
 const server = http.createServer((req, res) => {
   let filePath = path.join(__dirname, req.url);
-  if (req.url === '/' || req.url === '') {
-    filePath = path.join(__dirname, 'index.html');
+  if (req.url === "/" || req.url === "") {
+    filePath = path.join(__dirname, "index.html");
   }
   if (!filePath.startsWith(__dirname)) {
     res.writeHead(400);
-    return res.end('Bad Request');
+    return res.end("Bad Request");
   }
 
   const extname = String(path.extname(filePath)).toLowerCase();
-  const mimeType = mimeTypes[extname] || 'application/octet-stream';
+  const mimeType = mimeTypes[extname] || "application/octet-stream";
 
   fs.readFile(filePath, (error, content) => {
     if (error) {
-      if (error.code === 'ENOENT') {
-        res.writeHead(404, { 'Content-Type': 'text/html' });
-        res.end('<h1>404 Not Found</h1>', 'utf-8');
+      if (error.code === "ENOENT") {
+        res.writeHead(404, { "Content-Type": "text/html" });
+        res.end("<h1>404 Not Found</h1>", "utf-8");
       } else {
         res.writeHead(500);
-        res.end(`Server Error: ${error.code}`, 'utf-8');
+        res.end(`Server Error: ${error.code}`, "utf-8");
       }
     } else {
-      res.writeHead(200, { 'Content-Type': mimeType });
-      res.end(content, 'utf-8');
+      res.writeHead(200, { "Content-Type": mimeType });
+      res.end(content, "utf-8");
     }
   });
 });

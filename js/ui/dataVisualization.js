@@ -1,1 +1,1 @@
-export { default } from '../algorithms/dataVisualization.js';
+export { default } from "../algorithms/dataVisualization.js";

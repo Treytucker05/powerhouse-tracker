@@ -3,12 +3,20 @@
  * Integrates machine learning analytics, exercise selection, and live performance tracking
  */
 
-import trainingState from '../core/trainingState.js';
-import { optimizeVolumeLandmarks, predictDeloadTiming, adaptiveRIRRecommendations, detectTrainingPlateaus } from './analytics.js';
-import { selectOptimalExercises, generateWeeklyProgram } from './exerciseSelection.js';
-import { liveMonitor } from './livePerformance.js';
-import { isHighFatigue } from './fatigue.js';
-import { processWeeklyVolumeProgression } from './volume.js';
+import trainingState from "../core/trainingState.js";
+import {
+  optimizeVolumeLandmarks,
+  predictDeloadTiming,
+  adaptiveRIRRecommendations,
+  detectTrainingPlateaus,
+} from "./analytics.js";
+import {
+  selectOptimalExercises,
+  generateWeeklyProgram,
+} from "./exerciseSelection.js";
+import { liveMonitor } from "./livePerformance.js";
+import { isHighFatigue } from "./fatigue.js";
+import { processWeeklyVolumeProgression } from "./volume.js";
 
 /**
  * Advanced Training Intelligence System
@@ -27,21 +35,21 @@ class AdvancedTrainingIntelligence {
    * Initialize advanced features
    */
   initialize() {
-    console.log('🧠 Advanced Training Intelligence initializing...');
-    
+    console.log("🧠 Advanced Training Intelligence initializing...");
+
     // Set up live monitoring event handlers
     this.setupLiveMonitoring();
-    
+
     // Initialize analytics if sufficient data
     this.initializeAnalytics();
-    
-    console.log('✅ Advanced features ready');
-    
+
+    console.log("✅ Advanced features ready");
+
     return {
       analytics: this.analyticsEnabled,
       exerciseSelection: this.exerciseSelectionEnabled,
       liveMonitoring: this.liveMonitoringEnabled,
-      message: 'Advanced Training Intelligence is online'
+      message: "Advanced Training Intelligence is online",
     };
   }
 
@@ -51,11 +59,11 @@ class AdvancedTrainingIntelligence {
   setupLiveMonitoring() {
     if (!this.liveMonitoringEnabled) return;
 
-    liveMonitor.on('sessionCompleted', (sessionData) => {
+    liveMonitor.on("sessionCompleted", (sessionData) => {
       this.processSessionData(sessionData);
     });
 
-    liveMonitor.on('setCompleted', (setData) => {
+    liveMonitor.on("setCompleted", (setData) => {
       this.processLiveSetData(setData);
     });
   }
@@ -65,12 +73,16 @@ class AdvancedTrainingIntelligence {
    */
   initializeAnalytics() {
     const historicalData = this.getHistoricalData();
-    
+
     if (historicalData.length >= 4) {
       this.analyticsEnabled = true;
-      console.log(`📊 Analytics enabled with ${historicalData.length} weeks of data`);
+      console.log(
+        `📊 Analytics enabled with ${historicalData.length} weeks of data`,
+      );
     } else {
-      console.log(`📊 Analytics disabled - need ${4 - historicalData.length} more weeks of data`);
+      console.log(
+        `📊 Analytics disabled - need ${4 - historicalData.length} more weeks of data`,
+      );
       this.analyticsEnabled = false;
     }
   }
@@ -88,21 +100,21 @@ class AdvancedTrainingIntelligence {
       analytics: null,
       exerciseSelections: {},
       riskAssessment: null,
-      optimizations: []
+      optimizations: [],
     };
 
     // 1. Analytics-based insights
     if (this.analyticsEnabled) {
       intelligence.analytics = this.generateAnalyticsInsights();
-      
+
       // Predictive deload timing
       const deloadPrediction = this.predictDeloadTiming();
       if (deloadPrediction.weeksUntilDeload <= 2) {
         intelligence.recommendations.push({
-          type: 'deload_prediction',
-          urgency: 'high',
+          type: "deload_prediction",
+          urgency: "high",
           message: `Deload predicted in ${deloadPrediction.weeksUntilDeload} weeks`,
-          action: deloadPrediction.recommendedAction
+          action: deloadPrediction.recommendedAction,
         });
       }
 
@@ -110,10 +122,10 @@ class AdvancedTrainingIntelligence {
       const plateauAnalysis = this.detectPlateaus();
       if (plateauAnalysis.plateauDetected) {
         intelligence.recommendations.push({
-          type: 'plateau_intervention',
+          type: "plateau_intervention",
           urgency: plateauAnalysis.urgency,
           message: `${plateauAnalysis.plateauType} detected`,
-          interventions: plateauAnalysis.interventions
+          interventions: plateauAnalysis.interventions,
         });
       }
     }
@@ -142,16 +154,18 @@ class AdvancedTrainingIntelligence {
   generateAnalyticsInsights() {
     const historicalData = this.getHistoricalData();
     const muscles = Object.keys(trainingState.volumeLandmarks);
-    
+
     const insights = {
       volumeLandmarkOptimizations: {},
       adaptiveRIRRecommendations: {},
-      performanceTrends: {}
+      performanceTrends: {},
     };
 
-    muscles.forEach(muscle => {
-      const muscleData = historicalData.filter(week => week.muscle === muscle);
-      
+    muscles.forEach((muscle) => {
+      const muscleData = historicalData.filter(
+        (week) => week.muscle === muscle,
+      );
+
       if (muscleData.length >= 4) {
         // Volume landmark optimization
         const optimizedLandmarks = optimizeVolumeLandmarks(muscle, muscleData);
@@ -160,14 +174,14 @@ class AdvancedTrainingIntelligence {
         }
 
         // Adaptive RIR recommendations
-        const rirHistory = muscleData.map(week => ({
+        const rirHistory = muscleData.map((week) => ({
           actualRIR: week.averageRIR,
           targetRIR: week.targetRIR,
           nextDayFatigue: week.fatigue,
           recoveryDays: week.recoveryTime,
-          techniqueRating: week.techniqueRating || 7
+          techniqueRating: week.techniqueRating || 7,
         }));
-        
+
         const adaptiveRIR = adaptiveRIRRecommendations(muscle, rirHistory);
         if (adaptiveRIR.confidence >= 60) {
           insights.adaptiveRIRRecommendations[muscle] = adaptiveRIR;
@@ -185,28 +199,29 @@ class AdvancedTrainingIntelligence {
   generateExerciseRecommendations() {
     const muscles = Object.keys(trainingState.volumeLandmarks);
     const recommendations = {};
-    
-    muscles.forEach(muscle => {
+
+    muscles.forEach((muscle) => {
       const volumeStatus = trainingState.getVolumeStatus(muscle);
       const fatigueLevel = this.estimateFatigueLevel(muscle);
-      
+
       const exercises = selectOptimalExercises(muscle, {
-        availableEquipment: ['barbell', 'dumbbells', 'cables', 'machines'],
-        trainingGoal: 'hypertrophy',
-        experienceLevel: 'intermediate',
+        availableEquipment: ["barbell", "dumbbells", "cables", "machines"],
+        trainingGoal: "hypertrophy",
+        experienceLevel: "intermediate",
         fatigueLevel,
-        timeConstraint: 'moderate',
+        timeConstraint: "moderate",
         previousExercises: this.getRecentExercises(muscle),
-        preferredStyle: volumeStatus === 'maximum' ? 'isolation_focused' : 'balanced'
+        preferredStyle:
+          volumeStatus === "maximum" ? "isolation_focused" : "balanced",
       });
-      
+
       recommendations[muscle] = {
         primary: exercises[0],
         alternatives: exercises.slice(1, 3),
-        rationale: `Selected based on ${volumeStatus} volume status and fatigue level ${fatigueLevel}`
+        rationale: `Selected based on ${volumeStatus} volume status and fatigue level ${fatigueLevel}`,
       };
     });
-    
+
     return recommendations;
   }
 
@@ -217,25 +232,29 @@ class AdvancedTrainingIntelligence {
   checkForOptimizations() {
     const optimizations = [];
     const lastOptimization = this.lastOptimization;
-    const weeksSinceOptimization = lastOptimization ? 
-      trainingState.weekNo - lastOptimization.week : Infinity;
+    const weeksSinceOptimization = lastOptimization
+      ? trainingState.weekNo - lastOptimization.week
+      : Infinity;
 
     // Volume landmark optimization (every 4-6 weeks)
     if (weeksSinceOptimization >= 4 && this.analyticsEnabled) {
       const historicalData = this.getHistoricalData();
-      
-      Object.keys(trainingState.volumeLandmarks).forEach(muscle => {
-        const muscleData = historicalData.filter(w => w.muscle === muscle);
+
+      Object.keys(trainingState.volumeLandmarks).forEach((muscle) => {
+        const muscleData = historicalData.filter((w) => w.muscle === muscle);
         if (muscleData.length >= 6) {
           const optimized = optimizeVolumeLandmarks(muscle, muscleData);
           if (optimized.confidence >= 70) {
             optimizations.push({
-              type: 'volume_landmarks',
+              type: "volume_landmarks",
               muscle,
               currentLandmarks: trainingState.volumeLandmarks[muscle],
               optimizedLandmarks: optimized,
               confidence: optimized.confidence,
-              estimatedImprovement: this.calculateImprovementEstimate(muscle, optimized)
+              estimatedImprovement: this.calculateImprovementEstimate(
+                muscle,
+                optimized,
+              ),
             });
           }
         }
@@ -246,9 +265,10 @@ class AdvancedTrainingIntelligence {
     const staleExercises = this.detectStaleExercises();
     if (staleExercises.length > 0) {
       optimizations.push({
-        type: 'exercise_rotation',
+        type: "exercise_rotation",
         staleExercises,
-        recommendation: 'Consider rotating exercises to prevent adaptation plateau'
+        recommendation:
+          "Consider rotating exercises to prevent adaptation plateau",
       });
     }
 
@@ -267,36 +287,46 @@ class AdvancedTrainingIntelligence {
     const highFatigueMuscles = this.getHighFatigueMuscles();
     if (highFatigueMuscles.length > 0) {
       riskScore += highFatigueMuscles.length * 10;
-      riskFactors.push(`${highFatigueMuscles.length} muscles showing high fatigue`);
+      riskFactors.push(
+        `${highFatigueMuscles.length} muscles showing high fatigue`,
+      );
     }
 
     // Consecutive MRV weeks
     if (trainingState.consecutiveMRVWeeks >= 2) {
       riskScore += 20;
-      riskFactors.push('Multiple consecutive weeks at MRV');
+      riskFactors.push("Multiple consecutive weeks at MRV");
     }
 
     // Volume progression rate
     const progressionRate = this.calculateVolumeProgressionRate();
     if (progressionRate > 2) {
       riskScore += 15;
-      riskFactors.push('Rapid volume progression detected');
+      riskFactors.push("Rapid volume progression detected");
     }
 
     // Performance decline indicators
     const performanceDecline = this.detectPerformanceDecline();
     if (performanceDecline) {
       riskScore += 25;
-      riskFactors.push('Performance decline detected');
+      riskFactors.push("Performance decline detected");
     }
 
     return {
       riskScore,
-      riskLevel: riskScore <= 25 ? 'low' : 
-                 riskScore <= 50 ? 'moderate' : 
-                 riskScore <= 75 ? 'high' : 'critical',
+      riskLevel:
+        riskScore <= 25
+          ? "low"
+          : riskScore <= 50
+            ? "moderate"
+            : riskScore <= 75
+              ? "high"
+              : "critical",
       riskFactors,
-      recommendations: this.generateRiskMitigationRecommendations(riskScore, riskFactors)
+      recommendations: this.generateRiskMitigationRecommendations(
+        riskScore,
+        riskFactors,
+      ),
     };
   }
 
@@ -305,30 +335,30 @@ class AdvancedTrainingIntelligence {
    * @param {Object} sessionData - Session data from live monitor
    */
   processSessionData(sessionData) {
-    console.log('🔄 Processing session data for insights...');
-    
+    console.log("🔄 Processing session data for insights...");
+
     // Update training insights
     this.trainingInsights[sessionData.muscle] = {
       lastSession: sessionData,
       performance: sessionData.performance,
       consistency: sessionData.performance.consistency,
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
 
     // Check for immediate concerns
-    if (sessionData.performance.targetAchievement.grade === 'D') {
-      console.warn('⚠️ Poor target achievement - consider technique review');
+    if (sessionData.performance.targetAchievement.grade === "D") {
+      console.warn("⚠️ Poor target achievement - consider technique review");
     }
 
-    if (sessionData.performance.consistency.rating === 'poor') {
-      console.warn('⚠️ Poor consistency - fatigue or technique issues');
+    if (sessionData.performance.consistency.rating === "poor") {
+      console.warn("⚠️ Poor consistency - fatigue or technique issues");
     }
 
     // Update fatigue indicators
     const fatigueData = this.extractFatigueFromSession(sessionData);
     if (isHighFatigue(sessionData.muscle, fatigueData, trainingState)) {
       console.warn(`🚨 High fatigue detected for ${sessionData.muscle}`);
-      
+
       // Auto-trigger recovery recommendations
       this.triggerRecoveryRecommendations(sessionData.muscle);
     }
@@ -341,12 +371,17 @@ class AdvancedTrainingIntelligence {
   processLiveSetData(setData) {
     // Real-time fatigue detection
     if (setData.setInfo.rir > setData.setInfo.targetRIR + 2) {
-      console.log('💡 Tip: Consider increasing weight next set');
+      console.log("💡 Tip: Consider increasing weight next set");
     }
 
     // Technique breakdown detection
-    if (setData.setInfo.techniqueRating && setData.setInfo.techniqueRating < 6) {
-      console.warn('⚠️ Technique breakdown detected - consider stopping or reducing weight');
+    if (
+      setData.setInfo.techniqueRating &&
+      setData.setInfo.techniqueRating < 6
+    ) {
+      console.warn(
+        "⚠️ Technique breakdown detected - consider stopping or reducing weight",
+      );
     }
   }
 
@@ -357,24 +392,24 @@ class AdvancedTrainingIntelligence {
   triggerRecoveryRecommendations(muscle) {
     const recommendations = {
       immediate: [
-        'Reduce training volume by 20-30% next session',
-        'Extend rest periods between sets',
-        'Focus on technique over intensity'
+        "Reduce training volume by 20-30% next session",
+        "Extend rest periods between sets",
+        "Focus on technique over intensity",
       ],
       shortTerm: [
-        'Add extra rest day before next session',
-        'Implement stress management techniques',
-        'Prioritize sleep quality (8+ hours)'
+        "Add extra rest day before next session",
+        "Implement stress management techniques",
+        "Prioritize sleep quality (8+ hours)",
       ],
       longTerm: [
-        'Consider deload if fatigue persists',
-        'Review nutrition and hydration status',
-        'Assess life stress factors'
-      ]
+        "Consider deload if fatigue persists",
+        "Review nutrition and hydration status",
+        "Assess life stress factors",
+      ],
     };
 
     console.log(`🔧 Recovery recommendations for ${muscle}:`, recommendations);
-    
+
     // Could trigger UI notification here
     return recommendations;
   }
@@ -385,20 +420,20 @@ class AdvancedTrainingIntelligence {
    */
   getHistoricalData() {
     const data = [];
-    
+
     // Retrieve from localStorage
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && key.startsWith('session-')) {
+      if (key && key.startsWith("session-")) {
         try {
           const sessionData = JSON.parse(localStorage.getItem(key));
           data.push(sessionData);
         } catch (e) {
-          console.warn('Failed to parse session data:', key);
+          console.warn("Failed to parse session data:", key);
         }
       }
     }
-    
+
     // Sort by date
     return data.sort((a, b) => new Date(a.startTime) - new Date(b.startTime));
   }
@@ -411,25 +446,25 @@ class AdvancedTrainingIntelligence {
   estimateFatigueLevel(muscle) {
     const volumeStatus = trainingState.getVolumeStatus(muscle);
     const baselineFatigue = {
-      'under-minimum': 2,
-      'optimal': 4,
-      'high': 6,
-      'maximum': 8
+      "under-minimum": 2,
+      optimal: 4,
+      high: 6,
+      maximum: 8,
     };
-    
+
     let fatigue = baselineFatigue[volumeStatus] || 5;
-    
+
     // Adjust based on recent session data
     const recentInsight = this.trainingInsights[muscle];
     if (recentInsight) {
-      if (recentInsight.performance.consistency.rating === 'poor') {
+      if (recentInsight.performance.consistency.rating === "poor") {
         fatigue += 2;
       }
-      if (recentInsight.performance.targetAchievement.grade === 'D') {
+      if (recentInsight.performance.targetAchievement.grade === "D") {
         fatigue += 1;
       }
     }
-    
+
     return Math.min(10, Math.max(1, fatigue));
   }
 
@@ -440,10 +475,10 @@ class AdvancedTrainingIntelligence {
    */
   getRecentExercises(muscle) {
     const recentSessions = this.getHistoricalData()
-      .filter(session => session.muscle === muscle)
+      .filter((session) => session.muscle === muscle)
       .slice(-3); // Last 3 sessions
-    
-    return recentSessions.map(session => session.exercise);
+
+    return recentSessions.map((session) => session.exercise);
   }
 
   /**
@@ -451,8 +486,9 @@ class AdvancedTrainingIntelligence {
    * @returns {Array} - High fatigue muscles
    */
   getHighFatigueMuscles() {
-    return Object.keys(trainingState.volumeLandmarks)
-      .filter(muscle => this.estimateFatigueLevel(muscle) >= 7);
+    return Object.keys(trainingState.volumeLandmarks).filter(
+      (muscle) => this.estimateFatigueLevel(muscle) >= 7,
+    );
   }
 
   /**
@@ -462,15 +498,16 @@ class AdvancedTrainingIntelligence {
   calculateVolumeProgressionRate() {
     const historicalData = this.getHistoricalData();
     if (historicalData.length < 3) return 0;
-    
+
     const recentWeeks = historicalData.slice(-3);
     const volumeChanges = [];
-    
+
     for (let i = 1; i < recentWeeks.length; i++) {
-      const volumeChange = recentWeeks[i].totalSets - recentWeeks[i-1].totalSets;
+      const volumeChange =
+        recentWeeks[i].totalSets - recentWeeks[i - 1].totalSets;
       volumeChanges.push(volumeChange);
     }
-    
+
     return volumeChanges.reduce((a, b) => a + b, 0) / volumeChanges.length;
   }
 
@@ -481,12 +518,16 @@ class AdvancedTrainingIntelligence {
   detectPerformanceDecline() {
     const historicalData = this.getHistoricalData();
     if (historicalData.length < 3) return false;
-    
-    const recentPerformance = historicalData.slice(-3)
-      .map(session => session.performance?.targetAchievement?.targetPercentage || 70);
-    
-    return recentPerformance.every((perf, i) => 
-      i === 0 || perf <= recentPerformance[i-1]
+
+    const recentPerformance = historicalData
+      .slice(-3)
+      .map(
+        (session) =>
+          session.performance?.targetAchievement?.targetPercentage || 70,
+      );
+
+    return recentPerformance.every(
+      (perf, i) => i === 0 || perf <= recentPerformance[i - 1],
     );
   }
 
@@ -497,13 +538,13 @@ class AdvancedTrainingIntelligence {
   detectStaleExercises() {
     const historicalData = this.getHistoricalData();
     const exerciseUsage = {};
-    
+
     // Count recent exercise usage
-    historicalData.slice(-6).forEach(session => {
+    historicalData.slice(-6).forEach((session) => {
       const key = `${session.muscle}-${session.exercise}`;
       exerciseUsage[key] = (exerciseUsage[key] || 0) + 1;
     });
-    
+
     // Find overused exercises
     return Object.entries(exerciseUsage)
       .filter(([key, count]) => count >= 4)
@@ -518,18 +559,18 @@ class AdvancedTrainingIntelligence {
    */
   generateRiskMitigationRecommendations(riskScore, riskFactors) {
     const recommendations = [];
-    
+
     if (riskScore >= 75) {
-      recommendations.push('Implement immediate deload (50% volume reduction)');
-      recommendations.push('Address sleep and stress management urgently');
+      recommendations.push("Implement immediate deload (50% volume reduction)");
+      recommendations.push("Address sleep and stress management urgently");
     } else if (riskScore >= 50) {
-      recommendations.push('Plan deload within 1-2 weeks');
-      recommendations.push('Reduce volume progression rate');
+      recommendations.push("Plan deload within 1-2 weeks");
+      recommendations.push("Reduce volume progression rate");
     } else if (riskScore >= 25) {
-      recommendations.push('Monitor fatigue indicators closely');
-      recommendations.push('Ensure adequate recovery between sessions');
+      recommendations.push("Monitor fatigue indicators closely");
+      recommendations.push("Ensure adequate recovery between sessions");
     }
-    
+
     return recommendations;
   }
 
@@ -542,15 +583,17 @@ class AdvancedTrainingIntelligence {
   calculateImprovementEstimate(muscle, optimizedLandmarks) {
     const current = trainingState.volumeLandmarks[muscle];
     const optimized = optimizedLandmarks;
-    
+
     const mevImprovement = ((optimized.MEV - current.MEV) / current.MEV) * 100;
     const mavImprovement = ((optimized.MAV - current.MAV) / current.MAV) * 100;
-    
+
     return {
       mevChange: Math.round(mevImprovement),
       mavChange: Math.round(mavImprovement),
-      estimatedVolumeIncrease: Math.round((mevImprovement + mavImprovement) / 2),
-      confidence: optimized.confidence
+      estimatedVolumeIncrease: Math.round(
+        (mevImprovement + mavImprovement) / 2,
+      ),
+      confidence: optimized.confidence,
     };
   }
 
@@ -558,14 +601,15 @@ class AdvancedTrainingIntelligence {
    * Extract fatigue data from session
    * @param {Object} sessionData - Session data
    * @returns {Object} - Fatigue data
-   */  extractFatigueFromSession(sessionData) {
+   */ extractFatigueFromSession(sessionData) {
     return {
-      soreness: sessionData.performance.consistency.rating === 'poor' ? 3 : 1,
+      soreness: sessionData.performance.consistency.rating === "poor" ? 3 : 1,
       jointAche: 0, // Would need user input
-      perfChange: sessionData.performance.targetAchievement.grade === 'A' ? 1 : 0,
+      perfChange:
+        sessionData.performance.targetAchievement.grade === "A" ? 1 : 0,
       pump: sessionData.progress.totalLoad > 1000 ? 3 : 2,
       disruption: sessionData.progress.totalLoad > 1000 ? 3 : 2, // Using workload metric
-      lastLoad: Math.max(...sessionData.sets.map(set => set.weight))
+      lastLoad: Math.max(...sessionData.sets.map((set) => set.weight)),
     };
   }
 
@@ -580,15 +624,19 @@ class AdvancedTrainingIntelligence {
 
     const historicalData = this.getHistoricalData();
     const recentMetrics = {
-      weeklyFatigueScore: historicalData.slice(-4).map(week => 
-        this.estimateFatigueLevel(week.muscle)
-      ),
-      performanceTrend: historicalData.slice(-4).map(week => 
-        week.performance?.targetAchievement?.targetPercentage || 70
-      ),
-      volumeProgression: historicalData.slice(-4).map(week => week.totalSets || 0),
+      weeklyFatigueScore: historicalData
+        .slice(-4)
+        .map((week) => this.estimateFatigueLevel(week.muscle)),
+      performanceTrend: historicalData
+        .slice(-4)
+        .map(
+          (week) => week.performance?.targetAchievement?.targetPercentage || 70,
+        ),
+      volumeProgression: historicalData
+        .slice(-4)
+        .map((week) => week.totalSets || 0),
       motivationLevel: 7, // Would need user input
-      sleepQuality: 7 // Would need user input
+      sleepQuality: 7, // Would need user input
     };
 
     return predictDeloadTiming(recentMetrics);
@@ -605,16 +653,18 @@ class AdvancedTrainingIntelligence {
 
     const historicalData = this.getHistoricalData();
     const trainingData = {
-      weeklyPerformance: historicalData.slice(-6).map(week => 
-        week.performance?.targetAchievement?.targetPercentage || 70
-      ),
-      weeklyVolume: historicalData.slice(-6).map(week => week.totalSets || 0),
-      weeklyIntensity: historicalData.slice(-6).map(week => 
-        week.averageRIR ? (10 - week.averageRIR) : 7
-      ),
-      weeklyFatigue: historicalData.slice(-6).map(week => 
-        this.estimateFatigueLevel(week.muscle)
-      )
+      weeklyPerformance: historicalData
+        .slice(-6)
+        .map(
+          (week) => week.performance?.targetAchievement?.targetPercentage || 70,
+        ),
+      weeklyVolume: historicalData.slice(-6).map((week) => week.totalSets || 0),
+      weeklyIntensity: historicalData
+        .slice(-6)
+        .map((week) => (week.averageRIR ? 10 - week.averageRIR : 7)),
+      weeklyFatigue: historicalData
+        .slice(-6)
+        .map((week) => this.estimateFatigueLevel(week.muscle)),
     };
 
     return detectTrainingPlateaus(trainingData);
@@ -624,7 +674,4 @@ class AdvancedTrainingIntelligence {
 // Create singleton instance
 const advancedIntelligence = new AdvancedTrainingIntelligence();
 
-export {
-  AdvancedTrainingIntelligence,
-  advancedIntelligence
-};
+export { AdvancedTrainingIntelligence, advancedIntelligence };

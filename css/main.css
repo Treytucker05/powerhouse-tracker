@@ -12,7 +12,9 @@ html {
 body {
   background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
   color: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    Cantarell, sans-serif;
   line-height: 1.6;
   padding: 20px;
   min-height: 100vh;
@@ -22,16 +24,28 @@ body {
 
 /* Animated background effect */
 body::before {
-  content: '';
+  content: "";
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   background-image:
-    radial-gradient(circle at 20% 80%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 0, 0, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(255, 0, 0, 0.03) 0%, transparent 50%);
+    radial-gradient(
+      circle at 20% 80%,
+      rgba(255, 0, 0, 0.1) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(255, 0, 0, 0.05) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 40% 40%,
+      rgba(255, 0, 0, 0.03) 0%,
+      transparent 50%
+    );
   pointer-events: none;
   z-index: 1;
 }
@@ -46,7 +60,7 @@ body::before {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #FF0000;
+  background: #ff0000;
   border-radius: 5px;
 }
 
@@ -81,7 +95,7 @@ body::before {
 h1 {
   font-size: 3.5rem;
   font-weight: 900;
-  background: linear-gradient(135deg, #FF0000 0%, #ff6b6b 100%);
+  background: linear-gradient(135deg, #ff0000 0%, #ff6b6b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -99,7 +113,7 @@ h1 {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 1rem;
-  text-shadow: 0 0 10px rgba(255,255,255,0.1);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
 }
 
 .subtitle {
@@ -135,7 +149,7 @@ h1 {
 .status-value {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #FF0000;
+  color: #ff0000;
 }
 
 .status-label {
@@ -204,11 +218,26 @@ h1 {
   letter-spacing: 0.5px;
 }
 
-.status-indicator.under-minimum { background: #ff4444; color: white; }
-.status-indicator.maintenance { background: #ffaa00; color: white; }
-.status-indicator.optimal { background: #44ff44; color: black; }
-.status-indicator.high { background: #ffff44; color: black; }
-.status-indicator.maximum { background: #ff4444; color: white; }
+.status-indicator.under-minimum {
+  background: #ff4444;
+  color: white;
+}
+.status-indicator.maintenance {
+  background: #ffaa00;
+  color: white;
+}
+.status-indicator.optimal {
+  background: #44ff44;
+  color: black;
+}
+.status-indicator.high {
+  background: #ffff44;
+  color: black;
+}
+.status-indicator.maximum {
+  background: #ff4444;
+  color: white;
+}
 
 .landmarks-display {
   display: flex;
@@ -225,7 +254,11 @@ h1 {
 
 /* Section Banners */
 .section-banner {
-  background: linear-gradient(135deg, rgba(255, 0, 0, 0.2) 0%, rgba(255, 0, 0, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 0, 0, 0.2) 0%,
+    rgba(255, 0, 0, 0.1) 100%
+  );
   padding: 20px;
   margin: 40px 0 20px 0;
   border-radius: 12px;
@@ -237,7 +270,11 @@ h1 {
 }
 
 .section-banner:hover {
-  background: linear-gradient(135deg, rgba(255, 0, 0, 0.3) 0%, rgba(255, 0, 0, 0.15) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 0, 0, 0.3) 0%,
+    rgba(255, 0, 0, 0.15) 100%
+  );
 }
 
 .section-banner h3 {
@@ -310,18 +347,18 @@ h1 {
   color: #fff;
   margin-bottom: 1.5rem;
   padding-bottom: 0.75rem;
-  border-bottom: 3px solid #FF0000;
+  border-bottom: 3px solid #ff0000;
   position: relative;
 }
 
 .calculator h2::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -3px;
   left: 0;
   width: 60px;
   height: 3px;
-  background: linear-gradient(90deg, #FF0000 0%, transparent 100%);
+  background: linear-gradient(90deg, #ff0000 0%, transparent 100%);
 }
 
 /* Form Elements */
@@ -339,7 +376,8 @@ label {
   letter-spacing: 0.5px;
 }
 
-input[type="number"], select {
+input[type="number"],
+select {
   width: 100%;
   padding: 14px 16px;
   background: rgba(0, 0, 0, 0.5);
@@ -351,9 +389,10 @@ input[type="number"], select {
   font-weight: 500;
 }
 
-input[type="number"]:focus, select:focus {
+input[type="number"]:focus,
+select:focus {
   outline: none;
-  border-color: #FF0000;
+  border-color: #ff0000;
   box-shadow:
     0 0 0 4px rgba(255, 0, 0, 0.1),
     inset 0 0 0 1px rgba(255, 0, 0, 0.2);
@@ -362,7 +401,7 @@ input[type="number"]:focus, select:focus {
 
 /* RIR Validation Styling */
 input.rir-good {
-  border-color: #4CAF50;
+  border-color: #4caf50;
   box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
 }
 
@@ -400,13 +439,13 @@ input[type="radio"] {
   width: auto;
   margin: 0;
   transform: scale(1.2);
-  accent-color: #FF0000;
+  accent-color: #ff0000;
 }
 
 input[type="checkbox"] {
   margin-right: 0.5rem;
   transform: scale(1.5);
-  accent-color: #FF0000;
+  accent-color: #ff0000;
 }
 
 .helper-text {
@@ -419,7 +458,7 @@ input[type="checkbox"] {
 
 /* Buttons */
 button {
-  background: linear-gradient(135deg, #FF0000 0%, #cc0000 100%);
+  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
   color: white;
   border: none;
   padding: 16px 32px;
@@ -464,7 +503,11 @@ button.small {
 .result {
   margin-top: 1.5rem;
   padding: 25px;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.8) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
   border: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: 14px;
   transition: all 0.4s ease;
@@ -478,19 +521,31 @@ button.small {
 
 .result.success {
   border-color: rgba(46, 125, 50, 0.7);
-  background: linear-gradient(135deg, rgba(46, 125, 50, 0.15) 0%, rgba(46, 125, 50, 0.08) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(46, 125, 50, 0.15) 0%,
+    rgba(46, 125, 50, 0.08) 100%
+  );
   color: #a5d6a7;
 }
 
 .result.warning {
   border-color: rgba(245, 124, 0, 0.7);
-  background: linear-gradient(135deg, rgba(245, 124, 0, 0.15) 0%, rgba(245, 124, 0, 0.08) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(245, 124, 0, 0.15) 0%,
+    rgba(245, 124, 0, 0.08) 100%
+  );
   color: #ffcc80;
 }
 
 .result.danger {
   border-color: rgba(211, 47, 47, 0.7);
-  background: linear-gradient(135deg, rgba(211, 47, 47, 0.15) 0%, rgba(211, 47, 47, 0.08) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(211, 47, 47, 0.15) 0%,
+    rgba(211, 47, 47, 0.08) 100%
+  );
   color: #ef9a9a;
 }
 
@@ -506,7 +561,7 @@ button.small {
 }
 
 .main-recommendation h4 {
-  color: #FF0000;
+  color: #ff0000;
   font-size: 1.2rem;
   margin-bottom: 10px;
 }
@@ -536,9 +591,15 @@ button.small {
   font-size: 0.9rem;
 }
 
-.stimulus-add_sets { color: #4CAF50; }
-.stimulus-maintain { color: #ffcc80; }
-.stimulus-reduce_sets { color: #ff9800; }
+.stimulus-add_sets {
+  color: #4caf50;
+}
+.stimulus-maintain {
+  color: #ffcc80;
+}
+.stimulus-reduce_sets {
+  color: #ff9800;
+}
 
 .rir-feedback {
   margin-top: 15px;
@@ -547,9 +608,15 @@ button.small {
   font-size: 0.95rem;
 }
 
-.rir-feedback.normal { background: rgba(76, 175, 80, 0.2); }
-.rir-feedback.medium { background: rgba(255, 152, 0, 0.2); }
-.rir-feedback.high { background: rgba(244, 67, 54, 0.2); }
+.rir-feedback.normal {
+  background: rgba(76, 175, 80, 0.2);
+}
+.rir-feedback.medium {
+  background: rgba(255, 152, 0, 0.2);
+}
+.rir-feedback.high {
+  background: rgba(244, 67, 54, 0.2);
+}
 
 .deload-warning {
   margin-top: 15px;
@@ -581,7 +648,7 @@ button.small {
 }
 
 .autoregulation-section h4 {
-  color: #FF0000;
+  color: #ff0000;
   font-size: 1.2rem;
   margin-bottom: 15px;
 }
@@ -605,7 +672,7 @@ button.small {
 .rir-schedule-display h4,
 .load-feedback-section h4,
 .load-progression-section h4 {
-  color: #FF0000;
+  color: #ff0000;
   font-size: 1.1rem;
   margin-bottom: 12px;
   font-weight: 600;
@@ -641,7 +708,7 @@ button.small {
 
 .rir-week-target .rir-value {
   font-size: 1.4rem;
-  color: #FF0000;
+  color: #ff0000;
   font-weight: 700;
 }
 
@@ -655,12 +722,12 @@ button.small {
   margin: 8px 0;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 6px;
-  border-left: 3px solid #FF0000;
+  border-left: 3px solid #ff0000;
 }
 
 .load-adjustment-item .muscle-name {
   font-weight: 600;
-  color: #FF0000;
+  color: #ff0000;
   margin-bottom: 4px;
 }
 
@@ -716,7 +783,7 @@ button.small {
 .rir-schedule-display button,
 .load-feedback-section button,
 .load-progression-section button {
-  background: linear-gradient(135deg, #FF0000 0%, #cc0000 100%);
+  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
   margin: 5px 0;
   width: auto;
   min-width: 180px;
@@ -724,7 +791,11 @@ button.small {
 
 /* --- Advanced Intelligence Section --- */
 .section-banner.advanced {
-  background: linear-gradient(135deg, rgba(0, 123, 255, 0.2) 0%, rgba(0, 123, 255, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 123, 255, 0.2) 0%,
+    rgba(0, 123, 255, 0.1) 100%
+  );
   border-color: rgba(0, 123, 255, 0.3);
 }
 
@@ -835,7 +906,7 @@ button.small {
 }
 
 .system-status h4 {
-  color: #FF0000;
+  color: #ff0000;
   margin-bottom: 15px;
 }
 
@@ -937,7 +1008,9 @@ button.small {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* --- Utility Systems Styling --- */
@@ -1060,7 +1133,7 @@ button.small {
 .stat-value {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #4CAF50;
+  color: #4caf50;
   display: block;
 }
 
@@ -1082,7 +1155,7 @@ button.small {
 }
 
 .feedback-toggle {
-  background: linear-gradient(135deg, #FF0000 0%, #cc0000 100%);
+  background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
   color: white;
   padding: 10px 15px;
   border-radius: 20px 0 0 20px;
@@ -1121,7 +1194,7 @@ button.small {
 }
 
 .feedback-header h3 {
-  color: #FF0000;
+  color: #ff0000;
   font-size: 1.1rem;
   margin: 0;
 }
@@ -1141,11 +1214,11 @@ button.small {
 /* ─── Quick-Start Guide list alignment ──────────────────────────── */
 #quickStartGuide ol,
 .quick-start-guide ol {
-  margin: 0 auto;          /* center container */
-  max-width: 480px;        /* comfortable line length */
-  padding-left: 1.4rem;    /* slight indent for numbers */
+  margin: 0 auto; /* center container */
+  max-width: 480px; /* comfortable line length */
+  padding-left: 1.4rem; /* slight indent for numbers */
   list-style-position: inside;
-  text-align: left;        /* align numbers with text */
+  text-align: left; /* align numbers with text */
 }
 
 /* --- End of Styles --- */

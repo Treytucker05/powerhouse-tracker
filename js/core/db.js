@@ -1,5 +1,5 @@
 /* global process */
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
 // Load from Parcel-exposed env vars
 const supabaseUrl = process.env.VITE_SUPABASE_URL;

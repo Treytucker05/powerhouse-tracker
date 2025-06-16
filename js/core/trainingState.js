@@ -3,7 +3,8 @@
  * Manages all training state including volume landmarks, meso progression, and deload logic
  */
 
-class TrainingState {  constructor(opts = {}) {
+class TrainingState {
+  constructor(opts = {}) {
     if (TrainingState.instance) {
       return TrainingState.instance;
     }
@@ -11,23 +12,23 @@ class TrainingState {  constructor(opts = {}) {
     // Settings and feature flags
     this.settings = {
       enableAdvancedDashboard: false,
-      ...opts.settings
+      ...opts.settings,
     };
 
     // Core RP Volume Landmarks (defaults from RP literature)
     this.volumeLandmarks = {
-      'Chest': { MV: 4, MEV: 8, MAV: 16, MRV: 22 },
-      'Back': { MV: 6, MEV: 10, MAV: 20, MRV: 25 },
-      'Quads': { MV: 6, MEV: 10, MAV: 20, MRV: 25 },
-      'Hamstrings': { MV: 4, MEV: 6, MAV: 16, MRV: 20 },
-      'Shoulders': { MV: 4, MEV: 8, MAV: 16, MRV: 20 },
-      'Biceps': { MV: 4, MEV: 6, MAV: 14, MRV: 20 },
-      'Triceps': { MV: 4, MEV: 6, MAV: 14, MRV: 18 },
-      'Calves': { MV: 6, MEV: 8, MAV: 16, MRV: 22 },
-      'Abs': { MV: 0, MEV: 6, MAV: 16, MRV: 25 },
-      'Forearms': { MV: 2, MEV: 4, MAV: 10, MRV: 16 },
-      'Neck': { MV: 0, MEV: 2, MAV: 8, MRV: 12 },
-      'Traps': { MV: 2, MEV: 4, MAV: 12, MRV: 16 }
+      Chest: { MV: 4, MEV: 8, MAV: 16, MRV: 22 },
+      Back: { MV: 6, MEV: 10, MAV: 20, MRV: 25 },
+      Quads: { MV: 6, MEV: 10, MAV: 20, MRV: 25 },
+      Hamstrings: { MV: 4, MEV: 6, MAV: 16, MRV: 20 },
+      Shoulders: { MV: 4, MEV: 8, MAV: 16, MRV: 20 },
+      Biceps: { MV: 4, MEV: 6, MAV: 14, MRV: 20 },
+      Triceps: { MV: 4, MEV: 6, MAV: 14, MRV: 18 },
+      Calves: { MV: 6, MEV: 8, MAV: 16, MRV: 22 },
+      Abs: { MV: 0, MEV: 6, MAV: 16, MRV: 25 },
+      Forearms: { MV: 2, MEV: 4, MAV: 10, MRV: 16 },
+      Neck: { MV: 0, MEV: 2, MAV: 8, MRV: 12 },
+      Traps: { MV: 2, MEV: 4, MAV: 12, MRV: 16 },
     };
 
     // Training progression state
@@ -40,19 +41,20 @@ class TrainingState {  constructor(opts = {}) {
     // Current week data
     this.currentWeekSets = {};
     this.lastWeekSets = {};
-    
+
     // Baseline strength tracking for fatigue detection
     this.baselineStrength = {};
-    
+
     // Initialize current week sets at MEV and baseline strength
-    Object.keys(this.volumeLandmarks).forEach(muscle => {
-      this.currentWeekSets[muscle] = this.volumeLandmarks[muscle].MEV;      this.lastWeekSets[muscle] = this.volumeLandmarks[muscle].MEV;
+    Object.keys(this.volumeLandmarks).forEach((muscle) => {
+      this.currentWeekSets[muscle] = this.volumeLandmarks[muscle].MEV;
+      this.lastWeekSets[muscle] = this.volumeLandmarks[muscle].MEV;
       this.baselineStrength[muscle] = 100; // Default baseline load (kg)
     });
-    
+
     // Performance tracking for deload detection
     this.consecutiveMRVWeeks = 0;
-    
+
     this.recoverySessionsThisWeek = 0;
     this.totalMusclesNeedingRecovery = 0;
 
@@ -64,7 +66,7 @@ class TrainingState {  constructor(opts = {}) {
     const startRIR = 3.0;
     const endRIR = 0.5;
     const progressionRate = (startRIR - endRIR) / (this.mesoLen - 1);
-    const targetRIR = startRIR - (progressionRate * (this.weekNo - 1));
+    const targetRIR = startRIR - progressionRate * (this.weekNo - 1);
     return Math.max(endRIR, Math.min(startRIR, targetRIR));
   }
 
@@ -72,23 +74,23 @@ class TrainingState {  constructor(opts = {}) {
   getVolumeStatus(muscle, sets = null) {
     const currentSets = sets !== null ? sets : this.currentWeekSets[muscle];
     const landmarks = this.volumeLandmarks[muscle];
-    
-    if (currentSets < landmarks.MV) return 'under-minimum';
-    if (currentSets < landmarks.MEV) return 'maintenance';
-    if (currentSets < landmarks.MAV) return 'optimal';
-    if (currentSets < landmarks.MRV) return 'high';
-    return 'maximum';
+
+    if (currentSets < landmarks.MV) return "under-minimum";
+    if (currentSets < landmarks.MEV) return "maintenance";
+    if (currentSets < landmarks.MAV) return "optimal";
+    if (currentSets < landmarks.MRV) return "high";
+    return "maximum";
   }
 
   // Get volume zone color for charting
   getVolumeColor(muscle, sets = null) {
     const status = this.getVolumeStatus(muscle, sets);
     const colors = {
-      'under-minimum': '#ff4444',  // Red
-      'maintenance': '#ffaa00',    // Orange
-      'optimal': '#44ff44',        // Green
-      'high': '#ffff44',           // Yellow
-      'maximum': '#ff4444'         // Red
+      "under-minimum": "#ff4444", // Red
+      maintenance: "#ffaa00", // Orange
+      optimal: "#44ff44", // Green
+      high: "#ffff44", // Yellow
+      maximum: "#ff4444", // Red
     };
     return colors[status];
   }
@@ -109,22 +111,24 @@ class TrainingState {  constructor(opts = {}) {
   shouldDeload() {
     // Check 1: Consecutive weeks at MRV
     if (this.consecutiveMRVWeeks >= 2) return true;
-    
+
     // Check 2: Most muscles need recovery
     const totalMuscles = Object.keys(this.volumeLandmarks).length;
-    if (this.totalMusclesNeedingRecovery >= Math.ceil(totalMuscles / 2)) return true;
-    
+    if (this.totalMusclesNeedingRecovery >= Math.ceil(totalMuscles / 2))
+      return true;
+
     // Check 3: Enhanced fatigue detection - if ≥1 major muscle hit MRV via fatigue this week
-    const majorMuscles = ['Chest', 'Back', 'Quads', 'Shoulders'];
-    const fatigueBasedMRV = majorMuscles.some(muscle => 
-      this.currentWeekSets[muscle] >= this.volumeLandmarks[muscle].MRV && 
-      this.totalMusclesNeedingRecovery > 0
+    const majorMuscles = ["Chest", "Back", "Quads", "Shoulders"];
+    const fatigueBasedMRV = majorMuscles.some(
+      (muscle) =>
+        this.currentWeekSets[muscle] >= this.volumeLandmarks[muscle].MRV &&
+        this.totalMusclesNeedingRecovery > 0,
     );
     if (fatigueBasedMRV) return true;
-    
+
     // Check 4: End of meso
     if (this.weekNo >= this.mesoLen) return true;
-    
+
     return false;
   }
 
@@ -137,7 +141,7 @@ class TrainingState {  constructor(opts = {}) {
   startDeload() {
     this.deloadPhase = true;
     // Reduce all sets to 50% of MEV
-    Object.keys(this.volumeLandmarks).forEach(muscle => {
+    Object.keys(this.volumeLandmarks).forEach((muscle) => {
       const deloadSets = Math.round(this.volumeLandmarks[muscle].MEV * 0.5);
       this.currentWeekSets[muscle] = deloadSets;
     });
@@ -148,7 +152,7 @@ class TrainingState {  constructor(opts = {}) {
   startResensitization() {
     this.resensitizationPhase = true;
     // Set all muscles to MV
-    Object.keys(this.volumeLandmarks).forEach(muscle => {
+    Object.keys(this.volumeLandmarks).forEach((muscle) => {
       this.currentWeekSets[muscle] = this.volumeLandmarks[muscle].MV;
     });
     this.saveState();
@@ -158,12 +162,13 @@ class TrainingState {  constructor(opts = {}) {
   nextWeek() {
     // Store last week's data
     this.lastWeekSets = { ...this.currentWeekSets };
-    
+
     // Check for MRV breach
-    const mrvBreaches = Object.keys(this.volumeLandmarks).filter(muscle => 
-      this.currentWeekSets[muscle] >= this.volumeLandmarks[muscle].MRV
+    const mrvBreaches = Object.keys(this.volumeLandmarks).filter(
+      (muscle) =>
+        this.currentWeekSets[muscle] >= this.volumeLandmarks[muscle].MRV,
     );
-    
+
     if (mrvBreaches.length > 0) {
       this.consecutiveMRVWeeks++;
     } else {
@@ -172,7 +177,7 @@ class TrainingState {  constructor(opts = {}) {
 
     // Progress week
     this.weekNo++;
-    
+
     // Check for meso completion
     if (this.weekNo > this.mesoLen) {
       this.weekNo = 1;
@@ -189,19 +194,20 @@ class TrainingState {  constructor(opts = {}) {
 
   // Reset week (for testing/corrections)
   resetWeek() {
-    Object.keys(this.volumeLandmarks).forEach(muscle => {
+    Object.keys(this.volumeLandmarks).forEach((muscle) => {
       this.currentWeekSets[muscle] = this.volumeLandmarks[muscle].MEV;
     });
     this.saveState();
   }
 
   // Auto-progression methods
-  
+
   // Mark muscle as hitting MRV for deload tracking
   hitMRV(muscle) {
     this.totalMusclesNeedingRecovery++;
     // Check if this muscle has been at MRV for consecutive weeks
-    const atMRV = this.currentWeekSets[muscle] >= this.volumeLandmarks[muscle].MRV;
+    const atMRV =
+      this.currentWeekSets[muscle] >= this.volumeLandmarks[muscle].MRV;
     if (atMRV) {
       this.consecutiveMRVWeeks++;
     }
@@ -222,8 +228,9 @@ class TrainingState {  constructor(opts = {}) {
   // Check if most muscles are at MRV (deload trigger)
   mostMusclesAtMRV() {
     const muscles = Object.keys(this.volumeLandmarks);
-    const mrvCount = muscles.filter(muscle => 
-      this.currentWeekSets[muscle] >= this.volumeLandmarks[muscle].MRV
+    const mrvCount = muscles.filter(
+      (muscle) =>
+        this.currentWeekSets[muscle] >= this.volumeLandmarks[muscle].MRV,
     ).length;
     return mrvCount >= Math.ceil(muscles.length * 0.5);
   }
@@ -238,15 +245,18 @@ class TrainingState {  constructor(opts = {}) {
   repStrengthDrop(muscle, lastLoad) {
     const baseline = this.baselineStrength[muscle];
     if (!baseline || !lastLoad) return false;
-    
+
     // Consider significant drop if last load < 97% of baseline
     const strengthDropThreshold = 0.97;
-    return lastLoad < (baseline * strengthDropThreshold);
+    return lastLoad < baseline * strengthDropThreshold;
   }
 
   // Update volume landmarks for a muscle
   updateVolumeLandmarks(muscle, landmarks) {
-    this.volumeLandmarks[muscle] = { ...this.volumeLandmarks[muscle], ...landmarks };
+    this.volumeLandmarks[muscle] = {
+      ...this.volumeLandmarks[muscle],
+      ...landmarks,
+    };
     this.saveState();
   }
 
@@ -272,21 +282,21 @@ class TrainingState {  constructor(opts = {}) {
       lastWeekSets: this.lastWeekSets,
       consecutiveMRVWeeks: this.consecutiveMRVWeeks,
       recoverySessionsThisWeek: this.recoverySessionsThisWeek,
-      totalMusclesNeedingRecovery: this.totalMusclesNeedingRecovery
+      totalMusclesNeedingRecovery: this.totalMusclesNeedingRecovery,
     };
-    
-    localStorage.setItem('rp-training-state', JSON.stringify(state));
+
+    localStorage.setItem("rp-training-state", JSON.stringify(state));
   }
 
   // Load state from localStorage
   loadState() {
-    const saved = localStorage.getItem('rp-training-state');
+    const saved = localStorage.getItem("rp-training-state");
     if (saved) {
       try {
         const state = JSON.parse(saved);
         Object.assign(this, state);
       } catch (e) {
-        console.warn('Failed to load training state, using defaults');
+        console.warn("Failed to load training state, using defaults");
       }
     }
   }
@@ -296,11 +306,11 @@ class TrainingState {  constructor(opts = {}) {
     const muscles = Object.keys(this.volumeLandmarks);
     let hasLegacyData = false;
 
-    muscles.forEach(muscle => {
+    muscles.forEach((muscle) => {
       // Check for old format keys
       const oldKey = `week-1-${muscle}`;
       const oldValue = localStorage.getItem(oldKey);
-      
+
       if (oldValue) {
         this.currentWeekSets[muscle] = parseInt(oldValue, 10);
         localStorage.removeItem(oldKey);
@@ -316,8 +326,12 @@ class TrainingState {  constructor(opts = {}) {
       if (mevValue || mrvValue) {
         this.volumeLandmarks[muscle] = {
           ...this.volumeLandmarks[muscle],
-          MEV: mevValue ? parseInt(mevValue, 10) : this.volumeLandmarks[muscle].MEV,
-          MRV: mrvValue ? parseInt(mrvValue, 10) : this.volumeLandmarks[muscle].MRV
+          MEV: mevValue
+            ? parseInt(mevValue, 10)
+            : this.volumeLandmarks[muscle].MEV,
+          MRV: mrvValue
+            ? parseInt(mrvValue, 10)
+            : this.volumeLandmarks[muscle].MRV,
         };
         if (mevValue) localStorage.removeItem(mevKey);
         if (mrvValue) localStorage.removeItem(mrvKey);
@@ -327,7 +341,7 @@ class TrainingState {  constructor(opts = {}) {
 
     if (hasLegacyData) {
       this.saveState();
-      console.log('Legacy data migrated to new RP training state');
+      console.log("Legacy data migrated to new RP training state");
     }
   }
 
@@ -340,8 +354,11 @@ class TrainingState {  constructor(opts = {}) {
       targetRIR: this.getTargetRIR(),
       deloadRecommended: this.shouldDeload(),
       resensitizationRecommended: this.shouldResensitize(),
-      currentPhase: this.deloadPhase ? 'deload' : 
-                   this.resensitizationPhase ? 'resensitization' : 'accumulation'
+      currentPhase: this.deloadPhase
+        ? "deload"
+        : this.resensitizationPhase
+          ? "resensitization"
+          : "accumulation",
     };
   }
 }
@@ -350,16 +367,16 @@ class TrainingState {  constructor(opts = {}) {
 const trainingState = new TrainingState();
 // Initialize advanced features conditionally
 if (trainingState.settings.enableAdvancedDashboard) {
-  import('../ui/dataVisualization.js')
+  import("../ui/dataVisualization.js")
     .then(({ default: AdvancedDataVisualizer }) => {
       trainingState.dataVisualizer = new AdvancedDataVisualizer();
-      console.log('Advanced dashboard initialized');
+      console.log("Advanced dashboard initialized");
     })
-    .catch(err => console.error('Dashboard init failed:', err));
+    .catch((err) => console.error("Dashboard init failed:", err));
 }
 export default trainingState;
 
 // Also make available globally for legacy compatibility
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.trainingState = trainingState;
 }

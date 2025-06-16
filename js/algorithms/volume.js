@@ -3,8 +3,8 @@
  * Implements RP Table 2.2 (MEV Stimulus Estimator) and Table 2.3 (Set Progression Algorithm)
  */
 
-import trainingState from '../core/trainingState.js';
-import { isHighFatigue } from './fatigue.js';
+import trainingState from "../core/trainingState.js";
+import { isHighFatigue } from "./fatigue.js";
 
 /**
  * RP Table 2.2: MEV Stimulus Estimator
@@ -18,25 +18,25 @@ function scoreStimulus({ mmc, pump, disruption }) {
   const clampedMmc = clamp(mmc, 0, 3);
   const clampedPump = clamp(pump, 0, 3);
   const clampedWorkload = clamp(disruption, 0, 3);
-  
+
   const totalScore = clampedMmc + clampedPump + clampedWorkload;
-  
+
   let advice, action, setChange;
-  
+
   if (totalScore <= 3) {
     advice = `Stimulus too low (${totalScore}/9) → Add 2 sets next session`;
-    action = 'add_sets';
+    action = "add_sets";
     setChange = 2;
   } else if (totalScore <= 6) {
     advice = `Stimulus adequate (${totalScore}/9) → Keep sets the same`;
-    action = 'maintain';
+    action = "maintain";
     setChange = 0;
   } else {
     advice = `Stimulus excessive (${totalScore}/9) → Remove 1-2 sets next session`;
-    action = 'reduce_sets';
+    action = "reduce_sets";
     setChange = -1;
   }
-    return {
+  return {
     score: totalScore,
     advice,
     action,
@@ -44,8 +44,8 @@ function scoreStimulus({ mmc, pump, disruption }) {
     breakdown: {
       mmc: clampedMmc,
       pump: clampedPump,
-      disruption: clampedWorkload
-    }
+      disruption: clampedWorkload,
+    },
   };
 }
 
@@ -61,14 +61,24 @@ function autoSetIncrement(muscle, feedback = {}, state) {
   const currentSets = state.getWeeklySets(muscle);
   const atMRV = currentSets >= state.volumeLandmarks[muscle].MRV;
   const vStat = state.getVolumeStatus(muscle);
-  const stim = scoreStimulus(feedback.stimulus || { mmc: 0, pump: 0, disruption: 0 });
+  const stim = scoreStimulus(
+    feedback.stimulus || { mmc: 0, pump: 0, disruption: 0 },
+  );
   const lowStim = stim.score <= 3;
-  const goodRec = feedback.recoveryMuscle === 'recovered' || feedback.recoveryMuscle === 'fully recovered';
+  const goodRec =
+    feedback.recoveryMuscle === "recovered" ||
+    feedback.recoveryMuscle === "fully recovered";
 
-  if (atMRV || feedback.recoverySession || ['maintenance','optimal','high','maximum'].includes(vStat)) return {add:false,delta:0};
-  if (['low'].includes(vStat) && lowStim) return {add:true,delta:1};
-  if (vStat==='suboptimal' && lowStim && goodRec) return {add:true,delta:1};
-  return {add:false,delta:0};
+  if (
+    atMRV ||
+    feedback.recoverySession ||
+    ["maintenance", "optimal", "high", "maximum"].includes(vStat)
+  )
+    return { add: false, delta: 0 };
+  if (["low"].includes(vStat) && lowStim) return { add: true, delta: 1 };
+  if (vStat === "suboptimal" && lowStim && goodRec)
+    return { add: true, delta: 1 };
+  return { add: false, delta: 0 };
 }
 
 /**
@@ -82,9 +92,9 @@ function processWeeklyVolumeProgression(weeklyFeedback, state) {
   let deloadTriggered = false;
   let mrvHits = 0;
   // Process each muscle's auto-progression
-  Object.keys(weeklyFeedback).forEach(muscle => {
+  Object.keys(weeklyFeedback).forEach((muscle) => {
     const feedback = weeklyFeedback[muscle];
-    
+
     // Check for high fatigue using enhanced detection
     const high = isHighFatigue(muscle, feedback, state);
     if (high) {
@@ -92,30 +102,31 @@ function processWeeklyVolumeProgression(weeklyFeedback, state) {
       state.hitMRV(muscle);
       mrvHits++;
       console.log(`hitMRV: true (fatigue) - ${muscle}`);
-      
+
       // Force recovery session
       feedback.recoverySession = true;
     }
-    
+
     const increment = autoSetIncrement(muscle, feedback, state);
-    
+
     // Apply set changes
     if (increment.add) {
       state.addSets(muscle, increment.delta);
     }
-    
+
     // Track MRV hits for deload logic
     if (state.getWeeklySets(muscle) >= state.volumeLandmarks[muscle].MRV) {
       state.hitMRV(muscle);
       mrvHits++;
     }
-    
+
     progressionLog[muscle] = {
-      previousSets: state.lastWeekSets[muscle] || state.volumeLandmarks[muscle].MEV,
+      previousSets:
+        state.lastWeekSets[muscle] || state.volumeLandmarks[muscle].MEV,
       currentSets: state.getWeeklySets(muscle),
       increment: increment.delta,
       reason: increment.reason,
-      status: state.getVolumeStatus(muscle)
+      status: state.getVolumeStatus(muscle),
     };
   });
 
@@ -130,7 +141,9 @@ function processWeeklyVolumeProgression(weeklyFeedback, state) {
     deloadTriggered,
     mrvHits,
     weekComplete: true,
-    recommendation: deloadTriggered ? 'Deload phase initiated' : 'Continue progression'
+    recommendation: deloadTriggered
+      ? "Deload phase initiated"
+      : "Continue progression",
   };
 }
 
@@ -146,39 +159,55 @@ function setProgressionAlgorithm(soreness, performance) {
   const clamp = (val, min, max) => Math.max(min, Math.min(max, val));
   const s = clamp(soreness, 0, 3);
   const p = clamp(performance, 0, 3);
-  
+
   // RP Set Progression Matrix [soreness][performance]
   const progressionMatrix = [
     // Soreness 0 (None)
     [
-      { advice: "Add 1 set next session", action: "add_sets", setChange: 1 },      // Performance 0 (worse)
-      { advice: "Add 2 sets next session", action: "add_sets", setChange: 2 },     // Performance 1 (same)
-      { advice: "Add 2-3 sets next session", action: "add_sets", setChange: 2 },   // Performance 2 (better)
-      { advice: "Add 2-3 sets next session", action: "add_sets", setChange: 3 }    // Performance 3 (much better)
+      { advice: "Add 1 set next session", action: "add_sets", setChange: 1 }, // Performance 0 (worse)
+      { advice: "Add 2 sets next session", action: "add_sets", setChange: 2 }, // Performance 1 (same)
+      { advice: "Add 2-3 sets next session", action: "add_sets", setChange: 2 }, // Performance 2 (better)
+      { advice: "Add 2-3 sets next session", action: "add_sets", setChange: 3 }, // Performance 3 (much better)
     ],
     // Soreness 1 (Mild)
     [
-      { advice: "Hold sets at current level", action: "maintain", setChange: 0 },  // Performance 0
-      { advice: "Add 1 set next session", action: "add_sets", setChange: 1 },      // Performance 1
-      { advice: "Add 2 sets next session", action: "add_sets", setChange: 2 },     // Performance 2
-      { advice: "Add 2-3 sets next session", action: "add_sets", setChange: 2 }    // Performance 3
+      {
+        advice: "Hold sets at current level",
+        action: "maintain",
+        setChange: 0,
+      }, // Performance 0
+      { advice: "Add 1 set next session", action: "add_sets", setChange: 1 }, // Performance 1
+      { advice: "Add 2 sets next session", action: "add_sets", setChange: 2 }, // Performance 2
+      { advice: "Add 2-3 sets next session", action: "add_sets", setChange: 2 }, // Performance 3
     ],
     // Soreness 2 (Moderate)
     [
-      { advice: "Do recovery session", action: "recovery", setChange: -99 },       // Performance 0
-      { advice: "Hold sets at current level", action: "maintain", setChange: 0 },  // Performance 1
-      { advice: "Hold sets at current level", action: "maintain", setChange: 0 },  // Performance 2
-      { advice: "Add 1 set next session", action: "add_sets", setChange: 1 }       // Performance 3
+      { advice: "Do recovery session", action: "recovery", setChange: -99 }, // Performance 0
+      {
+        advice: "Hold sets at current level",
+        action: "maintain",
+        setChange: 0,
+      }, // Performance 1
+      {
+        advice: "Hold sets at current level",
+        action: "maintain",
+        setChange: 0,
+      }, // Performance 2
+      { advice: "Add 1 set next session", action: "add_sets", setChange: 1 }, // Performance 3
     ],
     // Soreness 3 (High)
     [
-      { advice: "Do recovery session", action: "recovery", setChange: -99 },       // Performance 0
-      { advice: "Do recovery session", action: "recovery", setChange: -99 },       // Performance 1
-      { advice: "Do recovery session", action: "recovery", setChange: -99 },       // Performance 2
-      { advice: "Hold sets at current level", action: "maintain", setChange: 0 }   // Performance 3
-    ]
+      { advice: "Do recovery session", action: "recovery", setChange: -99 }, // Performance 0
+      { advice: "Do recovery session", action: "recovery", setChange: -99 }, // Performance 1
+      { advice: "Do recovery session", action: "recovery", setChange: -99 }, // Performance 2
+      {
+        advice: "Hold sets at current level",
+        action: "maintain",
+        setChange: 0,
+      }, // Performance 3
+    ],
   ];
-  
+
   return progressionMatrix[s][p];
 }
 
@@ -189,42 +218,43 @@ function setProgressionAlgorithm(soreness, performance) {
  * @returns {Object} - Volume analysis
  */
 function analyzeVolumeStatus(muscle, currentSets = null) {
-  const sets = currentSets !== null ? currentSets : trainingState.currentWeekSets[muscle];
+  const sets =
+    currentSets !== null ? currentSets : trainingState.currentWeekSets[muscle];
   const landmarks = trainingState.volumeLandmarks[muscle];
-  
+
   if (!landmarks) {
     throw new Error(`Unknown muscle group: ${muscle}`);
   }
-  
+
   const status = trainingState.getVolumeStatus(muscle, sets);
   const percentage = (sets / landmarks.MRV) * 100;
-  
-  let recommendation = '';
-  let urgency = 'normal';
-  
+
+  let recommendation = "";
+  let urgency = "normal";
+
   switch (status) {
-    case 'under-minimum':
+    case "under-minimum":
       recommendation = `Below MV (${landmarks.MV}). Increase volume significantly.`;
-      urgency = 'high';
+      urgency = "high";
       break;
-    case 'maintenance':
+    case "maintenance":
       recommendation = `In maintenance zone (${landmarks.MV}-${landmarks.MEV}). Consider increasing for growth.`;
-      urgency = 'low';
+      urgency = "low";
       break;
-    case 'optimal':
+    case "optimal":
       recommendation = `In optimal zone (${landmarks.MEV}-${landmarks.MAV}). Continue progressive overload.`;
-      urgency = 'normal';
+      urgency = "normal";
       break;
-    case 'high':
+    case "high":
       recommendation = `High volume zone (${landmarks.MAV}-${landmarks.MRV}). Monitor recovery closely.`;
-      urgency = 'medium';
+      urgency = "medium";
       break;
-    case 'maximum':
+    case "maximum":
       recommendation = `At/above MRV (${landmarks.MRV}). Deload recommended.`;
-      urgency = 'high';
+      urgency = "high";
       break;
   }
-  
+
   return {
     muscle,
     currentSets: sets,
@@ -233,7 +263,7 @@ function analyzeVolumeStatus(muscle, currentSets = null) {
     percentage: Math.round(percentage),
     recommendation,
     urgency,
-    color: trainingState.getVolumeColor(muscle, sets)
+    color: trainingState.getVolumeColor(muscle, sets),
   };
 }
 
@@ -246,13 +276,13 @@ function analyzeVolumeStatus(muscle, currentSets = null) {
 function calculateRecoveryVolume(muscle, hasIllness = false) {
   const landmarks = trainingState.volumeLandmarks[muscle];
   const recoveryVolume = trainingState.getRecoveryVolume(muscle, hasIllness);
-  
+
   return {
     muscle,
     recommendedSets: recoveryVolume,
-    reasoning: hasIllness ? 'illness adjustment' : 'standard recovery',
+    reasoning: hasIllness ? "illness adjustment" : "standard recovery",
     landmarks,
-    percentage: Math.round((recoveryVolume / landmarks.MEV) * 100)
+    percentage: Math.round((recoveryVolume / landmarks.MEV) * 100),
   };
 }
 
@@ -265,21 +295,21 @@ function calculateRecoveryVolume(muscle, hasIllness = false) {
 function validateVolumeInput(muscle, proposedSets) {
   const landmarks = trainingState.volumeLandmarks[muscle];
   const isValid = proposedSets >= 0 && proposedSets <= landmarks.MRV * 1.2; // Allow 20% over MRV
-  
-  let warning = '';
+
+  let warning = "";
   if (proposedSets < 0) {
-    warning = 'Sets cannot be negative';
+    warning = "Sets cannot be negative";
   } else if (proposedSets > landmarks.MRV) {
     warning = `Above MRV (${landmarks.MRV}). Consider deload.`;
   } else if (proposedSets < landmarks.MV) {
     warning = `Below MV (${landmarks.MV}). May not be sufficient for adaptation.`;
   }
-  
+
   return {
     isValid,
     warning,
     proposedSets,
-    landmarks
+    landmarks,
   };
 }
 
@@ -293,44 +323,48 @@ function getVolumeProgression(muscle, feedback) {
   const currentSets = trainingState.currentWeekSets[muscle];
   const volumeAnalysis = analyzeVolumeStatus(muscle);
   const vStat = trainingState.getVolumeStatus(muscle);
-  if (['optimal','high','maximum'].includes(vStat)) return {
-    deltaSets: 0,
-    headline: 'Maintain current sets next session',
-    currentSets: currentSets,
-    nextSets: currentSets,
-    notes: 'Volume already optimal'
-  };
-  
+  if (["optimal", "high", "maximum"].includes(vStat))
+    return {
+      deltaSets: 0,
+      headline: "Maintain current sets next session",
+      currentSets: currentSets,
+      nextSets: currentSets,
+      notes: "Volume already optimal",
+    };
+
   // Get stimulus score
   const stimulusResult = scoreStimulus(feedback.stimulus);
-  
+
   // Get set progression recommendation
-  const progressionResult = setProgressionAlgorithm(feedback.soreness, feedback.performance);
-  
+  const progressionResult = setProgressionAlgorithm(
+    feedback.soreness,
+    feedback.performance,
+  );
+
   // Combine recommendations with volume constraints
   let finalSetChange = progressionResult.setChange;
   let finalAdvice = progressionResult.advice;
-  
+
   // Override if at volume limits
-  if (volumeAnalysis.status === 'maximum' && finalSetChange > 0) {
+  if (volumeAnalysis.status === "maximum" && finalSetChange > 0) {
     finalSetChange = 0;
     finalAdvice = "At MRV limit. Hold sets or consider deload.";
   }
-  
-  if (volumeAnalysis.status === 'under-minimum' && finalSetChange <= 0) {
+
+  if (volumeAnalysis.status === "under-minimum" && finalSetChange <= 0) {
     finalSetChange = 2;
     finalAdvice = "Below minimum volume. Add sets regardless of fatigue.";
   }
-  
+
   // Special handling for recovery sessions
-  if (progressionResult.action === 'recovery') {
+  if (progressionResult.action === "recovery") {
     const recoveryVolume = calculateRecoveryVolume(muscle, feedback.hasIllness);
     finalSetChange = recoveryVolume.recommendedSets - currentSets;
     finalAdvice = `Recovery session: ${recoveryVolume.recommendedSets} sets (${recoveryVolume.reasoning})`;
   }
-  
+
   const projectedSets = Math.max(0, currentSets + finalSetChange);
-  
+
   return {
     muscle,
     currentSets,
@@ -340,7 +374,7 @@ function getVolumeProgression(muscle, feedback) {
     stimulusScore: stimulusResult.score,
     volumeStatus: volumeAnalysis.status,
     targetRIR: trainingState.getTargetRIR(),
-    deloadRecommended: trainingState.shouldDeload()
+    deloadRecommended: trainingState.shouldDeload(),
   };
 }
 
@@ -350,29 +384,31 @@ function getVolumeProgression(muscle, feedback) {
  */
 function analyzeDeloadNeed() {
   const muscles = Object.keys(trainingState.volumeLandmarks);
-  const mrvBreaches = muscles.filter(muscle => 
-    trainingState.getVolumeStatus(muscle) === 'maximum'
+  const mrvBreaches = muscles.filter(
+    (muscle) => trainingState.getVolumeStatus(muscle) === "maximum",
   );
-  
+
   const shouldDeload = trainingState.shouldDeload();
   const reasons = [];
-  
+
   if (trainingState.consecutiveMRVWeeks >= 2) {
-    reasons.push('Two consecutive weeks at MRV');
+    reasons.push("Two consecutive weeks at MRV");
   }
-  
-  if (trainingState.totalMusclesNeedingRecovery >= Math.ceil(muscles.length / 2)) {
-    reasons.push('Most muscles need recovery sessions');
+
+  if (
+    trainingState.totalMusclesNeedingRecovery >= Math.ceil(muscles.length / 2)
+  ) {
+    reasons.push("Most muscles need recovery sessions");
   }
-  
+
   if (trainingState.weekNo >= trainingState.mesoLen) {
-    reasons.push('End of mesocycle reached');
+    reasons.push("End of mesocycle reached");
   }
-  
+
   if (mrvBreaches.length >= Math.ceil(muscles.length / 3)) {
     reasons.push(`${mrvBreaches.length} muscle groups at/above MRV`);
   }
-  
+
   return {
     shouldDeload,
     reasons,
@@ -380,7 +416,7 @@ function analyzeDeloadNeed() {
     consecutiveMRVWeeks: trainingState.consecutiveMRVWeeks,
     currentWeek: trainingState.weekNo,
     mesoLength: trainingState.mesoLen,
-    musclesNeedingRecovery: trainingState.totalMusclesNeedingRecovery
+    musclesNeedingRecovery: trainingState.totalMusclesNeedingRecovery,
   };
 }
 
@@ -393,9 +429,10 @@ export {
   analyzeVolumeStatus,
   calculateRecoveryVolume,
   validateVolumeInput,
-  getVolumeProgression,  analyzeDeloadNeed,
+  getVolumeProgression,
+  analyzeDeloadNeed,
   autoSetIncrement,
-  processWeeklyVolumeProgression
+  processWeeklyVolumeProgression,
 };
 
 export function weeklyVolume(weekArray) {

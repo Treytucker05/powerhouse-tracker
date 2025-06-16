@@ -1,4 +1,128 @@
-!function(e,a,i,t,n,s,l,o){var c="undefined"!=typeof globalThis?globalThis:"undefined"!=typeof self?self:"undefined"!=typeof window?window:"undefined"!=typeof global?global:{},r="function"==typeof c[t]&&c[t],d=r.i||{},v=r.cache||{},u="undefined"!=typeof module&&"function"==typeof module.require&&module.require.bind(module);function p(a,i){if(!v[a]){if(!e[a]){if(n[a])return n[a];var s="function"==typeof c[t]&&c[t];if(!i&&s)return s(a,!0);if(r)return r(a,!0);if(u&&"string"==typeof a)return u(a);var l=Error("Cannot find module '"+a+"'");throw l.code="MODULE_NOT_FOUND",l}d.resolve=function(i){var t=e[a][1][i];return null!=t?t:i},d.cache={};var o=v[a]=new p.Module(a);e[a][0].call(o.exports,d,o,o.exports,c)}return v[a].exports;function d(e){var a=d.resolve(e);return!1===a?{}:p(a)}}p.isParcelRequire=!0,p.Module=function(e){this.id=e,this.bundle=p,this.require=u,this.exports={}},p.modules=e,p.cache=v,p.parent=r,p.distDir=void 0,p.publicUrl=void 0,p.devServer=void 0,p.i=d,p.register=function(a,i){e[a]=[function(e,a){a.exports=i},{}]},Object.defineProperty(p,"root",{get:function(){return c[t]}}),c[t]=p;for(var h=0;h<a.length;h++)p(a[h]);if(i){var m=p(i);"object"==typeof exports&&"undefined"!=typeof module?module.exports=m:"function"==typeof define&&define.amd&&define(function(){return m})}}({"5fv1I":[function(e,a,i,t){var n=e("@parcel/transformer-js/src/esmodule-helpers.js");n.defineInteropFlag(i),n.export(i,"EnhancedAdvancedUI",()=>l),n.export(i,"enhancedUI",()=>o),e("../algorithms/dataVisualization.js"),e("../algorithms/wellnessIntegration.js"),e("../algorithms/periodizationSystem.js");var s=e("../algorithms/intelligenceHub.js");class l{constructor(){this.activeCharts=new Map,this.dashboardState=this.initializeDashboardState(),this.notifications=this.initializeNotificationSystem()}initializeDashboardState(){return{activeTab:"overview",chartConfigs:new Map,refreshRate:5e3,autoRefresh:!1,fullscreen:!1,theme:"light"}}initializeNotificationSystem(){return{queue:[],displayed:new Set,types:{info:{icon:"ℹ️",color:"#3b82f6"},success:{icon:"✅",color:"#10b981"},warning:{icon:"⚠️",color:"#f59e0b"},error:{icon:"❌",color:"#ef4444"},insight:{icon:"\uD83D\uDCA1",color:"#8b5cf6"}}}}createAdvancedDashboard(){let e=document.createElement("div");return e.className="advanced-dashboard",e.innerHTML=`
+!(function (e, a, i, t, n, s, l, o) {
+  var c =
+      "undefined" != typeof globalThis
+        ? globalThis
+        : "undefined" != typeof self
+          ? self
+          : "undefined" != typeof window
+            ? window
+            : "undefined" != typeof global
+              ? global
+              : {},
+    r = "function" == typeof c[t] && c[t],
+    d = r.i || {},
+    v = r.cache || {},
+    u =
+      "undefined" != typeof module &&
+      "function" == typeof module.require &&
+      module.require.bind(module);
+  function p(a, i) {
+    if (!v[a]) {
+      if (!e[a]) {
+        if (n[a]) return n[a];
+        var s = "function" == typeof c[t] && c[t];
+        if (!i && s) return s(a, !0);
+        if (r) return r(a, !0);
+        if (u && "string" == typeof a) return u(a);
+        var l = Error("Cannot find module '" + a + "'");
+        throw ((l.code = "MODULE_NOT_FOUND"), l);
+      }
+      (d.resolve = function (i) {
+        var t = e[a][1][i];
+        return null != t ? t : i;
+      }),
+        (d.cache = {});
+      var o = (v[a] = new p.Module(a));
+      e[a][0].call(o.exports, d, o, o.exports, c);
+    }
+    return v[a].exports;
+    function d(e) {
+      var a = d.resolve(e);
+      return !1 === a ? {} : p(a);
+    }
+  }
+  (p.isParcelRequire = !0),
+    (p.Module = function (e) {
+      (this.id = e), (this.bundle = p), (this.require = u), (this.exports = {});
+    }),
+    (p.modules = e),
+    (p.cache = v),
+    (p.parent = r),
+    (p.distDir = void 0),
+    (p.publicUrl = void 0),
+    (p.devServer = void 0),
+    (p.i = d),
+    (p.register = function (a, i) {
+      e[a] = [
+        function (e, a) {
+          a.exports = i;
+        },
+        {},
+      ];
+    }),
+    Object.defineProperty(p, "root", {
+      get: function () {
+        return c[t];
+      },
+    }),
+    (c[t] = p);
+  for (var h = 0; h < a.length; h++) p(a[h]);
+  if (i) {
+    var m = p(i);
+    "object" == typeof exports && "undefined" != typeof module
+      ? (module.exports = m)
+      : "function" == typeof define &&
+        define.amd &&
+        define(function () {
+          return m;
+        });
+  }
+})(
+  {
+    "5fv1I": [
+      function (e, a, i, t) {
+        var n = e("@parcel/transformer-js/src/esmodule-helpers.js");
+        n.defineInteropFlag(i),
+          n.export(i, "EnhancedAdvancedUI", () => l),
+          n.export(i, "enhancedUI", () => o),
+          e("../algorithms/dataVisualization.js"),
+          e("../algorithms/wellnessIntegration.js"),
+          e("../algorithms/periodizationSystem.js");
+        var s = e("../algorithms/intelligenceHub.js");
+        class l {
+          constructor() {
+            (this.activeCharts = new Map()),
+              (this.dashboardState = this.initializeDashboardState()),
+              (this.notifications = this.initializeNotificationSystem());
+          }
+          initializeDashboardState() {
+            return {
+              activeTab: "overview",
+              chartConfigs: new Map(),
+              refreshRate: 5e3,
+              autoRefresh: !1,
+              fullscreen: !1,
+              theme: "light",
+            };
+          }
+          initializeNotificationSystem() {
+            return {
+              queue: [],
+              displayed: new Set(),
+              types: {
+                info: { icon: "ℹ️", color: "#3b82f6" },
+                success: { icon: "✅", color: "#10b981" },
+                warning: { icon: "⚠️", color: "#f59e0b" },
+                error: { icon: "❌", color: "#ef4444" },
+                insight: { icon: "\uD83D\uDCA1", color: "#8b5cf6" },
+              },
+            };
+          }
+          createAdvancedDashboard() {
+            let e = document.createElement("div");
+            return (
+              (e.className = "advanced-dashboard"),
+              (e.innerHTML = `
       <div class="dashboard-header">
         <h2>\u{1F3AF} Advanced Training Dashboard</h2>
         <div class="dashboard-controls">
@@ -33,7 +157,12 @@
       </div>
 
       <div class="notification-area" id="notificationArea"></div>
-    `,e}createOverviewTab(){return`
+    `),
+              e
+            );
+          }
+          createOverviewTab() {
+            return `
       <div class="tab-content active" id="overview-tab">
         <div class="overview-grid">
           <!-- Key Metrics Panel -->
@@ -111,7 +240,10 @@
           </div>
         </div>
       </div>
-    `}createAnalyticsTab(){return`
+    `;
+          }
+          createAnalyticsTab() {
+            return `
       <div class="tab-content" id="analytics-tab">
         <div class="analytics-grid">
           <!-- Predictive Analytics -->
@@ -181,7 +313,10 @@
           </div>
         </div>
       </div>
-    `}createWellnessTab(){return`
+    `;
+          }
+          createWellnessTab() {
+            return `
       <div class="tab-content" id="wellness-tab">
         <div class="wellness-grid">
           <!-- Wellness Input Panel -->
@@ -269,7 +404,10 @@
           </div>
         </div>
       </div>
-    `}createPlanningTab(){return`
+    `;
+          }
+          createPlanningTab() {
+            return `
       <div class="tab-content" id="planning-tab">
         <div class="planning-grid">
           <!-- Plan Creation -->
@@ -359,7 +497,10 @@
           </div>
         </div>
       </div>
-    `}createInsightsTab(){return`
+    `;
+          }
+          createInsightsTab() {
+            return `
       <div class="tab-content" id="insights-tab">
         <div class="insights-grid">
           <!-- AI Insights -->
@@ -404,13 +545,151 @@
           </div>
         </div>
       </div>
-    `}initializeEnhancedUI(){this.setupEventListeners(),this.initializeCharts(),this.startAutoRefresh(),this.loadDashboardData(),console.log("\uD83D\uDE80 Enhanced Advanced UI System Initialized")}setupEventListeners(){document.addEventListener("input",e=>{if("range"===e.target.type){let a=document.getElementById(e.target.id+"Value");a&&(a.textContent=e.target.value)}}),document.addEventListener("click",e=>{e.target.classList.contains("tab-btn")&&this.handleTabClick(e.target)}),document.addEventListener("change",e=>{e.target.closest("#wellnessForm")&&this.autoSaveWellnessData()})}switchTab(e){document.querySelectorAll(".tab-btn").forEach(e=>e.classList.remove("active")),document.querySelector(`.tab-btn[onclick*="${e}"]`).classList.add("active"),document.querySelectorAll(".tab-content").forEach(e=>e.classList.remove("active")),document.getElementById(`${e}-tab`).classList.add("active"),this.loadTabData(e),this.dashboardState.activeTab=e}loadTabData(e){switch(e){case"overview":this.loadOverviewData();break;case"analytics":this.loadAnalyticsData();break;case"wellness":this.loadWellnessData();break;case"planning":this.loadPlanningData();break;case"insights":this.loadInsightsData()}}generateAIInsights(){let e=s.advancedIntelligence.getWeeklyIntelligence(),a=document.getElementById("aiInsightsContent"),i='<div class="insights-list">';e.recommendations.length>0&&(i+="<h4>\uD83C\uDFAF Recommendations</h4>",e.recommendations.forEach(e=>{i+=`<div class="insight-item ${e.urgency}">
+    `;
+          }
+          initializeEnhancedUI() {
+            this.setupEventListeners(),
+              this.initializeCharts(),
+              this.startAutoRefresh(),
+              this.loadDashboardData(),
+              console.log(
+                "\uD83D\uDE80 Enhanced Advanced UI System Initialized",
+              );
+          }
+          setupEventListeners() {
+            document.addEventListener("input", (e) => {
+              if ("range" === e.target.type) {
+                let a = document.getElementById(e.target.id + "Value");
+                a && (a.textContent = e.target.value);
+              }
+            }),
+              document.addEventListener("click", (e) => {
+                e.target.classList.contains("tab-btn") &&
+                  this.handleTabClick(e.target);
+              }),
+              document.addEventListener("change", (e) => {
+                e.target.closest("#wellnessForm") &&
+                  this.autoSaveWellnessData();
+              });
+          }
+          switchTab(e) {
+            document
+              .querySelectorAll(".tab-btn")
+              .forEach((e) => e.classList.remove("active")),
+              document
+                .querySelector(`.tab-btn[onclick*="${e}"]`)
+                .classList.add("active"),
+              document
+                .querySelectorAll(".tab-content")
+                .forEach((e) => e.classList.remove("active")),
+              document.getElementById(`${e}-tab`).classList.add("active"),
+              this.loadTabData(e),
+              (this.dashboardState.activeTab = e);
+          }
+          loadTabData(e) {
+            switch (e) {
+              case "overview":
+                this.loadOverviewData();
+                break;
+              case "analytics":
+                this.loadAnalyticsData();
+                break;
+              case "wellness":
+                this.loadWellnessData();
+                break;
+              case "planning":
+                this.loadPlanningData();
+                break;
+              case "insights":
+                this.loadInsightsData();
+            }
+          }
+          generateAIInsights() {
+            let e = s.advancedIntelligence.getWeeklyIntelligence(),
+              a = document.getElementById("aiInsightsContent"),
+              i = '<div class="insights-list">';
+            e.recommendations.length > 0 &&
+              ((i += "<h4>\uD83C\uDFAF Recommendations</h4>"),
+              e.recommendations.forEach((e) => {
+                i += `<div class="insight-item ${e.urgency}">
           <strong>${e.type}:</strong> ${e.message}
-        </div>`})),e.analytics&&(i+="<h4>\uD83D\uDCCA Analytics Insights</h4>",Object.entries(e.analytics.volumeLandmarkOptimizations||{}).forEach(([e,a])=>{i+=`<div class="insight-item success">
+        </div>`;
+              })),
+              e.analytics &&
+                ((i += "<h4>\uD83D\uDCCA Analytics Insights</h4>"),
+                Object.entries(
+                  e.analytics.volumeLandmarkOptimizations || {},
+                ).forEach(([e, a]) => {
+                  i += `<div class="insight-item success">
           <strong>${e}:</strong> Volume landmarks can be optimized (${a.confidence}% confidence)
-        </div>`})),a.innerHTML=i+="</div>",this.showNotification("AI insights generated successfully","success")}showNotification(e,a="info"){let i=document.createElement("div");i.className=`notification ${a}`,i.innerHTML=`
+        </div>`;
+                })),
+              (a.innerHTML = i += "</div>"),
+              this.showNotification(
+                "AI insights generated successfully",
+                "success",
+              );
+          }
+          showNotification(e, a = "info") {
+            let i = document.createElement("div");
+            (i.className = `notification ${a}`),
+              (i.innerHTML = `
       <span class="notification-icon">${this.notifications.types[a].icon}</span>
       <span class="notification-message">${e}</span>
       <button class="notification-close" onclick="this.parentElement.remove()">\xd7</button>
-    `,document.getElementById("notificationArea").appendChild(i),setTimeout(()=>{i.parentElement&&i.remove()},5e3)}exportDashboard(){let e=this.collectDashboardData(),a=new Blob([JSON.stringify({timestamp:new Date().toISOString(),data:e},null,2)],{type:"application/json"}),i=URL.createObjectURL(a),t=document.createElement("a");t.href=i,t.download=`training-dashboard-${new Date().toISOString().split("T")[0]}.json`,t.click(),this.showNotification("Dashboard data exported successfully","success")}collectDashboardData(){return{overview:this.getOverviewData(),analytics:this.getAnalyticsData(),wellness:this.getWellnessData(),planning:this.getPlanningData(),insights:this.getInsightsData()}}}let o=new l;window.enhancedUI=o},{"../algorithms/dataVisualization.js":"ewacr","../algorithms/wellnessIntegration.js":"baIS0","../algorithms/periodizationSystem.js":"gvkvx","../algorithms/intelligenceHub.js":"bDUtg","@parcel/transformer-js/src/esmodule-helpers.js":"91HVb"}]},["5fv1I"],"5fv1I","parcelRequire66c8",{});
+    `),
+              document.getElementById("notificationArea").appendChild(i),
+              setTimeout(() => {
+                i.parentElement && i.remove();
+              }, 5e3);
+          }
+          exportDashboard() {
+            let e = this.collectDashboardData(),
+              a = new Blob(
+                [
+                  JSON.stringify(
+                    { timestamp: new Date().toISOString(), data: e },
+                    null,
+                    2,
+                  ),
+                ],
+                { type: "application/json" },
+              ),
+              i = URL.createObjectURL(a),
+              t = document.createElement("a");
+            (t.href = i),
+              (t.download = `training-dashboard-${new Date().toISOString().split("T")[0]}.json`),
+              t.click(),
+              this.showNotification(
+                "Dashboard data exported successfully",
+                "success",
+              );
+          }
+          collectDashboardData() {
+            return {
+              overview: this.getOverviewData(),
+              analytics: this.getAnalyticsData(),
+              wellness: this.getWellnessData(),
+              planning: this.getPlanningData(),
+              insights: this.getInsightsData(),
+            };
+          }
+        }
+        let o = new l();
+        window.enhancedUI = o;
+      },
+      {
+        "../algorithms/dataVisualization.js": "ewacr",
+        "../algorithms/wellnessIntegration.js": "baIS0",
+        "../algorithms/periodizationSystem.js": "gvkvx",
+        "../algorithms/intelligenceHub.js": "bDUtg",
+        "@parcel/transformer-js/src/esmodule-helpers.js": "91HVb",
+      },
+    ],
+  },
+  ["5fv1I"],
+  "5fv1I",
+  "parcelRequire66c8",
+  {},
+);
 //# sourceMappingURL=ProgramDesignWorkspace.36e482e4.js.map
