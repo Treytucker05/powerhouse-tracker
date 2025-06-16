@@ -52,6 +52,14 @@ class TrainingState {
       this.baselineStrength[muscle] = 100; // Default baseline load (kg)
     });
 
+    this.weeklyVolume = {};
+    Object.keys(this.volumeLandmarks).forEach((m) => {
+      this.weeklyVolume[m] = {
+        current: this.currentWeekSets[m],
+        ...this.volumeLandmarks[m],
+      };
+    });
+
     // Performance tracking for deload detection
     this.consecutiveMRVWeeks = 0;
 
@@ -98,14 +106,22 @@ class TrainingState {
   // Update weekly sets for a muscle
   updateWeeklySets(muscle, sets) {
     this.currentWeekSets[muscle] = Math.max(0, sets);
+    if (this.weeklyVolume[muscle])
+      this.weeklyVolume[muscle].current = this.currentWeekSets[muscle];
     this.saveState();
+    if (typeof window !== "undefined" && window.updateAllDisplays)
+      window.updateAllDisplays();
   }
 
   // Add sets to a muscle
   addSets(muscle, additionalSets) {
     this.currentWeekSets[muscle] += additionalSets;
     this.currentWeekSets[muscle] = Math.max(0, this.currentWeekSets[muscle]);
+    if (this.weeklyVolume[muscle])
+      this.weeklyVolume[muscle].current = this.currentWeekSets[muscle];
     this.saveState();
+    if (typeof window !== "undefined" && window.updateAllDisplays)
+      window.updateAllDisplays();
   }
   // Check if deload is needed
   shouldDeload() {
@@ -280,6 +296,7 @@ class TrainingState {
       resensitizationPhase: this.resensitizationPhase,
       currentWeekSets: this.currentWeekSets,
       lastWeekSets: this.lastWeekSets,
+      weeklyVolume: this.weeklyVolume,
       consecutiveMRVWeeks: this.consecutiveMRVWeeks,
       recoverySessionsThisWeek: this.recoverySessionsThisWeek,
       totalMusclesNeedingRecovery: this.totalMusclesNeedingRecovery,
