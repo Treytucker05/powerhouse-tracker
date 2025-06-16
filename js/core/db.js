@@ -21,6 +21,7 @@ export async function signOut() {
 }
 
 export function onAuth(callback) {
+  return console.log("Auth functionality temporarily disabled for debugging");
   return supa.auth.onAuthStateChange((_e, s) => {
     console.log("onAuth change:", s);
     callback(s);
