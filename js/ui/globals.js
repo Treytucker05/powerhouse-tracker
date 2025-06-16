@@ -1,3 +1,4 @@
+console.log("AUTH SYSTEM NUKED");
 console.log("globals.js loaded");
 
 /*  Maps module functions onto window so legacy inline onclick="" handlers keep working */
@@ -1334,81 +1335,65 @@ window.getUserAnalytics = function () {
   output.className = "result active";
 };
 
-// Authentication handlers
-import { signIn, signUp, signOut, onAuth, supa } from "../core/db.js";
+// Authentication handlers removed
+// import { signIn, signUp, signOut, onAuth, supa } from "../core/db.js";
 
-// DOM elements for auth
-const authEmail = document.getElementById("authEmail");
-const authPass = document.getElementById("authPass");
+// const authEmail = document.getElementById("authEmail");
+// const authPass = document.getElementById("authPass");
 
-// Helper function for auth loading state
-function setAuthLoading(isLoading) {
-  const spinner = document.getElementById("authSpinner");
-  const btnLogin = document.getElementById("btnLogin");
-  const btnSignUp = document.getElementById("btnSignUp");
-  if (!spinner || !btnLogin || !btnSignUp) return;
-  spinner.style.display = isLoading ? "inline" : "none";
-  btnLogin.disabled = isLoading;
-  btnSignUp.disabled = isLoading;
-}
+// function setAuthLoading(isLoading) {
+//   const spinner = document.getElementById("authSpinner");
+//   const btnLogin = document.getElementById("btnLogin");
+//   const btnSignUp = document.getElementById("btnSignUp");
+//   if (!spinner || !btnLogin || !btnSignUp) return;
+//   spinner.style.display = isLoading ? "inline" : "none";
+//   btnLogin.disabled = isLoading;
+//   btnSignUp.disabled = isLoading;
+// }
 
-/**
- * Handle user sign in * Uses email/password from auth form fields
- */
-window.handleSignIn = async function () {
-  const email = authEmail.value.trim();
-  const pass = authPass.value;
-  setAuthLoading(true);
-  const { error, data } = await signIn(email, pass);
-  setAuthLoading(false);
-  if (error) return alert(error.message);
-  const modal = document.getElementById("authModal");
-  console.log("signIn authModal:", modal, "ready:", document.readyState);
-  // modal?.classList.add("hidden"); // hide modal on success
-  console.log("Logged-in session:", data);
-};
+// window.handleSignIn = async function () {
+//   const email = authEmail.value.trim();
+//   const pass = authPass.value;
+//   setAuthLoading(true);
+//   const { error, data } = await signIn(email, pass);
+//   setAuthLoading(false);
+//   if (error) return alert(error.message);
+//   const modal = document.getElementById("authModal");
+//   console.log("signIn authModal:", modal, "ready:", document.readyState);
+//   console.log("Logged-in session:", data);
+// };
 
-/**
- * Handle user sign up
- * Uses email/password from auth form fields
- */
-window.handleSignUp = async function () {
-  const email = authEmail.value.trim();
-  const pass = authPass.value;
-  setAuthLoading(true);
-  const { error, data } = await signUp(email, pass);
-  setAuthLoading(false);
-  if (error) return alert(error.message);
-  const modal = document.getElementById("authModal");
-  console.log("signUp authModal:", modal, "ready:", document.readyState);
-  // modal?.classList.add("hidden");
-  console.log("Signed-up session:", data);
-};
+// window.handleSignUp = async function () {
+//   const email = authEmail.value.trim();
+//   const pass = authPass.value;
+//   setAuthLoading(true);
+//   const { error, data } = await signUp(email, pass);
+//   setAuthLoading(false);
+//   if (error) return alert(error.message);
+//   const modal = document.getElementById("authModal");
+//   console.log("signUp authModal:", modal, "ready:", document.readyState);
+//   console.log("Signed-up session:", data);
+// };
 
-/**
- * Handle user sign out
- */
-window.handleSignOut = async function () {
-  await supa.auth.signOut();
-  const modal = document.getElementById("authModal");
-  console.log("signOut authModal:", modal, "ready:", document.readyState);
-  // modal?.classList.remove("hidden");
-};
+// window.handleSignOut = async function () {
+//   await supa.auth.signOut();
+//   const modal = document.getElementById("authModal");
+//   console.log("signOut authModal:", modal, "ready:", document.readyState);
+// };
 
-// Handle authentication state changes
-onAuth((sess) => {
-  try {
-    const modal = document.getElementById("authModal");
-    console.log("onAuth authModal:", modal, "ready:", document.readyState);
-    // if (modal) modal.classList.toggle("hidden", !!sess);
-    else console.warn("authModal missing in onAuth");
-    const signOutBtn = document.getElementById("signOutBtn");
-    if (signOutBtn) signOutBtn.style.display = sess ? "inline-block" : "none";
-    console.log("Auth session", sess);
-  } catch (err) {
-    console.error("onAuth callback failed:", err);
-  }
-});
+// onAuth((sess) => {
+//   try {
+//     const modal = document.getElementById("authModal");
+//     console.log("onAuth authModal:", modal, "ready:", document.readyState);
+//     // if (modal) modal.classList.toggle("hidden", !!sess);
+//     else console.warn("authModal missing in onAuth");
+//     const signOutBtn = document.getElementById("signOutBtn");
+//     if (signOutBtn) signOutBtn.style.display = sess ? "inline-block" : "none";
+//     console.log("Auth session", sess);
+//   } catch (err) {
+//     console.error("onAuth callback failed:", err);
+//   }
+// });
 
 /* Temporary stubs to satisfy ESLint — replace with real logic */
 export function showSystemMessage(msg = "") {
