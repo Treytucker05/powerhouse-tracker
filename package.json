@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",
   "scripts": {
-    "dev": "parcel index.html --port 1234 --no-cache --open",
+    "dev": "parcel index.html --port 1234 --no-cache",
     "lint": "eslint \"js/**\"",
     "format": "prettier --write .",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
