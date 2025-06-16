@@ -523,17 +523,26 @@ function simulateWeeklyRIRFeedback(muscles, week) {
     if (volumeStatus === "maximum") {
       jointAche = Math.floor(Math.random() * 3) + 1; // 1-3 (mild to pain)
       perfChange = Math.random() > 0.6 ? -1 : 0; // 40% chance of performance drop
-      lastLoad = trainingState.baselineStrength[muscle] * 0.95; // 5% strength drop
+      lastLoad =
+        trainingState.baselineStrength[muscle] *
+        trainingState.loadReduction *
+        0.95; // 5% strength drop
       soreness = Math.floor(Math.random() * 2) + 2; // 2-3 (moderate to high)
     } else if (volumeStatus === "high") {
       jointAche = Math.floor(Math.random() * 2); // 0-1 (none to mild)
       perfChange = Math.random() > 0.8 ? -1 : Math.random() > 0.5 ? 0 : 1; // Mixed performance
-      lastLoad = trainingState.baselineStrength[muscle] * 0.98; // 2% strength drop
+      lastLoad =
+        trainingState.baselineStrength[muscle] *
+        trainingState.loadReduction *
+        0.98; // 2% strength drop
       soreness = Math.floor(Math.random() * 2) + 1; // 1-2 (mild to moderate)
     } else {
       jointAche = Math.floor(Math.random() * 2); // 0-1 (none to mild)
       perfChange = Math.random() > 0.7 ? 1 : 0; // 30% chance of PR
-      lastLoad = trainingState.baselineStrength[muscle] * 1.02; // 2% strength increase
+      lastLoad =
+        trainingState.baselineStrength[muscle] *
+        trainingState.loadReduction *
+        1.02; // 2% strength increase
       soreness = Math.floor(Math.random() * 2); // 0-1 (none to mild)
     }
 
