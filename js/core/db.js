@@ -21,5 +21,8 @@ export async function signOut() {
 }
 
 export function onAuth(callback) {
-  return supa.auth.onAuthStateChange((_event, session) => callback(session));
+  return supa.auth.onAuthStateChange((_e, s) => {
+    console.log("onAuth change:", s);
+    callback(s);
+  });
 }

@@ -1397,15 +1397,17 @@ window.handleSignOut = async function () {
 
 // Handle authentication state changes
 onAuth((sess) => {
-  const modal = document.getElementById("authModal");
-  console.log("onAuth authModal:", modal, "ready:", document.readyState);
-  if (modal) modal.classList.toggle("hidden", !!sess);
-  else console.warn("authModal missing in onAuth");
-
-  const signOutBtn = document.getElementById("signOutBtn");
-  if (signOutBtn) signOutBtn.style.display = sess ? "inline-block" : "none";
-
-  console.log("Auth session", sess);
+  try {
+    const modal = document.getElementById("authModal");
+    console.log("onAuth authModal:", modal, "ready:", document.readyState);
+    if (modal) modal.classList.toggle("hidden", !!sess);
+    else console.warn("authModal missing in onAuth");
+    const signOutBtn = document.getElementById("signOutBtn");
+    if (signOutBtn) signOutBtn.style.display = sess ? "inline-block" : "none";
+    console.log("Auth session", sess);
+  } catch (err) {
+    console.error("onAuth callback failed:", err);
+  }
 });
 
 /* Temporary stubs to satisfy ESLint — replace with real logic */
