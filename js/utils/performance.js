@@ -385,15 +385,15 @@ class PerformanceManager {
    * Load advanced features
    */
   loadAdvancedFeatures() {
-    // Load Chart.js only when advanced section is opened
-    if (!window.Chart && !document.querySelector('script[src*="chart.js"]')) {
-      const script = document.createElement("script");
-      script.src = "https://cdn.jsdelivr.net/npm/chart.js";
-      script.onload = () => {
-        console.log("📈 Chart.js loaded on demand");
-        this.initializeCharts();
-      };
-      document.head.appendChild(script);
+    // Dynamically import Chart.js when advanced section is opened
+    if (!window.Chart) {
+      import("chart.js/auto")
+        .then((module) => {
+          window.Chart = module.default;
+          console.log("📈 Chart.js loaded on demand");
+          this.initializeCharts();
+        })
+        .catch((err) => console.error("Failed to load Chart.js", err));
     }
   }
 
