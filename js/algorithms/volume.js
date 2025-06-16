@@ -393,11 +393,9 @@ export {
   analyzeVolumeStatus,
   calculateRecoveryVolume,
   validateVolumeInput,
-  getVolumeProgression,
-  analyzeDeloadNeed,
+  getVolumeProgression,  analyzeDeloadNeed,
   autoSetIncrement,
-  processWeeklyVolumeProgression,
-  weeklyVolume
+  processWeeklyVolumeProgression
 };
 
 export function weeklyVolume(weekArray) {
