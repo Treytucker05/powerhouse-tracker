@@ -1,12 +1,12 @@
 console.log("AUTH SYSTEM NUKED");
 /* global process */
-import { createClient } from "@supabase/supabase-js";
+// import { createClient } from "@supabase/supabase-js";
 
 // Load from Parcel-exposed env vars
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
+// const supabaseUrl = process.env.VITE_SUPABASE_URL;
+// const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
 
-export const supa = createClient(supabaseUrl, supabaseKey);
+// export const supa = createClient(supabaseUrl, supabaseKey);
 
 /* ---------- Auth helpers ---------- */
 // export async function signUp(email, password) {
@@ -24,6 +24,10 @@ export const supa = createClient(supabaseUrl, supabaseKey);
 // export function onAuth(callback) {
 //   return console.log("Auth functionality temporarily disabled for debugging");
 //   return supa.auth.onAuthStateChange((_e, s) => {
+//     if (!document.getElementById('authModal')) {
+//       console.log('authModal missing - skipping auth UI updates');  
+//       return;
+//     }
 //     console.log("onAuth change:", s);
 //     callback(s);
 //   });
