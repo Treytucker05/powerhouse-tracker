@@ -18,7 +18,7 @@ import {
   analyzeDeloadNeed,
   autoSetIncrement,
   processWeeklyVolumeProgression,
-} from "../algorithms/volume.js";
+} from "../calculators/unified.js";
 
 import {
   calculateTargetRIR,
@@ -33,7 +33,7 @@ import {
   analyzeFrequency,
   calculateOptimalFrequency,
   isHighFatigue,
-} from "../algorithms/fatigue.js";
+} from "../calculators/unified.js";
 
 import {
   validateLoad,
