@@ -165,7 +165,16 @@ class PhaseSections {
     };
     
     return `<span class="phase-level-indicator level-${level}">${labels[level]}</span>`;
-  }  /**
+  }
+
+  /**
+   * Get count of visible phase details elements
+   */
+  getVisiblePhaseCount() {
+    return this.container?.querySelectorAll('details').length ?? 0;
+  }
+
+  /**
    * Generate buttons programmatically for phase sections
    */
   moveButtonsToPhases() {
