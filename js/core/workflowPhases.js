@@ -5,239 +5,90 @@
 
 export const workflowPhases = [
   {
-    id: 'foundation',
-    title: '🏗️ Foundation Setup',
-    cadence: 'One-time setup',
-    level: 1, // Beginner+
-    description: 'Essential setup and volume landmarks',
+    id: "foundation",
+    title: "Phase 1 · Foundation Setup",
+    blurb: "Set up your training foundation",
+    level: "beginner",
     buttons: [
-      { 
-        selector: '[onclick="saveLandmarks()"]',
-        label: 'Save Volume Landmarks',
-        primary: true
-      },
-      { 
-        selector: '[onclick="applyVolumePreset(\'beginner\')"]',
-        label: 'Beginner Preset'
-      },
-      { 
-        selector: '[onclick="applyVolumePreset(\'intermediate\')"]',
-        label: 'Intermediate Preset'
-      },
-      { 
-        selector: '[onclick="applyVolumePreset(\'advanced\')"]',
-        label: 'Advanced Preset'
-      },
-      { 
-        selector: '[onclick="setupMeso()"]',
-        label: 'Setup Mesocycle'
-      }
+      "btnBeginnerPreset",
+      "btnIntermediatePreset", 
+      "btnAdvancedPreset",
+      "btnSaveVolumeLandmarks"
     ]
   },
-  
   {
-    id: 'daily',
-    title: '📝 Daily Training',
-    cadence: 'During workouts',
-    level: 1, // Beginner+
-    description: 'Real-time workout feedback and logging',
+    id: "mesocycle",
+    title: "Phase 2 · Mesocycle Planning",
+    blurb: "Plan your 5–7 week training block",
+    level: "intermediate",
     buttons: [
-      { 
-        selector: '[onclick="submitFeedback()"]',
-        label: 'Process with RP Algorithms',
-        primary: true
-      },
-      { 
-        selector: '[onclick="resetWeeklyData()"]',
-        label: 'Reset Week'
-      },
-      { 
-        selector: '[onclick="exportSummary()"]',
-        label: '📊 Export Chart'
-      }
+      "btnSetupMesocycle",
+      "btnShowRIRSchedule",
+      "btnOptimizeFrequency",
+      "btnGenerateWeeklyProgram",
+      "btnSmartExerciseSelection",
+      "btnRiskAssessment"
     ]
   },
-  
   {
-    id: 'weekly',
-    title: '📊 Weekly Review',
-    cadence: 'End of week',
-    level: 1, // Beginner+
-    description: 'Analyze progress and plan next week',
+    id: "weekly",
+    title: "Phase 3 · Weekly Management",
+    blurb: "Manage weekly progression & reports",
+    level: "intermediate",
     buttons: [
-      { 
-        selector: '[onclick="analyzeDeload()"]',
-        label: 'Analyze Deload Need',
-        primary: true
-      },
-      { 
-        selector: '[onclick="runAutoVolumeProgression()"]',
-        label: '▶️ Run Weekly Auto-Progression'
-      },
-      { 
-        selector: '[onclick="initializeAllMusclesAtMEV()"]',
-        label: '🎯 Initialize at MEV'
-      },
-      { 
-        selector: '[onclick="advanceToNextWeek()"]',
-        label: '📅 Next Week'
-      },
-      { 
-        selector: '[onclick="analyzeFrequency()"]',
-        label: 'Optimize Frequency'
-      }
+      "btnRunWeeklyAutoProgression",
+      "btnNextWeek",
+      "btnProcessWeeklyAdjustments",
+      "btnWeeklyIntelligenceReport",
+      "btnPredictDeloadTiming",
+      "btnPlateauAnalysis"
     ]
   },
-  
   {
-    id: 'periodization',
-    title: '🎯 Periodization',
-    cadence: 'Block planning',
-    level: 2, // Intermediate+
-    description: 'RIR scheduling and load management',
+    id: "daily",
+    title: "Phase 4 · Daily Execution",
+    blurb: "Log today's workout",
+    level: "beginner",
     buttons: [
-      { 
-        selector: '[onclick="showRIRSchedule()"]',
-        label: 'Show RIR Schedule',
-        primary: true
-      },
-      { 
-        selector: '[onclick="runWeeklyLoadAdjustments()"]',
-        label: 'Process Weekly Adjustments'
-      },
-      { 
-        selector: '[onclick="showNextWeekLoadProgression()"]',
-        label: 'Show Load Progression'
-      }
+      "btnStartLiveSession",
+      "btnProcessWithRPAlgorithms",
+      "btnLogSet",
+      "btnEndSession"
     ]
   },
-  
   {
-    id: 'live',
-    title: '🔴 Live Training',
-    cadence: 'During sets',
-    level: 2, // Intermediate+
-    description: 'Real-time performance monitoring',
+    id: "deload",
+    title: "Phase 5 · Deload Analysis",
+    blurb: "Determine recovery needs",
+    level: "intermediate",
     buttons: [
-      { 
-        selector: '[onclick="startLiveSession()"]',
-        label: '🎮 Start Live Session',
-        primary: true
-      },
-      { 
-        selector: '[onclick="logTrainingSet()"]',
-        label: '📊 Log Set'
-      },
-      { 
-        selector: '[onclick="endLiveSession()"]',
-        label: '⏹️ End Session'
-      }
+      "btnAnalyzeDeloadNeed",
+      "btnInitializeAtMEV"
     ]
   },
-  
   {
-    id: 'intelligence',
-    title: '🧠 AI Intelligence',
-    cadence: 'As needed',
-    level: 3, // Advanced
-    description: 'Machine learning insights and optimization',
+    id: "ai",
+    title: "Phase 6 · Advanced Intelligence",
+    blurb: "AI-powered optimisation",
+    level: "advanced",
     buttons: [
-      { 
-        selector: '[onclick="initializeIntelligence()"]',
-        label: '🚀 Initialize Intelligence',
-        primary: true
-      },
-      { 
-        selector: '[onclick="getWeeklyIntelligence()"]',
-        label: '📈 Weekly Intelligence Report'
-      },
-      { 
-        selector: '[onclick="getOptimalExercises()"]',
-        label: '💡 Smart Exercise Selection'
-      },
-      { 
-        selector: '[onclick="assessTrainingRisk()"]',
-        label: '⚠️ Risk Assessment'
-      },
-      { 
-        selector: '[onclick="optimizeVolumeLandmarks()"]',
-        label: '🎯 Optimize Volume Landmarks'
-      },
-      { 
-        selector: '[onclick="predictDeloadTiming()"]',
-        label: '🔮 Predict Deload Timing'
-      },
-      { 
-        selector: '[onclick="detectPlateaus()"]',
-        label: '📈 Plateau Analysis'
-      },
-      { 
-        selector: '[onclick="getAdaptiveRIR()"]',
-        label: '🎛️ Adaptive RIR Recommendations'
-      }
+      "btnInitializeIntelligence",
+      "btnOptimizeVolumeLandmarks",
+      "btnAdaptiveRIRRecommendations"
     ]
   },
-  
   {
-    id: 'advanced',
-    title: '⚙️ Advanced Tools',
-    cadence: 'Power users',
-    level: 3, // Advanced
-    description: 'Program generation, analytics, and system management',
+    id: "data",
+    title: "Phase 7 · Data Management",
+    blurb: "Export & backup your progress",
+    level: "advanced",
     buttons: [
-      { 
-        selector: '[onclick="generateWeeklyProgram()"]',
-        label: '📋 Generate Weekly Program',
-        primary: true
-      },
-      { 
-        selector: '[onclick="performanceManager.initialize()"]',
-        label: '🚀 Initialize Monitoring'
-      },
-      { 
-        selector: '[onclick="performanceManager.generateReport()"]',
-        label: '📊 Performance Report'
-      },
-      { 
-        selector: '[onclick="performanceManager.optimizeApp()"]',
-        label: '⚙️ Optimize App'
-      },
-      { 
-        selector: '[onclick="performanceManager.clearCache()"]',
-        label: '🧹 Clear Cache'
-      },
-      { 
-        selector: '[onclick="dataExportManager.exportAllData()"]',
-        label: '📤 Export All Data'
-      },
-      { 
-        selector: '[onclick="dataExportManager.createBackup()"]',
-        label: '💾 Create Backup'
-      },
-      { 
-        selector: '[onclick="dataExportManager.importData()"]',
-        label: '📥 Import Data'
-      },
-      { 
-        selector: '[onclick="dataExportManager.scheduleAutoBackup()"]',
-        label: '⏰ Auto Backup'
-      },
-      { 
-        selector: '[onclick="userFeedbackManager.initializeFeedbackSystem()"]',
-        label: '🎯 Initialize Feedback'
-      },
-      { 
-        selector: '[onclick="userFeedbackManager.showFeedbackForm()"]',
-        label: '💭 Submit Feedback'
-      },
-      { 
-        selector: '[onclick="userFeedbackManager.viewAnalytics()"]',
-        label: '📊 View Analytics'
-      },
-      { 
-        selector: '[onclick="userFeedbackManager.exportFeedbackData()"]',
-        label: '📤 Export Feedback'
-      }
+      "btnExportAllData",
+      "btnExportChart",
+      "btnCreateBackup",
+      "btnImportData",
+      "btnAutoBackup",
+      "btnExportFeedback"
     ]
   }
 ];
