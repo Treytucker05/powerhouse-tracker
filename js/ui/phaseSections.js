@@ -78,34 +78,34 @@ class PhaseSections {
     
     this.container.appendChild(toggleContainer);
   }
-
   /**
    * Render a single phase section
    */
   renderPhase(phase) {
-    const isVisible = phase.level <= this.userLevel;
-    const levelClass = `level-${phase.level}`;
+    const levelNum = this.getLevelNumber(phase.level);
+    const isVisible = levelNum <= this.userLevel;
+    const levelClass = `level-${levelNum}`;
     const hiddenClass = isVisible ? '' : 'level--hidden';
     
     const phaseElement = document.createElement('details');
     phaseElement.className = `phase-section ${levelClass} ${hiddenClass}`;
     phaseElement.dataset.phaseId = phase.id;
-    phaseElement.dataset.level = phase.level;
+    phaseElement.dataset.level = levelNum;
     
     // Create summary (header)
     const summary = document.createElement('summary');
     summary.className = 'phase-summary';
     
-    const levelIndicator = this.getLevelIndicator(phase.level);
+    const levelIndicator = this.getLevelIndicator(levelNum);
     const buttonCount = phase.buttons.length;
     
     summary.innerHTML = `
       <div class="phase-header">
         <h3 class="phase-title">${phase.title}</h3>
+        <p class="phase-blurb">${phase.blurb}</p>
         <div class="phase-meta">
-          <span class="phase-cadence">${phase.cadence}</span>
-          <span class="phase-description">${phase.description}</span>
           ${levelIndicator}
+          <span class="phase-button-count">${buttonCount} actions</span>
         </div>
       </div>
       <div class="phase-expand-icon">▼</div>
@@ -128,6 +128,18 @@ class PhaseSections {
   }
 
   /**
+   * Convert level string to number
+   */
+  getLevelNumber(levelString) {
+    const levelMap = {
+      'beginner': 1,
+      'intermediate': 2,
+      'advanced': 3
+    };
+    return levelMap[levelString] || 1;
+  }
+
+  /**
    * Get level indicator HTML
    */
   getLevelIndicator(level) {
@@ -139,7 +151,6 @@ class PhaseSections {
     
     return `<span class="phase-level-indicator level-${level}">${labels[level]}</span>`;
   }
-
   /**
    * Move existing buttons from HTML into phase sections
    */
@@ -148,17 +159,12 @@ class PhaseSections {
       const phaseContainer = document.querySelector(`[data-phase="${phase.id}"]`);
       if (!phaseContainer) return;
       
-      phase.buttons.forEach(buttonConfig => {
-        const existingButton = document.querySelector(buttonConfig.selector);
+      phase.buttons.forEach(buttonId => {
+        const existingButton = document.getElementById(buttonId);
         if (existingButton) {
           // Clone the button to preserve event listeners
           const newButton = existingButton.cloneNode(true);
-          newButton.className = `phase-button ${buttonConfig.primary ? 'primary' : ''}`;
-          
-          // Update text if specified
-          if (buttonConfig.label) {
-            newButton.textContent = buttonConfig.label;
-          }
+          newButton.className = `phase-button`;
           
           // Add to phase container
           phaseContainer.appendChild(newButton);
@@ -166,12 +172,11 @@ class PhaseSections {
           // Hide original button
           existingButton.style.display = 'none';
         } else {
-          console.warn(`Button not found: ${buttonConfig.selector}`);
+          console.warn(`Button not found: #${buttonId}`);
         }
       });
     });
   }
-
   /**
    * Update visibility based on user level
    */
@@ -204,21 +209,20 @@ class PhaseSections {
    * Get count of visible phases
    */
   getVisiblePhaseCount() {
-    return this.phases.filter(phase => phase.level <= this.userLevel).length;
+    return this.phases.filter(phase => this.getLevelNumber(phase.level) <= this.userLevel).length;
   }
 
   /**
    * Get phase statistics
    */
-  getStats() {
-    const stats = {
+  getStats() {    const stats = {
       totalPhases: this.phases.length,
       visiblePhases: this.getVisiblePhaseCount(),
       totalButtons: this.phases.reduce((total, phase) => total + phase.buttons.length, 0),
       byLevel: {
-        1: this.phases.filter(p => p.level === 1).length,
-        2: this.phases.filter(p => p.level === 2).length,
-        3: this.phases.filter(p => p.level === 3).length
+        1: this.phases.filter(p => this.getLevelNumber(p.level) === 1).length,
+        2: this.phases.filter(p => this.getLevelNumber(p.level) === 2).length,
+        3: this.phases.filter(p => this.getLevelNumber(p.level) === 3).length
       }
     };
     
