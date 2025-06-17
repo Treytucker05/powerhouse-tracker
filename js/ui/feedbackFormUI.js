@@ -9,7 +9,7 @@ import {
   scoreStimulus,
   setProgressionAlgorithm,
   getVolumeProgression,
-} from "../algorithms/volume.js";
+} from "../calculators/unified.js";
 import {
   validateEffortLevel,
   getAutoregulationAdvice,

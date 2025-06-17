@@ -357,31 +357,4 @@ class PhaseSections {
 
 // Create and export singleton instance
 export const phaseSections = new PhaseSections();
-
-function delegateButtonClicks(root) {
-  root.addEventListener('click', (e) => {
-    const btn = e.target.closest('.phase-button');
-    if (!btn) return;
-    const handler = window[btn.id];
-    if (typeof handler === 'function') {
-      handler();
-    } else {
-      console.warn('⚠️  No handler found for', btn.id);
-    }
-  });
-}
-
-// Auto-initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    phaseSections.initialize();
-    const root = document.getElementById('phasesRoot');
-    if (root) delegateButtonClicks(root);
-  });
-} else {
-  phaseSections.initialize();
-  const root = document.getElementById('phasesRoot');
-  if (root) delegateButtonClicks(root);
-}
-
 export default phaseSections;
