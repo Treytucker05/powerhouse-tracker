@@ -1335,65 +1335,106 @@ window.getUserAnalytics = function () {
   output.className = "result active";
 };
 
-// Authentication handlers removed
-// import { signIn, signUp, signOut, onAuth, supa } from "../core/db.js";
+window.processWithRPAlgorithms = function () {
+  console.log("🧠 Processing with RP algorithms...");
 
-// const authEmail = document.getElementById("authEmail");
-// const authPass = document.getElementById("authPass");
+  if (!trainingState.currentExercise) {
+    alert("Please select an exercise first");
+    return;
+  }
 
-// function setAuthLoading(isLoading) {
-//   const spinner = document.getElementById("authSpinner");
-//   const btnLogin = document.getElementById("btnLogin");
-//   const btnSignUp = document.getElementById("btnSignUp");
-//   if (!spinner || !btnLogin || !btnSignUp) return;
-//   spinner.style.display = isLoading ? "inline" : "none";
-//   btnLogin.disabled = isLoading;
-//   btnSignUp.disabled = isLoading;
-// }
+  const exercise = trainingState.currentExercise;
+  const currentVolume = trainingState.exerciseProgress[exercise]?.weeklyVolume || 0;
+  const targetRIR = window.calculateTargetRIR?.(trainingState.currentWeek, trainingState.mesocycleLength) || 2;
 
-// window.handleSignIn = async function () {
-//   const email = authEmail.value.trim();
-//   const pass = authPass.value;
-//   setAuthLoading(true);
-//   const { error, data } = await signIn(email, pass);
-//   setAuthLoading(false);
-//   if (error) return alert(error.message);
-//   const modal = document.getElementById("authModal");
-//   console.log("signIn authModal:", modal, "ready:", document.readyState);
-//   console.log("Logged-in session:", data);
-// };
+  // Apply RP algorithm logic
+  const recommendation = {
+    sets: Math.ceil(currentVolume / 3), // Rough estimate
+    reps: 8,
+    load: '75-85% 1RM',
+    rir: targetRIR,
+    notes: `RP algorithm suggests ${targetRIR} RIR for week ${trainingState.currentWeek}`
+  };
 
-// window.handleSignUp = async function () {
-//   const email = authEmail.value.trim();
-//   const pass = authPass.value;
-//   setAuthLoading(true);
-//   const { error, data } = await signUp(email, pass);
-//   setAuthLoading(false);
-//   if (error) return alert(error.message);
-//   const modal = document.getElementById("authModal");
-//   console.log("signUp authModal:", modal, "ready:", document.readyState);
-//   console.log("Signed-up session:", data);
-// };
+  // Update UI with recommendations
+  const output = document.getElementById("output") || document.getElementById("liveSessionData");
+  if (output) {
+    output.innerHTML += `
+      <div class="rp-recommendation">
+        <h4>RP Algorithm Recommendation</h4>
+        <p><strong>Exercise:</strong> ${exercise}</p>
+        <p><strong>Sets:</strong> ${recommendation.sets}</p>
+        <p><strong>Reps:</strong> ${recommendation.reps}</p>
+        <p><strong>Load:</strong> ${recommendation.load}</p>
+        <p><strong>Target RIR:</strong> ${recommendation.rir}</p>
+        <p><strong>Notes:</strong> ${recommendation.notes}</p>
+      </div>
+    `;
+  }
 
-// window.handleSignOut = async function () {
-//   await supa.auth.signOut();
-//   const modal = document.getElementById("authModal");
-//   console.log("signOut authModal:", modal, "ready:", document.readyState);
-// };
+  alert(`RP Algorithm recommendation: ${recommendation.sets} sets of ${recommendation.reps} reps at ${recommendation.load} with ${recommendation.rir} RIR`);
+};
 
-// onAuth((sess) => {
-//   try {
-//     const modal = document.getElementById("authModal");
-//     console.log("onAuth authModal:", modal, "ready:", document.readyState);
-//     // if (modal) modal.classList.toggle("hidden", !!sess);
-//     else console.warn("authModal missing in onAuth");
-//     const signOutBtn = document.getElementById("signOutBtn");
-//     if (signOutBtn) signOutBtn.style.display = sess ? "inline-block" : "none";
-//     console.log("Auth session", sess);
-//   } catch (err) {
-//     console.error("onAuth callback failed:", err);
-//   }
-// });
+/* ----- Authentication handlers removed
+import { signIn, signUp, signOut, onAuth, supa } from "../core/db.js";
+
+const authEmail = document.getElementById("authEmail");
+const authPass = document.getElementById("authPass");
+
+function setAuthLoading(isLoading) {
+  const spinner = document.getElementById("authSpinner");
+  const btnLogin = document.getElementById("btnLogin");
+  const btnSignUp = document.getElementById("btnSignUp");
+  if (!spinner || !btnLogin || !btnSignUp) return;
+  spinner.style.display = isLoading ? "inline" : "none";
+  btnLogin.disabled = isLoading;
+  btnSignUp.disabled = isLoading;
+}
+
+window.handleSignIn = async function () {
+  const email = authEmail.value.trim();
+  const pass = authPass.value;
+  setAuthLoading(true);
+  const { error, data } = await signIn(email, pass);
+  setAuthLoading(false);
+  if (error) return alert(error.message);
+  const modal = document.getElementById("authModal");
+  console.log("signIn authModal:", modal, "ready:", document.readyState);
+  console.log("Logged-in session:", data);
+};
+
+window.handleSignUp = async function () {
+  const email = authEmail.value.trim();
+  const pass = authPass.value;
+  setAuthLoading(true);
+  const { error, data } = await signUp(email, pass);
+  setAuthLoading(false);
+  if (error) return alert(error.message);
+  const modal = document.getElementById("authModal");
+  console.log("signUp authModal:", modal, "ready:", document.readyState);
+  console.log("Signed-up session:", data);
+};
+
+window.handleSignOut = async function () {
+  await supa.auth.signOut();
+  const modal = document.getElementById("authModal");
+  console.log("signOut authModal:", modal, "ready:", document.readyState);
+};
+
+onAuth((sess) => {
+  try {
+    const modal = document.getElementById("authModal");
+    console.log("onAuth authModal:", modal, "ready:", document.readyState);
+    // if (modal) modal.classList.toggle("hidden", !!sess);
+    else console.warn("authModal missing in onAuth");
+    const signOutBtn = document.getElementById("signOutBtn");
+    if (signOutBtn) signOutBtn.style.display = sess ? "inline-block" : "none";
+    console.log("Auth session", sess);
+  } catch (err) {
+    console.error("onAuth callback failed:", err);
+  }
+});
+*/
 
 /* Temporary stubs to satisfy ESLint — replace with real logic */
 export function showSystemMessage(msg = "") {
@@ -1422,3 +1463,46 @@ export function updateAllDisplays() {
 }
 
 console.log("globals loaded – auth handlers ready");
+/* ----- placeholder handlers for future implementation ----- */
+
+window.importData = function() {
+  console.log("📥 Import Data functionality");
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,.csv';
+  input.onchange = function(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          // TODO: Implement data import logic
+          console.log("Imported data:", data);
+          alert("Data import functionality coming soon!");
+        } catch (error) {
+          alert("Error importing file: " + error.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+  input.click();
+};
+
+window.autoBackup = function() {
+  console.log("🔄 Auto Backup functionality");
+  
+  // Enable auto-backup interval
+  if (window.autoBackupInterval) {
+    clearInterval(window.autoBackupInterval);
+    window.autoBackupInterval = null;
+    alert("Auto-backup disabled");
+  } else {
+    window.autoBackupInterval = setInterval(() => {
+      window.createBackup();
+      console.log("🔄 Auto-backup completed");
+    }, 5 * 60 * 1000); // Every 5 minutes
+    alert("Auto-backup enabled (every 5 minutes)");
+  }
+};
