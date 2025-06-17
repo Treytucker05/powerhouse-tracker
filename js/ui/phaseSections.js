@@ -149,30 +149,20 @@ class PhaseSections {
     };
     
     return `<span class="phase-level-indicator level-${level}">${labels[level]}</span>`;
-  }
-  /**
-   * Move existing buttons from HTML into phase sections
+  }  /**
+   * Generate buttons programmatically for phase sections
    */
   moveButtonsToPhases() {
     this.phases.forEach(phase => {
       const phaseContainer = document.querySelector(`[data-phase="${phase.id}"]`);
       if (!phaseContainer) return;
       
-      phase.buttons.forEach(buttonId => {
-        const existingButton = document.getElementById(buttonId);
-        if (existingButton) {
-          // Clone the button to preserve event listeners
-          const newButton = existingButton.cloneNode(true);
-          newButton.className = `phase-button`;
-          
-          // Add to phase container
-          phaseContainer.appendChild(newButton);
-          
-          // Hide original button
-          existingButton.style.display = 'none';
-        } else {
-          console.warn(`Button not found: #${buttonId}`);
-        }
+      phase.buttons.forEach(id => {
+        const btn = document.createElement('button');
+        btn.id = id;
+        btn.className = 'phase-button';
+        btn.textContent = id.replace(/^btn/, '').replace(/([A-Z])/g, ' $1').trim();
+        phaseContainer.appendChild(btn);
       });
     });
   }
