@@ -98,11 +98,9 @@ class PhaseSections {
     
     const levelIndicator = this.getLevelIndicator(levelNum);
     const buttonCount = phase.buttons.length;
-    
-    summary.innerHTML = `
+      summary.innerHTML = `
       <div class="phase-header">
         <h3 class="phase-title">${phase.title}</h3>
-        <p class="phase-blurb">${phase.blurb}</p>
         <div class="phase-meta">
           ${levelIndicator}
           <span class="phase-button-count">${buttonCount} actions</span>
@@ -116,6 +114,7 @@ class PhaseSections {
     content.className = 'phase-content';
     
     content.innerHTML = `
+      <p class="phase-blurb">${phase.blurb}</p>
       <div class="phase-buttons" data-phase="${phase.id}">
         <!-- Buttons will be moved here dynamically -->
       </div>
