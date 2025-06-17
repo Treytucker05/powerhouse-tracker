@@ -11,11 +11,11 @@
     <meta
       name="description"
       content="Advanced AI-powered training intelligence system for optimal workout programming and progression"
-    />
-    <link rel="icon" href="/assets/favicon.ico" />
+    />    <link rel="icon" href="/assets/favicon.ico" />
 
     <link rel="stylesheet" href="css/main.css" />
     <link rel="stylesheet" href="css/enhancedAdvanced.css" />
+    <link rel="stylesheet" href="css/tooltips.css" />
   </head>
   <body>
     <div class="container">
@@ -128,7 +128,7 @@
               <div class="landmark" style="left: 40%"></div>
               <div class="landmark" style="left: 75%"></div>
             </div>
-            <div class="card-ftr">MEV 8 | MAV 16 | MRV 22</div>
+            <div class="card-ftr"><abbr class="tooltip" data-tip="Minimum Effective Volume">MEV</abbr> 8 | <abbr class="tooltip" data-tip="Maximum Adaptive Volume">MAV</abbr> 16 | <abbr class="tooltip" data-tip="Maximum Recoverable Volume">MRV</abbr> 22</div>
           </div>
         </section>
       </div>
@@ -293,7 +293,7 @@
 
             <div class="input-group">
               <label>
-                <input type="checkbox" id="mrvBreach" /> Hit MRV twice in a row
+                <input type="checkbox" id="mrvBreach" /> Hit <abbr class="tooltip" data-tip="Maximum Recoverable Volume">MRV</abbr> twice in a row
               </label>
             </div>
 
@@ -321,21 +321,21 @@
             <div class="input-group">
               <p class="helper-text">
                 Automatically progress all muscles based on weekly feedback.
-                System starts each muscle at MEV and adds +1-2 sets per week
+                System starts each muscle at <abbr class="tooltip" data-tip="Minimum Effective Volume">MEV</abbr> and adds +1-2 sets per week
                 based on recovery indicators.
               </p>
             </div>
             <div class="input-group">
               <h4>Progression Logic:</h4>
               <ul style="font-size: 0.9rem; margin: 10px 0; padding-left: 20px">
-                <li><strong>Start:</strong> All muscles begin at MEV</li>
+                <li><strong>Start:</strong> All muscles begin at <abbr class="tooltip" data-tip="Minimum Effective Volume">MEV</abbr></li>
                 <li>
                   <strong>+1 set:</strong> Good recovery (soreness ≤1,
                   performance ≥0)
                 </li>
-                <li><strong>+2 sets:</strong> At MEV or low stimulus (≤3)</li>
-                <li><strong>Hold volume:</strong> At MRV or fatigue present</li>
-                <li><strong>Deload:</strong> Most muscles at MRV</li>
+                <li><strong>+2 sets:</strong> At <abbr class="tooltip" data-tip="Minimum Effective Volume">MEV</abbr> or low stimulus (≤3)</li>
+                <li><strong>Hold volume:</strong> At <abbr class="tooltip" data-tip="Maximum Recoverable Volume">MRV</abbr> or fatigue present</li>
+                <li><strong>Deload:</strong> Most muscles at <abbr class="tooltip" data-tip="Maximum Recoverable Volume">MRV</abbr></li>
               </ul>
             </div>
             <div
@@ -352,7 +352,7 @@
                   min-width: 150px;
                 "
               >
-                🎯 Initialize at MEV
+                🎯 Initialize at <abbr class="tooltip" data-tip="Minimum Effective Volume">MEV</abbr>
               </button>
               <button
                 type="button"
@@ -444,25 +444,25 @@
 
             <div class="landmark-grid">
               <div class="input-group">
-                <label for="mv">MV (Maintenance Volume):</label>
+                <label for="mv"><abbr class="tooltip" data-tip="Maintenance Volume">MV</abbr> (Maintenance Volume):</label>
                 <input type="number" id="mv" min="0" value="4" />
                 <div class="helper-text">Minimum to maintain muscle</div>
               </div>
 
               <div class="input-group">
-                <label for="mev">MEV (Minimum Effective):</label>
+                <label for="mev"><abbr class="tooltip" data-tip="Minimum Effective Volume">MEV</abbr> (Minimum Effective):</label>
                 <input type="number" id="mev" min="0" value="8" />
                 <div class="helper-text">Minimum for growth</div>
               </div>
 
               <div class="input-group">
-                <label for="mav">MAV (Maximum Adaptive):</label>
+                <label for="mav"><abbr class="tooltip" data-tip="Maximum Adaptive Volume">MAV</abbr> (Maximum Adaptive):</label>
                 <input type="number" id="mav" min="0" value="16" />
                 <div class="helper-text">Best volume for adaptation</div>
               </div>
 
               <div class="input-group">
-                <label for="mrv">MRV (Maximum Recoverable):</label>
+                <label for="mrv"><abbr class="tooltip" data-tip="Maximum Recoverable Volume">MRV</abbr> (Maximum Recoverable):</label>
                 <input type="number" id="mrv" min="0" value="22" />
                 <div class="helper-text">Maximum you can recover from</div>
               </div>
