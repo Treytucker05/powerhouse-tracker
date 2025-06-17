@@ -33,14 +33,22 @@ class PhaseSections {
     if (!this.container) {
       console.warn('PhaseSections: #phasesRoot container not found');
       return;
-    }
-
-    this.render();
+    }    this.render();
     console.log('🎯 Phase sections initialized with', this.phases.length, 'phases');
     console.info(
       '✅ Buttons rendered:',
       this.container.querySelectorAll('.phase-button').length
     );
+    
+    // dev audit: list any workflow IDs that failed to render
+    if (import.meta.env.DEV) {
+      import('../core/workflowPhases.js').then(({ workflowPhases }) => {
+        const expected = workflowPhases.flatMap(p => p.buttons);
+        const present = [...this.container.querySelectorAll('.phase-button')].map(b => b.id);
+        const missing = expected.filter(id => !present.includes(id));
+        console.warn('⚠️ Missing buttons:', missing);
+      });
+    }
   }
 
   /**
@@ -172,6 +180,16 @@ class PhaseSections {
    */
   getVisiblePhaseCount() {
     return this.container?.querySelectorAll('details').length ?? 0;
+  }
+
+  /**
+   * Get basic statistics for experienceToggle analytics
+   */
+  getStats() {
+    return {
+      phases: this.container?.querySelectorAll('details').length ?? 0,
+      buttons: this.container?.querySelectorAll('.phase-button').length ?? 0
+    };
   }
 
   /**
