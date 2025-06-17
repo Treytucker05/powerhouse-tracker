@@ -3,6 +3,8 @@ import "./js/core/db.js";
 import "./js/ui/globals.js";
 import "./js/core/trainingState.js";
 import { initChart } from "./js/ui/chartManager.js";
+import "./js/ui/phaseSections.js";
+import "./js/ui/experienceToggle.js";
 
 // App initialization
 console.log("RP Toolkit initialized");
