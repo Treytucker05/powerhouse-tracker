@@ -165,57 +165,128 @@ class PhaseSections {
         phaseContainer.appendChild(btn);
       });
     });
-  }
-  /**
-   * Update visibility based on user level
-   */
-  updateVisibility(newLevel) {
-    this.userLevel = parseInt(newLevel);
     
-    // Update phase visibility
-    const phaseElements = document.querySelectorAll('.phase-section');
-    phaseElements.forEach(element => {
-      const phaseLevel = parseInt(element.dataset.level);
-      const isVisible = phaseLevel <= this.userLevel;
-      
-      if (isVisible) {
-        element.classList.remove('level--hidden');
+    // Attach event listeners after buttons are created
+    this.attachEventListeners();
+  }
+
+  /**
+   * Attach event listeners to dynamically generated buttons
+   */
+  attachEventListeners() {
+    // Button ID to handler function mapping
+    const buttonHandlers = {
+      // Phase 1: Foundation Setup
+      'btnBeginnerPreset': () => window.applyVolumePreset?.('beginner'),
+      'btnIntermediatePreset': () => window.applyVolumePreset?.('intermediate'),
+      'btnAdvancedPreset': () => window.applyVolumePreset?.('advanced'),
+      'btnSaveVolumeLandmarks': () => window.saveLandmarks?.(),
+
+      // Phase 2: Mesocycle Planning
+      'btnSetupMesocycle': () => window.setupMeso?.(),
+      'btnShowRIRSchedule': () => window.showRIRSchedule?.(),
+      'btnOptimizeFrequency': () => window.calculateOptimalFrequency?.(),
+      'btnGenerateWeeklyProgram': () => window.generateWeeklyProgram?.(),
+      'btnSmartExerciseSelection': () => window.getOptimalExercises?.(),
+      'btnRiskAssessment': () => window.assessTrainingRisk?.(),
+
+      // Phase 3: Weekly Management
+      'btnRunWeeklyAutoProgression': () => window.runAutoVolumeProgression?.(),
+      'btnNextWeek': () => window.advanceToNextWeek?.(),
+      'btnProcessWeeklyAdjustments': () => window.runWeeklyLoadAdjustments?.(),
+      'btnWeeklyIntelligenceReport': () => window.getWeeklyIntelligence?.(),
+      'btnPredictDeloadTiming': () => window.predictDeloadTiming?.(),
+      'btnPlateauAnalysis': () => window.detectPlateaus?.(),      // Phase 4: Daily Execution
+      'btnStartLiveSession': () => window.startLiveSession?.(),
+      'btnProcessWithRPAlgorithms': () => window.processWithRPAlgorithms?.(),
+      'btnLogSet': () => window.logTrainingSet?.(),
+      'btnEndSession': () => window.endLiveSession?.(),
+
+      // Phase 5: Deload Analysis
+      'btnAnalyzeDeloadNeed': () => window.analyzeDeload?.(),
+      'btnInitializeAtMEV': () => window.initializeAllMusclesAtMEV?.(),
+
+      // Phase 6: Advanced Intelligence
+      'btnInitializeIntelligence': () => window.initializeIntelligence?.(),
+      'btnOptimizeVolumeLandmarks': () => window.optimizeVolumeLandmarks?.(),
+      'btnAdaptiveRIRRecommendations': () => window.getAdaptiveRIR?.(),
+
+      // Phase 7: Data Management
+      'btnExportAllData': () => window.exportAllData?.(),
+      'btnExportChart': () => window.exportSummary?.(),
+      'btnCreateBackup': () => window.createBackup?.(),
+      'btnImportData': () => window.importData?.(),
+      'btnAutoBackup': () => window.autoBackup?.(),
+      'btnExportFeedback': () => window.openFeedbackWidget?.()
+    };
+
+    // Attach event listeners to each button
+    Object.entries(buttonHandlers).forEach(([buttonId, handler]) => {
+      const button = document.getElementById(buttonId);
+      if (button) {
+        button.addEventListener('click', (e) => {
+          e.preventDefault();
+          console.log(`🎯 Executing handler for ${buttonId}`);
+          try {
+            handler();
+          } catch (error) {
+            console.error(`❌ Error executing ${buttonId}:`, error);
+            this.showError(`Error executing ${buttonId}: ${error.message}`);
+          }
+        });
+        console.log(`✅ Attached event listener to ${buttonId}`);
       } else {
-        element.classList.add('level--hidden');
+        console.warn(`⚠️ Button not found: ${buttonId}`);
       }
     });
+
+    console.log(`🎯 Event listeners attached to ${Object.keys(buttonHandlers).length} buttons`);
     
-    // Update button count
-    const countElement = document.querySelector('.phase-button-count');
-    if (countElement) {
-      countElement.textContent = `${this.getVisiblePhaseCount()} phases visible`;
+    // Debug event listeners attachment
+    if (typeof window !== 'undefined' && window.location && window.location.search.includes('debug')) {
+      setTimeout(() => this.debugEventListeners(), 100);
     }
-    
-    console.log(`🎯 Updated visibility to level ${this.userLevel}`);
   }
 
   /**
-   * Get count of visible phases
+   * Debug method to verify event listeners are attached
    */
-  getVisiblePhaseCount() {
-    return this.phases.filter(phase => this.getLevelNumber(phase.level) <= this.userLevel).length;
+  debugEventListeners() {
+    console.log('🔍 Debugging event listeners...');
+    
+    const allButtons = document.querySelectorAll('.phase-button');
+    console.log(`Found ${allButtons.length} phase buttons`);
+    
+    allButtons.forEach(button => {
+      const hasListener = button.onclick !== null || button.addEventListener !== undefined;
+      console.log(`Button ${button.id}: ${button.textContent} - Has listener: ${hasListener}`);
+    });
+    
+    // Test window functions availability
+    const testFunctions = [
+      'applyVolumePreset', 'setupMeso', 'startLiveSession', 'processWithRPAlgorithms',
+      'exportAllData', 'createBackup', 'importData', 'autoBackup'
+    ];
+    
+    console.log('🧪 Testing window function availability:');
+    testFunctions.forEach(funcName => {
+      const available = typeof window[funcName] === 'function';
+      console.log(`window.${funcName}: ${available ? '✅' : '❌'}`);
+    });
   }
 
   /**
-   * Get phase statistics
+   * Show not implemented message
    */
-  getStats() {    const stats = {
-      totalPhases: this.phases.length,
-      visiblePhases: this.getVisiblePhaseCount(),
-      totalButtons: this.phases.reduce((total, phase) => total + phase.buttons.length, 0),
-      byLevel: {
-        1: this.phases.filter(p => this.getLevelNumber(p.level) === 1).length,
-        2: this.phases.filter(p => this.getLevelNumber(p.level) === 2).length,
-        3: this.phases.filter(p => this.getLevelNumber(p.level) === 3).length
-      }
-    };
-    
-    return stats;
+  showNotImplemented(featureName) {
+    alert(`${featureName} feature is not yet implemented. Coming soon!`);
+  }
+
+  /**
+   * Show error message
+   */
+  showError(message) {
+    alert(`Error: ${message}`);
   }
 }
 
