@@ -1,0 +1,10 @@
+.level-beginner  details[data-level="intermediate"],
+.level-beginner  details[data-level="advanced"],
+.level-intermediate details[data-level="advanced"] {
+  display: none;
+}
+.phase-blurb {
+  font-size: .85rem;
+  color: #64748b;
+  margin-top: .25rem;
+}

@@ -165,6 +165,11 @@ class PerformanceManager {
     }
   }
 
+  handlePaintTiming(entry) {
+    // temporary stub – logs paint events
+    console.debug(`\uD83C\uDFA8 Paint: ${entry.name}`, entry.startTime.toFixed(1));
+  }
+
   /**
    * Setup memory monitoring
    */

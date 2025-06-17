@@ -39,6 +39,7 @@ class TrainingState {
     this.deloadPhase = false;
     this.resensitizationPhase = false;
     this.loadReduction = 1;
+    this.userLevel = 'beginner';
 
     // Current week data
     this.currentWeekSets = {};
@@ -311,6 +312,7 @@ class TrainingState {
       consecutiveMRVWeeks: this.consecutiveMRVWeeks,
       recoverySessionsThisWeek: this.recoverySessionsThisWeek,
       totalMusclesNeedingRecovery: this.totalMusclesNeedingRecovery,
+      userLevel: this.userLevel,
     };
 
     localStorage.setItem("rp-training-state", JSON.stringify(state));
