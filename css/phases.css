@@ -101,6 +101,7 @@
 }
 
 .phase-button {
+  margin: 0.25rem 0.5rem 0.25rem 0;
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
   border: none;
