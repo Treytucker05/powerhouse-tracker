@@ -277,3 +277,43 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* Progressive Disclosure - Experience Level Visibility */
+
+/* Beginner Level: Show only level-1 phases (Foundation & Daily) */
+.experience-beginner .phase-section.level-2,
+.experience-beginner .phase-section.level-3 {
+  display: none !important;
+}
+
+/* Intermediate Level: Show level-1 and level-2 phases */
+.experience-intermediate .phase-section.level-3 {
+  display: none !important;
+}
+
+/* Advanced Level: Show all phases (no restrictions) */
+/* .experience-advanced - shows all by default */
+
+/* Fallback: Default to beginner if no experience class is set */
+body:not(.experience-beginner):not(.experience-intermediate):not(.experience-advanced) .phase-section.level-2,
+body:not(.experience-beginner):not(.experience-intermediate):not(.experience-advanced) .phase-section.level-3 {
+  display: none !important;
+}
+
+/* Optional: Smooth transitions when phases become visible */
+.phase-section {
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* Phase level visual indicators for clarity */
+.phase-section.level-1 {
+  border-left: 4px solid #22c55e; /* Green for beginner */
+}
+
+.phase-section.level-2 {
+  border-left: 4px solid #f59e0b; /* Orange for intermediate */
+}
+
+.phase-section.level-3 {
+  border-left: 4px solid #ef4444; /* Red for advanced */
+}
