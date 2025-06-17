@@ -298,6 +298,34 @@ class PhaseSections {
   }
 
   /**
+   * Update visibility of phases based on user experience level
+   */
+  updateVisibility(newLevel) {
+    this.userLevel = parseInt(newLevel);
+    
+    // Update phase visibility
+    const phaseElements = document.querySelectorAll('.phase-section');
+    phaseElements.forEach(element => {
+      const phaseLevel = parseInt(element.dataset.level);
+      const isVisible = phaseLevel <= this.userLevel;
+      
+      if (isVisible) {
+        element.classList.remove('level--hidden');
+      } else {
+        element.classList.add('level--hidden');
+      }
+    });
+    
+    // Update button count if the count element exists
+    const countElement = document.querySelector('.phase-button-count');
+    if (countElement) {
+      countElement.textContent = `${this.getVisiblePhaseCount()} phases visible`;
+    }
+    
+    console.log(`🎯 Updated visibility to level ${this.userLevel}`);
+  }
+
+  /**
    * Show not implemented message
    */
   showNotImplemented(featureName) {
