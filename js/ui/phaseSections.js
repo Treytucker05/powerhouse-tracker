@@ -6,6 +6,18 @@
 import { workflowPhases } from '../core/workflowPhases.js';
 import trainingState from '../core/trainingState.js';
 
+// Utility to create consistently formatted phase buttons
+function createButton(id) {
+  const btn = document.createElement('button');
+  btn.id = id;
+  btn.className = 'phase-button';
+  btn.textContent = id
+    .replace(/^btn/, '')
+    .replace(/([A-Z])/g, ' $1')
+    .trim();
+  return btn;
+}
+
 class PhaseSections {
   constructor() {
     this.container = null;
@@ -25,6 +37,10 @@ class PhaseSections {
 
     this.render();
     console.log('🎯 Phase sections initialized with', this.phases.length, 'phases');
+    console.info(
+      '✅ Buttons rendered:',
+      this.container.querySelectorAll('.phase-button').length
+    );
   }
 
   /**
@@ -157,11 +173,8 @@ class PhaseSections {
       const phaseContainer = document.querySelector(`[data-phase="${phase.id}"]`);
       if (!phaseContainer) return;
       
-      phase.buttons.forEach(id => {
-        const btn = document.createElement('button');
-        btn.id = id;
-        btn.className = 'phase-button';
-        btn.textContent = id.replace(/^btn/, '').replace(/([A-Z])/g, ' $1').trim();
+      phase.buttons.forEach((id) => {
+        const btn = createButton(id);
         phaseContainer.appendChild(btn);
       });
     });
@@ -293,13 +306,30 @@ class PhaseSections {
 // Create and export singleton instance
 export const phaseSections = new PhaseSections();
 
+function delegateButtonClicks(root) {
+  root.addEventListener('click', (e) => {
+    const btn = e.target.closest('.phase-button');
+    if (!btn) return;
+    const handler = window[btn.id];
+    if (typeof handler === 'function') {
+      handler();
+    } else {
+      console.warn('⚠️  No handler found for', btn.id);
+    }
+  });
+}
+
 // Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     phaseSections.initialize();
+    const root = document.getElementById('phasesRoot');
+    if (root) delegateButtonClicks(root);
   });
 } else {
   phaseSections.initialize();
+  const root = document.getElementById('phasesRoot');
+  if (root) delegateButtonClicks(root);
 }
 
 export default phaseSections;
