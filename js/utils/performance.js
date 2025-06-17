@@ -166,6 +166,24 @@ class PerformanceManager {
   }
 
   /**
+   * Handle user timing
+   * @param {PerformanceEntry} entry - User timing entry
+   */
+  handleUserTiming(entry) {
+    // Temporary no-op handler; logs user timing for later analysis
+    console.debug(`⏱️ User Timing: ${entry.name} - ${entry.duration?.toFixed(1) || 'N/A'} ms`);
+  }
+
+  /**
+   * Handle paint timing
+   * @param {PerformanceEntry} entry - Paint timing entry
+   */
+  handlePaintTiming(entry) {
+    // Temporary no-op handler; logs paint timings for later analysis
+    console.debug(`🎨 Paint: ${entry.name} at ${entry.startTime.toFixed(1)} ms`);
+  }
+
+  /**
    * Setup memory monitoring
    */
   setupMemoryMonitoring() {
