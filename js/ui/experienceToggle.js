@@ -191,6 +191,27 @@ class ExperienceToggle {
     // For now, just return current level
     return this.currentLevel;
   }
+
+  /**
+   * Render experience selector HTML (if not already present)
+   */
+  renderExperienceSelector() {
+    const selectorHTML = `
+      <option value="1">Beginner</option>
+      <option value="2">Intermediate</option>
+      <option value="3">Advanced</option>
+    `;
+
+    const root = document.getElementById("experienceToggle");
+    if (!root) {
+      console.warn(
+        "[experienceToggle] #experienceToggle not found — selector not rendered."
+      );
+      return;
+    }
+    if (root.children.length) return; // already rendered
+    root.innerHTML = selectorHTML;
+  }
 }
 
 // Create and export singleton instance
@@ -199,10 +220,28 @@ export const experienceToggle = new ExperienceToggle();
 // Auto-initialize when DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
+    // Prevent duplicate initialization
+    if (experienceToggle.toggle) return; // already initialized
+    
     experienceToggle.initialize();
+    
+    // Kick off initial phase-visibility update so tabs appear
+    const initEvent = new CustomEvent("experienceLevelChanged", {
+      detail: { level: trainingState.getExperienceLevel?.() ?? "beginner" },
+    });
+    window.dispatchEvent(initEvent);
   });
 } else {
-  experienceToggle.initialize();
+  // DOM already ready - check for duplicates
+  if (!experienceToggle.toggle) {
+    experienceToggle.initialize();
+    
+    // Kick off initial phase-visibility update so tabs appear
+    const initEvent = new CustomEvent("experienceLevelChanged", {
+      detail: { level: trainingState.getExperienceLevel?.() ?? "beginner" },
+    });
+    window.dispatchEvent(initEvent);
+  }
 }
 
 export default experienceToggle;
