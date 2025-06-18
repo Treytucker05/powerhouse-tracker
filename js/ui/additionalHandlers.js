@@ -7,9 +7,39 @@ import { processRPData } from "../core/rpAlgorithms.js";
 
 export async function btnOptimizeFrequency() {
   const muscles = Object.keys(trainingState.volumeLandmarks);
-  const results = muscles.map((m) =>
-    calculateOptimalFrequency(m, { currentVolume: trainingState.currentWeekSets[m] })
-  );
+  
+  // Check if any volume landmarks are set
+  if (!muscles.length || !trainingState.volumeLandmarks) {
+    alert(
+      "Please set volume landmarks (MV → MRV) for muscles before optimizing frequency."
+    );
+    return;
+  }
+  
+  // Check if any muscle has incomplete landmarks
+  const incompleteMuscles = muscles.filter(m => {
+    const landmarks = trainingState.volumeLandmarks[m];
+    return !landmarks || landmarks.MAV == null || landmarks.MRV == null;
+  });
+  
+  if (incompleteMuscles.length > 0) {
+    alert(
+      `Please complete volume landmarks for: ${incompleteMuscles.join(", ")} before optimizing frequency.`
+    );
+    return;
+  }
+    const results = muscles.map((m) => {
+    const landmarks = trainingState.volumeLandmarks[m];
+    const currentFreq =
+      trainingState.currentFrequency?.[m] ??
+      trainingState.currentFrequency ??
+      0;
+
+    return {
+      muscle: m,
+      optimal: calculateOptimalFrequency(landmarks, currentFreq),
+    };
+  });
   const out = document.getElementById("freqOut") || document.body;
   out.innerHTML = `<pre>${JSON.stringify(results, null, 2)}</pre>`;
 }
