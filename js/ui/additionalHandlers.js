@@ -86,6 +86,20 @@ export async function btnSaveToCloud() {
   alert("Saved to cloud (localStorage)");
 }
 
+// Phase 1: Foundation Setup handlers
+function btnBeginnerPreset() {
+  console.log("TODO: apply beginner volume landmarks");
+}
+function btnIntermediatePreset() {
+  console.log("TODO: apply intermediate volume landmarks");
+}
+function btnAdvancedPreset() {
+  console.log("TODO: apply advanced volume landmarks");
+}
+function btnSaveVolumeLandmarks() {
+  console.log("TODO: persist edited volume landmarks");
+}
+
 // Attach handlers to the global window for phaseSections.js
 window.btnProcessWithRPAlgorithms = btnProcessWithRPAlgorithms;
 window.btnAutoProgressWeekly = btnAutoProgressWeekly;
@@ -100,4 +114,8 @@ Object.assign(window, {
   btnDetectPlateau,
   btnAdaptiveRIR,
   btnSaveToCloud,
+  btnBeginnerPreset,
+  btnIntermediatePreset,
+  btnAdvancedPreset,
+  btnSaveVolumeLandmarks,
 });
