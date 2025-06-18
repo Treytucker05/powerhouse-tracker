@@ -30,7 +30,3 @@ export {
   calculateOptimalFrequency,
   isHighFatigue,
 };
-
-// Re-export full modules for forward compatibility
-export * from "../algorithms/volume.js";
-export { analyzeFrequency, calculateOptimalFrequency, isHighFatigue } from "../algorithms/fatigue.js";
