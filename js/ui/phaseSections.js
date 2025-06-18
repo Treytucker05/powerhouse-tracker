@@ -8,13 +8,64 @@ import trainingState from '../core/trainingState.js';
 
 // Utility to create consistently formatted phase buttons
 function createButton(id) {
+  // Button label mapping for better UX
+  const buttonLabels = {
+    // Phase 1: Foundation Setup
+    'btnBeginnerPreset': 'Beginner Preset',
+    'btnIntermediatePreset': 'Intermediate Preset',
+    'btnAdvancedPreset': 'Advanced Preset',
+    'btnSaveVolumeLandmarks': 'Save Volume Landmarks',
+    
+    // Phase 2: Mesocycle Planning
+    'btnSetupMesocycle': 'Setup Mesocycle',
+    'btnShowRIRSchedule': 'Show RIR Schedule',
+    'btnOptimizeFrequency': 'Optimize Frequency',
+    'btnGenerateWeeklyProgram': 'Generate Weekly Program',
+    'btnSmartExerciseSelection': 'Smart Exercise Selection',
+    'btnRiskAssessment': 'Risk Assessment',
+    
+    // Phase 3: Weekly Management
+    'btnRunWeeklyAutoProgression': 'Run Weekly Auto Progression',
+    'btnNextWeek': 'Next Week',
+    'btnProcessWeeklyAdjustments': 'Process Weekly Adjustments',
+    'btnWeeklyIntelligenceReport': 'Weekly Intelligence Report',
+    'btnPredictDeloadTiming': 'Predict Deload Timing',
+    'btnPlateauAnalysis': 'Plateau Analysis',
+    
+    // Phase 4: Daily Execution
+    'btnStartLiveSession': 'Start Live Session',
+    'btnProcessWithRPAlgorithms': 'Process with RP Algorithms',
+    'btnLogSet': 'Log Set',
+    'btnEndSession': 'End Session',
+    
+    // Phase 5: Deload Analysis
+    'btnAnalyzeDeloadNeed': 'Analyze Deload Need',
+    'btnInitializeAtMEV': 'Initialize at MEV',
+    
+    // Phase 6: Advanced Intelligence
+    'btnInitializeIntelligence': 'Initialize Intelligence',
+    'btnOptimizeVolumeLandmarks': 'Optimize Volume Landmarks',
+    'btnAdaptiveRIRRecommendations': 'Adaptive RIR Recommendations',
+    
+    // Phase 7: Data Management
+    'btnExportAllData': 'Export All Data',
+    'btnExportChart': 'Export Chart',
+    'btnCreateBackup': 'Create Backup',
+    'btnImportData': 'Import Data',
+    'btnAutoBackup': 'Auto Backup',
+    'btnExportFeedback': 'Export Feedback'
+  };
+
   const btn = document.createElement('button');
   btn.id = id;
   btn.className = 'phase-button';
-  btn.textContent = id
+  
+  // Use mapped label if available, otherwise fallback to formatted ID
+  btn.textContent = buttonLabels[id] || id
     .replace(/^btn/, '')
     .replace(/([A-Z])/g, ' $1')
     .trim();
+    
   return btn;
 }
 
