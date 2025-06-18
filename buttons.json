@@ -309,6 +309,16 @@
       "hasHandler": false,
       "handlerName": "(none)",
       "category": "other"
+    },
+    {
+      "id": "btnBeginnerPreset",
+      "label": "BEGINNER PRESET",
+      "section": "(no section)",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": true,
+      "handlerName": "btnBeginnerPreset",
+      "category": "other"
     }
   ],
   "inputs": [

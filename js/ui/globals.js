@@ -2,6 +2,8 @@ import { debugLog } from "../utils/debug.js";
 
 /*  Maps module functions onto window so legacy inline onclick="" handlers keep working */
 
+import { beginnerPreset } from "./buttonHandlers.js";
+
 import {
   initChart,
   updateChart,
@@ -1528,3 +1530,10 @@ function legacyToggleSection(id) {
   if (!el) return;
   el.classList.toggle("hidden");
 }
+
+/* ------------------------------------------------------------------ */
+/*  Event Listeners Setup                                           */
+/* ------------------------------------------------------------------ */
+document
+  .getElementById("btnBeginnerPreset")
+  ?.addEventListener("click", window.beginnerPreset);
