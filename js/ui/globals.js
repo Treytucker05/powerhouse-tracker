@@ -376,23 +376,6 @@ window.saveLandmarks = function () {
   output.className = "result success active";
 };
 
-window.applyVolumePreset = function (level) {
-  const muscle = document.getElementById("landmarkMuscle").value;
-  const multipliers = {
-    beginner: 0.8,
-    intermediate: 1.0,
-    advanced: 1.2,
-  };
-
-  const mult = multipliers[level];
-  const baseLandmarks = trainingState.volumeLandmarks[muscle];
-
-  document.getElementById("mv").value = Math.round(baseLandmarks.MV * mult);
-  document.getElementById("mev").value = Math.round(baseLandmarks.MEV * mult);
-  document.getElementById("mav").value = Math.round(baseLandmarks.MAV * mult);
-  document.getElementById("mrv").value = Math.round(baseLandmarks.MRV * mult);
-};
-
 window.setupMeso = function () {
   const length = parseInt(document.getElementById("mesoLength").value, 10);
   const week = parseInt(document.getElementById("currentWeekNum").value, 10);
