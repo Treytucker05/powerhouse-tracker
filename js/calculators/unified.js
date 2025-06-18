@@ -1,7 +1,32 @@
-import * as volume from "../algorithms/volume.js";
-import * as fatigue from "../algorithms/fatigue.js";
+/* ---------------------------------------------------------------------------
+ * Legacy RP Toolkit algorithm bridges
+ * Expose functions that ui/globals.js still imports until those modules
+ * are fully refactored to the new API.
+ * -------------------------------------------------------------------------*/
 
-export const scoreStimulus = volume.scoreStimulus;
-export const processWeeklyVolumeProgression = volume.processWeeklyVolumeProgression;
-export const calculateOptimalFrequency = fatigue.calculateOptimalFrequency;
-export const analyzeFrequency = fatigue.analyzeFrequency;
+import {
+  scoreStimulus,
+  setProgressionAlgorithm,
+  getVolumeProgression,
+  analyzeDeloadNeed,
+  autoSetIncrement,
+  processWeeklyVolumeProgression,
+} from "../algorithms/volume.js";
+
+import {
+  analyzeFrequency,
+  calculateOptimalFrequency,
+  isHighFatigue,
+} from "../algorithms/fatigue.js";
+
+export {
+  scoreStimulus,
+  setProgressionAlgorithm,
+  getVolumeProgression,
+  analyzeDeloadNeed,
+  autoSetIncrement,
+  processWeeklyVolumeProgression,
+  analyzeFrequency,
+  calculateOptimalFrequency,
+  isHighFatigue,
+};
