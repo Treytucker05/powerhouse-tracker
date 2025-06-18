@@ -314,8 +314,7 @@ class PhaseSections {
 
   /**
    * Update visibility of phases based on user experience level
-   */
-  updateVisibility(newLevel) {
+   */  updateVisibility(newLevel) {
     this.userLevel = parseInt(newLevel);
     
     // Update phase visibility
@@ -326,8 +325,10 @@ class PhaseSections {
       
       if (isVisible) {
         element.classList.remove('level--hidden');
+        element.style.setProperty("display", "block", "important");
       } else {
         element.classList.add('level--hidden');
+        element.style.setProperty("display", "none", "important");
       }
     });
     
