@@ -34,11 +34,18 @@ class ExperienceToggle {
    * Bind event listeners
    */
   bindEvents() {
-    if (!this.toggle) return;
+    if (!this.toggle) return;    this.toggle.addEventListener('change', (e) => {
+      const level = e.target.value || "beginner";
 
-    this.toggle.addEventListener('change', (event) => {
-      const newLevel = parseInt(event.target.value);
-      this.updateLevel(newLevel);
+      // ✅ persist to state layer
+      if (trainingState?.setExperienceLevel) {
+        trainingState.setExperienceLevel(level);
+      }
+
+      // ✅ inform listeners (phaseSections.js)
+      window.dispatchEvent(
+        new CustomEvent("experienceLevelChanged", { detail: { level } })
+      );
     });
   }
 
