@@ -218,12 +218,23 @@ class ExperienceToggle {
 export const experienceToggle = new ExperienceToggle();
 
 // Auto-initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {  document.addEventListener('DOMContentLoaded', () => {
     // Prevent duplicate initialization
     if (experienceToggle.toggle) return; // already initialized
     
     experienceToggle.initialize();
+    
+    // Render the experience selector options if needed
+    experienceToggle.renderExperienceSelector();
+
+    /* -----------------------------------------------------------
+     *  Clean up: delete any <select id="experienceToggle"> element
+     *  that lacks the 'experience-toggle-select' class.
+     *  This gets rid of the blank red-border duplicate at the top.
+     * --------------------------------------------------------- */
+    [...document.querySelectorAll("select#experienceToggle")]
+      .filter((el) => !el.classList.contains("experience-toggle-select"))
+      .forEach((el) => el.remove());
     
     // Kick off initial phase-visibility update so tabs appear
     const initEvent = new CustomEvent("experienceLevelChanged", {
@@ -231,10 +242,21 @@ if (document.readyState === 'loading') {
     });
     window.dispatchEvent(initEvent);
   });
-} else {
-  // DOM already ready - check for duplicates
+} else {  // DOM already ready - check for duplicates
   if (!experienceToggle.toggle) {
     experienceToggle.initialize();
+    
+    // Render the experience selector options if needed
+    experienceToggle.renderExperienceSelector();
+
+    /* -----------------------------------------------------------
+     *  Clean up: delete any <select id="experienceToggle"> element
+     *  that lacks the 'experience-toggle-select' class.
+     *  This gets rid of the blank red-border duplicate at the top.
+     * --------------------------------------------------------- */
+    [...document.querySelectorAll("select#experienceToggle")]
+      .filter((el) => !el.classList.contains("experience-toggle-select"))
+      .forEach((el) => el.remove());
     
     // Kick off initial phase-visibility update so tabs appear
     const initEvent = new CustomEvent("experienceLevelChanged", {
