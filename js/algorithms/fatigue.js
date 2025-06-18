@@ -344,6 +344,9 @@ function calculateOptimalFrequency(muscle, constraints = {}) {
 
   const volume = currentVolume || trainingState.currentWeekSets[muscle];
   const landmarks = trainingState.volumeLandmarks[muscle];
+  if (!landmarks || landmarks.MAV === undefined) {
+    throw new Error(`Missing volume landmarks for muscle: ${muscle}`);
+  }
 
   // Base frequency recommendations by training age
   const baseFrequencies = {

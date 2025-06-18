@@ -6,10 +6,25 @@ import {
 import { processRPData } from "../core/rpAlgorithms.js";
 
 export async function btnOptimizeFrequency() {
-  const muscles = Object.keys(trainingState.volumeLandmarks);
-  const results = muscles.map((m) =>
-    calculateOptimalFrequency(m, { currentVolume: trainingState.currentWeekSets[m] })
-  );
+  const volumeLandmarks = trainingState.volumeLandmarks;
+  if (!volumeLandmarks || Object.keys(volumeLandmarks).length === 0) {
+    console.warn("btnOptimizeFrequency: No volume landmarks available");
+    return;
+  }
+  const muscles = Object.keys(volumeLandmarks);
+  const results = [];
+  muscles.forEach((m) => {
+    const lm = volumeLandmarks[m];
+    if (!lm || lm.MAV === undefined) {
+      console.warn(`btnOptimizeFrequency: Missing landmarks for ${m}`);
+      return;
+    }
+    results.push(
+      calculateOptimalFrequency(m, {
+        currentVolume: trainingState.currentWeekSets[m],
+      }),
+    );
+  });
   const out = document.getElementById("freqOut") || document.body;
   out.innerHTML = `<pre>${JSON.stringify(results, null, 2)}</pre>`;
 }
