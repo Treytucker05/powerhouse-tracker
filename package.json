@@ -8,7 +8,7 @@
     "lint": "eslint \"js/**\"",
     "format": "prettier --write .",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "build": "parcel build index.html --dist-dir docs"
+    "build": "parcel build index.html --dist-dir dist --public-url ./"
   },
   "jest": {
     "testEnvironment": "jsdom"
