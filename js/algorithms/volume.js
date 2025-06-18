@@ -6,6 +6,7 @@
 import Chart from 'chart.js/auto';
 import trainingState from "../core/trainingState.js";
 import { isHighFatigue } from "./fatigue.js";
+import { debugLog } from "../utils/debug.js";
 
 /**
  * RP Table 2.2: MEV Stimulus Estimator
@@ -102,7 +103,7 @@ function processWeeklyVolumeProgression(weeklyFeedback, state) {
       // Treat like MRV - trigger recovery
       state.hitMRV(muscle);
       mrvHits++;
-      console.log(`hitMRV: true (fatigue) - ${muscle}`);
+      debugLog(`hitMRV: true (fatigue) - ${muscle}`);
 
       // Force recovery session
       feedback.recoverySession = true;

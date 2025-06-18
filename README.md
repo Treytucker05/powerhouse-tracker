@@ -116,14 +116,26 @@ targetRIR = 4.5 - (4.0 / (mesoLength - 1)) * (week - 1);
 
 ## 🚀 Getting Started
 
-1. **Open `index.html`** in a modern browser
-2. **Create a `.env` file** based on `.env.example` and add your `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+1. **Install dependencies**
+   ```
+   npm install
+   ```
+2. **Create a `.env` file** from `.env.example` and add your Supabase credentials.
    ```
    VITE_SUPABASE_URL=https://your-project.supabase.co
    VITE_SUPABASE_ANON_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxx
+   # Optional: customize the PORT the server listens on
+   PORT=3000
    ```
-3. **Run `npm run build`** so Parcel injects your Supabase credentials into the bundle.
-4. **Set Volume Landmarks**: Configure MV/MEV/MAV/MRV for each muscle
+3. **Build the project** so Parcel injects your credentials.
+   ```
+   npm run build
+   ```
+4. **Start the local server**
+   ```
+   node server.cjs
+   ```
+5. **Set Volume Landmarks**: Configure MV/MEV/MAV/MRV for each muscle
 5. **Daily Use**: Submit set feedback after each exercise
 6. **Weekly Review**: Check deload need and frequency optimization
 7. **Export Data**: Generate summaries for tracking progress
@@ -193,3 +205,9 @@ This implementation follows the Renaissance Periodization methodology as outline
 ---
 
 **Built for PowerHouseATX** - Evidence-based muscle building through Renaissance Periodization methodology.
+
+## Troubleshooting
+
+- **Build fails**: Ensure `.env` variables `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set.
+- **Charts not loading**: Verify the Chart.js bundle exists inside the `dist/` folder after running `npm run build`.
+- **Tests failing**: Run `npm test -- --verbose` to see detailed errors.

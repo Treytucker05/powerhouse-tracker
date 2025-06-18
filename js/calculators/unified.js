@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /* ---------------------------------------------------------------------------
  * Legacy RP Toolkit algorithm bridges
  * Expose functions that ui/globals.js still imports until those modules
@@ -30,3 +31,11 @@ export {
   calculateOptimalFrequency,
   isHighFatigue,
 };
+=======
+export * from "../algorithms/volume.js";
+export {
+  calculateOptimalFrequency,
+  analyzeFrequency,
+  isHighFatigue,
+} from "../algorithms/fatigue.js";
+>>>>>>> 5a1c01a59fbf0b5865cb43f9ef7c52c73314e3af
