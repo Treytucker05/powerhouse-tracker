@@ -6,6 +6,7 @@
 import trainingState from "../core/trainingState.js";
 import { isHighFatigue } from "./fatigue.js";
 import { validateEffortLevel } from "./effort.js";
+import { debugLog } from "../utils/debug.js";
 
 /**
  * Live Performance Monitor Class
@@ -636,7 +637,7 @@ class LivePerformanceMonitor {
     };
 
     if (isHighFatigue(sessionData.muscle, fatigueData, trainingState)) {
-      console.log(
+      debugLog(
         `High fatigue detected for ${sessionData.muscle} after session`,
       );
     }
