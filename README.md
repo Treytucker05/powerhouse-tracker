@@ -134,12 +134,11 @@ targetRIR = 4.5 - (4.0 / (mesoLength - 1)) * (week - 1);
 4. **Start the local server**
    ```
    node server.cjs
-   ```
-   Then open `http://localhost:3000` (or your configured `PORT`) in a browser.
-5. **Set Volume Landmarks**: Configure MV/MEV/MAV/MRV for each muscle
-6. **Daily Use**: Submit set feedback after each exercise
-7. **Weekly Review**: Check deload need and frequency optimization
-8. **Export Data**: Generate summaries for tracking progress
+   ```3. **Run `npm run build`** to generate a production bundle and inject your Supabase credentials.
+4. **Set Volume Landmarks**: Configure MV/MEV/MAV/MRV for each muscle
+5. **Daily Use**: Submit set feedback after each exercise
+6. **Weekly Review**: Check deload need and frequency optimization
+7. **Export Data**: Generate summaries for tracking progress
 
 ## 📱 User Interface
 
