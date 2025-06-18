@@ -265,9 +265,10 @@ class PhaseSections {
     // Button ID to handler function mapping
     const buttonHandlers = {
       // Phase 1: Foundation Setup
-      'btnBeginnerPreset': () => window.applyVolumePreset?.('beginner'),
-      'btnIntermediatePreset': () => window.applyVolumePreset?.('intermediate'),
-      'btnAdvancedPreset': () => window.applyVolumePreset?.('advanced'),
+      'btnBeginnerPreset': () => window.beginnerPreset?.(),
+      'btnIntermediatePreset': () => window.intermediatePreset?.(),
+      'btnAdvancedPreset': () => window.advancedPreset?.(),
+      'btnCustomConfiguration': () => window.customConfiguration?.(),
       'btnSaveVolumeLandmarks': () => window.saveLandmarks?.(),
 
       // Phase 2: Mesocycle Planning
