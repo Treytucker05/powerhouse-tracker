@@ -2,6 +2,7 @@
  * Performance Optimization Module
  * Provides comprehensive performance monitoring and optimization for the training app
  */
+import { debugLog } from "./debug.js";
 
 /**
  * Performance Manager Class
@@ -42,7 +43,7 @@ class PerformanceManager {
       this.optimizeInitialLoad();
       this.isMonitoring = true;
 
-      console.log("🚀 Performance monitoring initialized");
+      debugLog("🚀 Performance monitoring initialized");
     }
   }
 
@@ -310,7 +311,7 @@ class PerformanceManager {
    */ preloadCriticalResources() {
     // All critical resources are now bundled by Parcel
     // No need to manually preload individual files
-    console.log("📦 Using Parcel bundling - individual preloads not needed");
+    debugLog("📦 Using Parcel bundling - individual preloads not needed");
   }
 
   /**
@@ -372,7 +373,7 @@ class PerformanceManager {
   loadAnalyticsFeatures() {
     if (!window.optimizeVolumeLandmarks) {
       import("/js/algorithms/analytics.js").then((module) => {
-        console.log("📊 Analytics features loaded");
+        debugLog("📊 Analytics features loaded");
       });
     }
   }
@@ -383,7 +384,7 @@ class PerformanceManager {
   loadLiveMonitorFeatures() {
     if (!window.liveMonitor) {
       import("/js/algorithms/livePerformance.js").then((module) => {
-        console.log("⚡ Live monitor features loaded");
+        debugLog("⚡ Live monitor features loaded");
       });
     }
   }
@@ -394,7 +395,7 @@ class PerformanceManager {
   loadIntelligenceFeatures() {
     if (!window.advancedIntelligence) {
       import("/js/algorithms/intelligenceHub.js").then((module) => {
-        console.log("🧠 Intelligence features loaded");
+        debugLog("🧠 Intelligence features loaded");
       });
     }
   }
@@ -408,7 +409,7 @@ class PerformanceManager {
       import("chart.js/auto")
         .then((module) => {
           window.Chart = module.default;
-          console.log("📈 Chart.js loaded on demand");
+          debugLog("📈 Chart.js loaded on demand");
           this.initializeCharts();
         })
         .catch((err) => console.error("Failed to load Chart.js", err));
@@ -651,7 +652,7 @@ class PerformanceManager {
       navigator.serviceWorker
         .register(new URL("../../sw.js", import.meta.url))
         .then(() => {
-          console.log("✅ Service Worker registered");
+          debugLog("✅ Service Worker registered");
         })
         .catch((error) => {
           console.warn("❌ Service Worker registration failed:", error);
@@ -733,14 +734,14 @@ class PerformanceManager {
   }
 
   suggestResourceOptimization(timing) {
-    console.log(`💡 Optimization suggestion for ${timing.name}:`, {
+    debugLog(`💡 Optimization suggestion for ${timing.name}:`, {
       duration: timing.responseEnd - timing.requestStart,
       suggestion: "Consider caching or CDN optimization",
     });
   }
 
   optimizeChartLoading(timing) {
-    console.log("📈 Optimizing Chart.js loading based on timing:", timing);
+    debugLog("📈 Optimizing Chart.js loading based on timing:", timing);
   }
 
   reportInteractionDelay(event, delay) {

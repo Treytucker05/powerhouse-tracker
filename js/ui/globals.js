@@ -1,5 +1,4 @@
-console.log("AUTH SYSTEM NUKED");
-console.log("globals.js loaded");
+import { debugLog } from "../utils/debug.js";
 
 /*  Maps module functions onto window so legacy inline onclick="" handlers keep working */
 
@@ -431,7 +430,7 @@ window.advanceToNextWeek = function () {
   `;
   output.className = "result success active";
 
-  console.log("Advanced to next week:", summary);
+  debugLog("Advanced to next week:", summary);
 };
 
 /* ----- initialization helpers ----- */
@@ -462,7 +461,7 @@ window.initializeAllMusclesAtMEV = function () {
   `;
   output.className = "result success active";
 
-  console.log("All muscles initialized at MEV");
+  debugLog("All muscles initialized at MEV");
 };
 
 /* ----- auto-volume progression demo function ----- */
@@ -565,7 +564,7 @@ window.runAutoVolumeProgression = function () {
     ? "result warning active"
     : "result success active";
 
-  console.log("Auto-progression result:", result);
+  debugLog("Auto-progression result:", result);
 };
 
 /* ----- RIR Schedule & Load Feedback Functions ----- */
@@ -611,7 +610,7 @@ window.runWeeklyLoadAdjustments = function () {
   `;
   output.className = "result success active";
 
-  console.log("Weekly load adjustments:", adjustmentResult);
+  debugLog("Weekly load adjustments:", adjustmentResult);
 };
 
 window.showNextWeekLoadProgression = function () {
@@ -664,7 +663,7 @@ window.showNextWeekLoadProgression = function () {
   `;
   output.className = "result success active";
 
-  console.log("Next week load progressions:", progressions);
+  debugLog("Next week load progressions:", progressions);
 };
 
 window.showRIRSchedule = function () {
@@ -720,7 +719,7 @@ window.showRIRSchedule = function () {
   `;
   output.className = "result success active";
 
-  console.log("RIR Schedule:", schedule);
+  debugLog("RIR Schedule:", schedule);
 };
 /* ----- Advanced Intelligence UI Functions ----- */
 
@@ -1180,7 +1179,7 @@ window.exportAllData = function (format = "json") {
   });
 
   if (result.success) {
-    console.log(`✅ Data exported successfully: ${result.filename}`);
+    debugLog(`✅ Data exported successfully: ${result.filename}`);
     showSystemMessage(
       `📤 Data exported: ${result.filename} (${(result.size / 1024).toFixed(1)}KB)`,
       "success",
@@ -1195,7 +1194,7 @@ window.createBackup = function () {
   const result = dataExportManager.createAutoBackup();
 
   if (result.success) {
-    console.log("✅ Backup created:", result.backupKey);
+    debugLog("✅ Backup created:", result.backupKey);
     showSystemMessage(
       `💾 Backup created successfully (${result.dataPoints} data points)`,
       "success",
@@ -1336,7 +1335,7 @@ window.getUserAnalytics = function () {
 };
 
 window.processWithRPAlgorithms = function () {
-  console.log("🧠 Processing with RP algorithms...");
+  debugLog("🧠 Processing with RP algorithms...");
 
   if (!trainingState.currentExercise) {
     alert("Please select an exercise first");
@@ -1399,8 +1398,8 @@ window.handleSignIn = async function () {
   setAuthLoading(false);
   if (error) return alert(error.message);
   const modal = document.getElementById("authModal");
-  console.log("signIn authModal:", modal, "ready:", document.readyState);
-  console.log("Logged-in session:", data);
+  debugLog("signIn authModal:", modal, "ready:", document.readyState);
+  debugLog("Logged-in session:", data);
 };
 
 window.handleSignUp = async function () {
@@ -1411,25 +1410,25 @@ window.handleSignUp = async function () {
   setAuthLoading(false);
   if (error) return alert(error.message);
   const modal = document.getElementById("authModal");
-  console.log("signUp authModal:", modal, "ready:", document.readyState);
-  console.log("Signed-up session:", data);
+  debugLog("signUp authModal:", modal, "ready:", document.readyState);
+  debugLog("Signed-up session:", data);
 };
 
 window.handleSignOut = async function () {
   await supa.auth.signOut();
   const modal = document.getElementById("authModal");
-  console.log("signOut authModal:", modal, "ready:", document.readyState);
+  debugLog("signOut authModal:", modal, "ready:", document.readyState);
 };
 
 onAuth((sess) => {
   try {
     const modal = document.getElementById("authModal");
-    console.log("onAuth authModal:", modal, "ready:", document.readyState);
+    debugLog("onAuth authModal:", modal, "ready:", document.readyState);
     // if (modal) modal.classList.toggle("hidden", !!sess);
     else console.warn("authModal missing in onAuth");
     const signOutBtn = document.getElementById("signOutBtn");
     if (signOutBtn) signOutBtn.style.display = sess ? "inline-block" : "none";
-    console.log("Auth session", sess);
+    debugLog("Auth session", sess);
   } catch (err) {
     console.error("onAuth callback failed:", err);
   }
@@ -1462,11 +1461,11 @@ export function updateAllDisplays() {
   b.style.backgroundColor = col;
 }
 
-console.log("globals loaded – auth handlers ready");
+debugLog("globals loaded – auth handlers ready");
 /* ----- placeholder handlers for future implementation ----- */
 
 window.importData = function() {
-  console.log("📥 Import Data functionality");
+  debugLog("📥 Import Data functionality");
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = '.json,.csv';
@@ -1478,7 +1477,7 @@ window.importData = function() {
         try {
           const data = JSON.parse(e.target.result);
           // TODO: Implement data import logic
-          console.log("Imported data:", data);
+          debugLog("Imported data:", data);
           alert("Data import functionality coming soon!");
         } catch (error) {
           alert("Error importing file: " + error.message);
@@ -1491,7 +1490,7 @@ window.importData = function() {
 };
 
 window.autoBackup = function() {
-  console.log("🔄 Auto Backup functionality");
+  debugLog("🔄 Auto Backup functionality");
   
   // Enable auto-backup interval
   if (window.autoBackupInterval) {
@@ -1501,7 +1500,7 @@ window.autoBackup = function() {
   } else {
     window.autoBackupInterval = setInterval(() => {
       window.createBackup();
-      console.log("🔄 Auto-backup completed");
+      debugLog("🔄 Auto-backup completed");
     }, 5 * 60 * 1000); // Every 5 minutes
     alert("Auto-backup enabled (every 5 minutes)");
   }
