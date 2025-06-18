@@ -17,6 +17,7 @@ import {
 import { liveMonitor } from "./livePerformance.js";
 import { isHighFatigue } from "./fatigue.js";
 import { processWeeklyVolumeProgression } from "./volume.js";
+import { debugLog } from "../utils/debug.js";
 
 /**
  * Advanced Training Intelligence System
@@ -35,7 +36,7 @@ class AdvancedTrainingIntelligence {
    * Initialize advanced features
    */
   initialize() {
-    console.log("🧠 Advanced Training Intelligence initializing...");
+    debugLog("🧠 Advanced Training Intelligence initializing...");
 
     // Set up live monitoring event handlers
     this.setupLiveMonitoring();
@@ -43,7 +44,7 @@ class AdvancedTrainingIntelligence {
     // Initialize analytics if sufficient data
     this.initializeAnalytics();
 
-    console.log("✅ Advanced features ready");
+    debugLog("✅ Advanced features ready");
 
     return {
       analytics: this.analyticsEnabled,
@@ -76,11 +77,11 @@ class AdvancedTrainingIntelligence {
 
     if (historicalData.length >= 4) {
       this.analyticsEnabled = true;
-      console.log(
+      debugLog(
         `📊 Analytics enabled with ${historicalData.length} weeks of data`,
       );
     } else {
-      console.log(
+      debugLog(
         `📊 Analytics disabled - need ${4 - historicalData.length} more weeks of data`,
       );
       this.analyticsEnabled = false;
@@ -335,7 +336,7 @@ class AdvancedTrainingIntelligence {
    * @param {Object} sessionData - Session data from live monitor
    */
   processSessionData(sessionData) {
-    console.log("🔄 Processing session data for insights...");
+    debugLog("🔄 Processing session data for insights...");
 
     // Update training insights
     this.trainingInsights[sessionData.muscle] = {
@@ -371,7 +372,7 @@ class AdvancedTrainingIntelligence {
   processLiveSetData(setData) {
     // Real-time fatigue detection
     if (setData.setInfo.rir > setData.setInfo.targetRIR + 2) {
-      console.log("💡 Tip: Consider increasing weight next set");
+      debugLog("💡 Tip: Consider increasing weight next set");
     }
 
     // Technique breakdown detection
@@ -408,7 +409,7 @@ class AdvancedTrainingIntelligence {
       ],
     };
 
-    console.log(`🔧 Recovery recommendations for ${muscle}:`, recommendations);
+    debugLog(`🔧 Recovery recommendations for ${muscle}:`, recommendations);
 
     // Could trigger UI notification here
     return recommendations;

@@ -1,7 +1,5 @@
 import { debugLog } from "../utils/debug.js";
 
-debugLog("AUTH SYSTEM NUKED");
-
 // Provide a minimal stub so anything expecting the Supabase client
 // won't throw errors when auth is disabled. This avoids DOM access
 // during initialization which previously caused crashes.
