@@ -59,9 +59,19 @@ window.exportSummary = exportChartImage;
 
 /* ----- expose section toggle (enhanced with display:none) ----- */
 window.toggleSection = function (sectionId) {
+  // Simple legacy fallback: if element exists directly, just toggle hidden class
+  const directElement = document.getElementById(sectionId);
+  if (directElement && !document.getElementById(sectionId + "-content")) {
+    directElement.classList.toggle("hidden");
+    return;
+  }
+
+  // Complex case: handle structured sections with animations
   const content = document.getElementById(sectionId + "-content");
+  if (!content) return; // Neither direct element nor structured section found
+  
   const banner = content.previousElementSibling;
-  const icon = banner.querySelector(".expand-icon");
+  const icon = banner?.querySelector(".expand-icon");
 
   const opening = !content.classList.contains("expanded");
 
@@ -1505,3 +1515,16 @@ window.autoBackup = function() {
     alert("Auto-backup enabled (every 5 minutes)");
   }
 };
+
+/* ------------------------------------------------------------------ */
+/*  Legacy UI helper                                                  */
+/* ------------------------------------------------------------------ */
+/**
+ * Simple toggle helper for legacy HTML onclick attributes.
+ * Toggles the `hidden` class on any element by ID.
+ */
+function legacyToggleSection(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle("hidden");
+}
