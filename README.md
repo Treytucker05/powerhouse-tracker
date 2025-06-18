@@ -134,8 +134,8 @@ targetRIR = 4.5 - (4.0 / (mesoLength - 1)) * (week - 1);
 4. **Start the local server**
    ```
    node server.cjs
-   ```3. **Run `npm run build`** to generate a production bundle and inject your Supabase credentials.
-4. **Set Volume Landmarks**: Configure MV/MEV/MAV/MRV for each muscle
+   ```
+5. **Set Volume Landmarks**: Configure MV/MEV/MAV/MRV for each muscle
 5. **Daily Use**: Submit set feedback after each exercise
 6. **Weekly Review**: Check deload need and frequency optimization
 7. **Export Data**: Generate summaries for tracking progress
@@ -205,3 +205,9 @@ This implementation follows the Renaissance Periodization methodology as outline
 ---
 
 **Built for PowerHouseATX** - Evidence-based muscle building through Renaissance Periodization methodology.
+
+## Troubleshooting
+
+- **Build fails**: Ensure `.env` variables `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set.
+- **Charts not loading**: Verify the Chart.js bundle exists inside the `dist/` folder after running `npm run build`.
+- **Tests failing**: Run `npm test -- --verbose` to see detailed errors.

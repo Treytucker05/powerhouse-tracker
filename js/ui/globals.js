@@ -1,8 +1,5 @@
 import { debugLog } from "../utils/debug.js";
 
-debugLog("AUTH SYSTEM NUKED");
-debugLog("globals.js loaded");
-
 /*  Maps module functions onto window so legacy inline onclick="" handlers keep working */
 
 import {

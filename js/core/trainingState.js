@@ -2,6 +2,7 @@
  * TrainingState Singleton - Renaissance Periodization Implementation
  * Manages all training state including volume landmarks, meso progression, and deload logic
  */
+import { debugLog } from "../utils/debug.js";
 
 class TrainingState {
   constructor(opts = {}) {
@@ -372,7 +373,7 @@ class TrainingState {
 
     if (hasLegacyData) {
       this.saveState();
-      console.log("Legacy data migrated to new RP training state");
+      debugLog("Legacy data migrated to new RP training state");
     }
   }
 
@@ -401,7 +402,7 @@ if (trainingState.settings.enableAdvancedDashboard) {
   import("../ui/dataVisualization.js")
     .then(({ default: AdvancedDataVisualizer }) => {
       trainingState.dataVisualizer = new AdvancedDataVisualizer();
-      console.log("Advanced dashboard initialized");
+      debugLog("Advanced dashboard initialized");
     })
     .catch((err) => console.error("Dashboard init failed:", err));
 }
