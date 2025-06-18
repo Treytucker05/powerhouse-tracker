@@ -116,13 +116,25 @@ targetRIR = 4.5 - (4.0 / (mesoLength - 1)) * (week - 1);
 
 ## 🚀 Getting Started
 
-1. **Open `index.html`** in a modern browser
-2. **Create a `.env` file** based on `.env.example` and add your `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+1. **Install dependencies**
+   ```
+   npm install
+   ```
+2. **Create a `.env` file** from `.env.example` and add your Supabase credentials.
    ```
    VITE_SUPABASE_URL=https://your-project.supabase.co
    VITE_SUPABASE_ANON_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxx
+   # Optional: customize the PORT the server listens on
+   PORT=3000
    ```
-3. **Run `npm run build`** to generate a production bundle and inject your Supabase credentials.
+3. **Build the project** so Parcel injects your credentials.
+   ```
+   npm run build
+   ```
+4. **Start the local server**
+   ```
+   node server.cjs
+   ```3. **Run `npm run build`** to generate a production bundle and inject your Supabase credentials.
 4. **Set Volume Landmarks**: Configure MV/MEV/MAV/MRV for each muscle
 5. **Daily Use**: Submit set feedback after each exercise
 6. **Weekly Review**: Check deload need and frequency optimization
