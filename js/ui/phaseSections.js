@@ -359,3 +359,18 @@ class PhaseSections {
 // Create and export singleton instance
 export const phaseSections = new PhaseSections();
 export default phaseSections;
+
+/* ------------------------------------------------------------------ */
+/*  Event wiring                                                      */
+/* ------------------------------------------------------------------ */
+
+// Initial render (safe default = beginner)
+document.addEventListener("DOMContentLoaded", () => {
+  phaseSections.updateVisibility("beginner");
+});
+
+// React to dropdown changes
+window.addEventListener("experienceLevelChanged", (e) => {
+  const level = e?.detail?.level ?? "beginner";
+  phaseSections.updateVisibility(level);
+});
