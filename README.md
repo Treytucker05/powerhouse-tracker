@@ -122,7 +122,7 @@ targetRIR = 4.5 - (4.0 / (mesoLength - 1)) * (week - 1);
    VITE_SUPABASE_URL=https://your-project.supabase.co
    VITE_SUPABASE_ANON_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxx
    ```
-3. **Run `npm run build`** so Parcel injects your Supabase credentials into the bundle.
+3. **Run `npm run build`** to generate a production bundle and inject your Supabase credentials.
 4. **Set Volume Landmarks**: Configure MV/MEV/MAV/MRV for each muscle
 5. **Daily Use**: Submit set feedback after each exercise
 6. **Weekly Review**: Check deload need and frequency optimization
