@@ -6,6 +6,7 @@ Analysis of all calculators and their alignment with RP book formulas and method
 
 | Calculator | Purpose | RP Book Formula | Current Implementation | Accuracy | Test Cases | Notes |
 |------------|---------|-----------------|------------------------|----------|------------|-------|
+| (no section) | Training calculator/tool |  | 1 action(s) only |  |  |  |
 | Phase 1 · Foundation Setup Beginner 4 actions ▼ | Training calculator/tool |  | 4 action(s) only |  |  |  |
 | Phase 2 · Mesocycle Planning Intermediate 6 actions ▼ | Mesocycle planning and periodization |  | 6 action(s) only |  |  |  |
 | Phase 3 · Weekly Management Intermediate 6 actions ▼ | Weekly planning and progression |  | 6 action(s) only |  |  |  |
@@ -17,6 +18,48 @@ Analysis of all calculators and their alignment with RP book formulas and method
 
 
 ## Calculator Details
+
+### (no section)
+
+**Purpose:** Training calculator/tool
+
+**Buttons (1):**
+- `btnBeginnerPreset`: BEGINNER PRESET
+
+**Inputs (31):**
+- `experienceToggle` (select-one)
+- `muscleSelect` (select-one)
+- `currentSets` (number)
+- `mmc` (number)
+- `pump` (number)
+- `dis` (number)
+- `sore` (number)
+- `jointAche` (number)
+- `perfChange` (select-one)
+- `actualRIR` (number)
+- `soreDays` (number)
+- `sessionGap` (number)
+- `trainingAge` (select-one)
+- `landmarkMuscle` (select-one)
+- `mv` (number)
+- `mev` (number)
+- `mav` (number)
+- `mrv` (number)
+- `mesoLength` (number)
+- `currentWeekNum` (number)
+- `trainingGoal` (select-one)
+- `rirMesocycleLength` (number)
+- `rirCurrentWeek` (number)
+- `liveExercise` (text)
+- `liveMuscle` (select-one)
+- `plannedSets` (number)
+- `programDays` (select-one)
+- `programSplit` (select-one)
+- `sessionTime` (select-one)
+- `experienceLevel` (select-one)
+- `exportFormat` (select-one)
+
+---
 
 ### Phase 1 · Foundation Setup Beginner 4 actions ▼
 
