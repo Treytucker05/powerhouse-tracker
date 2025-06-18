@@ -1,0 +1,506 @@
+{
+  "buttons": [
+    {
+      "id": "btnBeginnerPreset",
+      "label": "(no label)",
+      "section": "Phase 1 · Foundation Setup Beginner 4 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "btnBeginnerPreset",
+      "category": "other"
+    },
+    {
+      "id": "btnIntermediatePreset",
+      "label": "(no label)",
+      "section": "Phase 1 · Foundation Setup Beginner 4 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "btnIntermediatePreset",
+      "category": "other"
+    },
+    {
+      "id": "btnAdvancedPreset",
+      "label": "(no label)",
+      "section": "Phase 1 · Foundation Setup Beginner 4 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "btnAdvancedPreset",
+      "category": "other"
+    },
+    {
+      "id": "btnSaveVolumeLandmarks",
+      "label": "(no label)",
+      "section": "Phase 1 · Foundation Setup Beginner 4 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "btnSaveVolumeLandmarks",
+      "category": "other"
+    },
+    {
+      "id": "btnSetupMesocycle",
+      "label": "Setup Mesocycle",
+      "section": "Phase 2 · Mesocycle Planning Intermediate 6 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnShowRIRSchedule",
+      "label": "Show RIR Schedule",
+      "section": "Phase 2 · Mesocycle Planning Intermediate 6 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnOptimizeFrequency",
+      "label": "Optimize Frequency",
+      "section": "Phase 2 · Mesocycle Planning Intermediate 6 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": true,
+      "handlerName": "btnOptimizeFrequency",
+      "category": "other"
+    },
+    {
+      "id": "btnGenerateWeeklyProgram",
+      "label": "Generate Weekly Program",
+      "section": "Phase 2 · Mesocycle Planning Intermediate 6 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnSmartExerciseSelection",
+      "label": "Smart Exercise Selection",
+      "section": "Phase 2 · Mesocycle Planning Intermediate 6 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnRiskAssessment",
+      "label": "Risk Assessment",
+      "section": "Phase 2 · Mesocycle Planning Intermediate 6 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnRunWeeklyAutoProgression",
+      "label": "Run Weekly Auto Progression",
+      "section": "Phase 3 · Weekly Management Intermediate 6 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnNextWeek",
+      "label": "Next Week",
+      "section": "Phase 3 · Weekly Management Intermediate 6 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnProcessWeeklyAdjustments",
+      "label": "Process Weekly Adjustments",
+      "section": "Phase 3 · Weekly Management Intermediate 6 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnWeeklyIntelligenceReport",
+      "label": "Weekly Intelligence Report",
+      "section": "Phase 3 · Weekly Management Intermediate 6 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnPredictDeloadTiming",
+      "label": "Predict Deload Timing",
+      "section": "Phase 3 · Weekly Management Intermediate 6 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnPlateauAnalysis",
+      "label": "Plateau Analysis",
+      "section": "Phase 3 · Weekly Management Intermediate 6 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnStartLiveSession",
+      "label": "(no label)",
+      "section": "Phase 4 · Daily Execution Beginner 4 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnProcessWithRPAlgorithms",
+      "label": "(no label)",
+      "section": "Phase 4 · Daily Execution Beginner 4 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": true,
+      "handlerName": "btnProcessWithRPAlgorithms",
+      "category": "other"
+    },
+    {
+      "id": "btnLogSet",
+      "label": "(no label)",
+      "section": "Phase 4 · Daily Execution Beginner 4 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnEndSession",
+      "label": "(no label)",
+      "section": "Phase 4 · Daily Execution Beginner 4 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnAnalyzeDeloadNeed",
+      "label": "Analyze Deload Need",
+      "section": "Phase 5 · Deload Analysis Intermediate 2 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnInitializeAtMEV",
+      "label": "Initialize at MEV",
+      "section": "Phase 5 · Deload Analysis Intermediate 2 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnInitializeIntelligence",
+      "label": "Initialize Intelligence",
+      "section": "Phase 6 · Advanced Intelligence Advanced 3 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnOptimizeVolumeLandmarks",
+      "label": "Optimize Volume Landmarks",
+      "section": "Phase 6 · Advanced Intelligence Advanced 3 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnAdaptiveRIRRecommendations",
+      "label": "Adaptive RIR Recommendations",
+      "section": "Phase 6 · Advanced Intelligence Advanced 3 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnExportAllData",
+      "label": "Export All Data",
+      "section": "Phase 7 · Data Management Advanced 6 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnExportChart",
+      "label": "Export Chart",
+      "section": "Phase 7 · Data Management Advanced 6 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnCreateBackup",
+      "label": "Create Backup",
+      "section": "Phase 7 · Data Management Advanced 6 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnImportData",
+      "label": "Import Data",
+      "section": "Phase 7 · Data Management Advanced 6 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnAutoBackup",
+      "label": "Auto Backup",
+      "section": "Phase 7 · Data Management Advanced 6 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    },
+    {
+      "id": "btnExportFeedback",
+      "label": "Export Feedback",
+      "section": "Phase 7 · Data Management Advanced 6 actions ▼",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": false,
+      "handlerName": "(none)",
+      "category": "other"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "experienceToggle",
+      "type": "select-one",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "muscleSelect",
+      "type": "select-one",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "currentSets",
+      "type": "number",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "mmc",
+      "type": "number",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "pump",
+      "type": "number",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "dis",
+      "type": "number",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "sore",
+      "type": "number",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "jointAche",
+      "type": "number",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "perfChange",
+      "type": "select-one",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "actualRIR",
+      "type": "number",
+      "section": "(no section)",
+      "placeholder": "e.g. 2.5"
+    },
+    {
+      "id": "soreDays",
+      "type": "number",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "sessionGap",
+      "type": "number",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "trainingAge",
+      "type": "select-one",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "landmarkMuscle",
+      "type": "select-one",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "mv",
+      "type": "number",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "mev",
+      "type": "number",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "mav",
+      "type": "number",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "mrv",
+      "type": "number",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "mesoLength",
+      "type": "number",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "currentWeekNum",
+      "type": "number",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "trainingGoal",
+      "type": "select-one",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "rirMesocycleLength",
+      "type": "number",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "rirCurrentWeek",
+      "type": "number",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "liveExercise",
+      "type": "text",
+      "section": "(no section)",
+      "placeholder": "e.g. Barbell Bench Press"
+    },
+    {
+      "id": "liveMuscle",
+      "type": "select-one",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "plannedSets",
+      "type": "number",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "programDays",
+      "type": "select-one",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "programSplit",
+      "type": "select-one",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "sessionTime",
+      "type": "select-one",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "experienceLevel",
+      "type": "select-one",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    },
+    {
+      "id": "exportFormat",
+      "type": "select-one",
+      "section": "(no section)",
+      "placeholder": "(none)"
+    }
+  ],
+  "algorithms": [
+    "calculateTargetRIR",
+    "calculateOptimalFrequency"
+  ]
+}

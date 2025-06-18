@@ -34,7 +34,8 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.50.0",
-    "chart.js": "^4.5.0"
+    "chart.js": "^4.5.0",
+    "clipboardy": "^4.0.0"
   },
   "targets": {
     "default": {
