@@ -16,14 +16,22 @@
     <link rel="stylesheet" href="css/tooltips.css" />
     <link rel="stylesheet" href="css/phases.css" />  </head>
   <body>
-    <label for="experienceToggle" style="margin-right:0.5rem;">Experience:</label>
-    <select id="experienceToggle">
+    <label for="experienceToggle" style="margin-right:0.5rem;">Experience:</label>    <select id="experienceToggle">
       <option value="beginner">Beginner</option>
       <option value="intermediate">Intermediate</option>
       <option value="advanced" selected>Advanced</option>
     </select>
     
+    <!-- Navigation Tabs -->
+    <nav class="main-nav">
+      <button id="navMacro" class="nav-btn active">Macrocycle</button>
+      <button id="navMeso" class="nav-btn">Mesocycle</button>
+      <button id="navMicro" class="nav-btn">Microcycle</button>
+      <button id="navTrack" class="nav-btn">Tracking</button>
+    </nav>    
     <div class="container">
+      <!-- Macrocycle Section -->
+      <section id="macrocycleSection">
       <header class="header-section">
         <h1>PowerHouseATX</h1>
         <div class="page-title">Workout Calculator</div>
@@ -103,39 +111,7 @@
               <div class="status-label">Phase</div>
             </div>
           </div>
-        </div>
-      </header>
-
-      <!-- Weekly Volume Chart -->
-      <div class="chart-section">
-        <div class="chart-header">
-          <h2>Weekly Volume by Muscle</h2>
-          <div class="chart-controls">
-            <button class="small" onclick="resetWeeklyData()">
-              Reset Week
-            </button>
-            <button class="small" onclick="exportSummary()">
-              📊 Export Chart
-            </button>
-          </div>
-        </div>
-        <canvas id="weeklyChart"></canvas>
-      </div>
-
-      <!-- Muscle Volume Cards -->
-      <div class="muscle-cards-section">
-        <!---- Muscle cards container (below the chart) -->
-        <section id="muscleCards">
-          <div class="muscle-card" data-muscle="chest">
-            <h3>Chest <span class="vol-badge">14&nbsp;sets</span></h3>
-            <div class="volume-bar">
-              <div class="volume-fill"></div>
-              <div class="landmark" style="left: 40%"></div>
-              <div class="landmark" style="left: 75%"></div>
-            </div>
-            <div class="card-ftr"><abbr class="tooltip" data-tip="Minimum Effective Volume">MEV</abbr> 8 | <abbr class="tooltip" data-tip="Maximum Adaptive Volume">MAV</abbr> 16 | <abbr class="tooltip" data-tip="Maximum Recoverable Volume">MRV</abbr> 22</div>
-          </div>
-        </section>      </div>
+        </div>      </header>
 
       <!-- RP Workflow Phases -->
       <section id="phasesRoot"></section>
@@ -1063,10 +1039,58 @@
               </div>
             </div>
 
-            <output id="feedbackOut" class="result"></output>
-          </section>
+            <output id="feedbackOut" class="result"></output>          </section>
         </div>
       </div>
+      </section>
+
+      <!-- Mesocycle Section -->
+      <section id="mesocycleSection" style="display: none;">
+        <!-- RP Workflow Phases -->
+        <section id="phasesRoot"></section>
+        <h2>Mesocycle Planning</h2>
+        <p>Configure training blocks, volume landmarks, and mesocycle structure.</p>
+      </section>
+
+      <!-- Microcycle Section -->
+      <section id="microcycleSection" style="display: none;">
+        <h2>Microcycle Management</h2>
+        <p>Daily and weekly training execution, volume tracking, and progression.</p>
+      </section>
+
+      <!-- Tracking Section -->
+      <section id="trackingSection" style="display: none;">
+        <!-- Weekly Volume Chart -->
+        <div class="chart-section">
+          <div class="chart-header">
+            <h2>Weekly Volume by Muscle</h2>
+            <div class="chart-controls">
+              <button class="small" onclick="resetWeeklyData()">
+                Reset Week
+              </button>
+              <button class="small" onclick="exportSummary()">
+                📊 Export Chart
+              </button>
+            </div>
+          </div>
+          <canvas id="weeklyChart"></canvas>
+        </div>
+
+        <!-- Muscle Volume Cards -->
+        <div class="muscle-cards-section">
+          <section id="muscleCards">
+            <div class="muscle-card" data-muscle="chest">
+              <h3>Chest <span class="vol-badge">14&nbsp;sets</span></h3>
+              <div class="volume-bar">
+                <div class="volume-fill"></div>
+                <div class="landmark" style="left: 40%"></div>
+                <div class="landmark" style="left: 75%"></div>
+              </div>
+              <div class="card-ftr"><abbr class="tooltip" data-tip="Minimum Effective Volume">MEV</abbr> 8 | <abbr class="tooltip" data-tip="Maximum Adaptive Volume">MAV</abbr> 16 | <abbr class="tooltip" data-tip="Maximum Recoverable Volume">MRV</abbr> 22</div>
+            </div>
+          </section>
+        </div>
+      </section>
     </div>
 
     <!-- Load modules and initialize -->
