@@ -22,7 +22,8 @@ import {
   plateauAnalysis,
   startWorkoutHandler,
   logSetHandler,
-  undoLastSetHandler
+  undoLastSetHandler,
+  finishWorkoutHandler
 } from "./buttonHandlers.js";
 
 import {
@@ -1567,6 +1568,7 @@ document.getElementById("btnPlateauAnalysis")?.addEventListener("click", window.
 document.getElementById("btnStartLiveSession")?.addEventListener("click", window.btnStartLiveSession);
 document.getElementById("btnLogSet")?.addEventListener("click", window.btnLogSet);
 document.getElementById("btnUndoLastSet")?.addEventListener("click", window.btnUndoLastSet);
+document.getElementById("btnFinishWorkout")?.addEventListener("click", window.btnFinishWorkout);
 
 // Ensure all Phase-2 button handlers are exposed for audit script compatibility
 window.btnSetupMesocycle = window.btnSetupMesocycle || window.setupMesocycle;
@@ -1587,6 +1589,7 @@ window.btnPlateauAnalysis = window.btnPlateauAnalysis || window.plateauAnalysis;
 window.btnStartLiveSession = window.btnStartLiveSession || window.startWorkoutHandler;
 window.btnLogSet = window.btnLogSet || window.logSetHandler;
 window.btnUndoLastSet = window.btnUndoLastSet || window.undoLastSetHandler;
+window.btnFinishWorkout = window.btnFinishWorkout || window.finishWorkoutHandler;
 
 // Initialize navigation system
 initNavigation();
