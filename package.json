@@ -2,14 +2,15 @@
   "name": "powerhouse-rp-toolkit",
   "type": "module",
   "version": "1.0.0",
-  "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",
-  "scripts": {
+  "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",  "scripts": {
     "dev": "parcel index.html --no-cache --open",
+    "serve": "parcel index.html --no-cache --port 1234 --open false",
     "lint": "eslint \"js/**\"",
     "format": "prettier --write .",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "build": "parcel build index.html --dist-dir dist --public-url ./",
     "audit": "node scripts/collect-ui-inventory.js && node scripts/convert-inventory-to-md.js buttons.json && node scripts/report-missing-handlers.js",
+    "audit:dev": "run-p serve audit",
     "ci": "npm run audit && npm test -- --runInBand && node scripts/report-missing-handlers.js --fail-on-missing"
   },
   "keywords": [
@@ -28,6 +29,7 @@
     "eslint-config-prettier": "^10.1.5",
     "jest": "^30.0.0",
     "jest-environment-jsdom": "^30.0.0",
+    "npm-run-all": "^4.1.5",
     "parcel": "^2.15.2",
     "playwright": "^1.53.1",
     "prettier": "^3.5.3"

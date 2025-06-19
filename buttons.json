@@ -46,8 +46,8 @@
       "section": "Phase 2 · Mesocycle Planning Intermediate 6 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "setupMesocycle",
       "category": "other"
     },
     {
@@ -56,8 +56,8 @@
       "section": "Phase 2 · Mesocycle Planning Intermediate 6 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "showRIRSchedule",
       "category": "other"
     },
     {
@@ -76,8 +76,8 @@
       "section": "Phase 2 · Mesocycle Planning Intermediate 6 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "generateWeeklyProgram",
       "category": "other"
     },
     {
@@ -86,8 +86,8 @@
       "section": "Phase 2 · Mesocycle Planning Intermediate 6 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "smartExerciseSelection",
       "category": "other"
     },
     {
@@ -96,8 +96,8 @@
       "section": "Phase 2 · Mesocycle Planning Intermediate 6 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "riskAssessment",
       "category": "other"
     },
     {

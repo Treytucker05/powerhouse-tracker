@@ -7,7 +7,12 @@ import {
   intermediatePreset, 
   advancedPreset, 
   customConfiguration,
-  saveVolumeLandmarks
+  saveVolumeLandmarks,
+  setupMesocycle,
+  showRIRSchedule,
+  generateWeeklyProgram,
+  smartExerciseSelection,
+  riskAssessment
 } from "./buttonHandlers.js";
 
 import {
@@ -1548,3 +1553,10 @@ document.getElementById("btnNextWeek")?.addEventListener("click", window.btnNext
 document.getElementById("btnProcessWeeklyAdjustments")?.addEventListener("click", window.btnProcessWeeklyAdjustments);
 document.getElementById("btnWeeklyIntelligenceReport")?.addEventListener("click", window.btnWeeklyIntelligenceReport);
 document.getElementById("btnPredictDeloadTiming")?.addEventListener("click", window.btnPredictDeloadTiming);
+
+// Ensure all Phase-2 button handlers are exposed for audit script compatibility
+window.btnSetupMesocycle = window.btnSetupMesocycle || window.setupMesocycle;
+window.btnShowRIRSchedule = window.btnShowRIRSchedule || window.showRIRSchedule;
+window.btnGenerateWeeklyProgram = window.btnGenerateWeeklyProgram || window.generateWeeklyProgram;
+window.btnSmartExerciseSelection = window.btnSmartExerciseSelection || window.smartExerciseSelection;
+window.btnRiskAssessment = window.btnRiskAssessment || window.riskAssessment;
