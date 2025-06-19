@@ -14,7 +14,12 @@ import {
   generateWeeklyProgram,
   smartExerciseSelection,
   riskAssessment,
-  runWeeklyAutoProgression
+  runWeeklyAutoProgression,
+  nextWeek,
+  processWeeklyAdjustments,
+  weeklyIntelligenceReport,
+  predictDeloadTiming,
+  plateauAnalysis
 } from "./buttonHandlers.js";
 
 import {
@@ -156,7 +161,7 @@ window.validateMesocycleLength = validateMesocycleLength;
 /* ----- expose advanced intelligence functions ----- */
 import {
   optimizeVolumeLandmarks,
-  predictDeloadTiming,
+  predictDeloadTiming as analyticsDeloadPredictor,
   adaptiveRIRRecommendations,
   detectTrainingPlateaus,
 } from "../algorithms/analytics.js";
@@ -180,7 +185,7 @@ import { userFeedbackManager } from "../utils/userFeedback.js";
 import { performanceManager } from "../utils/performance.js";
 
 window.optimizeVolumeLandmarks = optimizeVolumeLandmarks;
-window.predictDeloadTiming = predictDeloadTiming;
+window.predictDeloadTiming = analyticsDeloadPredictor;
 window.adaptiveRIRRecommendations = adaptiveRIRRecommendations;
 window.detectTrainingPlateaus = detectTrainingPlateaus;
 window.selectOptimalExercises = selectOptimalExercises;
@@ -1059,7 +1064,7 @@ window.predictDeloadTiming = function () {
       sleepQuality: 7,
     };
 
-    const prediction = predictDeloadTiming(mockMetrics);
+    const prediction = analyticsDeloadPredictor(mockMetrics);
 
     let html = "<strong>🔮 Deload Prediction Analysis:</strong><br><br>";
     html += `<strong>Weeks Until Deload:</strong> ${prediction.weeksUntilDeload}<br>`;
@@ -1555,6 +1560,7 @@ document.getElementById("btnNextWeek")?.addEventListener("click", window.btnNext
 document.getElementById("btnProcessWeeklyAdjustments")?.addEventListener("click", window.btnProcessWeeklyAdjustments);
 document.getElementById("btnWeeklyIntelligenceReport")?.addEventListener("click", window.btnWeeklyIntelligenceReport);
 document.getElementById("btnPredictDeloadTiming")?.addEventListener("click", window.btnPredictDeloadTiming);
+document.getElementById("btnPlateauAnalysis")?.addEventListener("click", window.btnPlateauAnalysis);
 
 // Ensure all Phase-2 button handlers are exposed for audit script compatibility
 window.btnSetupMesocycle = window.btnSetupMesocycle || window.setupMesocycle;
@@ -1562,6 +1568,14 @@ window.btnShowRIRSchedule = window.btnShowRIRSchedule || window.showRIRSchedule;
 window.btnGenerateWeeklyProgram = window.btnGenerateWeeklyProgram || window.generateWeeklyProgram;
 window.btnSmartExerciseSelection = window.btnSmartExerciseSelection || window.smartExerciseSelection;
 window.btnRiskAssessment = window.btnRiskAssessment || window.riskAssessment;
+
+// Ensure all Phase-3 button handlers are exposed for audit script compatibility
+window.btnRunWeeklyAutoProgression = window.btnRunWeeklyAutoProgression || window.runWeeklyAutoProgression;
+window.btnNextWeek = window.btnNextWeek || window.nextWeek;
+window.btnProcessWeeklyAdjustments = window.btnProcessWeeklyAdjustments || window.processWeeklyAdjustments;
+window.btnWeeklyIntelligenceReport = window.btnWeeklyIntelligenceReport || window.weeklyIntelligenceReport;
+window.btnPredictDeloadTiming = window.btnPredictDeloadTiming || window.predictDeloadTiming;
+window.btnPlateauAnalysis = window.btnPlateauAnalysis || window.plateauAnalysis;
 
 // Initialize navigation system
 initNavigation();
