@@ -1,6 +1,6 @@
 import trainingState, { saveState } from "../core/trainingState.js";
 import { autoProgressWeeklyVolume } from "../algorithms/effort.js";
-import { startWorkout, validateWorkoutStart, logSet, undoLastSet } from "../algorithms/workout.js";
+import { startWorkout, validateWorkoutStart, logSet, undoLastSet, finishWorkout } from "../algorithms/workout.js";
 
 export function beginnerPreset() {
   console.log("Beginner preset selected");
@@ -483,3 +483,32 @@ window["btnPlateauAnalysis"] = plateauAnalysis;
 window["btnStartLiveSession"] = startWorkoutHandler;
 window["btnLogSet"] = logSetHandler;
 window["btnUndoLastSet"] = undoLastSetHandler;
+window["btnFinishWorkout"] = finishWorkoutHandler;
+
+export function finishWorkoutHandler() {
+  console.log("Finishing workout session");
+
+  const currentWorkout = trainingState.currentWorkout;
+  if (!currentWorkout || currentWorkout.status !== 'active') {
+    console.error("No active workout session");
+    window.dispatchEvent(new CustomEvent("workout-finish-failed", {
+      detail: { error: "No active workout session. Please start a workout first." }
+    }));
+    return;
+  }
+
+  try {
+    const finishedSession = finishWorkout(currentWorkout, trainingState);
+    saveState();
+    window.dispatchEvent(new CustomEvent("workout-finished", {
+      detail: { session: finishedSession }
+    }));
+    console.log("Workout session finished successfully:", finishedSession.id);
+  } catch (error) {
+    console.error("Failed to finish workout:", error.message);
+    window.dispatchEvent(new CustomEvent("workout-finish-failed", {
+      detail: { error: error.message }
+    }));
+  }
+}
+window.btnFinishWorkout = finishWorkoutHandler;
