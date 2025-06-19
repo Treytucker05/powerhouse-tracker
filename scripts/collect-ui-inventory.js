@@ -4,7 +4,19 @@ import fs from "fs/promises";
 (async () => {
   const browser = await chromium.launch();
   const page = await browser.newPage();
-  await page.goto("http://localhost:1234");
+  
+  // Retry logic for connecting to dev server
+  for (let i = 0; i < 3; i++) {
+    try { 
+      await page.goto("http://localhost:1234"); 
+      break; 
+    } catch (e) { 
+      if (i === 2) throw e; 
+      console.log(`Connection attempt ${i + 1} failed, retrying in 2 seconds...`);
+      await new Promise(r => setTimeout(r, 2000)); 
+    }
+  }
+  
   await page
     .waitForFunction(() => window.Chart || false, { timeout: 5000 })
     .catch(() => {});

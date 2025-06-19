@@ -1,4 +1,4 @@
-import trainingState from "../core/trainingState.js";
+import trainingState, { saveState } from "../core/trainingState.js";
 
 export function beginnerPreset() {
   console.log("Beginner preset selected");
@@ -52,106 +52,62 @@ export function saveVolumeLandmarks() {
 }
 window.btnSaveVolumeLandmarks = saveVolumeLandmarks; // expose for audit
 
-window["btnBeginnerPreset"]       = beginnerPreset;
-window["btnIntermediatePreset"]   = intermediatePreset;
-window["btnAdvancedPreset"]       = advancedPreset;
-window["btnCustomConfiguration"]  = customConfiguration;
-window["btnSaveVolumeLandmarks"]  = saveVolumeLandmarks; // stub if not written yet
-
+// Phase-2 Mesocycle Planning handlers
 export function setupMesocycle() {
-  console.log("Setting up mesocycle");
-  trainingState.mesocycleSetup = true;
-  trainingState.saveState();
+  console.log("Setup mesocycle");
+  window.trainingState = window.trainingState || {};
+  window.trainingState.mesocycleConfigured = true;
+  window.trainingState.lastMesocycleSetup = new Date().toISOString();
+  saveState();
   window.dispatchEvent(new CustomEvent("mesocycle-setup"));
 }
 window.btnSetupMesocycle = setupMesocycle;
-window.setupMesocycle = setupMesocycle;
-window["btnSetupMesocycle"] = setupMesocycle;
 
 export function showRIRSchedule() {
-  console.log("Showing RIR schedule");
+  console.log("Show RIR schedule");
+  window.trainingState = window.trainingState || {};
+  window.trainingState.rirScheduleViewed = true;
+  saveState();
   window.dispatchEvent(new CustomEvent("rir-schedule-shown"));
 }
 window.btnShowRIRSchedule = showRIRSchedule;
-window.showRIRSchedule = showRIRSchedule;
-window["btnShowRIRSchedule"] = showRIRSchedule;
 
 export function generateWeeklyProgram() {
-  console.log("Generating weekly program");
-  trainingState.weeklyProgramGenerated = true;
-  trainingState.saveState();
+  console.log("Generate weekly program");
+  window.trainingState = window.trainingState || {};
+  window.trainingState.weeklyProgramGenerated = true;
+  window.trainingState.lastProgramGeneration = new Date().toISOString();
+  saveState();
   window.dispatchEvent(new CustomEvent("weekly-program-generated"));
 }
 window.btnGenerateWeeklyProgram = generateWeeklyProgram;
-window.generateWeeklyProgram = generateWeeklyProgram;
-window["btnGenerateWeeklyProgram"] = generateWeeklyProgram;
 
 export function smartExerciseSelection() {
-  console.log("Running smart exercise selection");
-  trainingState.smartSelectionUsed = true;
-  trainingState.saveState();
+  console.log("Smart exercise selection");
+  window.trainingState = window.trainingState || {};
+  window.trainingState.exerciseSelectionUsed = true;
+  saveState();
   window.dispatchEvent(new CustomEvent("smart-exercise-selection"));
 }
 window.btnSmartExerciseSelection = smartExerciseSelection;
-window.smartExerciseSelection = smartExerciseSelection;
-window["btnSmartExerciseSelection"] = smartExerciseSelection;
 
 export function riskAssessment() {
-  console.log("Running risk assessment");
-  trainingState.lastRiskAssessment = Date.now();
-  trainingState.saveState();
-  window.dispatchEvent(new CustomEvent("risk-assessed"));
+  console.log("Risk assessment");
+  window.trainingState = window.trainingState || {};
+  window.trainingState.riskAssessed = true;
+  window.trainingState.lastRiskAssessment = new Date().toISOString();
+  saveState();
+  window.dispatchEvent(new CustomEvent("risk-assessment"));
 }
 window.btnRiskAssessment = riskAssessment;
-window.riskAssessment = riskAssessment;
+
+window["btnBeginnerPreset"] = beginnerPreset;
+window["btnIntermediatePreset"] = intermediatePreset;
+window["btnAdvancedPreset"] = advancedPreset;
+window["btnCustomConfiguration"] = customConfiguration;
+window["btnSaveVolumeLandmarks"] = saveVolumeLandmarks;
+window["btnSetupMesocycle"] = setupMesocycle;
+window["btnShowRIRSchedule"] = showRIRSchedule;
+window["btnGenerateWeeklyProgram"] = generateWeeklyProgram;
+window["btnSmartExerciseSelection"] = smartExerciseSelection;
 window["btnRiskAssessment"] = riskAssessment;
-
-export function runWeeklyAutoProgression() {
-  console.log("Running weekly auto progression");
-  trainingState.autoProgressionRun = (trainingState.autoProgressionRun || 0) + 1;
-  trainingState.saveState();
-  window.dispatchEvent(new CustomEvent("weekly-auto-progression"));
-}
-window.btnRunWeeklyAutoProgression = runWeeklyAutoProgression;
-window.runWeeklyAutoProgression = runWeeklyAutoProgression;
-window["btnRunWeeklyAutoProgression"] = runWeeklyAutoProgression;
-
-export function nextWeek() {
-  console.log("Advancing to next week");
-  trainingState.weekNo = (trainingState.weekNo || 0) + 1;
-  trainingState.saveState();
-  window.dispatchEvent(new CustomEvent("next-week"));
-}
-window.btnNextWeek = nextWeek;
-window.nextWeek = nextWeek;
-window["btnNextWeek"] = nextWeek;
-
-export function processWeeklyAdjustments() {
-  console.log("Processing weekly adjustments");
-  trainingState.adjustmentsProcessed = true;
-  trainingState.saveState();
-  window.dispatchEvent(new CustomEvent("weekly-adjustments"));
-}
-window.btnProcessWeeklyAdjustments = processWeeklyAdjustments;
-window.processWeeklyAdjustments = processWeeklyAdjustments;
-window["btnProcessWeeklyAdjustments"] = processWeeklyAdjustments;
-
-export function weeklyIntelligenceReport() {
-  console.log("Generating weekly intelligence report");
-  trainingState.lastWeeklyReport = new Date().toISOString();
-  trainingState.saveState();
-  window.dispatchEvent(new CustomEvent("weekly-report"));
-}
-window.btnWeeklyIntelligenceReport = weeklyIntelligenceReport;
-window.weeklyIntelligenceReport = weeklyIntelligenceReport;
-window["btnWeeklyIntelligenceReport"] = weeklyIntelligenceReport;
-
-export function predictDeloadTiming() {
-  console.log("Predicting deload timing");
-  trainingState.deloadPredictionRequested = true;
-  trainingState.saveState();
-  window.dispatchEvent(new CustomEvent("deload-prediction"));
-}
-window.btnPredictDeloadTiming = predictDeloadTiming;
-window.predictDeloadTiming = predictDeloadTiming;
-window["btnPredictDeloadTiming"] = predictDeloadTiming;

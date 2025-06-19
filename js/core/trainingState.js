@@ -408,6 +408,11 @@ if (trainingState.settings.enableAdvancedDashboard) {
 }
 export default trainingState;
 
+// Export saveState function as requested for handlers
+export function saveState() { 
+  trainingState.saveState();
+}
+
 // Also make available globally for legacy compatibility
 if (typeof window !== "undefined") {
   window.trainingState = trainingState;
