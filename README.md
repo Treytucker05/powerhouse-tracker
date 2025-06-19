@@ -211,3 +211,39 @@ This implementation follows the Renaissance Periodization methodology as outline
 - **Build fails**: Ensure `.env` variables `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set.
 - **Charts not loading**: Verify the Chart.js bundle exists inside the `dist/` folder after running `npm run build`.
 - **Tests failing**: Run `npm test -- --verbose` to see detailed errors.
+
+## 🛠 Development Workflow
+
+### Button Handler Management
+
+**Architecture:** Button handlers are defined in `js/ui/buttonHandlers.js` and exposed globally for both ES6 imports and legacy inline `onclick` handlers.
+
+**Key Files:**
+- `js/ui/buttonHandlers.js` - New handler implementations
+- `js/ui/globals.js` - Legacy handler mappings and imports
+- `js/ui/additionalHandlers.js` - Additional system handlers
+- `main.js` - Entry point with side-effect imports
+
+**Audit System:**
+```bash
+npm run audit  # Runs full button/handler audit pipeline
+```
+
+**Handler Requirements:**
+1. Must be exposed on `window` object as `window.btnButtonId`
+2. Function source must not contain "TODO" or "stub" text
+3. Must have descriptive function name for debugging
+
+**Troubleshooting Missing Handlers:**
+1. Ensure function is exported from `buttonHandlers.js`
+2. Add to imports in `globals.js` 
+3. Verify no conflicting stubs in `additionalHandlers.js`
+4. Run `node scripts/debug-handlers.js` to inspect browser state
+5. Check order of imports in `main.js` (buttonHandlers should load early)
+
+### Testing
+
+```bash
+npm test                    # Run all Jest tests
+npm test handlers.test.js   # Test button handler exposure
+```

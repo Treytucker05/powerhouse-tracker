@@ -6,8 +6,8 @@
       "section": "Phase 1 · Foundation Setup Beginner 4 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "btnBeginnerPreset",
+      "hasHandler": true,
+      "handlerName": "beginnerPreset",
       "category": "other"
     },
     {
@@ -16,8 +16,8 @@
       "section": "Phase 1 · Foundation Setup Beginner 4 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "btnIntermediatePreset",
+      "hasHandler": true,
+      "handlerName": "intermediatePreset",
       "category": "other"
     },
     {
@@ -26,8 +26,8 @@
       "section": "Phase 1 · Foundation Setup Beginner 4 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "btnAdvancedPreset",
+      "hasHandler": true,
+      "handlerName": "advancedPreset",
       "category": "other"
     },
     {
@@ -37,7 +37,7 @@
       "parentForm": "(no form)",
       "relatedInputs": 0,
       "hasHandler": false,
-      "handlerName": "btnSaveVolumeLandmarks",
+      "handlerName": "saveVolumeLandmarks",
       "category": "other"
     },
     {
@@ -317,7 +317,7 @@
       "parentForm": "(no form)",
       "relatedInputs": 0,
       "hasHandler": true,
-      "handlerName": "btnBeginnerPreset",
+      "handlerName": "beginnerPreset",
       "category": "other"
     },
     {
@@ -327,7 +327,7 @@
       "parentForm": "(no form)",
       "relatedInputs": 0,
       "hasHandler": true,
-      "handlerName": "btnIntermediatePreset",
+      "handlerName": "intermediatePreset",
       "category": "other"
     },
     {
@@ -337,7 +337,7 @@
       "parentForm": "(no form)",
       "relatedInputs": 0,
       "hasHandler": true,
-      "handlerName": "btnAdvancedPreset",
+      "handlerName": "advancedPreset",
       "category": "other"
     },
     {
