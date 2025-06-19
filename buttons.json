@@ -116,8 +116,8 @@
       "section": "Phase 3 · Weekly Management Intermediate 6 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "nextWeek",
       "category": "other"
     },
     {
@@ -126,8 +126,8 @@
       "section": "Phase 3 · Weekly Management Intermediate 6 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "processWeeklyAdjustments",
       "category": "other"
     },
     {
@@ -136,8 +136,8 @@
       "section": "Phase 3 · Weekly Management Intermediate 6 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "weeklyIntelligenceReport",
       "category": "other"
     },
     {
@@ -146,8 +146,8 @@
       "section": "Phase 3 · Weekly Management Intermediate 6 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "predictDeloadTiming",
       "category": "other"
     },
     {
@@ -156,8 +156,8 @@
       "section": "Phase 3 · Weekly Management Intermediate 6 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "plateauAnalysis",
       "category": "other"
     },
     {
