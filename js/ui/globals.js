@@ -1537,3 +1537,14 @@ window.btnIntermediatePreset = window.btnIntermediatePreset || window.intermedia
 window.btnAdvancedPreset = window.btnAdvancedPreset || window.advancedPreset;
 window.btnCustomConfiguration = window.btnCustomConfiguration || window.customConfiguration;
 window.btnSaveVolumeLandmarks = window.btnSaveVolumeLandmarks || window.saveVolumeLandmarks;
+
+document.getElementById("btnSetupMesocycle")?.addEventListener("click", window.btnSetupMesocycle);
+document.getElementById("btnShowRIRSchedule")?.addEventListener("click", window.btnShowRIRSchedule);
+document.getElementById("btnGenerateWeeklyProgram")?.addEventListener("click", window.btnGenerateWeeklyProgram);
+document.getElementById("btnSmartExerciseSelection")?.addEventListener("click", window.btnSmartExerciseSelection);
+document.getElementById("btnRiskAssessment")?.addEventListener("click", window.btnRiskAssessment);
+document.getElementById("btnRunWeeklyAutoProgression")?.addEventListener("click", window.btnRunWeeklyAutoProgression);
+document.getElementById("btnNextWeek")?.addEventListener("click", window.btnNextWeek);
+document.getElementById("btnProcessWeeklyAdjustments")?.addEventListener("click", window.btnProcessWeeklyAdjustments);
+document.getElementById("btnWeeklyIntelligenceReport")?.addEventListener("click", window.btnWeeklyIntelligenceReport);
+document.getElementById("btnPredictDeloadTiming")?.addEventListener("click", window.btnPredictDeloadTiming);

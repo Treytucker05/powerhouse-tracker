@@ -5,7 +5,7 @@ import {
 } from "../calculators/unified.js";
 import { processRPData } from "../core/rpAlgorithms.js";
 
-async function btnOptimizeFrequency() {
+export async function btnOptimizeFrequency() {
   const volumeLandmarks = trainingState.volumeLandmarks;
   if (!volumeLandmarks || Object.keys(volumeLandmarks).length === 0) {
     alert("Please set volume landmarks (MV → MRV) for muscles before optimizing frequency.");
@@ -34,7 +34,7 @@ async function btnOptimizeFrequency() {
   out.innerHTML = `<pre>${JSON.stringify(results, null, 2)}</pre>`;
 }
 
-async function btnProcessWithRPAlgorithms() {
+export async function btnProcessWithRPAlgorithms() {
   const data = processRPData(trainingState);
   const out = document.getElementById("output") || document.body;
   out.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
