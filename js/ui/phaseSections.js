@@ -31,11 +31,11 @@ function createButton(id) {
     'btnWeeklyIntelligenceReport': 'Weekly Intelligence Report',
     'btnPredictDeloadTiming': 'Predict Deload Timing',
     'btnPlateauAnalysis': 'Plateau Analysis',
-    
-    // Phase 4: Daily Execution
+      // Phase 4: Daily Execution
     'btnStartLiveSession': 'Start Live Session',
     'btnProcessWithRPAlgorithms': 'Process with RP Algorithms',
     'btnLogSet': 'Log Set',
+    'btnUndoLastSet': 'Undo Last Set',
     'btnEndSession': 'End Session',
     
     // Phase 5: Deload Analysis
@@ -289,6 +289,7 @@ class PhaseSections {
       'btnStartLiveSession': () => window.startLiveSession?.(),
       'btnProcessWithRPAlgorithms': () => window.processWithRPAlgorithms?.(),
       'btnLogSet': () => window.logTrainingSet?.(),
+      'btnUndoLastSet': () => window.undoLastSet?.(),
       'btnEndSession': () => window.endLiveSession?.(),
 
       // Phase 5: Deload Analysis

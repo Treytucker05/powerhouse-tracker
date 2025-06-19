@@ -1,6 +1,6 @@
 import trainingState, { saveState } from "../core/trainingState.js";
 import { autoProgressWeeklyVolume } from "../algorithms/effort.js";
-import { startWorkout, validateWorkoutStart, logSet } from "../algorithms/workout.js";
+import { startWorkout, validateWorkoutStart, logSet, undoLastSet } from "../algorithms/workout.js";
 
 export function beginnerPreset() {
   console.log("Beginner preset selected");
@@ -419,6 +419,50 @@ export function logSetHandler() {
 }
 window.btnLogSet = logSetHandler;
 
+export function undoLastSetHandler() {
+  console.log("Undoing last set");
+  
+  // Check if there's an active workout session
+  const currentWorkout = trainingState.currentWorkout;
+  if (!currentWorkout || currentWorkout.status !== 'active') {
+    console.error("No active workout session");
+    window.dispatchEvent(new CustomEvent("undo-set-failed", {
+      detail: { error: "No active workout session. Please start a workout first." }
+    }));
+    return;
+  }
+  
+  try {
+    // Undo the last set using the workout algorithm
+    const result = undoLastSet(currentWorkout);
+    const { session: updatedSession, removedSet } = result;
+    
+    // Save state
+    saveState();
+    
+    // Dispatch success event
+    window.dispatchEvent(new CustomEvent("set-undone", {
+      detail: { 
+        removedSet,
+        sessionStats: {
+          totalSets: updatedSession.totalSets,
+          totalVolume: updatedSession.totalVolume,
+          exercisesWorked: updatedSession.exercises.length
+        }
+      }
+    }));
+    
+    console.log("Set undone successfully:", removedSet);
+    
+  } catch (error) {
+    console.error("Failed to undo set:", error.message);
+    window.dispatchEvent(new CustomEvent("undo-set-failed", {
+      detail: { error: error.message }
+    }));
+  }
+}
+window.btnUndoLastSet = undoLastSetHandler;
+
 // Expose all handlers on window object for audit script compatibility
 window["btnBeginnerPreset"] = beginnerPreset;
 window["btnIntermediatePreset"] = intermediatePreset;
@@ -438,3 +482,4 @@ window["btnPredictDeloadTiming"] = predictDeloadTiming;
 window["btnPlateauAnalysis"] = plateauAnalysis;
 window["btnStartLiveSession"] = startWorkoutHandler;
 window["btnLogSet"] = logSetHandler;
+window["btnUndoLastSet"] = undoLastSetHandler;

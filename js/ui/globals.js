@@ -21,7 +21,8 @@ import {
   predictDeloadTiming,
   plateauAnalysis,
   startWorkoutHandler,
-  logSetHandler
+  logSetHandler,
+  undoLastSetHandler
 } from "./buttonHandlers.js";
 
 import {
@@ -1565,6 +1566,7 @@ document.getElementById("btnPredictDeloadTiming")?.addEventListener("click", win
 document.getElementById("btnPlateauAnalysis")?.addEventListener("click", window.btnPlateauAnalysis);
 document.getElementById("btnStartLiveSession")?.addEventListener("click", window.btnStartLiveSession);
 document.getElementById("btnLogSet")?.addEventListener("click", window.btnLogSet);
+document.getElementById("btnUndoLastSet")?.addEventListener("click", window.btnUndoLastSet);
 
 // Ensure all Phase-2 button handlers are exposed for audit script compatibility
 window.btnSetupMesocycle = window.btnSetupMesocycle || window.setupMesocycle;
@@ -1584,6 +1586,7 @@ window.btnPlateauAnalysis = window.btnPlateauAnalysis || window.plateauAnalysis;
 // Ensure all Phase-4 button handlers are exposed for audit script compatibility
 window.btnStartLiveSession = window.btnStartLiveSession || window.startWorkoutHandler;
 window.btnLogSet = window.btnLogSet || window.logSetHandler;
+window.btnUndoLastSet = window.btnUndoLastSet || window.undoLastSetHandler;
 
 // Initialize navigation system
 initNavigation();
