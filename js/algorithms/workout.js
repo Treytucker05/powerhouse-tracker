@@ -5,6 +5,13 @@
 
 import trainingState from "../core/trainingState.js";
 
+// Debug logging - only logs if not in test environment
+const debugLog = (message, data) => {
+  if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+    console.log(message, data);
+  }
+};
+
 /**
  * Start a new workout session
  * @param {Date|string} now - Current timestamp (optional, defaults to now)
@@ -34,9 +41,8 @@ export function startWorkout(now = new Date()) {
   // Update training state
   trainingState.currentWorkout = workoutSession;
   trainingState.workoutHistory = trainingState.workoutHistory || [];
-  
-  // Log session start
-  console.log('Workout session started:', {
+    // Log session start
+  debugLog('Workout session started:', {
     id: workoutSession.id,
     startTime: workoutSession.startTime,
     week: workoutSession.metadata.week
@@ -228,8 +234,7 @@ export function logSet(session, setData) {
   
   // Update training state
   trainingState.currentWorkout = session;
-  
-  console.log('Set logged:', {
+    debugLog('Set logged:', {
     exercise: setRecord.exercise,
     setNumber: setRecord.setNumber,
     weight: setRecord.weight,
@@ -385,8 +390,7 @@ export function undoLastSet(session) {
   
   // Update training state
   trainingState.currentWorkout = session;
-  
-  console.log('Set undone:', {
+    debugLog('Set undone:', {
     exercise: removedSet.exercise,
     setNumber: removedSet.setNumber,
     weight: removedSet.weight,
@@ -423,7 +427,7 @@ export function finishWorkout(session = null, state = trainingState) {
   state.workoutHistory.push(workout);
   state.currentWorkout = null;
 
-  console.log('Workout session finished:', workout.id);
+  debugLog('Workout session finished:', workout.id);
 
   return workout;
 }

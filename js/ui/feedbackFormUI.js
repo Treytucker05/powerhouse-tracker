@@ -56,9 +56,8 @@ function handleFeedbackSubmission() {
 
   // Update training state
   updateTrainingState(formData, results);
-
   // Display results
-  displayFeedbackResults(results);
+  displayFeedbackResults(results, formData);
 
   // Update UI
   updateChart();
@@ -269,7 +268,7 @@ function storeFeedbackForTrends(data, results) {
 /**
  * Display feedback results
  */
-function displayFeedbackResults(results) {
+function displayFeedbackResults(results, formData = null) {
   const output = document.getElementById("mevOut");
   if (!output) return;
 
@@ -277,6 +276,14 @@ function displayFeedbackResults(results) {
   const title =
     volumeProgression.headline ?? `${volumeProgression.muscle} Recommendation`;
   const subtitle = volumeProgression.notes ?? volumeProgression.advice ?? "";
+  
+  // Check for load progression suggestion if formData is available
+  const loadSuggestion = formData ? suggestLoadIncrease(formData) : null;
+  
+  // Cleanup old suggestions periodically
+  if (Math.random() < 0.1) { // 10% chance
+    cleanupOldSuggestions();
+  }
 
   let resultHTML = `
     <div class="feedback-results">
@@ -304,6 +311,20 @@ function displayFeedbackResults(results) {
       </div>
     </div>
   `;
+
+  // Add load progression suggestion if available
+  if (loadSuggestion) {
+    resultHTML += `
+      <div class="load-progression-suggestion ${loadSuggestion.confidence}-confidence">
+        <h4>💪 Load Progression Suggestion</h4>
+        <div class="suggestion-content">
+          <div class="increment">Consider adding <strong>${loadSuggestion.increment}</strong> to ${loadSuggestion.type}</div>
+          <div class="reason">${loadSuggestion.reason}</div>
+          <div class="confidence">Confidence: ${loadSuggestion.confidence}</div>
+        </div>
+      </div>
+    `;
+  }
 
   // Add RIR validation if provided
   if (rirValidation) {
@@ -485,6 +506,99 @@ export function addAutoregulationFeatures() {
   if (submitButton) {
     submitButton.insertAdjacentHTML("beforebegin", autoregHTML);
   }
+}
+
+/**
+ * Suggest load progression based on performance and RIR
+ * @param {Object} formData - Feedback form data
+ * @returns {Object|null} - Load progression suggestion or null
+ */
+function suggestLoadIncrease(formData) {
+  const { muscle, perfChange, actualRIR, currentSets } = formData;
+  
+  // Only suggest if performance improved and RIR indicates capacity
+  if (perfChange < 1 || actualRIR < 2) {
+    return null;
+  }
+  
+  // Get muscle-specific load progression recommendations
+  const muscleSuggestions = {
+    Chest: { increment: "5-10lbs", type: "barbell/dumbbell" },
+    Back: { increment: "5-10lbs", type: "barbell/dumbbell" },
+    Quads: { increment: "10-20lbs", type: "leg exercises" },
+    Glutes: { increment: "10-15lbs", type: "hip hinge movements" },
+    Hamstrings: { increment: "5-10lbs", type: "leg curls/RDLs" },
+    Shoulders: { increment: "2.5-5lbs", type: "shoulder exercises" },
+    Biceps: { increment: "2.5-5lbs", type: "arm exercises" },
+    Triceps: { increment: "2.5-5lbs", type: "arm exercises" },
+    Calves: { increment: "10-15lbs", type: "calf raises" },
+    Abs: { increment: "5-10lbs", type: "weighted exercises" },
+    Forearms: { increment: "2.5-5lbs", type: "grip exercises" },
+    Neck: { increment: "2.5-5lbs", type: "neck exercises" },
+    Traps: { increment: "5-10lbs", type: "shrugs/pulls" }
+  };
+  
+  const suggestion = muscleSuggestions[muscle] || { increment: "5-10lbs", type: "exercises" };
+  
+  // Store suggestion in localStorage for tracking
+  const suggestions = getStoredLoadSuggestions();
+  const weekKey = `${trainingState.blockNo}-${trainingState.weekNo}`;
+  
+  if (!suggestions[weekKey]) {
+    suggestions[weekKey] = {};
+  }
+  
+  suggestions[weekKey][muscle] = {
+    increment: suggestion.increment,
+    reason: `Performance +${perfChange}, RIR ${actualRIR}`,
+    timestamp: new Date().toISOString(),
+    currentSets
+  };
+  
+  localStorage.setItem('loadProgressionSuggestions', JSON.stringify(suggestions));
+  
+  return {
+    muscle,
+    increment: suggestion.increment,
+    type: suggestion.type,
+    reason: `Great progress! Performance improved (+${perfChange}) with ${actualRIR} RIR remaining`,
+    confidence: actualRIR >= 3 ? "high" : "moderate"
+  };
+}
+
+/**
+ * Get stored load progression suggestions from localStorage
+ * @returns {Object} - Stored suggestions
+ */
+function getStoredLoadSuggestions() {
+  try {
+    const stored = localStorage.getItem('loadProgressionSuggestions');
+    return stored ? JSON.parse(stored) : {};
+  } catch (error) {
+    console.warn('Error parsing load suggestions from localStorage:', error);
+    return {};
+  }
+}
+
+/**
+ * Clear old load progression suggestions (older than 4 weeks)
+ */
+function cleanupOldSuggestions() {
+  const suggestions = getStoredLoadSuggestions();
+  const currentWeek = `${trainingState.blockNo}-${trainingState.weekNo}`;
+  const [currentBlock, currentWeekNum] = currentWeek.split('-').map(Number);
+  
+  // Remove suggestions older than 4 weeks
+  Object.keys(suggestions).forEach(weekKey => {
+    const [block, week] = weekKey.split('-').map(Number);
+    const weeksAgo = (currentBlock - block) * 4 + (currentWeekNum - week);
+    
+    if (weeksAgo > 4) {
+      delete suggestions[weekKey];
+    }
+  });
+  
+  localStorage.setItem('loadProgressionSuggestions', JSON.stringify(suggestions));
 }
 
 export {

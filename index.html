@@ -105,10 +105,16 @@
             <div class="status-item">
               <div class="status-value" id="targetRIR">4.5</div>
               <div class="status-label">Target RIR</div>
-            </div>
-            <div class="status-item">
+            </div>            <div class="status-item">
               <div class="status-value" id="currentPhase">Accumulation</div>
               <div class="status-label">Phase</div>
+            </div>
+            <div class="status-item fatigue-indicator" id="fatigueIndicator">
+              <div class="status-value" id="fatigueScore">0%</div>
+              <div class="status-label">System Fatigue</div>
+              <div class="fatigue-warning" id="fatigueWarning" style="display: none;">
+                Consider deload if above 80%
+              </div>
             </div>
           </div>
         </div>      </header>

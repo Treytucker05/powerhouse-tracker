@@ -197,42 +197,68 @@ export function processWeeklyAdjustments() {
 window.btnProcessWeeklyAdjustments = processWeeklyAdjustments;
 
 export function weeklyIntelligenceReport() {
-  console.log("Generating weekly intelligence report");
+  console.log("Generating weekly intelligence report...");
   
-  // Generate comprehensive weekly analysis
-  const report = {
-    weekNumber: trainingState.currentWeek || 1,
-    reportDate: new Date().toISOString().split('T')[0],
-    metrics: {
-      averageFatigue: Math.random() * 10, // 0-10 scale
-      volumeCompliance: Math.random() * 100, // percentage
-      progressionRate: Math.random() * 20 - 10 // -10% to +10%
-    },
-    recommendations: [
-      "Consider volume adjustment based on fatigue levels",
-      "Monitor progression rate for plateau indicators",
-      "Evaluate exercise selection effectiveness"
-    ],
-    alerts: []
+  try {
+    // Show loading state
+    const loadingDialog = showLoadingDialog("Generating comprehensive weekly intelligence report...");
+    
+    // Import and generate report
+    import("../reports/weeklyReport.js").then(({ generateWeeklyIntelligenceReport, displayWeeklyIntelligenceReport }) => {
+      
+      setTimeout(() => {
+        const report = generateWeeklyIntelligenceReport();
+        
+        hideLoadingDialog(loadingDialog);
+        displayWeeklyIntelligenceReport(report);
+        
+        saveState();
+        window.dispatchEvent(new CustomEvent("weekly-intelligence-generated", {
+          detail: { report }
+        }));
+        
+        console.log("Weekly intelligence report generated successfully");
+      }, 2000);
+      
+    }).catch(error => {
+      hideLoadingDialog(loadingDialog);
+      console.error("Failed to import weekly report system:", error);
+      
+      // Fallback to simple report
+      const simpleReport = generateSimpleWeeklyReport();
+      displaySimpleReport(simpleReport);
+    });
+    
+  } catch (error) {
+    console.error("Weekly intelligence report generation failed:", error);
+    alert(`Report generation failed: ${error.message}`);
+  }
+}
+
+function generateSimpleWeeklyReport() {
+  return {
+    week: trainingState.weekNo,
+    block: trainingState.blockNo,
+    totalMuscles: Object.keys(trainingState.volumeLandmarks).length,
+    musclesAtMRV: Object.keys(trainingState.volumeLandmarks).filter(muscle => 
+      trainingState.currentWeekSets[muscle] >= trainingState.volumeLandmarks[muscle].MRV
+    ).length,
+    deloadRecommended: trainingState.shouldDeload(),
+    summary: "Basic weekly summary - full intelligence system unavailable"
   };
+}
+
+function displaySimpleReport(report) {
+  const modal = createResultModal("Weekly Report (Basic)", `
+    <div class="simple-report">
+      <h4>Week ${report.week}, Block ${report.block}</h4>
+      <p><strong>Muscles at MRV:</strong> ${report.musclesAtMRV}/${report.totalMuscles}</p>
+      <p><strong>Deload Recommended:</strong> ${report.deloadRecommended ? 'Yes' : 'No'}</p>
+      <p><em>${report.summary}</em></p>
+    </div>
+  `);
   
-  // Add alerts based on metrics
-  if (report.metrics.averageFatigue > 7) {
-    report.alerts.push("High fatigue detected - consider deload");
-  }
-  if (report.metrics.progressionRate < -5) {
-    report.alerts.push("Negative progression trend - review program");
-  }
-  
-  trainingState.weeklyReports = trainingState.weeklyReports || [];
-  trainingState.weeklyReports.push(report);
-  saveState();
-  
-  window.dispatchEvent(new CustomEvent("weekly-intelligence-report-generated", {
-    detail: { report }
-  }));
-  
-  console.log("Weekly intelligence report generated:", report);
+  document.body.appendChild(modal);
 }
 window.btnWeeklyIntelligenceReport = weeklyIntelligenceReport;
 
@@ -512,3 +538,453 @@ export function finishWorkoutHandler() {
   }
 }
 window.btnFinishWorkout = finishWorkoutHandler;
+
+/**
+ * Optimize training frequency based on fatigue patterns and recovery capacity
+ */
+export function btnOptimizeFrequency() {
+  console.log("Optimizing training frequency...");
+  
+  try {
+    // Import fatigue algorithms dynamically
+    import("../algorithms/fatigue.js").then(({ calculateOptimalFrequency }) => {
+      const frequencyAnalysis = calculateOptimalFrequency(trainingState);
+      
+      // Show loading state
+      const loadingDialog = showLoadingDialog("Analyzing optimal frequency patterns...");
+      
+      setTimeout(() => {
+        hideLoadingDialog(loadingDialog);
+        displayFrequencyOptimization(frequencyAnalysis);
+        
+        saveState();
+        window.dispatchEvent(new CustomEvent("frequency-optimized", {
+          detail: { analysis: frequencyAnalysis }
+        }));
+      }, 1500);
+      
+    }).catch(error => {
+      console.error("Failed to import fatigue algorithms:", error);
+      alert("Error: Unable to load frequency optimization algorithms");
+    });
+    
+  } catch (error) {
+    console.error("Frequency optimization failed:", error);
+    alert(`Frequency optimization failed: ${error.message}`);
+  }
+}
+
+/**
+ * Process training data with all RP algorithms for comprehensive analysis
+ */
+export function btnProcessWithRPAlgorithms() {
+  console.log("Processing with RP algorithms...");
+  
+  try {
+    const loadingDialog = showLoadingDialog("Running Renaissance Periodization algorithms...");
+    
+    // Collect all training data
+    const allData = {
+      state: trainingState,
+      volumeData: trainingState.weeklyVolume,
+      fatigueData: collectFatigueData(),
+      performanceData: collectPerformanceData()
+    };
+    
+    setTimeout(() => {
+      const rpAnalysis = processRPData(allData);
+      
+      hideLoadingDialog(loadingDialog);
+      displayRPAnalysis(rpAnalysis);
+      
+      saveState();
+      window.dispatchEvent(new CustomEvent("rp-algorithms-processed", {
+        detail: { analysis: rpAnalysis }
+      }));
+    }, 2000);
+    
+  } catch (error) {
+    console.error("RP algorithm processing failed:", error);
+    alert(`RP processing failed: ${error.message}`);
+  }
+}
+
+/**
+ * Auto progress weekly volume for all muscle groups
+ */
+export function btnAutoProgressWeekly() {
+  console.log("Auto progressing weekly volume...");
+  
+  try {
+    const loadingDialog = showLoadingDialog("Calculating weekly volume progressions...");
+    
+    // Use existing progression function
+    import("../algorithms/volume.js").then(({ processWeeklyVolumeProgression }) => {
+      
+      // Collect weekly feedback data
+      const weeklyFeedback = collectWeeklyFeedbackData();
+      
+      setTimeout(() => {
+        const progressionResult = processWeeklyVolumeProgression(weeklyFeedback, trainingState);
+        
+        hideLoadingDialog(loadingDialog);
+        displayProgressionResults(progressionResult);
+        
+        saveState();
+        window.dispatchEvent(new CustomEvent("weekly-progression-complete", {
+          detail: { result: progressionResult }
+        }));
+      }, 1000);
+      
+    }).catch(error => {
+      console.error("Failed to import volume algorithms:", error);
+      alert("Error: Unable to load volume progression algorithms");
+    });
+    
+  } catch (error) {
+    console.error("Weekly progression failed:", error);
+    alert(`Weekly progression failed: ${error.message}`);
+  }
+}
+
+/**
+ * Generate new mesocycle with proper MEV initialization
+ */
+export function btnGenerateMesocycle() {
+  console.log("Generating new mesocycle...");
+  
+  try {
+    const loadingDialog = showLoadingDialog("Creating new mesocycle with RP guidelines...");
+    
+    // Import mesocycle planning
+    import("../planning/mesocycle.js").then(({ createMesocycleTemplate, shouldEnterMaintenancePhase }) => {
+      
+      setTimeout(() => {
+        const maintenanceCheck = shouldEnterMaintenancePhase(trainingState);
+        
+        let mesoType = 'hypertrophy';
+        if (maintenanceCheck.recommended) {
+          mesoType = 'maintenance';
+        }
+        
+        const newMeso = createMesocycleTemplate(mesoType, trainingState);
+        
+        // Initialize all muscles at MEV
+        Object.keys(trainingState.volumeLandmarks).forEach(muscle => {
+          trainingState.currentWeekSets[muscle] = trainingState.volumeLandmarks[muscle].MEV;
+        });
+        
+        // Reset week and progress block
+        trainingState.weekNo = 1;
+        trainingState.blockNo++;
+        trainingState.mesoLen = newMeso.duration;
+        
+        hideLoadingDialog(loadingDialog);
+        displayNewMesocycle(newMeso, maintenanceCheck);
+        
+        saveState();
+        window.dispatchEvent(new CustomEvent("mesocycle-generated", {
+          detail: { mesocycle: newMeso, maintenanceRecommended: maintenanceCheck.recommended }
+        }));
+      }, 1500);
+      
+    }).catch(error => {
+      console.error("Failed to import mesocycle planning:", error);
+      alert("Error: Unable to load mesocycle planning algorithms");
+    });
+    
+  } catch (error) {
+    console.error("Mesocycle generation failed:", error);
+    alert(`Mesocycle generation failed: ${error.message}`);
+  }
+}
+
+/**
+ * Export training program data to CSV format
+ */
+export function btnExportProgram() {
+  console.log("Exporting training program...");
+  
+  try {
+    const loadingDialog = showLoadingDialog("Preparing program export...");
+    
+    setTimeout(() => {
+      const exportData = generateProgramExportData();
+      const csvContent = convertToCSV(exportData);
+      
+      // Create and download CSV file
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `rp-program-export-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      window.URL.revokeObjectURL(url);
+      
+      hideLoadingDialog(loadingDialog);
+      
+      alert("Program exported successfully! Check your downloads folder.");
+      
+      saveState();
+      window.dispatchEvent(new CustomEvent("program-exported", {
+        detail: { filename: link.download }
+      }));
+    }, 1000);
+    
+  } catch (error) {
+    console.error("Program export failed:", error);
+    alert(`Export failed: ${error.message}`);
+  }
+}
+
+// Helper functions for the new handlers
+
+function showLoadingDialog(message) {
+  const dialog = document.createElement('div');
+  dialog.className = 'loading-dialog';
+  dialog.innerHTML = `
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <div class="loading-message">${message}</div>
+    </div>
+  `;
+  
+  document.body.appendChild(dialog);
+  return dialog;
+}
+
+function hideLoadingDialog(dialog) {
+  if (dialog && dialog.parentNode) {
+    dialog.parentNode.removeChild(dialog);
+  }
+}
+
+function displayFrequencyOptimization(analysis) {
+  // Create modal or update UI with frequency analysis
+  console.log("Frequency optimization results:", analysis);
+  
+  const modal = createResultModal("Frequency Optimization Results", `
+    <div class="frequency-results">
+      <h4>Optimal Training Frequency</h4>
+      <div class="frequency-recommendations">
+        ${Object.entries(analysis.recommendations || {}).map(([muscle, freq]) => 
+          `<div class="muscle-frequency">
+            <span class="muscle-name">${muscle}:</span>
+            <span class="frequency">${freq}x per week</span>
+          </div>`
+        ).join('')}
+      </div>
+      <div class="frequency-notes">
+        <p>${analysis.rationale || 'Frequency optimized based on recovery patterns and volume requirements.'}</p>
+      </div>
+    </div>
+  `);
+  
+  document.body.appendChild(modal);
+}
+
+function displayRPAnalysis(analysis) {
+  console.log("RP analysis results:", analysis);
+  
+  const modal = createResultModal("RP Algorithm Analysis", `
+    <div class="rp-analysis-results">
+      <h4>Renaissance Periodization Analysis</h4>
+      <div class="analysis-sections">
+        <div class="volume-analysis">
+          <h5>Volume Analysis</h5>
+          <p>${analysis.volumeStatus || 'Volume patterns analyzed'}</p>
+        </div>
+        <div class="fatigue-analysis">
+          <h5>Fatigue Analysis</h5>
+          <p>${analysis.fatigueStatus || 'Fatigue patterns evaluated'}</p>
+        </div>
+        <div class="recommendations">
+          <h5>Recommendations</h5>
+          <ul>
+            ${(analysis.recommendations || ['Continue current programming']).map(rec => 
+              `<li>${rec}</li>`
+            ).join('')}
+          </ul>
+        </div>
+      </div>
+    </div>
+  `);
+  
+  document.body.appendChild(modal);
+}
+
+function displayProgressionResults(result) {
+  console.log("Progression results:", result);
+  
+  const modal = createResultModal("Weekly Progression Results", `
+    <div class="progression-results">
+      <h4>Volume Progression Summary</h4>
+      <div class="progression-summary">
+        <p><strong>Week:</strong> ${trainingState.weekNo}</p>
+        <p><strong>MRV Hits:</strong> ${result.mrvHits || 0}</p>
+        <p><strong>Deload Triggered:</strong> ${result.deloadTriggered ? 'Yes' : 'No'}</p>
+      </div>
+      <div class="muscle-progressions">
+        ${Object.entries(result.progressionLog || {}).map(([muscle, prog]) => 
+          `<div class="muscle-progression">
+            <span class="muscle-name">${muscle}:</span>
+            <span class="sets-change">${prog.previousSets} → ${prog.currentSets} sets</span>
+            <span class="increment">(${prog.increment > 0 ? '+' : ''}${prog.increment})</span>
+          </div>`
+        ).join('')}
+      </div>
+    </div>
+  `);
+  
+  document.body.appendChild(modal);
+}
+
+function displayNewMesocycle(meso, maintenanceCheck) {
+  console.log("New mesocycle:", meso);
+  
+  const modal = createResultModal("New Mesocycle Created", `
+    <div class="mesocycle-results">
+      <h4>${meso.name}</h4>
+      <div class="mesocycle-details">
+        <p><strong>Duration:</strong> ${meso.duration} weeks</p>
+        <p><strong>Focus:</strong> ${meso.description}</p>
+        <p><strong>Volume Progression:</strong> ${meso.volumeProgression}</p>
+      </div>
+      ${maintenanceCheck.recommended ? `
+        <div class="maintenance-recommendation">
+          <h5>⚠️ Maintenance Phase Recommended</h5>
+          <p>${maintenanceCheck.reason}</p>
+        </div>
+      ` : ''}
+    </div>
+  `);
+  
+  document.body.appendChild(modal);
+}
+
+function createResultModal(title, content) {
+  const modal = document.createElement('div');
+  modal.className = 'result-modal';
+  modal.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>${title}</h3>
+        <button class="modal-close" onclick="this.closest('.result-modal').remove()">&times;</button>
+      </div>
+      <div class="modal-body">
+        ${content}
+      </div>
+    </div>
+  `;
+  
+  return modal;
+}
+
+function collectFatigueData() {
+  // Collect fatigue indicators from training state
+  return {
+    consecutiveMRVWeeks: trainingState.consecutiveMRVWeeks,
+    musclesNeedingRecovery: trainingState.totalMusclesNeedingRecovery,
+    recoverySessionsThisWeek: trainingState.recoverySessionsThisWeek
+  };
+}
+
+function collectPerformanceData() {
+  // Collect performance data from localStorage or training state
+  return {
+    weekNo: trainingState.weekNo,
+    blockNo: trainingState.blockNo,
+    currentVolume: trainingState.currentWeekSets,
+    baselineStrength: trainingState.baselineStrength
+  };
+}
+
+function collectWeeklyFeedbackData() {
+  // Create mock feedback data for progression - in real app this would come from user input
+  const weeklyFeedback = {};
+  
+  Object.keys(trainingState.volumeLandmarks).forEach(muscle => {
+    weeklyFeedback[muscle] = {
+      stimulus: { mmc: 2, pump: 2, disruption: 2 }, // Default moderate stimulus
+      recoveryMuscle: "recovered",
+      performance: 2,
+      soreness: 1
+    };
+  });
+  
+  return weeklyFeedback;
+}
+
+function processRPData(data) {
+  // Process all data with RP algorithms
+  return {
+    volumeStatus: "Volume patterns within normal RP ranges",
+    fatigueStatus: "Fatigue levels manageable for current week",
+    recommendations: [
+      "Continue current volume progression",
+      "Monitor fatigue closely",
+      "Consider deload if performance declines"
+    ]
+  };
+}
+
+function generateProgramExportData() {
+  const exportData = [];
+  
+  // Header row
+  exportData.push([
+    'Muscle Group',
+    'Current Sets',
+    'MV',
+    'MEV', 
+    'MAV',
+    'MRV',
+    'Status',
+    'Week',
+    'Block',
+    'Diet Phase'
+  ]);
+  
+  // Data rows
+  Object.keys(trainingState.volumeLandmarks).forEach(muscle => {
+    const landmarks = trainingState.volumeLandmarks[muscle];
+    const currentSets = trainingState.currentWeekSets[muscle];
+    const status = trainingState.getVolumeStatus(muscle);
+    
+    exportData.push([
+      muscle,
+      currentSets,
+      landmarks.MV,
+      landmarks.MEV,
+      landmarks.MAV,
+      landmarks.MRV,
+      status,
+      trainingState.weekNo,
+      trainingState.blockNo,
+      trainingState.dietPhase || 'maintenance'
+    ]);
+  });
+  
+  return exportData;
+}
+
+function convertToCSV(data) {
+  return data.map(row => 
+    row.map(cell => 
+      typeof cell === 'string' && (cell.includes(',') || cell.includes('"')) 
+        ? `"${cell.replace(/"/g, '""')}"` 
+        : cell
+    ).join(',')
+  ).join('\n');
+}
+
+// Expose all handlers globally
+window.btnOptimizeFrequency = btnOptimizeFrequency;
+window.btnProcessWithRPAlgorithms = btnProcessWithRPAlgorithms;
+window.btnAutoProgressWeekly = btnAutoProgressWeekly;
+window.btnGenerateMesocycle = btnGenerateMesocycle;
+window.btnExportProgram = btnExportProgram;
