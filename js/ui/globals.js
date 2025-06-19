@@ -28,7 +28,18 @@ import {
   btnProcessWithRPAlgorithms, 
   btnAutoProgressWeekly,
   btnGenerateMesocycle,
-  btnExportProgram
+  btnExportProgram,
+  analyzeDeloadNeedHandler,
+  initializeAtMEVHandler,
+  initializeIntelligenceHandler,
+  optimizeVolumeLandmarksHandler,
+  adaptiveRIRRecommendationsHandler,
+  exportAllDataHandler,
+  exportChartHandler,
+  createBackupHandler,
+  autoBackupHandler,
+  importDataHandler,
+  exportFeedbackHandler
 } from "./buttonHandlers.js";
 
 import {
@@ -1602,6 +1613,34 @@ window.btnProcessWithRPAlgorithms = window.btnProcessWithRPAlgorithms || btnProc
 window.btnAutoProgressWeekly = window.btnAutoProgressWeekly || btnAutoProgressWeekly;
 window.btnGenerateMesocycle = window.btnGenerateMesocycle || btnGenerateMesocycle;
 window.btnExportProgram = window.btnExportProgram || btnExportProgram;
+
+// Phase 5: Deload Analysis handlers
+window.analyzeDeloadNeed = window.analyzeDeloadNeed || analyzeDeloadNeedHandler;
+window.btnAnalyzeDeloadNeed = window.btnAnalyzeDeloadNeed || analyzeDeloadNeedHandler;
+window.initializeAtMEV = window.initializeAtMEV || initializeAtMEVHandler;
+window.btnInitializeAtMEV = window.btnInitializeAtMEV || initializeAtMEVHandler;
+
+// Phase 6: Advanced Intelligence handlers
+window.initializeIntelligence = window.initializeIntelligence || initializeIntelligenceHandler;
+window.btnInitializeIntelligence = window.btnInitializeIntelligence || initializeIntelligenceHandler;
+window.optimizeVolumeLandmarks = window.optimizeVolumeLandmarks || optimizeVolumeLandmarksHandler;
+window.btnOptimizeVolumeLandmarks = window.btnOptimizeVolumeLandmarks || optimizeVolumeLandmarksHandler;
+window.adaptiveRIRRecommendations = window.adaptiveRIRRecommendations || adaptiveRIRRecommendationsHandler;
+window.btnAdaptiveRIRRecommendations = window.btnAdaptiveRIRRecommendations || adaptiveRIRRecommendationsHandler;
+
+// Phase 7: Data Management handlers
+window.exportAllData = window.exportAllData || exportAllDataHandler;
+window.btnExportAllData = window.btnExportAllData || exportAllDataHandler;
+window.exportChart = window.exportChart || exportChartHandler;
+window.btnExportChart = window.btnExportChart || exportChartHandler;
+window.createBackup = window.createBackup || createBackupHandler;
+window.btnCreateBackup = window.btnCreateBackup || createBackupHandler;
+window.autoBackup = window.autoBackup || autoBackupHandler;
+window.btnAutoBackup = window.btnAutoBackup || autoBackupHandler;
+window.importData = window.importData || importDataHandler;
+window.btnImportData = window.btnImportData || importDataHandler;
+window.exportFeedback = window.exportFeedback || exportFeedbackHandler;
+window.btnExportFeedback = window.btnExportFeedback || exportFeedbackHandler;
 
 // Initialize new UI components
 document.addEventListener('DOMContentLoaded', () => {
