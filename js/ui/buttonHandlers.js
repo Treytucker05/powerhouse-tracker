@@ -41,3 +41,17 @@ export function customConfiguration() {
 // expose globally for legacy code
 window.customConfiguration = customConfiguration;
 window.btnCustomConfiguration = customConfiguration; // for inventory script
+
+function saveVolumeLandmarks() {
+  if (typeof window.saveLandmarks === "function") {
+    window.saveLandmarks();
+  } else {
+    console.warn("`saveLandmarks` is not available on window. Using stub for `saveVolumeLandmarks`.");
+  }
+}
+
+window["btnBeginnerPreset"]       = beginnerPreset;
+window["btnIntermediatePreset"]   = intermediatePreset;
+window["btnAdvancedPreset"]       = advancedPreset;
+window["btnCustomConfiguration"]  = customConfiguration;
+window["btnSaveVolumeLandmarks"]  = saveVolumeLandmarks; // stub if not written yet
