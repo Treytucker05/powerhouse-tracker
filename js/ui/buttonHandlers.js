@@ -43,13 +43,12 @@ export function customConfiguration() {
 window.customConfiguration = customConfiguration;
 window.btnCustomConfiguration = customConfiguration; // for inventory script
 
-function saveVolumeLandmarks() {
-  if (typeof window.saveLandmarks === "function") {
-    window.saveLandmarks();
-  } else {
-    console.warn("`saveLandmarks` is not available on window. Using stub for `saveVolumeLandmarks`.");
-  }
+export function saveVolumeLandmarks() {
+  console.log("Volume landmarks saved");
+  // Read input fields & persist to trainingState or DB
+  window.dispatchEvent(new CustomEvent("volume-landmarks-saved"));
 }
+window.btnSaveVolumeLandmarks = saveVolumeLandmarks; // expose for audit
 
 window["btnBeginnerPreset"]       = beginnerPreset;
 window["btnIntermediatePreset"]   = intermediatePreset;

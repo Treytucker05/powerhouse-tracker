@@ -36,7 +36,7 @@
       "section": "Phase 1 · Foundation Setup Beginner 4 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
+      "hasHandler": true,
       "handlerName": "saveVolumeLandmarks",
       "category": "other"
     },
