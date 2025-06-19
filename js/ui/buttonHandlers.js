@@ -1,5 +1,6 @@
 import trainingState, { saveState } from "../core/trainingState.js";
 import { autoProgressWeeklyVolume } from "../algorithms/effort.js";
+import { startWorkout, validateWorkoutStart, logSet } from "../algorithms/workout.js";
 
 export function beginnerPreset() {
   console.log("Beginner preset selected");
@@ -332,6 +333,92 @@ export function plateauAnalysis() {
 }
 window.btnPlateauAnalysis = plateauAnalysis;
 
+// Phase 4 · Daily Execution handlers
+export function startWorkoutHandler() {
+  console.log("Starting workout session");
+  
+  // Validate workout can be started
+  const validation = validateWorkoutStart();
+  if (!validation.isValid) {
+    console.error("Cannot start workout:", validation.reason);
+    window.dispatchEvent(new CustomEvent("workout-start-failed", {
+      detail: { error: validation.reason }
+    }));
+    return;
+  }
+  
+  // Start the workout session
+  const workoutSession = startWorkout();
+  
+  // Update training state and save
+  saveState();
+  
+  // Dispatch success event
+  window.dispatchEvent(new CustomEvent("workout-started", {
+    detail: { 
+      session: workoutSession,
+      startTime: workoutSession.startTime,
+      sessionId: workoutSession.id
+    }
+  }));
+  
+  console.log("Workout session started successfully:", workoutSession.id);
+}
+window.btnStartLiveSession = startWorkoutHandler;
+
+export function logSetHandler() {
+  console.log("Logging workout set");
+  
+  // Check if there's an active workout session
+  const currentWorkout = trainingState.currentWorkout;
+  if (!currentWorkout || currentWorkout.status !== 'active') {
+    console.error("No active workout session");
+    window.dispatchEvent(new CustomEvent("set-log-failed", {
+      detail: { error: "No active workout session. Please start a workout first." }
+    }));
+    return;
+  }
+  
+  // For demo purposes, create mock set data
+  // In a real app, this would come from form inputs or UI
+  const mockSetData = {
+    exercise: "Bench Press",
+    weight: 135 + Math.floor(Math.random() * 50), // Random weight 135-185
+    reps: 8 + Math.floor(Math.random() * 5), // Random reps 8-12
+    rir: Math.floor(Math.random() * 4), // Random RIR 0-3
+    notes: "Form felt good"
+  };
+  
+  try {
+    // Log the set using the workout algorithm
+    const updatedSession = logSet(currentWorkout, mockSetData);
+    
+    // Save state
+    saveState();
+    
+    // Dispatch success event
+    window.dispatchEvent(new CustomEvent("set-logged", {
+      detail: { 
+        setData: mockSetData,
+        sessionStats: {
+          totalSets: updatedSession.totalSets,
+          totalVolume: updatedSession.totalVolume,
+          exercisesWorked: updatedSession.exercises.length
+        }
+      }
+    }));
+    
+    console.log("Set logged successfully:", mockSetData);
+    
+  } catch (error) {
+    console.error("Failed to log set:", error.message);
+    window.dispatchEvent(new CustomEvent("set-log-failed", {
+      detail: { error: error.message }
+    }));
+  }
+}
+window.btnLogSet = logSetHandler;
+
 // Expose all handlers on window object for audit script compatibility
 window["btnBeginnerPreset"] = beginnerPreset;
 window["btnIntermediatePreset"] = intermediatePreset;
@@ -349,8 +436,5 @@ window["btnProcessWeeklyAdjustments"] = processWeeklyAdjustments;
 window["btnWeeklyIntelligenceReport"] = weeklyIntelligenceReport;
 window["btnPredictDeloadTiming"] = predictDeloadTiming;
 window["btnPlateauAnalysis"] = plateauAnalysis;
-window["btnNextWeek"] = nextWeek;
-window["btnProcessWeeklyAdjustments"] = processWeeklyAdjustments;
-window["btnWeeklyIntelligenceReport"] = weeklyIntelligenceReport;
-window["btnPredictDeloadTiming"] = predictDeloadTiming;
-window["btnPlateauAnalysis"] = plateauAnalysis;
+window["btnStartLiveSession"] = startWorkoutHandler;
+window["btnLogSet"] = logSetHandler;

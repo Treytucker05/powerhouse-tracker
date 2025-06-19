@@ -19,7 +19,9 @@ import {
   processWeeklyAdjustments,
   weeklyIntelligenceReport,
   predictDeloadTiming,
-  plateauAnalysis
+  plateauAnalysis,
+  startWorkoutHandler,
+  logSetHandler
 } from "./buttonHandlers.js";
 
 import {
@@ -1561,6 +1563,8 @@ document.getElementById("btnProcessWeeklyAdjustments")?.addEventListener("click"
 document.getElementById("btnWeeklyIntelligenceReport")?.addEventListener("click", window.btnWeeklyIntelligenceReport);
 document.getElementById("btnPredictDeloadTiming")?.addEventListener("click", window.btnPredictDeloadTiming);
 document.getElementById("btnPlateauAnalysis")?.addEventListener("click", window.btnPlateauAnalysis);
+document.getElementById("btnStartLiveSession")?.addEventListener("click", window.btnStartLiveSession);
+document.getElementById("btnLogSet")?.addEventListener("click", window.btnLogSet);
 
 // Ensure all Phase-2 button handlers are exposed for audit script compatibility
 window.btnSetupMesocycle = window.btnSetupMesocycle || window.setupMesocycle;
@@ -1576,6 +1580,10 @@ window.btnProcessWeeklyAdjustments = window.btnProcessWeeklyAdjustments || windo
 window.btnWeeklyIntelligenceReport = window.btnWeeklyIntelligenceReport || window.weeklyIntelligenceReport;
 window.btnPredictDeloadTiming = window.btnPredictDeloadTiming || window.predictDeloadTiming;
 window.btnPlateauAnalysis = window.btnPlateauAnalysis || window.plateauAnalysis;
+
+// Ensure all Phase-4 button handlers are exposed for audit script compatibility
+window.btnStartLiveSession = window.btnStartLiveSession || window.startWorkoutHandler;
+window.btnLogSet = window.btnLogSet || window.logSetHandler;
 
 // Initialize navigation system
 initNavigation();
