@@ -7,12 +7,10 @@
     "dev": "parcel index.html --no-cache --open",
     "lint": "eslint \"js/**\"",
     "format": "prettier --write .",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "build": "parcel build index.html --dist-dir dist --public-url ./",
-    "audit": "node scripts/collect-ui-inventory.js && node scripts/convert-inventory-to-md.js buttons.json && node scripts/report-missing-handlers.js"
-  },
-  "jest": {
-    "testEnvironment": "jsdom"
+    "audit": "node scripts/collect-ui-inventory.js && node scripts/convert-inventory-to-md.js buttons.json && node scripts/report-missing-handlers.js",
+    "ci": "npm run audit && npm test -- --runInBand && node scripts/report-missing-handlers.js --fail-on-missing"
   },
   "keywords": [
     "fitness",
