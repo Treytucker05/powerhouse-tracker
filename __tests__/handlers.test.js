@@ -85,6 +85,10 @@ describe('Button Handlers', () => {
     expect(typeof window.btnPredictDeloadTiming).toBe('function');
   });
 
+  test('btnPlateauAnalysis should be exposed as a function', () => {
+    expect(typeof window.btnPlateauAnalysis).toBe('function');
+  });
+
   test('all handlers should not contain TODO or stub in their source', () => {
     const handlers = [
       'btnBeginnerPreset',
