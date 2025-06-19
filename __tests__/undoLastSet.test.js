@@ -2,6 +2,8 @@
  * @jest-environment jsdom
  */
 
+import { jest } from '@jest/globals';
+
 import { undoLastSet } from '../js/algorithms/workout.js';
 import { undoLastSetHandler } from '../js/ui/buttonHandlers.js';
 import trainingState from '../js/core/trainingState.js';
@@ -392,11 +394,12 @@ describe('UndoLastSet Handler Integration', () => {
     );
   });
 
-  test('should be exposed on window object', () => {
+  test('should be exposed on window object', async () => {
     expect(typeof undoLastSetHandler).toBe('function');
-    
+
     // Test if handler is properly exposed
-    const { undoLastSetHandler: importedHandler } = require('../js/ui/buttonHandlers.js');
+    const mod = await import('../js/ui/buttonHandlers.js');
+    const importedHandler = mod.undoLastSetHandler;
     expect(typeof importedHandler).toBe('function');
   });
 });
