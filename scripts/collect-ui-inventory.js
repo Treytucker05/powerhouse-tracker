@@ -1,14 +1,15 @@
 import { chromium } from "playwright";
 import fs from "fs/promises";
 
-const browser = await chromium.launch();
-const page = await browser.newPage();
-await page.goto("http://localhost:1234");
-await page
-  .waitForFunction(() => window.Chart || false, { timeout: 5000 })
-  .catch(() => {});
+(async () => {
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  await page.goto("http://localhost:1234");
+  await page
+    .waitForFunction(() => window.Chart || false, { timeout: 5000 })
+    .catch(() => {});
 
-const data = await page.evaluate(() => {
+  const data = await page.evaluate(() => {
   const buttons = [...document.querySelectorAll('button[id^="btn"]')].map(btn => {
     const section =
       btn.closest("details")?.querySelector("summary")?.innerText
@@ -55,10 +56,11 @@ const data = await page.evaluate(() => {
     k => k.includes("calculate") || k.includes("compute")
   );
   return { buttons, inputs, algorithms };
-});
+  });
 
-await fs.writeFile("buttons.json", JSON.stringify(data, null, 2));
-console.log(
-  `inventory collected (${data.buttons.length} buttons) → buttons.json`
-);
-await browser.close();
+  await fs.writeFile("buttons.json", JSON.stringify(data, null, 2));
+  console.log(
+    `inventory collected (${data.buttons.length} buttons) → buttons.json`
+  );
+  await browser.close();
+})();
