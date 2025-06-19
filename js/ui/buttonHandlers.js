@@ -4,6 +4,7 @@ export function beginnerPreset() {
   window.trainingState.currentPreset = "beginner";
   window.dispatchEvent(new CustomEvent("beginner-preset-selected"));
 }
+window.btnBeginnerPreset = beginnerPreset;
 
 // expose globally for legacy code
 window.beginnerPreset = beginnerPreset;

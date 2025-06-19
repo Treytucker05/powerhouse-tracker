@@ -2,7 +2,12 @@ import { debugLog } from "../utils/debug.js";
 
 /*  Maps module functions onto window so legacy inline onclick="" handlers keep working */
 
-import { beginnerPreset } from "./buttonHandlers.js";
+import { 
+  beginnerPreset, 
+  intermediatePreset, 
+  advancedPreset, 
+  customConfiguration 
+} from "./buttonHandlers.js";
 
 import {
   initChart,
@@ -1521,4 +1526,8 @@ document
   .getElementById("btnBeginnerPreset")
   ?.addEventListener("click", window.beginnerPreset);
 
+// Ensure all button handlers are exposed for audit script compatibility
 window.btnBeginnerPreset = window.btnBeginnerPreset || window.beginnerPreset;
+window.btnIntermediatePreset = window.btnIntermediatePreset || window.intermediatePreset;
+window.btnAdvancedPreset = window.btnAdvancedPreset || window.advancedPreset;
+window.btnCustomConfiguration = window.btnCustomConfiguration || window.customConfiguration;
