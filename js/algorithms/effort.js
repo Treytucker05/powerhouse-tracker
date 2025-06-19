@@ -573,6 +573,113 @@ function simulateWeeklyRIRFeedback(muscles, week) {
   return feedback;
 }
 
+/**
+ * Auto-progress weekly volume based on RIR feedback and recovery status
+ * @param {Object} weeklyVolume - Current weekly volume for all muscles
+ * @param {Object} landmarks - Volume landmarks (MEV/MAV/MRV) for each muscle
+ * @param {number} targetRIR - Target RIR for the week
+ * @returns {Object} - Volume progression recommendations
+ */
+export function autoProgressWeeklyVolume(weeklyVolume = {}, landmarks = {}, targetRIR = 2) {
+  console.log("Auto-progressing weekly volume", { weeklyVolume, landmarks, targetRIR });
+  
+  const progressions = {};
+  const summary = {
+    totalMuscles: 0,
+    progressedMuscles: 0,
+    maintainedMuscles: 0,
+    reducedMuscles: 0,
+    recommendations: []
+  };
+
+  // Process each muscle group
+  Object.keys(weeklyVolume).forEach(muscle => {
+    const currentVolume = weeklyVolume[muscle] || 0;
+    const muscleLandmarks = landmarks[muscle] || { MEV: 8, MAV: 16, MRV: 22 };
+    const { MEV, MAV, MRV } = muscleLandmarks;
+    
+    summary.totalMuscles++;
+    
+    // Calculate volume progression based on RP principles
+    let newVolume = currentVolume;
+    let progression = 0;
+    let reasoning = "";
+    
+    // Auto-progression logic based on current volume position
+    if (currentVolume < MEV) {
+      // Below MEV - add 2-3 sets to reach MEV quickly
+      progression = Math.min(3, MEV - currentVolume);
+      reasoning = "Below MEV - rapid progression to minimum effective volume";
+      summary.progressedMuscles++;
+    } else if (currentVolume <= MEV + 2) {
+      // At or just above MEV - standard progression (+2 sets)
+      progression = 2;
+      reasoning = "At MEV - standard weekly progression";
+      summary.progressedMuscles++;
+    } else if (currentVolume < MAV) {
+      // Between MEV and MAV - moderate progression (+1-2 sets)
+      progression = targetRIR >= 2 ? 2 : 1;
+      reasoning = "Moderate volume - RIR-based progression";
+      summary.progressedMuscles++;
+    } else if (currentVolume < MRV) {
+      // Between MAV and MRV - conservative progression (+1 set)
+      progression = targetRIR >= 2.5 ? 1 : 0;
+      reasoning = targetRIR >= 2.5 ? "High volume - conservative progression" : "High volume - maintain current load";
+      if (progression === 0) {
+        summary.maintainedMuscles++;
+      } else {
+        summary.progressedMuscles++;
+      }
+    } else {
+      // At or above MRV - maintain or slight reduction
+      progression = targetRIR < 1 ? -1 : 0;
+      reasoning = targetRIR < 1 ? "At MRV - slight reduction for recovery" : "At MRV - maintain maximum volume";
+      if (progression < 0) {
+        summary.reducedMuscles++;
+      } else {
+        summary.maintainedMuscles++;
+      }
+    }
+    
+    newVolume = Math.max(MEV, currentVolume + progression);
+    
+    progressions[muscle] = {
+      currentVolume,
+      newVolume,
+      progression,
+      reasoning,
+      landmarks: muscleLandmarks,
+      volumePosition: getVolumePosition(newVolume, muscleLandmarks)
+    };
+    
+    summary.recommendations.push({
+      muscle,
+      change: progression,
+      reasoning
+    });
+  });
+  
+  return {
+    progressions,
+    summary,
+    targetRIR,
+    timestamp: new Date().toISOString()
+  };
+}
+
+/**
+ * Helper function to determine volume position relative to landmarks
+ */
+function getVolumePosition(volume, landmarks) {
+  const { MEV, MAV, MRV } = landmarks;
+  
+  if (volume < MEV) return "Below MEV";
+  if (volume <= MEV + 2) return "At MEV";
+  if (volume < MAV) return "MEV-MAV Range";
+  if (volume < MRV) return "MAV-MRV Range";
+  return "At/Above MRV";
+}
+
 export {
   calculateTargetRIR,
   validateEffortLevel,

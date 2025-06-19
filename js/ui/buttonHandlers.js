@@ -1,4 +1,5 @@
 import trainingState, { saveState } from "../core/trainingState.js";
+import { autoProgressWeeklyVolume } from "../algorithms/effort.js";
 
 export function beginnerPreset() {
   console.log("Beginner preset selected");
@@ -100,6 +101,49 @@ export function riskAssessment() {
 }
 window.btnRiskAssessment = riskAssessment;
 
+// Phase-3 Weekly Management handlers
+export function runWeeklyAutoProgression() {
+  console.log("Running weekly auto progression");
+  
+  window.trainingState = window.trainingState || {};
+  
+  // Get current volume data and landmarks
+  const currentVolume = window.trainingState.weeklyVolume || {};
+  const landmarks = window.trainingState.volumeLandmarks || {};
+  const targetRIR = window.trainingState.targetRIR || 2;
+  
+  // Run auto-progression algorithm
+  const progressionResult = autoProgressWeeklyVolume(currentVolume, landmarks, targetRIR);
+  
+  // Update training state with new volumes
+  window.trainingState.weeklyVolume = {};
+  Object.keys(progressionResult.progressions).forEach(muscle => {
+    window.trainingState.weeklyVolume[muscle] = progressionResult.progressions[muscle].newVolume;
+  });
+  
+  // Store progression history
+  window.trainingState.progressionHistory = window.trainingState.progressionHistory || [];
+  window.trainingState.progressionHistory.push({
+    timestamp: new Date().toISOString(),
+    week: window.trainingState.weekNo || 1,
+    progressionResult
+  });
+  
+  // Update last progression timestamp
+  window.trainingState.lastAutoProgression = new Date().toISOString();
+  
+  // Save state
+  saveState();
+  
+  // Dispatch event with progression details
+  window.dispatchEvent(new CustomEvent("weekly-auto-progression", {
+    detail: { progressionResult }
+  }));
+  
+  console.log("Weekly auto progression completed:", progressionResult);
+}
+window.btnRunWeeklyAutoProgression = runWeeklyAutoProgression;
+
 window["btnBeginnerPreset"] = beginnerPreset;
 window["btnIntermediatePreset"] = intermediatePreset;
 window["btnAdvancedPreset"] = advancedPreset;
@@ -110,3 +154,5 @@ window["btnShowRIRSchedule"] = showRIRSchedule;
 window["btnGenerateWeeklyProgram"] = generateWeeklyProgram;
 window["btnSmartExerciseSelection"] = smartExerciseSelection;
 window["btnRiskAssessment"] = riskAssessment;
+window["btnRunWeeklyAutoProgression"] = runWeeklyAutoProgression;
+window["btnRunWeeklyAutoProgression"] = runWeeklyAutoProgression;
