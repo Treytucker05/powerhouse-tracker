@@ -1520,3 +1520,5 @@ function legacyToggleSection(id) {
 document
   .getElementById("btnBeginnerPreset")
   ?.addEventListener("click", window.beginnerPreset);
+
+window.btnBeginnerPreset = window.btnBeginnerPreset || window.beginnerPreset;
