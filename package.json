@@ -4,11 +4,12 @@
   "version": "1.0.0",
   "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",
   "scripts": {
-    "dev": "parcel index.html --port 1234 --no-cache",
+    "dev": "parcel index.html --no-cache --open",
     "lint": "eslint \"js/**\"",
     "format": "prettier --write .",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "build": "parcel build index.html --dist-dir dist --public-url ./"
+    "build": "parcel build index.html --dist-dir dist --public-url ./",
+    "audit": "node scripts/collect-ui-inventory.js && node scripts/convert-inventory-to-md.js buttons.json && node scripts/report-missing-handlers.js"
   },
   "jest": {
     "testEnvironment": "jsdom"
