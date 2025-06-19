@@ -67,6 +67,8 @@ function formatSection(section) {
  * Main execution function
  */
 function main() {
+  const args = process.argv.slice(2);
+  const failOnMissing = args.includes('--fail-on-missing');
   console.log('🔍 Scanning for buttons with missing handlers...\n');
   
   // Check if buttons file exists
@@ -144,6 +146,10 @@ function main() {
   console.log('   2. Attach handlers to window object or appropriate modules');
   console.log('   3. Update button event listeners');
   console.log('   4. Re-run inventory to verify fixes');
+
+  if (failOnMissing && missingHandlers.length > 0) {
+    process.exit(1);
+  }
 }
 
 // Run the script
