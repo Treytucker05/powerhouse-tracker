@@ -23,7 +23,12 @@ import {
   startWorkoutHandler,
   logSetHandler,
   undoLastSetHandler,
-  finishWorkoutHandler
+  finishWorkoutHandler,
+  btnOptimizeFrequency,
+  btnProcessWithRPAlgorithms, 
+  btnAutoProgressWeekly,
+  btnGenerateMesocycle,
+  btnExportProgram
 } from "./buttonHandlers.js";
 
 import {
@@ -1591,5 +1596,36 @@ window.btnLogSet = window.btnLogSet || window.logSetHandler;
 window.btnUndoLastSet = window.btnUndoLastSet || window.undoLastSetHandler;
 window.btnFinishWorkout = window.btnFinishWorkout || window.finishWorkoutHandler;
 
+// Ensure all new RP methodology handlers are exposed
+window.btnOptimizeFrequency = window.btnOptimizeFrequency || btnOptimizeFrequency;
+window.btnProcessWithRPAlgorithms = window.btnProcessWithRPAlgorithms || btnProcessWithRPAlgorithms;
+window.btnAutoProgressWeekly = window.btnAutoProgressWeekly || btnAutoProgressWeekly;
+window.btnGenerateMesocycle = window.btnGenerateMesocycle || btnGenerateMesocycle;
+window.btnExportProgram = window.btnExportProgram || btnExportProgram;
+
+// Initialize new UI components
+document.addEventListener('DOMContentLoaded', () => {
+  // Initialize status panel with fatigue indicators
+  initStatusPanel();
+  
+  // Initialize workout logger with RIR tracking
+  initWorkoutLogger();
+  
+  // Update status panel when training state changes
+  window.addEventListener('trainingStateChanged', () => {
+    updateFatigueIndicator();
+    refreshStatusPanel();
+  });
+  
+  debugLog("All RP methodology components initialized");
+});
+
 // Initialize navigation system
 initNavigation();
+
+// Status Panel initialization
+import { initStatusPanel, updateFatigueIndicator, refreshStatusPanel } from "./statusPanel.js";
+import { initWorkoutLogger } from "./workoutLogger.js";
+
+initStatusPanel();
+initWorkoutLogger();

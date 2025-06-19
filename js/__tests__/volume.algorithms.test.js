@@ -40,15 +40,14 @@ function createMockState() {
   };
 }
 
-describe("autoSetIncrement", () => {
-  test("adds a set when volume low and stimulus poor", () => {
+describe("autoSetIncrement", () => {  test("adds a set when volume low and stimulus poor", () => {
     const state = createMockState();
     const result = autoSetIncrement(
       "Chest",
       { stimulus: { mmc: 1, pump: 1, disruption: 1 }, recoveryMuscle: "recovered" },
       state,
     );
-    expect(result).toEqual({ add: true, delta: 1 });
+    expect(result).toEqual({ add: true, delta: 1, reason: "Low volume, low stimulus" });
   });
 });
 

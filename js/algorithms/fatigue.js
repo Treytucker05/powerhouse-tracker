@@ -430,9 +430,19 @@ function isHighFatigue(muscle, feedback, state) {
   const strengthDrop = feedback.lastLoad
     ? state.repStrengthDrop(muscle, feedback.lastLoad)
     : false;
-
   // High fatigue if SFR ≤ 1 OR strength drop detected
   return SFR <= 1 || strengthDrop;
 }
 
-export { analyzeFrequency, calculateOptimalFrequency, isHighFatigue };
+/**
+ * Calculate systemic fatigue level from training state
+ * @param {Object} state - Training state object
+ * @returns {number} - Fatigue score (0-100)
+ */
+function calculateSystemicFatigue(state) {
+  const weeklyData = state.getWeeklyData ? state.getWeeklyData() : {};
+  const fatigueAssessment = assessFatigueAccumulation(weeklyData);
+  return fatigueAssessment.fatigueScore;
+}
+
+export { analyzeFrequency, calculateOptimalFrequency, isHighFatigue, calculateSystemicFatigue };

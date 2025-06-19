@@ -61,7 +61,9 @@ function scoreStimulus({ mmc, pump, disruption }) {
  */
 function autoSetIncrement(muscle, feedback = {}, state) {
   const currentSets = state.getWeeklySets(muscle);
-  const atMRV = currentSets >= state.volumeLandmarks[muscle].MRV;
+  const landmarks = state.volumeLandmarks[muscle];
+  const atMRV = currentSets >= landmarks.MRV;
+  const nearMRV = currentSets >= landmarks.MRV - 4; // Within 4 sets of MRV
   const vStat = state.getVolumeStatus(muscle);
   const stim = scoreStimulus(
     feedback.stimulus || { mmc: 0, pump: 0, disruption: 0 },
@@ -71,16 +73,26 @@ function autoSetIncrement(muscle, feedback = {}, state) {
     feedback.recoveryMuscle === "recovered" ||
     feedback.recoveryMuscle === "fully recovered";
 
+  // No progression if at MRV, recovery session, or high volume
   if (
     atMRV ||
     feedback.recoverySession ||
     ["maintenance", "optimal", "high", "maximum"].includes(vStat)
   )
-    return { add: false, delta: 0 };
-  if (["low"].includes(vStat) && lowStim) return { add: true, delta: 1 };
+    return { add: false, delta: 0, reason: "At volume ceiling or recovery" };
+
+  // Enhanced RP logic: +2 sets when stimulus ≤3 AND near MRV (≥4 sets to MRV)
+  if (lowStim && nearMRV && goodRec) {
+    return { add: true, delta: 2, reason: "Low stimulus near MRV - aggressive progression" };
+  }
+
+  // Standard progressions
+  if (["low"].includes(vStat) && lowStim) 
+    return { add: true, delta: 1, reason: "Low volume, low stimulus" };
   if (vStat === "suboptimal" && lowStim && goodRec)
-    return { add: true, delta: 1 };
-  return { add: false, delta: 0 };
+    return { add: true, delta: 1, reason: "Suboptimal volume, low stimulus, good recovery" };
+  
+  return { add: false, delta: 0, reason: "No progression criteria met" };
 }
 
 /**
@@ -92,8 +104,7 @@ function autoSetIncrement(muscle, feedback = {}, state) {
 function processWeeklyVolumeProgression(weeklyFeedback, state) {
   const progressionLog = {};
   let deloadTriggered = false;
-  let mrvHits = 0;
-  // Process each muscle's auto-progression
+  let mrvHits = 0;  // Process each muscle's auto-progression
   Object.keys(weeklyFeedback).forEach((muscle) => {
     const feedback = weeklyFeedback[muscle];
 
@@ -111,9 +122,10 @@ function processWeeklyVolumeProgression(weeklyFeedback, state) {
 
     const increment = autoSetIncrement(muscle, feedback, state);
 
-    // Apply set changes
+    // Apply set changes (enhanced to handle +2 sets)
     if (increment.add) {
       state.addSets(muscle, increment.delta);
+      debugLog(`Added ${increment.delta} sets to ${muscle}: ${increment.reason}`);
     }
 
     // Track MRV hits for deload logic
@@ -129,6 +141,7 @@ function processWeeklyVolumeProgression(weeklyFeedback, state) {
       increment: increment.delta,
       reason: increment.reason,
       status: state.getVolumeStatus(muscle),
+      stimulusScore: feedback.stimulus ? scoreStimulus(feedback.stimulus).score : null,
     };
   });
 
