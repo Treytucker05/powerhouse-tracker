@@ -1,4 +1,5 @@
 import { debugLog } from "../utils/debug.js";
+import { initNavigation } from "./navigation.js";
 
 /*  Maps module functions onto window so legacy inline onclick="" handlers keep working */
 
@@ -12,7 +13,8 @@ import {
   showRIRSchedule,
   generateWeeklyProgram,
   smartExerciseSelection,
-  riskAssessment
+  riskAssessment,
+  runWeeklyAutoProgression
 } from "./buttonHandlers.js";
 
 import {
@@ -1560,3 +1562,6 @@ window.btnShowRIRSchedule = window.btnShowRIRSchedule || window.showRIRSchedule;
 window.btnGenerateWeeklyProgram = window.btnGenerateWeeklyProgram || window.generateWeeklyProgram;
 window.btnSmartExerciseSelection = window.btnSmartExerciseSelection || window.smartExerciseSelection;
 window.btnRiskAssessment = window.btnRiskAssessment || window.riskAssessment;
+
+// Initialize navigation system
+initNavigation();
