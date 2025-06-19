@@ -319,6 +319,36 @@
       "hasHandler": true,
       "handlerName": "btnBeginnerPreset",
       "category": "other"
+    },
+    {
+      "id": "btnIntermediatePreset",
+      "label": "INTERMEDIATE PRESET",
+      "section": "(no section)",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": true,
+      "handlerName": "btnIntermediatePreset",
+      "category": "other"
+    },
+    {
+      "id": "btnAdvancedPreset",
+      "label": "ADVANCED PRESET",
+      "section": "(no section)",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": true,
+      "handlerName": "btnAdvancedPreset",
+      "category": "other"
+    },
+    {
+      "id": "btnCustomConfiguration",
+      "label": "CUSTOM CONFIGURATION",
+      "section": "(no section)",
+      "parentForm": "(no form)",
+      "relatedInputs": 0,
+      "hasHandler": true,
+      "handlerName": "customConfiguration",
+      "category": "other"
     }
   ],
   "inputs": [
