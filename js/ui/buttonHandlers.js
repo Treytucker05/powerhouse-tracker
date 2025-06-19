@@ -55,10 +55,12 @@ window.btnSaveVolumeLandmarks = saveVolumeLandmarks; // expose for audit
 // Phase-2 Mesocycle Planning handlers
 export function setupMesocycle() {
   console.log("Mesocycle setup wizard launched");
-  // TODO: open modal / load form steps
+  window.trainingState = window.trainingState || {};
+  window.trainingState.currentPhase = "mesocycle";
   window.dispatchEvent(new CustomEvent("mesocycle-setup"));
+  saveState?.();        // if saveState exists
 }
-window.btnSetupMesocycle = setupMesocycle;
+window.btnSetupMesocycle = setupMesocycle;   // expose for audit
 
 export function showRIRSchedule() {
   console.log("Show RIR schedule");
