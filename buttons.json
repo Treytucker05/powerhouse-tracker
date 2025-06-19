@@ -199,115 +199,104 @@
       "hasHandler": true,
       "handlerName": "undoLastSetHandler",
       "category": "other"
-    },
-    {
+    },    {
       "id": "btnAnalyzeDeloadNeed",
       "label": "Analyze Deload Need",
       "section": "Phase 5 · Deload Analysis Intermediate 2 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "analyzeDeloadNeed",
       "category": "other"
-    },
-    {
+    },    {
       "id": "btnInitializeAtMEV",
       "label": "Initialize at MEV",
       "section": "Phase 5 · Deload Analysis Intermediate 2 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "initializeAtMEV",
       "category": "other"
-    },
-    {
+    },    {
       "id": "btnInitializeIntelligence",
       "label": "Initialize Intelligence",
       "section": "Phase 6 · Advanced Intelligence Advanced 3 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "initializeIntelligenceHandler",
       "category": "other"
-    },
-    {
+    },    {
       "id": "btnOptimizeVolumeLandmarks",
       "label": "Optimize Volume Landmarks",
       "section": "Phase 6 · Advanced Intelligence Advanced 3 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "optimizeVolumeLandmarksHandler",
       "category": "other"
-    },
-    {
+    },    {
       "id": "btnAdaptiveRIRRecommendations",
       "label": "Adaptive RIR Recommendations",
       "section": "Phase 6 · Advanced Intelligence Advanced 3 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "adaptiveRIRRecommendationsHandler",
       "category": "other"
-    },
-    {
+    },    {
       "id": "btnExportAllData",
       "label": "Export All Data",
       "section": "Phase 7 · Data Management Advanced 6 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "exportAllDataHandler",
       "category": "other"
-    },
-    {
+    },    {
       "id": "btnExportChart",
       "label": "Export Chart",
       "section": "Phase 7 · Data Management Advanced 6 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "exportChartHandler",
       "category": "other"
-    },
-    {
+    },    {
       "id": "btnCreateBackup",
       "label": "Create Backup",
       "section": "Phase 7 · Data Management Advanced 6 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "createBackupHandler",
       "category": "other"
-    },
-    {
+    },    {
       "id": "btnImportData",
       "label": "Import Data",
       "section": "Phase 7 · Data Management Advanced 6 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "importDataHandler",
       "category": "other"
-    },
-    {
+    },    {
       "id": "btnAutoBackup",
       "label": "Auto Backup",
       "section": "Phase 7 · Data Management Advanced 6 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "autoBackupHandler",
       "category": "other"
-    },
-    {
+    },    {
       "id": "btnExportFeedback",
       "label": "Export Feedback",
       "section": "Phase 7 · Data Management Advanced 6 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "exportFeedbackHandler",
       "category": "other"
     },
     {

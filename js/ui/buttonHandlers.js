@@ -1,6 +1,9 @@
 import trainingState, { saveState } from "../core/trainingState.js";
 import { autoProgressWeeklyVolume } from "../algorithms/effort.js";
 import { startWorkout, validateWorkoutStart, logSet, undoLastSet, finishWorkout } from "../algorithms/workout.js";
+import { analyzeDeloadNeed, initializeAtMEV } from "../algorithms/deload.js";
+import { initIntelligence, optimizeVolumeLandmarks, adaptiveRIRRecommendations } from "../algorithms/intelligence.js";
+import { exportAllData, exportChart, createBackup, autoBackup, importData, exportFeedback } from "../algorithms/dataExport.js";
 
 export function beginnerPreset() {
   console.log("Beginner preset selected");
@@ -978,8 +981,351 @@ function convertToCSV(data) {
       typeof cell === 'string' && (cell.includes(',') || cell.includes('"')) 
         ? `"${cell.replace(/"/g, '""')}"` 
         : cell
-    ).join(',')
-  ).join('\n');
+    ).join(',')  ).join('\n');
+}
+
+// Phase 5: Deload Analysis Handlers
+export function analyzeDeloadNeedHandler() {
+  try {
+    const analysis = analyzeDeloadNeed(trainingState);
+    
+    // Display results in modal or alert
+    const message = `
+🔍 DELOAD ANALYSIS RESULTS
+
+Fatigue Index: ${(analysis.fatigueIndex * 100).toFixed(1)}%
+Deload Needed: ${analysis.needsDeload ? 'YES' : 'NO'}
+Timeline: ${analysis.timeline}
+Confidence: ${(analysis.confidence * 100).toFixed(0)}%
+
+📋 Recommendations:
+${analysis.recommendations.map(rec => `• ${rec}`).join('\n')}
+    `;
+    
+    alert(message);
+    
+    // Dispatch event for UI updates
+    window.dispatchEvent(new CustomEvent('deload-analysis', {
+      detail: { analysis }
+    }));
+    
+    saveState();
+    
+  } catch (error) {
+    console.error('Error analyzing deload need:', error);
+    alert(`Error analyzing deload need: ${error.message}`);
+  }
+}
+
+export function initializeAtMEVHandler() {
+  try {
+    if (!confirm('This will reset ALL muscle groups to their Minimum Effective Volume (MEV) and restart your mesocycle. Continue?')) {
+      return;
+    }
+    
+    const summary = initializeAtMEV(trainingState);
+    
+    // Display summary
+    const message = `
+🔄 MEV INITIALIZATION COMPLETE
+
+Reset Muscles: ${summary.resetMuscles.length}
+Total Volume Reduction: ${summary.totalReduction} sets
+
+📊 New Volumes:
+${Object.entries(summary.newVolumes).map(([muscle, sets]) => 
+  `• ${muscle}: ${summary.previousVolumes[muscle]} → ${sets} sets`
+).join('\n')}
+
+Week counter reset to 1. Ready for fresh mesocycle!
+    `;
+    
+    alert(message);
+    
+    // Dispatch event for UI updates
+    window.dispatchEvent(new CustomEvent('mev-initialization', {
+      detail: { summary }
+    }));
+    
+    saveState();
+    
+  } catch (error) {
+    console.error('Error initializing at MEV:', error);
+    alert(`Error initializing at MEV: ${error.message}`);  }
+}
+
+// Phase 6: Advanced Intelligence Handlers
+export function initializeIntelligenceHandler() {
+  try {
+    const intelligence = initIntelligence(trainingState);
+    
+    const message = `
+🧠 INTELLIGENCE SYSTEM INITIALIZED
+
+Version: ${intelligence.version}
+Baseline Metrics:
+• Average RPE: ${intelligence.kpis.avgRPE.toFixed(1)}
+• Weekly Load: ${intelligence.kpis.weeklyLoad.toFixed(0)}
+• Starting Volume: ${intelligence.baselines.startingVolume} sets
+
+📊 Initial Recommendations:
+${intelligence.recommendations.map(rec => `• ${rec}`).join('\n') || 'No specific recommendations at this time'}
+
+System is now learning from your training patterns!
+    `;
+    
+    alert(message);
+    
+    window.dispatchEvent(new CustomEvent('intelligence-initialized', {
+      detail: { intelligence }
+    }));
+    
+    saveState();
+    
+  } catch (error) {
+    console.error('Error initializing intelligence:', error);
+    alert(`Error initializing intelligence: ${error.message}`);
+  }
+}
+
+export function optimizeVolumeLandmarksHandler() {
+  try {
+    const optimization = optimizeVolumeLandmarks(trainingState);
+    
+    let message = `
+🎯 VOLUME LANDMARKS OPTIMIZATION
+
+Confidence: ${(optimization.confidence * 100).toFixed(0)}%
+Changes Made: ${optimization.totalChanges}
+
+📈 Reasoning:
+${optimization.reasoning.join('\n')}
+    `;
+    
+    if (optimization.totalChanges > 0) {
+      message += `\n\n📊 Adjustments Made:\n`;
+      Object.entries(optimization.adjustments).forEach(([muscle, adj]) => {
+        message += `\n${muscle}:`;
+        message += `\n  MEV: ${adj.before.MEV} → ${adj.after.MEV}`;
+        message += `\n  MAV: ${adj.before.MAV} → ${adj.after.MAV}`;
+        message += `\n  MRV: ${adj.before.MRV} → ${adj.after.MRV}`;
+        message += `\n  Reason: ${adj.reasoning.join(', ')}`;
+      });
+    }
+    
+    alert(message);
+    
+    window.dispatchEvent(new CustomEvent('landmarks-optimized', {
+      detail: { optimization }
+    }));
+    
+    saveState();
+    
+  } catch (error) {
+    console.error('Error optimizing landmarks:', error);
+    alert(`Error optimizing landmarks: ${error.message}`);
+  }
+}
+
+export function adaptiveRIRRecommendationsHandler() {
+  try {
+    const recommendations = adaptiveRIRRecommendations(trainingState);
+    
+    let message = `
+🎯 ADAPTIVE RIR RECOMMENDATIONS
+
+Global Recommendation: RIR ${recommendations.globalRecommendation}
+Confidence: ${(recommendations.confidence * 100).toFixed(0)}%
+
+🧠 Reasoning:
+${recommendations.reasoning.join('\n')}
+
+💪 Muscle-Specific Recommendations:
+    `;
+    
+    Object.entries(recommendations.muscleSpecific).forEach(([muscle, rec]) => {
+      message += `\n${muscle}: RIR ${rec.recommendedRIR}`;
+      message += `\n  Current: ${rec.currentVolume} sets (${(rec.fatigueRatio * 100).toFixed(0)}% of MRV)`;
+      message += `\n  Reason: ${rec.reasoning.join(', ')}`;
+    });
+    
+    alert(message);
+    
+    window.dispatchEvent(new CustomEvent('rir-recommendations', {
+      detail: { recommendations }
+    }));
+    
+    saveState();
+    
+  } catch (error) {
+    console.error('Error generating RIR recommendations:', error);
+    alert(`Error generating RIR recommendations: ${error.message}`);  }
+}
+
+// Phase 7: Data Management Handlers
+export function exportAllDataHandler() {
+  try {
+    const result = exportAllData(trainingState);
+    
+    alert(`
+📁 DATA EXPORT COMPLETE
+
+File: ${result.filename}
+Size: ${(result.size / 1024).toFixed(1)} KB
+Exported: ${new Date(result.timestamp).toLocaleString()}
+
+Your complete training data has been downloaded!
+    `);
+    
+    window.dispatchEvent(new CustomEvent('data-exported', { detail: result }));
+    
+  } catch (error) {
+    console.error('Export failed:', error);
+    alert(`Export failed: ${error.message}`);
+  }
+}
+
+export function exportChartHandler() {
+  try {
+    const result = exportChart();
+    
+    alert(`
+📊 CHART EXPORT COMPLETE
+
+File: ${result.filename}
+Format: ${result.format}
+Exported: ${new Date(result.timestamp).toLocaleString()}
+
+Your volume chart has been downloaded!
+    `);
+    
+    window.dispatchEvent(new CustomEvent('chart-exported', { detail: result }));
+    
+  } catch (error) {
+    console.error('Chart export failed:', error);
+    alert(`Chart export failed: ${error.message}`);
+  }
+}
+
+export function createBackupHandler() {
+  try {
+    const result = createBackup(trainingState);
+    
+    alert(`
+💾 BACKUP CREATED
+
+Backup ID: ${result.backupId}
+Location: ${result.location}
+Created: ${new Date(result.timestamp).toLocaleString()}
+
+Your training data has been backed up!
+    `);
+    
+    window.dispatchEvent(new CustomEvent('backup-created', { detail: result }));
+    
+  } catch (error) {
+    console.error('Backup failed:', error);
+    alert(`Backup failed: ${error.message}`);
+  }
+}
+
+export function autoBackupHandler() {
+  try {
+    const currentState = trainingState.autoBackupEnabled || false;
+    const newState = !currentState;
+    
+    const result = autoBackup(newState, trainingState);
+    
+    if (result.enabled) {
+      alert(`
+🔄 AUTO-BACKUP ENABLED
+
+Next backup: ${new Date(result.nextBackup).toLocaleString()}
+Last backup: ${new Date(result.lastBackup).toLocaleString()}
+
+Your data will be automatically backed up daily!
+      `);
+    } else {
+      alert(`
+⏸️ AUTO-BACKUP DISABLED
+
+Automatic backups have been turned off.
+You can still create manual backups anytime.
+      `);
+    }
+    
+    window.dispatchEvent(new CustomEvent('auto-backup-toggled', { detail: result }));
+    saveState();
+    
+  } catch (error) {
+    console.error('Auto-backup toggle failed:', error);
+    alert(`Auto-backup toggle failed: ${error.message}`);
+  }
+}
+
+export function importDataHandler() {
+  try {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      try {
+        const result = await importData(file, trainingState);
+        
+        alert(`
+📥 DATA IMPORT COMPLETE
+
+Imported:
+• ${result.imported.workouts} workouts
+• ${result.imported.progressionHistory} progression entries  
+• ${result.imported.landmarks} muscle landmarks
+
+${result.conflicts.length > 0 ? `\n⚠️ ${result.conflicts.length} conflicts resolved` : ''}
+
+Your data has been merged successfully!
+        `);
+        
+        window.dispatchEvent(new CustomEvent('data-imported', { detail: result }));
+        saveState();
+        
+      } catch (error) {
+        console.error('Import failed:', error);
+        alert(`Import failed: ${error.message}`);
+      }
+    };
+    
+    input.click();
+    
+  } catch (error) {
+    console.error('Import handler failed:', error);
+    alert(`Import failed: ${error.message}`);
+  }
+}
+
+export function exportFeedbackHandler() {
+  try {
+    const result = exportFeedback(trainingState);
+    
+    alert(`
+📋 FEEDBACK EXPORT COMPLETE
+
+File: ${result.filename}
+Format: ${result.format}
+Rows: ${result.rows}
+
+Your session feedback has been exported to CSV!
+    `);
+    
+    window.dispatchEvent(new CustomEvent('feedback-exported', { detail: result }));
+    
+  } catch (error) {
+    console.error('Feedback export failed:', error);
+    alert(`Feedback export failed: ${error.message}`);
+  }
 }
 
 // Expose all handlers globally
@@ -988,3 +1334,25 @@ window.btnProcessWithRPAlgorithms = btnProcessWithRPAlgorithms;
 window.btnAutoProgressWeekly = btnAutoProgressWeekly;
 window.btnGenerateMesocycle = btnGenerateMesocycle;
 window.btnExportProgram = btnExportProgram;
+window.analyzeDeloadNeed = analyzeDeloadNeedHandler;
+window.btnAnalyzeDeloadNeed = analyzeDeloadNeedHandler;
+window.initializeAtMEV = initializeAtMEVHandler;
+window.btnInitializeAtMEV = initializeAtMEVHandler;
+window.initializeIntelligence = initializeIntelligenceHandler;
+window.btnInitializeIntelligence = initializeIntelligenceHandler;
+window.optimizeVolumeLandmarks = optimizeVolumeLandmarksHandler;
+window.btnOptimizeVolumeLandmarks = optimizeVolumeLandmarksHandler;
+window.adaptiveRIRRecommendations = adaptiveRIRRecommendationsHandler;
+window.btnAdaptiveRIRRecommendations = adaptiveRIRRecommendationsHandler;
+window.exportAllData = exportAllDataHandler;
+window.btnExportAllData = exportAllDataHandler;
+window.exportChart = exportChartHandler;
+window.btnExportChart = exportChartHandler;
+window.createBackup = createBackupHandler;
+window.btnCreateBackup = createBackupHandler;
+window.autoBackup = autoBackupHandler;
+window.btnAutoBackup = autoBackupHandler;
+window.importData = importDataHandler;
+window.btnImportData = importDataHandler;
+window.exportFeedback = exportFeedbackHandler;
+window.btnExportFeedback = exportFeedbackHandler;

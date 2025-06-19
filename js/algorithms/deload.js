@@ -228,3 +228,143 @@ export function getDeloadStatus(state) {
     message: `${state.deloadType} deload in progress (${Math.round(state.loadReduction * 100)}% load)`
   };
 }
+
+/**
+ * Analyze if a deload is needed based on fatigue accumulation
+ * @param {Object} state - Training state object
+ * @returns {Object} - Deload analysis with recommendations
+ */
+export function analyzeDeloadNeed(state) {
+  const analysis = {
+    needsDeload: false,
+    fatigueIndex: 0,
+    recommendations: [],
+    timeline: "immediate",
+    confidence: 0.0
+  };
+
+  // Get current volume data
+  const landmarks = state.volumeLandmarks;
+  
+  if (!landmarks || Object.keys(landmarks).length === 0) {
+    analysis.recommendations.push("Set volume landmarks first");
+    return analysis;
+  }
+
+  let totalFatigueIndex = 0;
+  let muscleCount = 0;
+  let highFatigueMuscles = 0;
+
+  // Calculate fatigue index for each muscle
+  Object.keys(landmarks).forEach(muscle => {
+    const currentSets = state.getWeeklySets(muscle);
+    const mrv = landmarks[muscle].MRV;
+    const fatigueIndex = currentSets / mrv;
+    
+    totalFatigueIndex += fatigueIndex;
+    muscleCount++;
+    
+    if (fatigueIndex > 1.3) {
+      highFatigueMuscles++;
+      analysis.recommendations.push(`${muscle}: High fatigue (${(fatigueIndex * 100).toFixed(0)}% of MRV)`);
+    } else if (fatigueIndex > 1.0) {
+      analysis.recommendations.push(`${muscle}: Approaching MRV (${(fatigueIndex * 100).toFixed(0)}% of MRV)`);
+    }
+  });
+
+  // Calculate overall fatigue index
+  analysis.fatigueIndex = muscleCount > 0 ? totalFatigueIndex / muscleCount : 0;
+
+  // Check for consecutive weeks above 1.0 fatigue index
+  const weekHistory = state.weeklyProgressionHistory || [];
+  let recentHighWeeks = 0;
+  for (let i = weekHistory.length - 1; i >= Math.max(0, weekHistory.length - 3); i--) {
+    const week = weekHistory[i];
+    if (week && week.avgFatigueIndex && week.avgFatigueIndex > 1.0) {
+      recentHighWeeks++;
+    } else {
+      break;
+    }
+  }
+
+  // Deload decision logic
+  if (analysis.fatigueIndex > 1.3) {
+    analysis.needsDeload = true;
+    analysis.timeline = "immediate";
+    analysis.confidence = 0.9;
+    analysis.recommendations.unshift("🚨 IMMEDIATE DELOAD NEEDED - Fatigue index critically high");
+  } else if (analysis.fatigueIndex > 1.0 && recentHighWeeks >= 2) {
+    analysis.needsDeload = true;
+    analysis.timeline = "this week";
+    analysis.confidence = 0.8;
+    analysis.recommendations.unshift("⚠️ DELOAD RECOMMENDED - Two weeks of high fatigue");
+  } else if (highFatigueMuscles >= 2) {
+    analysis.needsDeload = true;
+    analysis.timeline = "next week";
+    analysis.confidence = 0.7;
+    analysis.recommendations.unshift("🔄 DELOAD SUGGESTED - Multiple muscles at high fatigue");
+  } else if (analysis.fatigueIndex > 0.9) {
+    analysis.needsDeload = false;
+    analysis.timeline = "monitor closely";
+    analysis.confidence = 0.6;
+    analysis.recommendations.unshift("👁️ MONITOR - Approaching deload threshold");
+  } else {
+    analysis.recommendations.unshift("✅ CONTINUE - Fatigue levels manageable");
+  }
+
+  debugLog("Deload analysis completed", analysis);
+  return analysis;
+}
+
+/**
+ * Initialize all muscle groups at MEV (Minimum Effective Volume)
+ * @param {Object} state - Training state object
+ * @returns {Object} - Reset summary
+ */
+export function initializeAtMEV(state) {
+  const summary = {
+    resetMuscles: [],
+    newVolumes: {},
+    previousVolumes: {},
+    totalReduction: 0
+  };
+
+  const landmarks = state.volumeLandmarks;
+  if (!landmarks || Object.keys(landmarks).length === 0) {
+    throw new Error("Volume landmarks must be set before initializing at MEV");
+  }
+
+  // Reset each muscle to MEV
+  Object.keys(landmarks).forEach(muscle => {
+    const mev = landmarks[muscle].MEV;
+    const currentVolume = state.getWeeklySets(muscle);
+    
+    summary.previousVolumes[muscle] = currentVolume;
+    summary.newVolumes[muscle] = mev;
+    summary.totalReduction += (currentVolume - mev);
+    summary.resetMuscles.push(muscle);
+    
+    // Update state
+    state.setWeeklySets(muscle, mev);
+  });
+
+  // Reset week counter
+  state.weekNo = 1;
+  state.lastDeload = new Date().toISOString();
+  
+  // Clear progression history for fresh start
+  state.weeklyProgressionHistory = [];
+  
+  // Log the reset
+  const resetLog = {
+    timestamp: new Date().toISOString(),
+    type: "MEV_INITIALIZATION",
+    summary: summary
+  };
+  
+  state.deloadHistory = state.deloadHistory || [];
+  state.deloadHistory.push(resetLog);
+
+  debugLog("MEV initialization completed", summary);
+  return summary;
+}

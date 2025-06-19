@@ -1,50 +1,88 @@
-# PowerHouseATX Renaissance Periodization Toolkit
+# PowerHouse Tracker - Renaissance Periodization Toolkit v0.9.0-beta
 
-A comprehensive evidence-based training calculator implementing Renaissance Periodization methodology with **automated volume progression**.
+A comprehensive evidence-based training toolkit implementing Renaissance Periodization methodology with **automated volume progression**, **intelligent deload analysis**, and **data management**.
 
-## 🤖 Auto-Volume Progression System
+## 🎯 Latest Features (v0.9.0-beta)
 
-**🎉 NEW: Fully automated weekly volume progression** - No more manual "+ set" buttons!
+### ✅ **Complete Handler Coverage (0 Missing)**
+All 35 button handlers are now implemented across 7 training phases:
+- ✅ **Phase 1:** Foundation Setup (4 handlers)
+- ✅ **Phase 2:** Mesocycle Planning (6 handlers) 
+- ✅ **Phase 3:** Weekly Programming (3 handlers)
+- ✅ **Phase 4:** Daily Execution (5 handlers)
+- ✅ **Phase 5:** Deload Analysis (2 handlers)
+- ✅ **Phase 6:** Advanced Intelligence (3 handlers)
+- ✅ **Phase 7:** Data Management (6 handlers)
 
+### 🧠 **Intelligence Layer (Phase 6)**
+- **`initIntelligence()`** - Initializes adaptive learning system
+- **`optimizeVolumeLandmarks()`** - ML-based landmark optimization
+- **`adaptiveRIRRecommendations()`** - Context-aware RIR suggestions
+
+### 💾 **Data Management (Phase 7)**
+- **`exportAllData()`** - Complete training data export (JSON)
+- **`exportChart()`** - Progress visualization export (SVG/PNG)
+- **`createBackup()`** - Compressed backup with integrity checks
+- **`autoBackup()`** - Automatic scheduled backups
+- **`importData()`** - Smart data import with validation
+- **`exportFeedback()`** - Session feedback analysis (CSV)
+
+### 🔬 **Deload Analysis (Phase 5)**
+- **`analyzeDeloadNeed()`** - Fatigue assessment with confidence scoring
+- **`initializeAtMEV()`** - Smart volume reset to MEV levels
+
+## 🚀 Quick Start
+
+### Development Setup
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Run tests
+npm test
+
+# Run handler audit
+npm run audit
+
+# Full CI pipeline
+npm run ci
+```
+
+### React/Vite Frontend
+```bash
+cd tracker-ui
+npm install
+npm run dev  # Runs on http://localhost:5173
+```
+
+## 🎯 Core Features
+
+### 🤖 **Auto-Volume Progression System**
 - **🎯 MEV Start:** All muscles begin at Minimum Effective Volume
 - **📈 Smart Progression:** +1-2 sets per week based on recovery feedback
 - **🛑 Auto-Deload:** Triggers when most muscles hit MRV
 - **🧠 Adaptive Logic:** Volume-dependent feedback simulation
 
-### Quick Demo
+### ✅ **Complete Renaissance Periodization Implementation**
 
-1. Click **"🎯 Initialize at MEV"** → Sets all muscles to starting volumes
-2. Click **"▶️ Run Weekly Auto-Progression"** → Simulates weekly progression
-3. Click **"📅 Next Week"** → Advances training cycle
-4. System auto-triggers deload when needed
-
-## 🎯 Features Implemented
-
-### ✅ Complete Renaissance Periodization Implementation
-
-1. **🤖 Auto-Volume Progression System**
-
-   - `autoSetIncrement()` - Determines weekly set increases (+0, +1, +2)
-   - `processWeeklyVolumeProgression()` - Batch processes all muscles
-   - Automatic deload triggering based on MRV accumulation
-   - Volume-adaptive feedback generation for realistic progression
-
-2. **📁 Refactored Structure**
-
+1. **📁 Modular Architecture**
    - `/js/core/trainingState.js` - Central training state singleton
    - `/js/algorithms/volume.js` - RP volume management algorithms
    - `/js/algorithms/effort.js` - RIR progression and effort management
    - `/js/algorithms/fatigue.js` - Recovery and frequency optimization
-   - `/js/algorithms/validation.js` - Load and input validation helpers
+   - `/js/algorithms/deload.js` - Deload analysis and MEV reset
+   - `/js/algorithms/intelligence.js` - Adaptive learning algorithms
+   - `/js/algorithms/dataExport.js` - Data management and export
    - `/js/ui/` - Modular UI components
 
-3. **🔢 RP "MEV Stimulus Estimator" (Table 2.2)**
-
+2. **🔢 RP "MEV Stimulus Estimator" (Table 2.2)**
    - `scoreStimulus({mmc, pump, disruption})` → 0-9 score
    - Automatic advice: 0-3 = "Add 2 sets", 4-6 = "Keep sets", 7-9 = "Remove sets"
 
-4. **📈 RP "Set Progression Algorithm" (Table 2.3)**
-
+3. **📈 RP "Set Progression Algorithm" (Table 2.3)**
    - Matrix lookup: [soreness 0-3] × [performance 0-3]
    - Replaces legacy `calcSets()` with evidence-based recommendations
 
