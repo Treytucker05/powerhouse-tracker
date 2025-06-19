@@ -400,3 +400,30 @@ export function undoLastSet(session) {
     removedSet
   };
 }
+
+/**
+ * Finish the current workout session
+ * @param {Object|null} session - Workout session to finish (default trainingState.currentWorkout)
+ * @param {Object} state - Training state object (default trainingState)
+ * @returns {Object} - Finished workout session
+ */
+export function finishWorkout(session = null, state = trainingState) {
+  const workout = session || state.currentWorkout;
+  if (!workout) {
+    throw new Error('No active workout session');
+  }
+  if (workout.status !== 'active') {
+    throw new Error('Workout session is not active');
+  }
+
+  workout.status = 'completed';
+  workout.endTime = new Date().toISOString();
+
+  state.workoutHistory = state.workoutHistory || [];
+  state.workoutHistory.push(workout);
+  state.currentWorkout = null;
+
+  console.log('Workout session finished:', workout.id);
+
+  return workout;
+}

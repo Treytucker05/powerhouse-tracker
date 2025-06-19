@@ -2,7 +2,7 @@
   "buttons": [
     {
       "id": "btnBeginnerPreset",
-      "label": "(no label)",
+      "label": "Beginner Preset",
       "section": "Phase 1 · Foundation Setup Beginner 4 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
@@ -12,7 +12,7 @@
     },
     {
       "id": "btnIntermediatePreset",
-      "label": "(no label)",
+      "label": "Intermediate Preset",
       "section": "Phase 1 · Foundation Setup Beginner 4 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
@@ -22,7 +22,7 @@
     },
     {
       "id": "btnAdvancedPreset",
-      "label": "(no label)",
+      "label": "Advanced Preset",
       "section": "Phase 1 · Foundation Setup Beginner 4 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
@@ -32,7 +32,7 @@
     },
     {
       "id": "btnSaveVolumeLandmarks",
-      "label": "(no label)",
+      "label": "Save Volume Landmarks",
       "section": "Phase 1 · Foundation Setup Beginner 4 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
@@ -162,8 +162,8 @@
     },
     {
       "id": "btnStartLiveSession",
-      "label": "(no label)",
-      "section": "Phase 4 · Daily Execution Beginner 4 actions ▼",
+      "label": "Start Live Session",
+      "section": "Phase 4 · Daily Execution Beginner 5 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
       "hasHandler": true,
@@ -172,8 +172,8 @@
     },
     {
       "id": "btnProcessWithRPAlgorithms",
-      "label": "(no label)",
-      "section": "Phase 4 · Daily Execution Beginner 4 actions ▼",
+      "label": "Process with RP Algorithms",
+      "section": "Phase 4 · Daily Execution Beginner 5 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
       "hasHandler": true,
@@ -182,8 +182,8 @@
     },
     {
       "id": "btnLogSet",
-      "label": "(no label)",
-      "section": "Phase 4 · Daily Execution Beginner 4 actions ▼",
+      "label": "Log Set",
+      "section": "Phase 4 · Daily Execution Beginner 5 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
       "hasHandler": true,
@@ -191,13 +191,13 @@
       "category": "other"
     },
     {
-      "id": "btnEndSession",
-      "label": "(no label)",
-      "section": "Phase 4 · Daily Execution Beginner 4 actions ▼",
+      "id": "btnUndoLastSet",
+      "label": "Undo Last Set",
+      "section": "Phase 4 · Daily Execution Beginner 5 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "undoLastSetHandler",
       "category": "other"
     },
     {
