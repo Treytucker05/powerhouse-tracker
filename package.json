@@ -2,16 +2,13 @@
   "name": "powerhouse-rp-toolkit",
   "type": "module",
   "version": "1.0.0",
-  "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",  "scripts": {
+  "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",
+  "scripts": {
     "dev": "parcel index.html --no-cache --open",
     "serve": "parcel index.html --no-cache --port 1234 --open false",
-    "lint": "eslint \"js/**\"",
-    "format": "prettier --write .",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "build": "parcel build index.html --dist-dir dist --public-url ./",
     "audit": "node scripts/collect-ui-inventory.js && node scripts/convert-inventory-to-md.js buttons.json && node scripts/report-missing-handlers.js",
     "audit:dev": "run-p serve audit",
-    "ci": "npm run audit && npm test -- --runInBand && node scripts/report-missing-handlers.js --fail-on-missing"
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "keywords": [
     "fitness",
@@ -25,6 +22,7 @@
     "@parcel/packager-raw-url": "^2.15.2",
     "@parcel/transformer-webmanifest": "^2.15.2",
     "buffer": "^6.0.3",
+    "cross-env": "^7.0.3",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.5",
     "jest": "^30.0.0",

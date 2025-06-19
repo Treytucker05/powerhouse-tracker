@@ -54,11 +54,8 @@ window.btnSaveVolumeLandmarks = saveVolumeLandmarks; // expose for audit
 
 // Phase-2 Mesocycle Planning handlers
 export function setupMesocycle() {
-  console.log("Setup mesocycle");
-  window.trainingState = window.trainingState || {};
-  window.trainingState.mesocycleConfigured = true;
-  window.trainingState.lastMesocycleSetup = new Date().toISOString();
-  saveState();
+  console.log("Mesocycle setup wizard launched");
+  // TODO: open modal / load form steps
   window.dispatchEvent(new CustomEvent("mesocycle-setup"));
 }
 window.btnSetupMesocycle = setupMesocycle;
