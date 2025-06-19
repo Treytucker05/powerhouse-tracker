@@ -313,3 +313,90 @@ function getMuscleGroupsForExercise(exercise) {
     return ['other'];
   }
 }
+
+/**
+ * Undo the last set logged in the current workout session
+ * @param {Object} session - Workout session object
+ * @returns {Object} - Updated session with last set removed
+ */
+export function undoLastSet(session) {
+  if (!session) {
+    throw new Error('No workout session provided');
+  }
+  
+  if (session.status !== 'active') {
+    throw new Error('Cannot undo set - workout session is not active');
+  }
+  
+  if (!session.exercises || session.exercises.length === 0) {
+    throw new Error('No exercises found in current session');
+  }
+  
+  // Find the exercise with the most recent set (highest timestamp)
+  let latestExercise = null;
+  let latestSetIndex = -1;
+  let latestTimestamp = null;
+  
+  session.exercises.forEach((exercise, exerciseIndex) => {
+    if (exercise.sets && exercise.sets.length > 0) {
+      exercise.sets.forEach((set, setIndex) => {
+        const setTimestamp = new Date(set.timestamp);
+        if (!latestTimestamp || setTimestamp > latestTimestamp) {
+          latestTimestamp = setTimestamp;
+          latestExercise = exerciseIndex;
+          latestSetIndex = setIndex;
+        }
+      });
+    }
+  });
+  
+  if (latestExercise === null || latestSetIndex === -1) {
+    throw new Error('No sets found to undo');
+  }
+  
+  // Get reference to the exercise and the set to be removed
+  const exercise = session.exercises[latestExercise];
+  const removedSet = exercise.sets[latestSetIndex];
+  
+  // Remove the set
+  exercise.sets.splice(latestSetIndex, 1);
+  
+  // Update set numbers for remaining sets in this exercise
+  exercise.sets.forEach((set, index) => {
+    set.setNumber = index + 1;
+  });
+  
+  // Recalculate exercise totals
+  exercise.totalSets = exercise.sets.length;
+  exercise.totalVolume = exercise.sets.reduce((total, set) => total + (set.weight * set.reps), 0);
+  
+  // If no sets remain in this exercise, remove the exercise entirely
+  if (exercise.sets.length === 0) {
+    session.exercises.splice(latestExercise, 1);
+  }
+  
+  // Recalculate session totals
+  session.totalSets = session.exercises.reduce((total, ex) => total + ex.totalSets, 0);
+  session.totalVolume = session.exercises.reduce((total, ex) => total + ex.totalVolume, 0);
+  
+  // Update muscle groups worked
+  const allMuscleGroups = session.exercises.flatMap(ex => ex.muscleGroups || []);
+  session.muscleGroups = [...new Set(allMuscleGroups)]; // Remove duplicates
+  
+  // Update training state
+  trainingState.currentWorkout = session;
+  
+  console.log('Set undone:', {
+    exercise: removedSet.exercise,
+    setNumber: removedSet.setNumber,
+    weight: removedSet.weight,
+    reps: removedSet.reps,
+    rir: removedSet.rir,
+    volume: removedSet.weight * removedSet.reps
+  });
+  
+  return {
+    session,
+    removedSet
+  };
+}
