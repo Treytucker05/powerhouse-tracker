@@ -6,7 +6,8 @@ import {
   beginnerPreset, 
   intermediatePreset, 
   advancedPreset, 
-  customConfiguration 
+  customConfiguration,
+  saveVolumeLandmarks
 } from "./buttonHandlers.js";
 
 import {
@@ -1526,8 +1527,13 @@ document
   .getElementById("btnBeginnerPreset")
   ?.addEventListener("click", window.beginnerPreset);
 
+document
+  .getElementById("btnSaveVolumeLandmarks")
+  ?.addEventListener("click", window.btnSaveVolumeLandmarks);
+
 // Ensure all button handlers are exposed for audit script compatibility
 window.btnBeginnerPreset = window.btnBeginnerPreset || window.beginnerPreset;
 window.btnIntermediatePreset = window.btnIntermediatePreset || window.intermediatePreset;
 window.btnAdvancedPreset = window.btnAdvancedPreset || window.advancedPreset;
 window.btnCustomConfiguration = window.btnCustomConfiguration || window.customConfiguration;
+window.btnSaveVolumeLandmarks = window.btnSaveVolumeLandmarks || window.saveVolumeLandmarks;
