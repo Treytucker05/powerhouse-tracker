@@ -89,6 +89,10 @@ describe('Button Handlers', () => {
     expect(typeof window.btnPlateauAnalysis).toBe('function');
   });
 
+  test('btnStartLiveSession should be exposed as a function', () => {
+    expect(typeof window.btnStartLiveSession).toBe('function');
+  });
+
   test('all handlers should not contain TODO or stub in their source', () => {
     const handlers = [
       'btnBeginnerPreset',

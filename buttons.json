@@ -166,8 +166,8 @@
       "section": "Phase 4 · Daily Execution Beginner 4 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "startWorkoutHandler",
       "category": "other"
     },
     {
@@ -186,8 +186,8 @@
       "section": "Phase 4 · Daily Execution Beginner 4 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "logSetHandler",
       "category": "other"
     },
     {
