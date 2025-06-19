@@ -106,8 +106,8 @@
       "section": "Phase 3 · Weekly Management Intermediate 6 actions ▼",
       "parentForm": "(no form)",
       "relatedInputs": 0,
-      "hasHandler": false,
-      "handlerName": "(none)",
+      "hasHandler": true,
+      "handlerName": "runWeeklyAutoProgression",
       "category": "other"
     },
     {
