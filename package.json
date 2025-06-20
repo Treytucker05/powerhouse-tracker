@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "test:unit": "vitest run --coverage",
-    "lint:ci": "eslint \"{lib,tests}/**/*.{js,jsx}\" --max-warnings 0",
+    "lint:ci": "eslint \"{lib,tests,tracker-ui/src}/**/*.{js,jsx}\" --max-warnings 0",
     "verify": "pnpm run build && pnpm run test:unit && pnpm run lint:ci"
   },
   "keywords": [
