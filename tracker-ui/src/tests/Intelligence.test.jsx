@@ -37,8 +37,7 @@ describe('Intelligence Page', () => {
     expect(screen.getByText('Confidence: 85%')).toBeInTheDocument();
     expect(screen.getByText('Confidence: 92%')).toBeInTheDocument();
   });
-  
-  it('should display empty state when no recommendations', () => {
+    it('should display empty state when no recommendations', () => {
     // Mock empty data
     vi.doMock('../src/lib/useAdaptiveRIR', () => ({
       default: () => []
