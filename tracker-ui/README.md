@@ -87,3 +87,22 @@ The application expects the following Supabase tables/views:
 - `muscle` (text)
 - `volume` (numeric)
 - `week` (integer)
+
+## Testing
+
+The application includes comprehensive testing:
+
+- **Unit Tests**: Jest tests for individual components and hooks
+- **E2E Tests**: Playwright tests for full application workflows  
+- **Linting**: ESLint for code quality
+- **CI/CD**: Automated testing in GitHub Actions
+
+Run tests locally:
+```bash
+pnpm run test        # Unit tests (watch mode)
+pnpm run ci          # Unit tests (CI mode)  
+pnpm run test:e2e    # E2E tests with Playwright
+pnpm run lint        # Code linting
+```
+
+See `E2E_TESTING.md` for detailed E2E testing information.

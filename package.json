@@ -1,7 +1,9 @@
-{  "name": "powerhouse-rp-toolkit",
+{
+  "name": "powerhouse-rp-toolkit",
   "type": "module",
   "version": "0.9.0-beta",
-  "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",  "scripts": {
+  "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",
+  "scripts": {
     "dev": "parcel index.html --no-cache --open",
     "serve": "parcel index.html --no-cache --port 1234 --open false",
     "audit": "node scripts/collect-ui-inventory.js && node scripts/convert-inventory-to-md.js buttons.json && node scripts/report-missing-handlers.js",
@@ -22,6 +24,7 @@
   "devDependencies": {
     "@parcel/packager-raw-url": "^2.15.2",
     "@parcel/transformer-webmanifest": "^2.15.2",
+    "@playwright/test": "^1.53.1",
     "buffer": "^6.0.3",
     "cross-env": "^7.0.3",
     "eslint": "^8.57.1",
