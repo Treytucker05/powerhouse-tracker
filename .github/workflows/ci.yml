@@ -34,10 +34,13 @@ jobs:
       - name: Install Playwright browsers
         working-directory: ./tracker-ui
         run: npx playwright install --with-deps
-        
-      - name: Lint React app
+          - name: Strict lint React app (fail on warnings)
         working-directory: ./tracker-ui
-        run: pnpm run lint
+        run: pnpm run lint:ci
+        
+      - name: Run unit tests with coverage
+        working-directory: ./tracker-ui
+        run: pnpm run test:unit
         
       - name: Build React app
         working-directory: ./tracker-ui
