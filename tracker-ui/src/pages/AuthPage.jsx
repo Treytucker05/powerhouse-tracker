@@ -37,9 +37,8 @@ export default function AuthPage() {
         if (data.user && !data.user.email_confirmed_at) {
           setMessage('Check your email for the confirmation link!');
         }
-      } else {
-        // Sign in
-        const { data, error } = await supabase.auth.signInWithPassword({
+      } else {        // Sign in
+        const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
