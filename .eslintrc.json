@@ -18,6 +18,11 @@
         "no-unused-vars": "off",
         "no-undef": "off"
       }
+    },
+    {
+      "files": ["tests/**/*.js"],
+      "env": { "node": true, "jest": true },
+      "rules": { "no-unused-vars": "off", "no-undef": "off" }
     }
   ]
 }
