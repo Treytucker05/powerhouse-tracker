@@ -1,49 +1,49 @@
-import js from '@eslint/js'
-import globals from 'globals'
-
+/** @type {import("eslint").Linter.FlatConfig[]} */
 export default [
+  /* 1️⃣  Ignore generated output & legacy docs */
   {
     ignores: [
-      // legacy bundles, screenshots, etc.
-      "docs/**",
-      "tracker-ui/dist/**",   // ignore Vite build artifacts
-      "**/*.min.js"
+      "dist/**/*",
+      "tracker-ui/dist/**/*",
+      "node_modules/**/*",
+      "docs/**/*",
+      "ProgramDesignWorkspace/docs/**/*"
     ],
   },
-  // Configuration for regular JS files
+
+  /* 2️⃣  Shared language options & globals */
   {
-    files: ["**/*.js"],
     languageOptions: {
-      ecmaVersion: 2020,
+      ecmaVersion: 2022,
+      sourceType: "module",
       globals: {
-        ...globals.browser,
-        ...globals.node,
-        ...globals.jest
+        window: "readonly",
+        document: "readonly",
+        localStorage: "readonly",
+        vi: "readonly",
+        expect: "readonly",
       },
-      parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module'
-      },
+      parserOptions: { ecmaFeatures: { jsx: true } },
     },
-    rules: {
-      ...js.configs.recommended.rules,
-      "no-unused-vars": "warn"
+    plugins: {
+      react: require("eslint-plugin-react"),
+      "react-hooks": require("eslint-plugin-react-hooks"),
+      vitest: require("eslint-plugin-vitest"),
     },
   },
-  // Skip JSX files for now since we need React plugin
+
+  /* 3️⃣  Actual rules for source & tests */
   {
-    files: ["**/*.jsx"],
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-        ...globals.jest,
-        React: "readonly"
-      }
-    },
+    files: [
+      "src/**/*.{js,jsx}",
+      "lib/**/*.{js,jsx}",
+      "tracker-ui/src/**/*.{js,jsx}",
+      "tests/**/*.{js,jsx}"
+    ],
     rules: {
-      // Minimal rules for JSX files
-      "no-unused-vars": "warn"
+      "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn"
     },
-  }
-]
+  },
+];
