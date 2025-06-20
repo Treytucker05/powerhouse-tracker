@@ -1,0 +1,15 @@
+{
+  "scoringLegend": {
+    "0": "Excellent performance / No soreness",
+    "1": "Good performance / Minimal soreness",
+    "2": "Average performance / Moderate soreness",
+    "3": "Below average / High soreness",
+    "4": "Poor performance / Excessive soreness"
+  },
+  "deloadTriggers": {
+    "totalScoreThreshold": 5,
+    "performanceCrashDays": 3,
+    "performanceCrashThreshold": 3,
+    "singleDayPerformanceThreshold": 4
+  }
+}
