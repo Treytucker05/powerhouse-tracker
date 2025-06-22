@@ -932,7 +932,13 @@ const feedbackCSS = `
 // Inject CSS
 const style = document.createElement("style");
 style.textContent = feedbackCSS;
-document.head.appendChild(style);
+if (document.head && typeof document.head.appendChild === 'function') {
+  try {
+    document.head.appendChild(style);
+  } catch (e) {
+    // Ignore errors in test environment
+  }
+}
 
 // Create singleton instance
 const userFeedbackManager = new UserFeedbackManager();
