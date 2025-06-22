@@ -3,7 +3,25 @@
  * Tests for Phase-4 set logging functionality
  */
 
-import { vi } from 'vitest';
+/**
+ * LogSet Algorithm Tests
+ * Tests for Phase-4 set logging functionality
+ */
+
++import { vi as jest } from 'vitest';
+
+// Mock the trainingState module
+const mockTrainingState = {
+  currentWorkout: null,
+  workoutHistory: [],
+  currentWeek: 1,
+  currentMesocycle: 1,
+  programVersion: '1.0',
+  volumeLandmarks: {
+    chest: { MV: 10, MRV: 20 },
+    back: { MV: 12, MRV: 24 }
+  }
+};
 
 // Mock the trainingState module
 const mockTrainingState = {
