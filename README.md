@@ -1,8 +1,8 @@
-# PowerHouse Tracker - Renaissance Periodization Toolkit v0.9.0-beta.1
+# PowerHouse Tracker - Renaissance Periodization Toolkit v0.9.0-beta.4
 
 A comprehensive evidence-based training toolkit implementing Renaissance Periodization methodology with **automated volume progression**, **intelligent deload analysis**, and **data management**.
 
-## 🎯 Latest Features (v0.9.0-beta.1)
+## 🎯 Latest Features (v0.9.0-beta.4)
 
 ### ✅ **Complete Handler Coverage (0 Missing)**
 All 35 button handlers are now implemented across 7 training phases:
@@ -55,6 +55,27 @@ pnpm run build
 
 # Lint check
 pnpm run lint:ci
+```
+
+## 🟢 Node.js Usage
+
+### Auto-Bootstrap (Recommended)
+```js
+// Automatically sets up browser globals for Node.js
+import { initIntelligence, calculateDeload } from 'powerhouse-rp-toolkit';
+
+// Use toolkit functions normally
+const result = await initIntelligence();
+```
+
+### Manual Bootstrap (CI, REPL, etc.)
+```js
+// Manual environment setup for special cases
+import 'powerhouse-rp-toolkit/node-bootstrap';
+const { calculateDeload, exportAllData } = await import('powerhouse-rp-toolkit');
+
+// Toolkit is now ready to use in Node.js
+const deloadAnalysis = calculateDeload(trainingData);
 ```
 
 ### Development Setup

@@ -1,7 +1,7 @@
 {
   "name": "powerhouse-rp-toolkit",
   "type": "module",
-  "version": "0.9.0-beta.3",
+  "version": "0.9.0-beta.4",
   "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",
   "main": "main.js",
   "exports": {
@@ -43,6 +43,7 @@
     "fake-indexeddb": "^4.0.2",
     "jest": "^30.0.0",
     "jest-environment-jsdom": "^30.0.0",
+    "jsdom": "^22.1.0",
     "npm-run-all": "^4.1.5",
     "parcel": "^2.15.2",
     "playwright": "^1.53.1",

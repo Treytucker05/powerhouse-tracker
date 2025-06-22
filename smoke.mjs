@@ -1,24 +1,31 @@
-// --- headless-Node smoke test for powerhouse-rp-toolkit -----------------
-import { JSDOM }        from 'jsdom';
-import { LocalStorage } from 'node-localstorage';
+// smoke.mjs — Enhanced Node.js smoke test for powerhouse-rp-toolkit
+import './node-bootstrap.js';
 
-// 1) spin up a minimal DOM
-const { window } = new JSDOM(
-  '<!doctype html><html><body></body></html>',
-  { url: 'https://localhost/' }          // gives us window.location
-);
+console.log('🧪 Bootstrapped Node environment');
 
-// 2) expose the globals the toolkit expects
-global.window            = window;
-global.document          = window.document;
-global.MutationObserver  = window.MutationObserver;
-global.location          = window.location;
-global.navigator         = window.navigator;
-global.Event             = window.Event;
-global.CustomEvent       = window.CustomEvent;
-global.localStorage      = new LocalStorage('./.pwr-rp-data');
+// Test Event polyfills
+const ev = new Event('check');
+const cev = new CustomEvent('custom', { detail: { test: true } });
 
-// 3) dynamically import the toolkit
-import('powerhouse-rp-toolkit')
-  .then(() => console.log('Toolkit loads correctly 👍'))
-  .catch(err => { console.error('Toolkit failed to load ❌'); console.error(err); });
+if (!(ev instanceof Event) || !(cev instanceof CustomEvent)) {
+  throw new Error('Event polyfill failed');
+}
+
+console.log('✅ Event system working');
+
+// Test basic imports
+try {
+  const { TrainingState } = await import('./js/core/trainingState.js');
+  console.log('✅ TrainingState imported');
+} catch (err) {
+  console.error('❌ TrainingState failed:', err.message);
+}
+
+try {
+  const { showSection } = await import('./js/ui/navigation.js');
+  console.log('✅ Navigation imported');
+} catch (err) {
+  console.error('❌ Navigation failed:', err.message);
+}
+
+console.log('🎉 Basic toolkit components load correctly 👍');

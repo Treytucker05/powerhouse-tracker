@@ -94,6 +94,11 @@ export function showSection(sectionId) {
  * @param {string} activeButtonId - The ID of the button to set as active
  */
 function setActiveNavButton(activeButtonId) {
+  if (!isBrowser()) {
+    console.log(`[Navigation] setActiveNavButton(${activeButtonId}) skipped (Node)`);
+    return;
+  }
+
   const navButtons = ["navMacro", "navMeso", "navMicro", "navTrack"];
 
   navButtons.forEach((buttonId) => {

@@ -4,6 +4,14 @@
  */
 import { debugLog } from "../utils/debug.js";
 
+/**
+ * Check if running in browser environment
+ */
+const isBrowser = () =>
+  typeof window !== "undefined" &&
+  typeof document !== "undefined" &&
+  typeof localStorage !== "undefined";
+
 class TrainingState {
   constructor(opts = {}) {
     if (TrainingState.instance) {
@@ -354,6 +362,11 @@ class TrainingState {
 
   // Save state to localStorage
   saveState() {
+    if (!isBrowser()) {
+      console.log("[TrainingState] saveState() skipped (Node)");
+      return;
+    }
+
     const state = {
       volumeLandmarks: this.volumeLandmarks,
       weekNo: this.weekNo,
@@ -375,6 +388,11 @@ class TrainingState {
 
   // Load state from localStorage
   loadState() {
+    if (!isBrowser()) {
+      console.log("[TrainingState] loadState() skipped (Node)");
+      return;
+    }
+
     const saved = localStorage.getItem("rp-training-state");
     if (saved) {
       try {
