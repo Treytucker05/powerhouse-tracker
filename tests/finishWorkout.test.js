@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { vi } from 'vitest';
++import { vi as jest } from 'vitest';
 
 import { finishWorkout } from '../js/algorithms/workout.js';
 import { finishWorkoutHandler } from '../js/ui/buttonHandlers.js';

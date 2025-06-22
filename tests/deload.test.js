@@ -3,17 +3,14 @@
  */
 
 import * as ts from "../js/core/trainingState.js";
+import { mockTrainingState as state } from "../__tests__/__mocks__/trainingState.js";
+import { resetMockTrainingState } from "../__tests__/helpers/mockState.js";
 import { analyzeDeloadNeed, initializeAtMEV } from "../js/algorithms/deload.js";
 
 // ----- isolate global singleton so later test-suites aren't polluted -----
 const snapshot = ts.trainingState ? Object.assign({}, ts.trainingState) : {};
 
-beforeEach(() => {
-  // start every test with a fresh clone of the pristine snapshot
-  if (ts.trainingState) {
-    Object.assign(ts.trainingState, Object.assign({}, snapshot));
-  }
-});
+beforeEach(resetMockTrainingState);
 
 afterAll(() => {
   // restore original once the whole file is done
@@ -25,6 +22,7 @@ afterAll(() => {
 describe('Deload Algorithm Tests', () => {
   describe('analyzeDeloadNeed', () => {
     const mockTrainingState = {
+      ...state,
       currentMesocycle: {
         currentWeek: 4,
         length: 6
@@ -116,6 +114,7 @@ describe('Deload Algorithm Tests', () => {
 
   describe('initializeAtMEV', () => {
     const mockTrainingState = {
+      ...state,
       volumeLandmarks: {
         chest: { mv: 8, mev: 10, mav: 16, mrv: 20 },
         back: { mv: 6, mev: 8, mav: 14, mrv: 18 },
@@ -188,6 +187,7 @@ describe('Deload Algorithm Tests', () => {
   describe('Integration Tests', () => {
     test('should work together for complete deload cycle', () => {
       const trainingState = {
+        ...state,
         currentMesocycle: { currentWeek: 5, length: 6 },
         weeklyProgram: {
           actualVolume: {

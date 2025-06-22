@@ -3,7 +3,7 @@
  * Tests for Phase-4 workout session management
  */
 
-import { vi } from 'vitest';
++import { vi as jest } from 'vitest';
 
 // Mock the trainingState module
 const mockTrainingState = {

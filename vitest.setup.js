@@ -1,7 +1,10 @@
 import { vi } from 'vitest';
 
-// temporary shim for legacy Jest calls
+import { vi } from 'vitest';
+
+// Provide jest global for legacy specs
 globalThis.jest = vi;
 
-// ensure ts-node/globals parity if needed
+// Optional but harmless: expose afterAll on global for parity
 globalThis.afterAll = afterAll;
+
