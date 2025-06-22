@@ -3,17 +3,14 @@
  */
 
 import * as ts from "../js/core/trainingState.js";
+import { mockTrainingState as state } from "../__tests__/__mocks__/trainingState.js";
+import { resetMockTrainingState } from "../__tests__/helpers/mockState.js";
 import { initIntelligence, optimizeVolumeLandmarks, adaptiveRIRRecommendations } from "../js/algorithms/intelligence.js";
 
 // ----- isolate global singleton so later test-suites aren't polluted -----
 const snapshot = ts.trainingState ? Object.assign({}, ts.trainingState) : {};
 
-beforeEach(() => {
-  // start every test with a fresh clone of the pristine snapshot
-  if (ts.trainingState) {
-    Object.assign(ts.trainingState, Object.assign({}, snapshot));
-  }
-});
+beforeEach(resetMockTrainingState);
 
 afterAll(() => {
   // restore original once the whole file is done
@@ -25,6 +22,7 @@ afterAll(() => {
 describe('Intelligence Algorithm Tests', () => {
   describe('initIntelligence', () => {
     const mockTrainingState = {
+      ...state,
       currentMesocycle: {
         currentWeek: 3,
         length: 6
@@ -95,6 +93,7 @@ describe('Intelligence Algorithm Tests', () => {
 
   describe('optimizeVolumeLandmarks', () => {
     const mockTrainingState = {
+      ...state,
       currentMesocycle: {
         currentWeek: 4,
         length: 6
@@ -181,6 +180,7 @@ describe('Intelligence Algorithm Tests', () => {
 
   describe('adaptiveRIRRecommendations', () => {
     const mockTrainingState = {
+      ...state,
       currentMesocycle: {
         currentWeek: 3,
         length: 6,
@@ -291,6 +291,7 @@ describe('Intelligence Algorithm Tests', () => {
   describe('Integration Tests', () => {
     test('should work together for complete intelligence workflow', () => {
       const trainingState = {
+        ...state,
         currentMesocycle: { currentWeek: 3, length: 6, phase: 'accumulation' },
         weeklyProgram: {
           actualVolume: {
