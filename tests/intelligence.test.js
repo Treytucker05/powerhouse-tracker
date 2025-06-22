@@ -265,13 +265,20 @@ describe('Intelligence Algorithm Tests', () => {
     test('should work together for complete intelligence workflow', () => {
       const trainingState = {
         ...mockTrainingState,
-        currentMesocycle: { currentWeek: 3, length: 6, phase: 'accumulation' },
-        weeklyProgram: {
+        currentMesocycle: { currentWeek: 3, length: 6, phase: 'accumulation' },        weeklyProgram: {
           actualVolume: {
             chest: [10, 12, 14],
             back: [8, 10, 12]
           }
         },
+        weeklyProgressionHistory: [
+          { week: 1, muscle: 'chest', volume: 10, rpe: 7 },
+          { week: 2, muscle: 'chest', volume: 12, rpe: 7.5 },
+          { week: 3, muscle: 'chest', volume: 14, rpe: 8 },
+          { week: 1, muscle: 'back', volume: 8, rpe: 7 },
+          { week: 2, muscle: 'back', volume: 10, rpe: 7.5 },
+          { week: 3, muscle: 'back', volume: 12, rpe: 8 }
+        ],
         volumeLandmarks: {
           chest: { mv: 8, mev: 10, mav: 16, mrv: 20 },
           back: { mv: 6, mev: 8, mav: 14, mrv: 18 }
@@ -281,23 +288,35 @@ describe('Intelligence Algorithm Tests', () => {
       
       // 1. Initialize intelligence
       const initResult = initIntelligence(trainingState);
-      expect(initResult.success).toBe(true);
-      
-      // Update state with initialization results
+      expect(initResult.success).toBe(true);      // Update state with initialization results and ensure volume landmarks are preserved
       const updatedState = {
         ...trainingState,
         intelligence: {
           isInitialized: true,
           ...initResult.intelligenceConfig
+        },
+        // Explicitly preserve volumeLandmarks
+        volumeLandmarks: {
+          chest: { mv: 8, mev: 10, mav: 16, mrv: 20 },
+          back: { mv: 6, mev: 8, mav: 14, mrv: 18 }
+        },
+        getWeeklySets: (muscle) => {
+          const volumeData = trainingState.weeklyProgram?.actualVolume[muscle];
+          return volumeData ? volumeData[volumeData.length - 1] : 0;
         }
       };
       
       // 2. Optimize volume landmarks
       const optimizeResult = optimizeVolumeLandmarks(updatedState);
-      expect(optimizeResult.success).toBe(true);
-      
-      // 3. Get adaptive RIR recommendations
+      expect(optimizeResult.success).toBe(true);      // 3. Get adaptive RIR recommendations  
       const rirResult = adaptiveRIRRecommendations(updatedState);
+      
+      // Debug - check why recommendations is empty
+      if (Object.keys(rirResult.recommendations).length === 0) {
+        console.error('RIR result has empty recommendations:', rirResult);
+        console.error('Updated state landmarks:', updatedState.volumeLandmarks);
+        console.error('Updated state intelligence:', updatedState.intelligence);
+      }      
       expect(rirResult.success).toBe(true);
       
       // Verify the workflow produces coherent results
