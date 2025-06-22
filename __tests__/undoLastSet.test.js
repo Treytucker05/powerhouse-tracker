@@ -1,8 +1,7 @@
 /**
- * @jest-environment jsdom
- */
+ * @jest-environment jsdom */
 
-+import { vi as jest } from 'vitest';
+import { vi as jest } from 'vitest';
 
 import { undoLastSet } from '../js/algorithms/workout.js';
 import { undoLastSetHandler } from '../js/ui/buttonHandlers.js';
