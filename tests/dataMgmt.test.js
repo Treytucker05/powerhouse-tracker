@@ -4,6 +4,7 @@
 
 import * as ts from "../js/core/trainingState.js";
 import { exportAllData, exportChart, createBackup, autoBackup, importData, exportFeedback } from "../js/algorithms/dataExport.js";
+import { mockTrainingState, resetMockTrainingState } from "../__tests__/helpers/mockState.js";
 import { vi } from 'vitest';
 
 // Mock file system operations for testing
@@ -36,14 +37,11 @@ document.createElement = vi.fn((tagName) => {
     element.files = [];
     element.onchange = null;
   }
-  
-  return element;
+    return element;
 });
 
-document.body = {
-  appendChild: vi.fn(),
-  removeChild: vi.fn()
-};
+vi.spyOn(document.body, 'appendChild').mockImplementation(() => {});
+vi.spyOn(document.body, 'removeChild').mockImplementation(() => {});
 
 // ----- isolate global singleton so later test-suites aren't polluted -----
 const snapshot = ts.trainingState ? Object.assign({}, ts.trainingState) : {};
@@ -66,26 +64,11 @@ afterAll(() => {
 });
 
 describe('Data Management Algorithm Tests', () => {
-  describe('exportAllData', () => {
-    const mockTrainingState = {
-      currentMesocycle: {
-        currentWeek: 3,
-        length: 6,
-        startDate: '2024-01-01',
-        phase: 'accumulation'
-      },
-      weeklyProgram: {
-        actualVolume: {
-          chest: [12, 14, 16],
-          back: [10, 12, 14]
-        }
-      },
-      volumeLandmarks: {
-        chest: { mv: 8, mev: 10, mav: 16, mrv: 20 },
-        back: { mv: 6, mev: 8, mav: 14, mrv: 18 }
-      }
-    };
+  beforeEach(() => {
+    resetMockTrainingState();
+  });
 
+  describe('exportAllData', () => {
     test('should export all training data as JSON', () => {
       const result = exportAllData(mockTrainingState);
       

@@ -3,8 +3,7 @@
  */
 
 import * as ts from "../js/core/trainingState.js";
-import { mockTrainingState as state } from "../__tests__/__mocks__/trainingState.js";
-import { resetMockTrainingState } from "../__tests__/helpers/mockState.js";
+import { mockTrainingState, resetMockTrainingState } from "../__tests__/helpers/mockState.js";
 import { analyzeDeloadNeed, initializeAtMEV } from "../js/algorithms/deload.js";
 
 // ----- isolate global singleton so later test-suites aren't polluted -----
@@ -21,26 +20,6 @@ afterAll(() => {
 
 describe('Deload Algorithm Tests', () => {
   describe('analyzeDeloadNeed', () => {
-    const mockTrainingState = {
-      ...state,
-      currentMesocycle: {
-        currentWeek: 4,
-        length: 6
-      },
-      weeklyProgram: {
-        actualVolume: {
-          chest: [12, 14, 16, 18],
-          back: [10, 12, 14, 16],
-          shoulders: [8, 10, 12, 14]
-        }
-      },
-      volumeLandmarks: {
-        chest: { mv: 8, mev: 10, mav: 16, mrv: 20 },
-        back: { mv: 6, mev: 8, mav: 14, mrv: 18 },
-        shoulders: { mv: 4, mev: 6, mav: 12, mrv: 16 }
-      }
-    };
-
     test('should recommend deload when volume approaches MRV', () => {
       const result = analyzeDeloadNeed(mockTrainingState);
       
@@ -111,10 +90,9 @@ describe('Deload Algorithm Tests', () => {
       });
     });
   });
-
   describe('initializeAtMEV', () => {
-    const mockTrainingState = {
-      ...state,
+    const localMockState = {
+      ...mockTrainingState,
       volumeLandmarks: {
         chest: { mv: 8, mev: 10, mav: 16, mrv: 20 },
         back: { mv: 6, mev: 8, mav: 14, mrv: 18 },
@@ -124,10 +102,8 @@ describe('Deload Algorithm Tests', () => {
         currentWeek: 1,
         length: 6
       }
-    };
-
-    test('should reset volumes to MEV levels', () => {
-      const result = initializeAtMEV(mockTrainingState);
+    };    test('should reset volumes to MEV levels', () => {
+      const result = initializeAtMEV(localMockState);
       
       expect(result).toHaveProperty('success', true);
       expect(result).toHaveProperty('newVolumes');
@@ -139,7 +115,7 @@ describe('Deload Algorithm Tests', () => {
     });
 
     test('should provide change summary', () => {
-      const result = initializeAtMEV(mockTrainingState);
+      const result = initializeAtMEV(localMockState);
       
       expect(result.changes).toHaveProperty('musclesReset');
       expect(Array.isArray(result.changes.musclesReset)).toBe(true);
@@ -158,10 +134,8 @@ describe('Deload Algorithm Tests', () => {
       
       expect(result).toHaveProperty('success');
       expect(result).toHaveProperty('newVolumes');
-    });
-
-    test('should provide reset recommendations', () => {
-      const result = initializeAtMEV(mockTrainingState);
+    });    test('should provide reset recommendations', () => {
+      const result = initializeAtMEV(localMockState);
       
       expect(result).toHaveProperty('recommendations');
       expect(Array.isArray(result.recommendations)).toBe(true);
@@ -183,11 +157,10 @@ describe('Deload Algorithm Tests', () => {
       expect(result.error).toContain('MEV');
     });
   });
-
   describe('Integration Tests', () => {
     test('should work together for complete deload cycle', () => {
       const trainingState = {
-        ...state,
+        ...mockTrainingState,
         currentMesocycle: { currentWeek: 5, length: 6 },
         weeklyProgram: {
           actualVolume: {

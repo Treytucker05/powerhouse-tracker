@@ -2,11 +2,9 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    setupFiles: ["./vitest.setup.js"],
-    environment: "jsdom",
-    globals: true,                        // Enable global test functions (describe, it, expect, etc.)
-
-    setupFiles: ['./vitest.setup.js'],
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./vitest.setup.js'],          // ← single, canonical entry
     
     // 🎯 Specify which test files to run
     include: ["tests/**/*.{test,spec}.{js,jsx}", "__tests__/**/*.{test,spec}.{js,jsx}"],

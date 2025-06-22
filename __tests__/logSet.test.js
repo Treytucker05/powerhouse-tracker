@@ -5,39 +5,14 @@
 
 /**
  * LogSet Algorithm Tests
- * Tests for Phase-4 set logging functionality
- */
+ * Tests for Phase-4 set logging functionality */
 
-+import { vi as jest } from 'vitest';
-
-// Mock the trainingState module
-const mockTrainingState = {
-  currentWorkout: null,
-  workoutHistory: [],
-  currentWeek: 1,
-  currentMesocycle: 1,
-  programVersion: '1.0',
-  volumeLandmarks: {
-    chest: { MV: 10, MRV: 20 },
-    back: { MV: 12, MRV: 24 }
-  }
-};
-
-// Mock the trainingState module
-const mockTrainingState = {
-  currentWorkout: null,
-  workoutHistory: [],
-  currentWeek: 1,
-  currentMesocycle: 1,
-  programVersion: '1.0',
-  volumeLandmarks: {
-    chest: { MV: 10, MRV: 20 },
-    back: { MV: 12, MRV: 24 }
-  }
-};
+import { vi as jest } from 'vitest';
+import { makeTrainingState } from '../helpers/mockState.js';
+const mockTrainingState = makeTrainingState();
 
 // Mock the core module
-jest.unstable_mockModule('../js/core/trainingState.js', () => ({
+vi.mock('../js/core/trainingState.js', () => ({
   default: mockTrainingState,
   saveState: vi.fn()
 }));

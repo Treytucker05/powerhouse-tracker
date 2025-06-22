@@ -3,7 +3,7 @@
  */
 
 import * as ts from "../js/core/trainingState.js";
-import { mockTrainingState as state } from "../__tests__/__mocks__/trainingState.js";
+import { mockTrainingState } from "../__tests__/helpers/mockState.js";
 import { resetMockTrainingState } from "../__tests__/helpers/mockState.js";
 import { initIntelligence, optimizeVolumeLandmarks, adaptiveRIRRecommendations } from "../js/algorithms/intelligence.js";
 
@@ -20,9 +20,8 @@ afterAll(() => {
 });
 
 describe('Intelligence Algorithm Tests', () => {
-  describe('initIntelligence', () => {
-    const mockTrainingState = {
-      ...state,
+  describe('initIntelligence', () => {    const localMockState = {
+      ...mockTrainingState,
       currentMesocycle: {
         currentWeek: 3,
         length: 6
@@ -40,10 +39,8 @@ describe('Intelligence Algorithm Tests', () => {
         shoulders: { mv: 4, mev: 6, mav: 12, mrv: 16 }
       },
       intelligence: {}
-    };
-
-    test('should initialize intelligence system successfully', () => {
-      const result = initIntelligence(mockTrainingState);
+    };    test('should initialize intelligence system successfully', () => {
+      const result = initIntelligence(localMockState);
       
       expect(result).toHaveProperty('success', true);
       expect(result).toHaveProperty('intelligenceConfig');
@@ -56,7 +53,7 @@ describe('Intelligence Algorithm Tests', () => {
     });
 
     test('should configure intelligence parameters', () => {
-      const result = initIntelligence(mockTrainingState);
+      const result = initIntelligence(localMockState);
       
       expect(result.intelligenceConfig).toHaveProperty('adaptiveThresholds');
       expect(result.intelligenceConfig).toHaveProperty('learningRate');
@@ -80,20 +77,17 @@ describe('Intelligence Algorithm Tests', () => {
       expect(result).toHaveProperty('success', true);
       expect(result).toHaveProperty('warnings');
       expect(Array.isArray(result.warnings)).toBe(true);
-    });
-
-    test('should provide initialization recommendations', () => {
-      const result = initIntelligence(mockTrainingState);
+    });    test('should provide initialization recommendations', () => {
+      const result = initIntelligence(localMockState);
       
       expect(result).toHaveProperty('recommendations');
       expect(Array.isArray(result.recommendations)).toBe(true);
       expect(result.recommendations.length).toBeGreaterThan(0);
     });
   });
-
   describe('optimizeVolumeLandmarks', () => {
-    const mockTrainingState = {
-      ...state,
+    const localMockState = {
+      ...mockTrainingState,
       currentMesocycle: {
         currentWeek: 4,
         length: 6
@@ -114,10 +108,8 @@ describe('Intelligence Algorithm Tests', () => {
         isInitialized: true,
         adaptiveThresholds: true
       }
-    };
-
-    test('should optimize volume landmarks based on performance data', () => {
-      const result = optimizeVolumeLandmarks(mockTrainingState);
+    };    test('should optimize volume landmarks based on performance data', () => {
+      const result = optimizeVolumeLandmarks(localMockState);
       
       expect(result).toHaveProperty('success', true);
       expect(result).toHaveProperty('optimizedLandmarks');
@@ -127,19 +119,15 @@ describe('Intelligence Algorithm Tests', () => {
       expect(typeof result.confidence).toBe('number');
       expect(result.confidence).toBeGreaterThanOrEqual(0);
       expect(result.confidence).toBeLessThanOrEqual(100);
-    });
-
-    test('should provide detailed optimization changes', () => {
-      const result = optimizeVolumeLandmarks(mockTrainingState);
+    });    test('should provide detailed optimization changes', () => {
+      const result = optimizeVolumeLandmarks(localMockState);
       
       expect(result.changes).toHaveProperty('adjustments');
       expect(result.changes).toHaveProperty('reasoning');
       expect(Array.isArray(result.changes.adjustments)).toBe(true);
       expect(Array.isArray(result.changes.reasoning)).toBe(true);
-    });
-
-    test('should maintain landmark relationships', () => {
-      const result = optimizeVolumeLandmarks(mockTrainingState);
+    });    test('should maintain landmark relationships', () => {
+      const result = optimizeVolumeLandmarks(localMockState);
       
       Object.keys(result.optimizedLandmarks).forEach(muscle => {
         const landmarks = result.optimizedLandmarks[muscle];
@@ -151,9 +139,8 @@ describe('Intelligence Algorithm Tests', () => {
       });
     });
 
-    test('should require initialized intelligence system', () => {
-      const uninitializedState = {
-        ...mockTrainingState,
+    test('should require initialized intelligence system', () => {      const uninitializedState = {
+        ...localMockState,
         intelligence: { isInitialized: false }
       };
       
@@ -162,10 +149,8 @@ describe('Intelligence Algorithm Tests', () => {
       expect(result.success).toBe(false);
       expect(result).toHaveProperty('error');
       expect(result.error).toContain('intelligence');
-    });
-
-    test('should provide optimization metrics', () => {
-      const result = optimizeVolumeLandmarks(mockTrainingState);
+    });    test('should provide optimization metrics', () => {
+      const result = optimizeVolumeLandmarks(localMockState);
       
       expect(result).toHaveProperty('metrics');
       expect(result.metrics).toHaveProperty('totalAdjustments');
@@ -177,10 +162,9 @@ describe('Intelligence Algorithm Tests', () => {
       expect(Array.isArray(result.metrics.musclesOptimized)).toBe(true);
     });
   });
-
   describe('adaptiveRIRRecommendations', () => {
-    const mockTrainingState = {
-      ...state,
+    const localMockState = {
+      ...mockTrainingState,
       currentMesocycle: {
         currentWeek: 3,
         length: 6,
@@ -203,10 +187,8 @@ describe('Intelligence Algorithm Tests', () => {
           volumeResponse: 0.75
         }
       }
-    };
-
-    test('should provide adaptive RIR recommendations', () => {
-      const result = adaptiveRIRRecommendations(mockTrainingState);
+    };    test('should provide adaptive RIR recommendations', () => {
+      const result = adaptiveRIRRecommendations(localMockState);
       
       expect(result).toHaveProperty('success', true);
       expect(result).toHaveProperty('recommendations');
@@ -217,13 +199,12 @@ describe('Intelligence Algorithm Tests', () => {
       expect(Object.keys(result.recommendations).length).toBeGreaterThan(0);
     });
 
-    test('should adjust RIR based on mesocycle phase', () => {
-      const accumulationResult = adaptiveRIRRecommendations(mockTrainingState);
+    test('should adjust RIR based on mesocycle phase', () => {      const accumulationResult = adaptiveRIRRecommendations(localMockState);
       
       const intensificationState = {
-        ...mockTrainingState,
+        ...localMockState,
         currentMesocycle: {
-          ...mockTrainingState.currentMesocycle,
+          ...localMockState.currentMesocycle,
           phase: 'intensification'
         }
       };
@@ -239,10 +220,8 @@ describe('Intelligence Algorithm Tests', () => {
       
       expect(typeof accRIR).toBe('number');
       expect(typeof intRIR).toBe('number');
-    });
-
-    test('should consider muscle-specific adaptations', () => {
-      const result = adaptiveRIRRecommendations(mockTrainingState);
+    });    test('should consider muscle-specific adaptations', () => {
+      const result = adaptiveRIRRecommendations(localMockState);
       
       expect(result.recommendations).toHaveProperty('chest');
       expect(result.recommendations).toHaveProperty('back');
@@ -252,10 +231,8 @@ describe('Intelligence Algorithm Tests', () => {
         expect(rir).toBeGreaterThanOrEqual(0);
         expect(rir).toBeLessThanOrEqual(5);
       });
-    });
-
-    test('should provide detailed rationale', () => {
-      const result = adaptiveRIRRecommendations(mockTrainingState);
+    });    test('should provide detailed rationale', () => {
+      const result = adaptiveRIRRecommendations(localMockState);
       
       expect(result.rationale).toHaveProperty('factorsConsidered');
       expect(result.rationale).toHaveProperty('adaptationLevel');
@@ -265,9 +242,8 @@ describe('Intelligence Algorithm Tests', () => {
       expect(typeof result.rationale.adaptationLevel).toBe('string');
     });
 
-    test('should handle missing performance metrics', () => {
-      const stateWithoutMetrics = {
-        ...mockTrainingState,
+    test('should handle missing performance metrics', () => {      const stateWithoutMetrics = {
+        ...localMockState,
         intelligence: { isInitialized: true }
       };
       
@@ -276,10 +252,8 @@ describe('Intelligence Algorithm Tests', () => {
       expect(result).toHaveProperty('success', true);
       expect(result).toHaveProperty('warnings');
       expect(Array.isArray(result.warnings)).toBe(true);
-    });
-
-    test('should provide confidence scores', () => {
-      const result = adaptiveRIRRecommendations(mockTrainingState);
+    });    test('should provide confidence scores', () => {
+      const result = adaptiveRIRRecommendations(localMockState);
       
       expect(result).toHaveProperty('confidence');
       expect(typeof result.confidence).toBe('number');
@@ -287,11 +261,10 @@ describe('Intelligence Algorithm Tests', () => {
       expect(result.confidence).toBeLessThanOrEqual(100);
     });
   });
-
   describe('Integration Tests', () => {
     test('should work together for complete intelligence workflow', () => {
       const trainingState = {
-        ...state,
+        ...mockTrainingState,
         currentMesocycle: { currentWeek: 3, length: 6, phase: 'accumulation' },
         weeklyProgram: {
           actualVolume: {
