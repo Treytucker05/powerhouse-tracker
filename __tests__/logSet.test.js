@@ -3,7 +3,7 @@
  * Tests for Phase-4 set logging functionality
  */
 
-import { jest } from '@jest/globals';
+import { vi as jest } from 'vitest';
 
 // Mock the trainingState module
 const mockTrainingState = {
