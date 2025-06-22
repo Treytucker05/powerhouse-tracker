@@ -1,10 +1,19 @@
 import trainingState from "../core/trainingState.js";
-import { isHighFatigue, calculateOptimalFrequency } from "../algorithms/fatigue.js";
+import {
+  isHighFatigue,
+  calculateOptimalFrequency,
+} from "../algorithms/fatigue.js";
 
 describe("isHighFatigue", () => {
   test("detects low stimulus to fatigue ratio", () => {
     const state = { repStrengthDrop: () => false };
-    const feedback = { soreness: 2, jointAche: 2, perfChange: 0, pump: 1, disruption: 0 };
+    const feedback = {
+      soreness: 2,
+      jointAche: 2,
+      perfChange: 0,
+      pump: 1,
+      disruption: 0,
+    };
     expect(isHighFatigue("Chest", feedback, state)).toBe(true);
   });
 
@@ -23,7 +32,13 @@ describe("isHighFatigue", () => {
 
   test("returns false when stimulus outweighs fatigue", () => {
     const state = { repStrengthDrop: () => false };
-    const feedback = { soreness: 0, jointAche: 0, perfChange: 1, pump: 3, disruption: 3 };
+    const feedback = {
+      soreness: 0,
+      jointAche: 0,
+      perfChange: 1,
+      pump: 3,
+      disruption: 3,
+    };
     expect(isHighFatigue("Chest", feedback, state)).toBe(false);
   });
 });
@@ -57,6 +72,8 @@ describe("calculateOptimalFrequency", () => {
   });
 
   test("throws for missing landmarks", () => {
-    expect(() => calculateOptimalFrequency("Unknown")).toThrow("Missing volume landmarks");
+    expect(() => calculateOptimalFrequency("Unknown")).toThrow(
+      "Missing volume landmarks",
+    );
   });
 });

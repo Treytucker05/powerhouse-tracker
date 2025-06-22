@@ -445,4 +445,9 @@ function calculateSystemicFatigue(state) {
   return fatigueAssessment.fatigueScore;
 }
 
-export { analyzeFrequency, calculateOptimalFrequency, isHighFatigue, calculateSystemicFatigue };
+export {
+  analyzeFrequency,
+  calculateOptimalFrequency,
+  isHighFatigue,
+  calculateSystemicFatigue,
+};

@@ -20,9 +20,11 @@ export function initWorkoutLogger() {
  */
 function setupRIRInputs() {
   // Add RIR inputs to existing exercise forms
-  const exerciseForms = document.querySelectorAll('.exercise-form, .set-logger');
-  
-  exerciseForms.forEach(form => {
+  const exerciseForms = document.querySelectorAll(
+    ".exercise-form, .set-logger",
+  );
+
+  exerciseForms.forEach((form) => {
     addRIRInputToForm(form);
   });
 }
@@ -33,10 +35,10 @@ function setupRIRInputs() {
  */
 function addRIRInputToForm(form) {
   // Check if RIR input already exists
-  if (form.querySelector('.rir-input')) return;
-  
-  const rirContainer = document.createElement('div');
-  rirContainer.className = 'rir-input-container';
+  if (form.querySelector(".rir-input")) return;
+
+  const rirContainer = document.createElement("div");
+  rirContainer.className = "rir-input-container";
   rirContainer.innerHTML = `
     <label for="rir-input" class="rir-label">
       RIR (Reps in Reserve): 
@@ -58,7 +60,7 @@ function addRIRInputToForm(form) {
       </div>
     </div>
   `;
-  
+
   // Insert before submit button or at end of form
   const submitButton = form.querySelector('button[type="submit"], .submit-btn');
   if (submitButton) {
@@ -66,11 +68,11 @@ function addRIRInputToForm(form) {
   } else {
     form.appendChild(rirContainer);
   }
-  
+
   // Add real-time validation
-  const rirInput = rirContainer.querySelector('.rir-input');
-  rirInput.addEventListener('input', validateRIRInput);
-  rirInput.addEventListener('change', handleRIRChange);
+  const rirInput = rirContainer.querySelector(".rir-input");
+  rirInput.addEventListener("input", validateRIRInput);
+  rirInput.addEventListener("change", handleRIRChange);
 }
 
 /**
@@ -80,32 +82,36 @@ function addRIRInputToForm(form) {
 function validateRIRInput(event) {
   const input = event.target;
   const value = parseFloat(input.value);
-  
+
   // Remove existing validation classes
-  input.classList.remove('valid', 'warning', 'invalid');
-  
+  input.classList.remove("valid", "warning", "invalid");
+
   if (isNaN(value)) return;
-  
+
   // Validate range
   if (value < 0 || value > 5) {
-    input.classList.add('invalid');
-    showRIRFeedback(input, 'RIR must be between 0-5', 'error');
+    input.classList.add("invalid");
+    showRIRFeedback(input, "RIR must be between 0-5", "error");
     return;
   }
-  
+
   // Check against target RIR for current week
   const targetRIR = trainingState.getTargetRIR();
   const difference = Math.abs(value - targetRIR);
-  
+
   if (difference <= 0.5) {
-    input.classList.add('valid');
-    showRIRFeedback(input, `Perfect! Target RIR: ${targetRIR}`, 'success');
+    input.classList.add("valid");
+    showRIRFeedback(input, `Perfect! Target RIR: ${targetRIR}`, "success");
   } else if (difference <= 1) {
-    input.classList.add('warning');
-    showRIRFeedback(input, `Close to target (${targetRIR})`, 'warning');
+    input.classList.add("warning");
+    showRIRFeedback(input, `Close to target (${targetRIR})`, "warning");
   } else {
-    input.classList.add('warning');
-    showRIRFeedback(input, `Target RIR: ${targetRIR}, adjust effort next set`, 'info');
+    input.classList.add("warning");
+    showRIRFeedback(
+      input,
+      `Target RIR: ${targetRIR}, adjust effort next set`,
+      "info",
+    );
   }
 }
 
@@ -116,8 +122,10 @@ function validateRIRInput(event) {
 function handleRIRChange(event) {
   const input = event.target;
   const value = parseFloat(input.value);
-  const exercise = getExerciseFromForm(input.closest('form, .exercise-container'));
-  
+  const exercise = getExerciseFromForm(
+    input.closest("form, .exercise-container"),
+  );
+
   if (!isNaN(value) && exercise) {
     updateExerciseRIR(exercise, value);
   }
@@ -131,21 +139,21 @@ function handleRIRChange(event) {
  */
 function showRIRFeedback(input, message, type) {
   // Remove existing feedback
-  const existingFeedback = input.parentNode.querySelector('.rir-feedback');
+  const existingFeedback = input.parentNode.querySelector(".rir-feedback");
   if (existingFeedback) {
     existingFeedback.remove();
   }
-  
+
   // Create new feedback element
-  const feedback = document.createElement('div');
+  const feedback = document.createElement("div");
   feedback.className = `rir-feedback rir-feedback-${type}`;
   feedback.textContent = message;
-  
+
   // Insert after input
   input.parentNode.insertBefore(feedback, input.nextSibling);
-  
+
   // Auto-remove after 3 seconds for non-error messages
-  if (type !== 'error') {
+  if (type !== "error") {
     setTimeout(() => {
       if (feedback.parentNode) {
         feedback.remove();
@@ -161,10 +169,12 @@ function showRIRFeedback(input, message, type) {
  */
 function getExerciseFromForm(form) {
   // Try multiple ways to get exercise name
-  const exerciseSelect = form.querySelector('select[name="muscle"], #muscleSelect');
+  const exerciseSelect = form.querySelector(
+    'select[name="muscle"], #muscleSelect',
+  );
   const exerciseInput = form.querySelector('input[name="exercise"]');
-  const exerciseLabel = form.querySelector('.exercise-label, .muscle-label');
-  
+  const exerciseLabel = form.querySelector(".exercise-label, .muscle-label");
+
   if (exerciseSelect && exerciseSelect.value) {
     return exerciseSelect.value;
   } else if (exerciseInput && exerciseInput.value) {
@@ -172,8 +182,8 @@ function getExerciseFromForm(form) {
   } else if (exerciseLabel) {
     return exerciseLabel.textContent.trim();
   }
-  
-  return 'Unknown Exercise';
+
+  return "Unknown Exercise";
 }
 
 /**
@@ -183,15 +193,15 @@ function getExerciseFromForm(form) {
  */
 function updateExerciseRIR(exercise, rir) {
   const currentWorkout = getCurrentWorkout();
-  
+
   if (!currentWorkout.exercises[exercise]) {
     currentWorkout.exercises[exercise] = {
       sets: [],
       averageRIR: 0,
-      targetRIR: trainingState.getTargetRIR()
+      targetRIR: trainingState.getTargetRIR(),
     };
   }
-  
+
   // Add RIR to current set (assume latest set)
   const exerciseData = currentWorkout.exercises[exercise];
   if (exerciseData.sets.length > 0) {
@@ -201,23 +211,26 @@ function updateExerciseRIR(exercise, rir) {
     exerciseData.sets.push({
       setNumber: 1,
       rir: rir,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
-  
+
   // Calculate average RIR for exercise
   const rirValues = exerciseData.sets
-    .filter(set => set.rir !== undefined)
-    .map(set => set.rir);
-  
+    .filter((set) => set.rir !== undefined)
+    .map((set) => set.rir);
+
   if (rirValues.length > 0) {
-    exerciseData.averageRIR = rirValues.reduce((sum, rir) => sum + rir, 0) / rirValues.length;
+    exerciseData.averageRIR =
+      rirValues.reduce((sum, rir) => sum + rir, 0) / rirValues.length;
   }
-  
+
   // Save workout data
   saveCurrentWorkout(currentWorkout);
-  
-  debugLog(`Updated RIR for ${exercise}: ${rir} (avg: ${exerciseData.averageRIR.toFixed(1)})`);
+
+  debugLog(
+    `Updated RIR for ${exercise}: ${rir} (avg: ${exerciseData.averageRIR.toFixed(1)})`,
+  );
 }
 
 /**
@@ -231,25 +244,25 @@ export function logSet(setData) {
     weight,
     reps,
     rir,
-    notes = '',
-    rpe = null
+    notes = "",
+    rpe = null,
   } = setData;
-  
+
   const currentWorkout = getCurrentWorkout();
   const exerciseKey = muscle || exercise;
-  
+
   if (!currentWorkout.exercises[exerciseKey]) {
     currentWorkout.exercises[exerciseKey] = {
       sets: [],
       averageRIR: 0,
       targetRIR: trainingState.getTargetRIR(),
-      volume: 0
+      volume: 0,
     };
   }
-  
+
   const exerciseData = currentWorkout.exercises[exerciseKey];
   const setNumber = exerciseData.sets.length + 1;
-  
+
   // Create set record
   const setRecord = {
     setNumber,
@@ -260,33 +273,34 @@ export function logSet(setData) {
     notes,
     timestamp: new Date().toISOString(),
     week: trainingState.weekNo,
-    block: trainingState.blockNo
+    block: trainingState.blockNo,
   };
-  
+
   exerciseData.sets.push(setRecord);
-  
+
   // Update volume tracking
   exerciseData.volume = exerciseData.sets.length;
-  
+
   // Update average RIR
   const rirValues = exerciseData.sets
-    .filter(set => set.rir !== null && set.rir !== undefined)
-    .map(set => set.rir);
-  
+    .filter((set) => set.rir !== null && set.rir !== undefined)
+    .map((set) => set.rir);
+
   if (rirValues.length > 0) {
-    exerciseData.averageRIR = rirValues.reduce((sum, rir) => sum + rir, 0) / rirValues.length;
+    exerciseData.averageRIR =
+      rirValues.reduce((sum, rir) => sum + rir, 0) / rirValues.length;
   }
-  
+
   // Save workout
   saveCurrentWorkout(currentWorkout);
-  
+
   // Update training state if muscle group specified
   if (muscle) {
     trainingState.addSets(muscle, 1);
   }
-  
+
   debugLog(`Logged set for ${exerciseKey}: ${weight}kg x ${reps} @ RIR ${rir}`);
-  
+
   return setRecord;
 }
 
@@ -297,23 +311,23 @@ export function logSet(setData) {
 function getCurrentWorkout() {
   const workoutKey = `workout-${trainingState.blockNo}-${trainingState.weekNo}`;
   const stored = localStorage.getItem(workoutKey);
-  
+
   if (stored) {
     try {
       return JSON.parse(stored);
     } catch (error) {
-      console.warn('Error parsing stored workout:', error);
+      console.warn("Error parsing stored workout:", error);
     }
   }
-  
+
   // Create new workout session
   return {
-    date: new Date().toISOString().split('T')[0],
+    date: new Date().toISOString().split("T")[0],
     week: trainingState.weekNo,
     block: trainingState.blockNo,
     exercises: {},
     startTime: new Date().toISOString(),
-    endTime: null
+    endTime: null,
   };
 }
 
@@ -324,7 +338,7 @@ function getCurrentWorkout() {
 function saveCurrentWorkout(workout) {
   const workoutKey = `workout-${workout.block}-${workout.week}`;
   localStorage.setItem(workoutKey, JSON.stringify(workout));
-  
+
   // Also save to recent workouts list
   updateRecentWorkouts(workout);
 }
@@ -334,42 +348,47 @@ function saveCurrentWorkout(workout) {
  * @param {Object} workout - Workout to add to recent list
  */
 function updateRecentWorkouts(workout) {
-  const recentKey = 'recent-workouts';
+  const recentKey = "recent-workouts";
   let recent = [];
-  
+
   try {
     const stored = localStorage.getItem(recentKey);
     if (stored) {
       recent = JSON.parse(stored);
     }
   } catch (error) {
-    console.warn('Error parsing recent workouts:', error);
+    console.warn("Error parsing recent workouts:", error);
   }
-  
+
   // Add/update current workout
   const workoutId = `${workout.block}-${workout.week}`;
-  const existingIndex = recent.findIndex(w => `${w.block}-${w.week}` === workoutId);
-  
+  const existingIndex = recent.findIndex(
+    (w) => `${w.block}-${w.week}` === workoutId,
+  );
+
   const workoutSummary = {
     id: workoutId,
     date: workout.date,
     week: workout.week,
     block: workout.block,
     exerciseCount: Object.keys(workout.exercises).length,
-    totalSets: Object.values(workout.exercises).reduce((total, ex) => total + ex.sets.length, 0),
+    totalSets: Object.values(workout.exercises).reduce(
+      (total, ex) => total + ex.sets.length,
+      0,
+    ),
     averageRIR: calculateWorkoutAverageRIR(workout),
-    lastModified: new Date().toISOString()
+    lastModified: new Date().toISOString(),
   };
-  
+
   if (existingIndex >= 0) {
     recent[existingIndex] = workoutSummary;
   } else {
     recent.unshift(workoutSummary);
   }
-  
+
   // Keep only last 20 workouts
   recent = recent.slice(0, 20);
-  
+
   localStorage.setItem(recentKey, JSON.stringify(recent));
 }
 
@@ -380,17 +399,17 @@ function updateRecentWorkouts(workout) {
  */
 function calculateWorkoutAverageRIR(workout) {
   const allRIRValues = [];
-  
-  Object.values(workout.exercises).forEach(exercise => {
-    exercise.sets.forEach(set => {
+
+  Object.values(workout.exercises).forEach((exercise) => {
+    exercise.sets.forEach((set) => {
       if (set.rir !== null && set.rir !== undefined) {
         allRIRValues.push(set.rir);
       }
     });
   });
-  
+
   if (allRIRValues.length === 0) return null;
-  
+
   return allRIRValues.reduce((sum, rir) => sum + rir, 0) / allRIRValues.length;
 }
 
@@ -399,9 +418,9 @@ function calculateWorkoutAverageRIR(workout) {
  */
 function loadCurrentWorkout() {
   const currentWorkout = getCurrentWorkout();
-  
+
   // Pre-fill any existing exercise data
-  Object.keys(currentWorkout.exercises).forEach(exercise => {
+  Object.keys(currentWorkout.exercises).forEach((exercise) => {
     const exerciseData = currentWorkout.exercises[exercise];
     displayExerciseProgress(exercise, exerciseData);
   });
@@ -414,10 +433,14 @@ function loadCurrentWorkout() {
  */
 function displayExerciseProgress(exercise, exerciseData) {
   // Find relevant UI elements and update them
-  const exerciseElements = document.querySelectorAll(`[data-exercise="${exercise}"], [data-muscle="${exercise}"]`);
-  
-  exerciseElements.forEach(element => {
-    const progressInfo = element.querySelector('.exercise-progress, .set-progress');
+  const exerciseElements = document.querySelectorAll(
+    `[data-exercise="${exercise}"], [data-muscle="${exercise}"]`,
+  );
+
+  exerciseElements.forEach((element) => {
+    const progressInfo = element.querySelector(
+      ".exercise-progress, .set-progress",
+    );
     if (progressInfo) {
       progressInfo.innerHTML = `
         <div class="sets-completed">${exerciseData.sets.length} sets logged</div>
@@ -433,9 +456,11 @@ function displayExerciseProgress(exercise, exerciseData) {
  */
 function setupSetLoggingHandlers() {
   // Handle set logging forms
-  document.addEventListener('submit', (event) => {
-    if (event.target.classList.contains('set-form') || 
-        event.target.querySelector('.rir-input')) {
+  document.addEventListener("submit", (event) => {
+    if (
+      event.target.classList.contains("set-form") ||
+      event.target.querySelector(".rir-input")
+    ) {
       event.preventDefault();
       handleSetFormSubmission(event.target);
     }
@@ -448,35 +473,37 @@ function setupSetLoggingHandlers() {
  */
 function handleSetFormSubmission(form) {
   const formData = new FormData(form);
-  const rirInput = form.querySelector('.rir-input');
-  
+  const rirInput = form.querySelector(".rir-input");
+
   const setData = {
     exercise: getExerciseFromForm(form),
-    muscle: formData.get('muscle') || getExerciseFromForm(form),
-    weight: parseFloat(formData.get('weight')) || 0,
-    reps: parseInt(formData.get('reps')) || 0,
+    muscle: formData.get("muscle") || getExerciseFromForm(form),
+    weight: parseFloat(formData.get("weight")) || 0,
+    reps: parseInt(formData.get("reps")) || 0,
     rir: rirInput ? parseFloat(rirInput.value) : null,
-    notes: formData.get('notes') || ''
+    notes: formData.get("notes") || "",
   };
-  
+
   // Validate required fields
   if (!setData.muscle) {
-    alert('Please select a muscle group');
+    alert("Please select a muscle group");
     return;
   }
-  
+
   // Log the set
   const setRecord = logSet(setData);
-  
+
   // Show success feedback
   showSetLoggedFeedback(form, setRecord);
-  
+
   // Clear form (except muscle selection)
-  form.querySelectorAll('input[type="number"], input[type="text"], textarea').forEach(input => {
-    if (!input.name || input.name !== 'muscle') {
-      input.value = '';
-    }
-  });
+  form
+    .querySelectorAll('input[type="number"], input[type="text"], textarea')
+    .forEach((input) => {
+      if (!input.name || input.name !== "muscle") {
+        input.value = "";
+      }
+    });
 }
 
 /**
@@ -485,15 +512,15 @@ function handleSetFormSubmission(form) {
  * @param {Object} setRecord - Logged set data
  */
 function showSetLoggedFeedback(form, setRecord) {
-  const feedback = document.createElement('div');
-  feedback.className = 'set-logged-feedback success';
+  const feedback = document.createElement("div");
+  feedback.className = "set-logged-feedback success";
   feedback.innerHTML = `
     ✅ Set ${setRecord.setNumber} logged: ${setRecord.weight}kg × ${setRecord.reps}
-    ${setRecord.rir !== null ? ` @ RIR ${setRecord.rir}` : ''}
+    ${setRecord.rir !== null ? ` @ RIR ${setRecord.rir}` : ""}
   `;
-  
+
   form.appendChild(feedback);
-  
+
   setTimeout(() => {
     feedback.remove();
   }, 3000);

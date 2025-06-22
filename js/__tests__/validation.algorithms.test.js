@@ -1,4 +1,8 @@
-import { validateLoad, validateSets, validateMesocycleLength } from "../algorithms/validation.js";
+import {
+  validateLoad,
+  validateSets,
+  validateMesocycleLength,
+} from "../algorithms/validation.js";
 
 describe("validateLoad", () => {
   test("good hypertrophy load", () => {

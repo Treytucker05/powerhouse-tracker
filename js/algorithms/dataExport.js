@@ -1,5 +1,5 @@
 // COMPLETE IMPLEMENTATION - js/algorithms/dataExport.js
-console.log('=== LOADING COMPLETE DATAEXPORT.JS ===');
+console.log("=== LOADING COMPLETE DATAEXPORT.JS ===");
 
 /**
  * Data Management and Export Utilities
@@ -7,7 +7,7 @@ console.log('=== LOADING COMPLETE DATAEXPORT.JS ===');
  */
 
 // Standalone implementation without imports
-const debugLog = (...args) => console.log('[DATA_EXPORT]', ...args);
+const debugLog = (...args) => console.log("[DATA_EXPORT]", ...args);
 
 /**
  * Export all training data as JSON
@@ -18,39 +18,39 @@ export function exportAllData(state = {}) {
   const exportMetadata = {
     exportDate: new Date().toISOString(),
     version: "1.0.0",
-    dataIntegrity: "verified"
+    dataIntegrity: "verified",
   };
 
   const exportData = {
     currentMesocycle: state.currentMesocycle || 1,
     weeklyProgram: state.weeklyProgram || [],
     volumeLandmarks: state.volumeLandmarks || {},
-    exportMetadata: exportMetadata
+    exportMetadata: exportMetadata,
   };
 
   // Create downloadable file
   const dataStr = JSON.stringify(exportData, null, 2);
-  const dataBlob = new Blob([dataStr], { type: 'application/json' });
-  
-  const link = document.createElement('a');
+  const dataBlob = new Blob([dataStr], { type: "application/json" });
+
+  const link = document.createElement("a");
   link.href = URL.createObjectURL(dataBlob);
-  const filename = `powerhouse-export-${new Date().toISOString().split('T')[0]}.json`;
+  const filename = `powerhouse-export-${new Date().toISOString().split("T")[0]}.json`;
   link.download = filename;
   link.click();
-  
+
   debugLog("Data exported", { size: dataStr.length });
-  
+
   const warnings = [];
   if (!state.currentMesocycle) warnings.push("No current mesocycle found");
   if (!state.weeklyProgram?.length) warnings.push("No weekly program data");
-  
+
   return {
     success: true,
-    format: 'json',
+    format: "json",
     filename: filename,
     size: dataStr.length,
     data: exportData,
-    warnings: warnings
+    warnings: warnings,
   };
 }
 
@@ -61,62 +61,72 @@ export function exportAllData(state = {}) {
  * @returns {Object} - Export summary
  */
 export function exportChart(chartData, options = {}) {
-  console.log('=== COMPLETE EXPORTCHART FUNCTION CALLED ===');
-  console.log('chartData:', JSON.stringify(chartData, null, 2));
-  console.log('options:', JSON.stringify(options, null, 2));
-  
-  const format = options.format || 'svg';
-  
+  console.log("=== COMPLETE EXPORTCHART FUNCTION CALLED ===");
+  console.log("chartData:", JSON.stringify(chartData, null, 2));
+  console.log("options:", JSON.stringify(options, null, 2));
+
+  const format = options.format || "svg";
+
   // Validate chart data first
   if (!chartData?.type) {
-    console.log('=== RETURNING FALSE - MISSING TYPE ===');
+    console.log("=== RETURNING FALSE - MISSING TYPE ===");
     return {
       success: false,
-      error: "Invalid chart data: missing type"
-    };
-  }
-  
-  // Check for valid chart types - THIS IS THE KEY FIX
-  const validTypes = ['volume-progression', 'strength-progression', 'fatigue-analysis', 'performance-tracking'];
-  console.log('=== CHECKING TYPE VALIDATION ===');
-  console.log('chartData.type:', chartData.type);
-  console.log('validTypes:', validTypes);
-  console.log('validTypes.includes(chartData.type):', validTypes.includes(chartData.type));
-  
-  if (!validTypes.includes(chartData.type)) {
-    console.log('=== RETURNING FALSE - INVALID CHART TYPE ===');
-    return {
-      success: false,
-      error: "Invalid chart data: unsupported chart type"
+      error: "Invalid chart data: missing type",
     };
   }
 
-  console.log('=== TYPE VALIDATION PASSED ===');
-  
+  // Check for valid chart types - THIS IS THE KEY FIX
+  const validTypes = [
+    "volume-progression",
+    "strength-progression",
+    "fatigue-analysis",
+    "performance-tracking",
+  ];
+  console.log("=== CHECKING TYPE VALIDATION ===");
+  console.log("chartData.type:", chartData.type);
+  console.log("validTypes:", validTypes);
+  console.log(
+    "validTypes.includes(chartData.type):",
+    validTypes.includes(chartData.type),
+  );
+
+  if (!validTypes.includes(chartData.type)) {
+    console.log("=== RETURNING FALSE - INVALID CHART TYPE ===");
+    return {
+      success: false,
+      error: "Invalid chart data: unsupported chart type",
+    };
+  }
+
+  console.log("=== TYPE VALIDATION PASSED ===");
+
   try {
     // Look for existing canvas or create a stub for JSDOM
     let canvas = null;
-    if (typeof document !== 'undefined') {
-      canvas = document.getElementById('weeklyChart');
+    if (typeof document !== "undefined") {
+      canvas = document.getElementById("weeklyChart");
       if (!canvas) {
         // Create a dummy canvas for JSDOM testing
-        canvas = document.createElement('canvas');
+        canvas = document.createElement("canvas");
         canvas.getContext = () => ({}); // Dummy context
-        canvas.toDataURL = () => 'data:image/png;base64,dummy';
+        canvas.toDataURL = () => "data:image/png;base64,dummy";
       }
     }
-    
+
     const filename = `chart-export-${Date.now()}.${format}`;
-    
-    if (canvas && typeof document !== 'undefined') {
+
+    if (canvas && typeof document !== "undefined") {
       // Convert canvas to image and download
-      const link = document.createElement('a');
-      const dataUrl = canvas.toDataURL(format === 'png' ? 'image/png' : 'image/svg+xml');
+      const link = document.createElement("a");
+      const dataUrl = canvas.toDataURL(
+        format === "png" ? "image/png" : "image/svg+xml",
+      );
       link.href = dataUrl;
       link.download = filename;
       link.click();
     }
-    
+
     return {
       success: true,
       format: format,
@@ -124,57 +134,57 @@ export function exportChart(chartData, options = {}) {
       chartInfo: {
         type: chartData.type,
         dataPoints: chartData.data?.length || 0,
-        muscle: chartData.muscle || 'unknown'
-      }
+        muscle: chartData.muscle || "unknown",
+      },
     };
   } catch (error) {
     return {
       success: false,
-      error: error.message
+      error: error.message,
     };
   }
 }
 
 /**
  * Create compressed backup
- * @param {Object} state - Training state object  
+ * @param {Object} state - Training state object
  * @returns {Object} - Backup summary with compression info
  */
 export function createBackup(state = {}) {
   const backupId = `backup-${Date.now()}`;
   const timestamp = new Date().toISOString();
-  
+
   const backupData = {
     id: backupId,
     timestamp: timestamp,
     data: {
       currentMesocycle: state.currentMesocycle || 1,
       weeklyProgram: state.weeklyProgram || [],
-      volumeLandmarks: state.volumeLandmarks || {}
-    }
+      volumeLandmarks: state.volumeLandmarks || {},
+    },
   };
 
   const originalDataStr = JSON.stringify(backupData, null, 2);
   const compressedDataStr = JSON.stringify(backupData); // Simulate compression by removing whitespace
-  
+
   const originalSize = originalDataStr.length;
   const compressedSize = compressedDataStr.length;
   const compressionRatio = compressedSize / originalSize;
-  
+
   // Create checksum (simple hash simulation)
   const checksum = btoa(compressedDataStr).slice(-16);
-  
-  const filename = `backup-${timestamp.split('T')[0]}.json`;
-  
+
+  const filename = `backup-${timestamp.split("T")[0]}.json`;
+
   // Create downloadable file
-  const dataBlob = new Blob([compressedDataStr], { type: 'application/json' });
-  const link = document.createElement('a');
+  const dataBlob = new Blob([compressedDataStr], { type: "application/json" });
+  const link = document.createElement("a");
   link.href = URL.createObjectURL(dataBlob);
   link.download = filename;
   link.click();
-  
+
   debugLog("Backup created", { backupId, size: compressedSize });
-  
+
   return {
     success: true,
     backupId: backupId,
@@ -183,13 +193,13 @@ export function createBackup(state = {}) {
     compression: {
       originalSize: originalSize,
       compressedSize: compressedSize,
-      ratio: compressionRatio
+      ratio: compressionRatio,
     },
     metadata: {
       created: timestamp,
       version: "1.0.0",
-      checksum: checksum
-    }
+      checksum: checksum,
+    },
   };
 }
 
@@ -199,44 +209,48 @@ export function createBackup(state = {}) {
  * @returns {Object} - Auto backup summary
  */
 export function autoBackup(state = {}) {
-  const autoBackupEnabled = state.dataManagement?.autoBackupEnabled || 
-                           state.settings?.autoBackup || 
-                           state.options?.autoBackup;
-  
+  const autoBackupEnabled =
+    state.dataManagement?.autoBackupEnabled ||
+    state.settings?.autoBackup ||
+    state.options?.autoBackup;
+
   if (!autoBackupEnabled) {
     return {
       success: true,
       backupCreated: false,
-      reason: "Auto backup disabled"
+      reason: "Auto backup disabled",
     };
   }
 
   const lastBackupTime = state.dataManagement?.lastBackup || state.lastBackup;
   const now = new Date();
   const backupFrequencyDays = state.options?.backupFrequencyDays || 7;
-  
+
   if (lastBackupTime) {
-    const daysSinceLastBackup = (now - new Date(lastBackupTime)) / (1000 * 60 * 60 * 24);
+    const daysSinceLastBackup =
+      (now - new Date(lastBackupTime)) / (1000 * 60 * 60 * 24);
     if (daysSinceLastBackup < backupFrequencyDays) {
       return {
         success: true,
         backupCreated: false,
-        reason: "Backup frequency limit not reached (recent backup exists)"
+        reason: "Backup frequency limit not reached (recent backup exists)",
       };
     }
   }
 
   // Create backup
   const backup = createBackup(state);
-  
+
   // Calculate next backup date
-  const nextBackupDate = new Date(now.getTime() + (backupFrequencyDays * 24 * 60 * 60 * 1000));
-  
+  const nextBackupDate = new Date(
+    now.getTime() + backupFrequencyDays * 24 * 60 * 60 * 1000,
+  );
+
   return {
     success: true,
     backupCreated: true,
     backupId: backup.backupId,
-    nextBackup: nextBackupDate.toISOString()
+    nextBackup: nextBackupDate.toISOString(),
   };
 }
 
@@ -248,9 +262,9 @@ export function autoBackup(state = {}) {
 export function importData(jsonData) {
   try {
     let dataStr;
-    
+
     // Handle different input types
-    if (typeof jsonData === 'string') {
+    if (typeof jsonData === "string") {
       dataStr = jsonData;
     } else if (jsonData instanceof File) {
       // For File objects, we need to read them synchronously in tests
@@ -261,52 +275,53 @@ export function importData(jsonData) {
     } else {
       return {
         success: false,
-        error: "Invalid data format"
+        error: "Invalid data format",
       };
     }
 
     // Parse JSON
     const parsedData = JSON.parse(dataStr);
-    
+
     // Validate data structure
     const validation = {
       hasCurrentMesocycle: !!parsedData.currentMesocycle,
       hasWeeklyProgram: !!parsedData.weeklyProgram,
-      hasVolumeLandmarks: !!parsedData.volumeLandmarks
+      hasVolumeLandmarks: !!parsedData.volumeLandmarks,
     };
-    
+
     // Check version compatibility
     const importVersion = parsedData.exportMetadata?.version || "unknown";
     const currentVersion = "1.0.0";
     const versionCompatible = importVersion === currentVersion;
-    
+
     const warnings = [];
     if (!versionCompatible) {
-      warnings.push(`Version mismatch: importing ${importVersion}, current ${currentVersion}`);
+      warnings.push(
+        `Version mismatch: importing ${importVersion}, current ${currentVersion}`,
+      );
     }
     if (!validation.hasCurrentMesocycle) {
       warnings.push("Missing current mesocycle data");
     }
-    
+
     debugLog("Data imported", { validation, warnings });
-    
+
     return {
       success: true,
       importedData: parsedData,
       validation: {
         isValid: true,
         version: importVersion,
-        compatibility: versionCompatible ? "compatible" : "warning"
+        compatibility: versionCompatible ? "compatible" : "warning",
       },
       warnings: warnings,
-      importDate: new Date().toISOString()
+      importDate: new Date().toISOString(),
     };
-    
   } catch (error) {
     return {
       success: false,
       error: error.message,
-      importDate: new Date().toISOString()
+      importDate: new Date().toISOString(),
     };
   }
 }
@@ -318,62 +333,71 @@ export function importData(jsonData) {
  */
 export function exportFeedback(state = {}) {
   // Look for feedback data in various possible locations
-  const feedbackData = state.feedbackData || 
-                      state.logs || 
-                      state.weeklyProgram?.sessions || 
-                      [];
-  
+  const feedbackData =
+    state.feedbackData || state.logs || state.weeklyProgram?.sessions || [];
+
   if (!feedbackData.length) {
     return {
       success: true,
-      format: 'csv',
-      filename: `feedback-export-${new Date().toISOString().split('T')[0]}.csv`,
+      format: "csv",
+      filename: `feedback-export-${new Date().toISOString().split("T")[0]}.csv`,
       size: 0,
       rows: 0,
-      warnings: ["No feedback data found"]
+      warnings: ["No feedback data found"],
     };
   }
-  
+
   // Create CSV headers matching test expectations
-  const headers = ['date', 'exercise', 'sets', 'reps', 'weight', 'rir', 'rpe', 'notes', 'difficulty', 'satisfaction'];
-  const csvHeaders = headers.join(',');
-  
+  const headers = [
+    "date",
+    "exercise",
+    "sets",
+    "reps",
+    "weight",
+    "rir",
+    "rpe",
+    "notes",
+    "difficulty",
+    "satisfaction",
+  ];
+  const csvHeaders = headers.join(",");
+
   // Convert feedback data to CSV rows
-  const csvRows = feedbackData.map(item => {
+  const csvRows = feedbackData.map((item) => {
     return [
-      item.date || new Date().toISOString().split('T')[0],
-      item.exercise || (item.exercises ? item.exercises.join(';') : 'Unknown'),
+      item.date || new Date().toISOString().split("T")[0],
+      item.exercise || (item.exercises ? item.exercises.join(";") : "Unknown"),
       item.sets || 0,
       item.reps || 0,
       item.weight || 0,
-      item.rir || '',
-      item.rpe || '',
-      item.notes || '',
-      item.feedback?.difficulty || item.difficulty || '',
-      item.feedback?.satisfaction || item.satisfaction || ''
-    ].join(',');
+      item.rir || "",
+      item.rpe || "",
+      item.notes || "",
+      item.feedback?.difficulty || item.difficulty || "",
+      item.feedback?.satisfaction || item.satisfaction || "",
+    ].join(",");
   });
-  
-  const csvContent = [csvHeaders, ...csvRows].join('\n');
-  
+
+  const csvContent = [csvHeaders, ...csvRows].join("\n");
+
   // Create downloadable file
-  const dataBlob = new Blob([csvContent], { type: 'text/csv' });
-  const link = document.createElement('a');
+  const dataBlob = new Blob([csvContent], { type: "text/csv" });
+  const link = document.createElement("a");
   link.href = URL.createObjectURL(dataBlob);
-  const filename = `feedback-export-${new Date().toISOString().split('T')[0]}.csv`;
+  const filename = `feedback-export-${new Date().toISOString().split("T")[0]}.csv`;
   link.download = filename;
   link.click();
-  
+
   debugLog("Feedback exported", { rows: csvRows.length });
-  
+
   return {
     success: true,
-    format: 'csv',
+    format: "csv",
     filename: filename,
     size: csvContent.length,
     rows: csvRows.length,
-    data: csvContent
+    data: csvContent,
   };
 }
 
-console.log('=== DATAEXPORT.JS MODULE LOADED ===');
+console.log("=== DATAEXPORT.JS MODULE LOADED ===");

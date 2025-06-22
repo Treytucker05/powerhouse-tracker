@@ -2,9 +2,9 @@
  * @jest-environment jsdom
  */
 
-import '../main.js';
+import "../main.js";
 
-describe('Button Handlers', () => {
+describe("Button Handlers", () => {
   beforeAll(() => {
     // Ensure DOM is ready
     document.body.innerHTML = `
@@ -25,99 +25,100 @@ describe('Button Handlers', () => {
     `;
   });
 
-  test('btnBeginnerPreset should be exposed as a function', () => {
-    expect(typeof window.btnBeginnerPreset).toBe('function');
-    expect(window.btnBeginnerPreset.name).toBe('beginnerPreset');
+  test("btnBeginnerPreset should be exposed as a function", () => {
+    expect(typeof window.btnBeginnerPreset).toBe("function");
+    expect(window.btnBeginnerPreset.name).toBe("beginnerPreset");
   });
 
-  test('btnIntermediatePreset should be exposed as a function', () => {
-    expect(typeof window.btnIntermediatePreset).toBe('function');
-    expect(window.btnIntermediatePreset.name).toBe('intermediatePreset');
+  test("btnIntermediatePreset should be exposed as a function", () => {
+    expect(typeof window.btnIntermediatePreset).toBe("function");
+    expect(window.btnIntermediatePreset.name).toBe("intermediatePreset");
   });
 
-  test('btnAdvancedPreset should be exposed as a function', () => {
-    expect(typeof window.btnAdvancedPreset).toBe('function');
-    expect(window.btnAdvancedPreset.name).toBe('advancedPreset');
+  test("btnAdvancedPreset should be exposed as a function", () => {
+    expect(typeof window.btnAdvancedPreset).toBe("function");
+    expect(window.btnAdvancedPreset.name).toBe("advancedPreset");
   });
 
-  test('btnCustomConfiguration should be exposed as a function', () => {
-    expect(typeof window.btnCustomConfiguration).toBe('function');
-    expect(window.btnCustomConfiguration.name).toBe('customConfiguration');
+  test("btnCustomConfiguration should be exposed as a function", () => {
+    expect(typeof window.btnCustomConfiguration).toBe("function");
+    expect(window.btnCustomConfiguration.name).toBe("customConfiguration");
   });
 
-  test('btnSetupMesocycle should be exposed as a function', () => {
-    expect(typeof window.btnSetupMesocycle).toBe('function');
+  test("btnSetupMesocycle should be exposed as a function", () => {
+    expect(typeof window.btnSetupMesocycle).toBe("function");
   });
 
-  test('btnShowRIRSchedule should be exposed as a function', () => {
-    expect(typeof window.btnShowRIRSchedule).toBe('function');
+  test("btnShowRIRSchedule should be exposed as a function", () => {
+    expect(typeof window.btnShowRIRSchedule).toBe("function");
   });
 
-  test('btnGenerateWeeklyProgram should be exposed as a function', () => {
-    expect(typeof window.btnGenerateWeeklyProgram).toBe('function');
+  test("btnGenerateWeeklyProgram should be exposed as a function", () => {
+    expect(typeof window.btnGenerateWeeklyProgram).toBe("function");
   });
 
-  test('btnSmartExerciseSelection should be exposed as a function', () => {
-    expect(typeof window.btnSmartExerciseSelection).toBe('function');
+  test("btnSmartExerciseSelection should be exposed as a function", () => {
+    expect(typeof window.btnSmartExerciseSelection).toBe("function");
   });
 
-  test('btnRiskAssessment should be exposed as a function', () => {
-    expect(typeof window.btnRiskAssessment).toBe('function');
+  test("btnRiskAssessment should be exposed as a function", () => {
+    expect(typeof window.btnRiskAssessment).toBe("function");
   });
 
-  test('btnRunWeeklyAutoProgression should be exposed as a function', () => {
-    expect(typeof window.btnRunWeeklyAutoProgression).toBe('function');
+  test("btnRunWeeklyAutoProgression should be exposed as a function", () => {
+    expect(typeof window.btnRunWeeklyAutoProgression).toBe("function");
   });
 
-  test('btnNextWeek should be exposed as a function', () => {
-    expect(typeof window.btnNextWeek).toBe('function');
+  test("btnNextWeek should be exposed as a function", () => {
+    expect(typeof window.btnNextWeek).toBe("function");
   });
 
-  test('btnProcessWeeklyAdjustments should be exposed as a function', () => {
-    expect(typeof window.btnProcessWeeklyAdjustments).toBe('function');
+  test("btnProcessWeeklyAdjustments should be exposed as a function", () => {
+    expect(typeof window.btnProcessWeeklyAdjustments).toBe("function");
   });
 
-  test('btnWeeklyIntelligenceReport should be exposed as a function', () => {
-    expect(typeof window.btnWeeklyIntelligenceReport).toBe('function');
+  test("btnWeeklyIntelligenceReport should be exposed as a function", () => {
+    expect(typeof window.btnWeeklyIntelligenceReport).toBe("function");
   });
 
-  test('btnPredictDeloadTiming should be exposed as a function', () => {
-    expect(typeof window.btnPredictDeloadTiming).toBe('function');
+  test("btnPredictDeloadTiming should be exposed as a function", () => {
+    expect(typeof window.btnPredictDeloadTiming).toBe("function");
   });
 
-  test('btnPlateauAnalysis should be exposed as a function', () => {
-    expect(typeof window.btnPlateauAnalysis).toBe('function');
+  test("btnPlateauAnalysis should be exposed as a function", () => {
+    expect(typeof window.btnPlateauAnalysis).toBe("function");
   });
 
-  test('btnStartLiveSession should be exposed as a function', () => {
-    expect(typeof window.btnStartLiveSession).toBe('function');
+  test("btnStartLiveSession should be exposed as a function", () => {
+    expect(typeof window.btnStartLiveSession).toBe("function");
   });
 
-  test('all handlers should not contain TODO or stub in their source', () => {
+  test("all handlers should not contain TODO or stub in their source", () => {
     const handlers = [
-      'btnBeginnerPreset',
-      'btnIntermediatePreset', 
-      'btnAdvancedPreset',
-      'btnCustomConfiguration'
+      "btnBeginnerPreset",
+      "btnIntermediatePreset",
+      "btnAdvancedPreset",
+      "btnCustomConfiguration",
     ];
 
-    handlers.forEach(handlerName => {
+    handlers.forEach((handlerName) => {
       const handler = window[handlerName];
       expect(handler).toBeDefined();
-      expect(typeof handler).toBe('function');
-      
+      expect(typeof handler).toBe("function");
+
       const source = handler.toString();
       expect(source).not.toMatch(/TODO|stub/i);
     });
-  });  test('handlers should dispatch proper events when called', () => {
+  });
+  test("handlers should dispatch proper events when called", () => {
     let eventFired = false;
-    window.addEventListener('beginner-preset-selected', () => {
+    window.addEventListener("beginner-preset-selected", () => {
       eventFired = true;
     });
-    
+
     window.btnBeginnerPreset();
-    
+
     expect(eventFired).toBe(true);
-    expect(window.trainingState.currentPreset).toBe('beginner');
+    expect(window.trainingState.currentPreset).toBe("beginner");
   });
 });

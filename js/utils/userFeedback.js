@@ -932,7 +932,7 @@ const feedbackCSS = `
 // Inject CSS
 const style = document.createElement("style");
 style.textContent = feedbackCSS;
-if (document.head && typeof document.head.appendChild === 'function') {
+if (document.head && typeof document.head.appendChild === "function") {
   try {
     document.head.appendChild(style);
   } catch (e) {

@@ -14,5 +14,5 @@ export default {
   logs: [],
   backups: [],
   options: { autoBackup: true, backupFrequencyDays: 7 },
-  workoutHistory: []
+  workoutHistory: [],
 };

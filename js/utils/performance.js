@@ -172,7 +172,9 @@ class PerformanceManager {
    */
   handleUserTiming(entry) {
     // Temporary no-op handler; logs user timing for later analysis
-    console.debug(`⏱️ User Timing: ${entry.name} - ${entry.duration?.toFixed(1) || 'N/A'} ms`);
+    console.debug(
+      `⏱️ User Timing: ${entry.name} - ${entry.duration?.toFixed(1) || "N/A"} ms`,
+    );
   }
 
   /**
@@ -181,7 +183,9 @@ class PerformanceManager {
    */
   handlePaintTiming(entry) {
     // Temporary no-op handler; logs paint timings for later analysis
-    console.debug(`🎨 Paint: ${entry.name} at ${entry.startTime.toFixed(1)} ms`);
+    console.debug(
+      `🎨 Paint: ${entry.name} at ${entry.startTime.toFixed(1)} ms`,
+    );
   }
 
   /**
@@ -637,7 +641,7 @@ class PerformanceManager {
   }
   /**
    * Setup service worker
-  */ setupServiceWorker() {
+   */ setupServiceWorker() {
     const isLocal = ["localhost", "127.0.0.1"].includes(location.hostname);
 
     if (isLocal && "serviceWorker" in navigator) {

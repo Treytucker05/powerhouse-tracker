@@ -276,12 +276,13 @@ function displayFeedbackResults(results, formData = null) {
   const title =
     volumeProgression.headline ?? `${volumeProgression.muscle} Recommendation`;
   const subtitle = volumeProgression.notes ?? volumeProgression.advice ?? "";
-  
+
   // Check for load progression suggestion if formData is available
   const loadSuggestion = formData ? suggestLoadIncrease(formData) : null;
-  
+
   // Cleanup old suggestions periodically
-  if (Math.random() < 0.1) { // 10% chance
+  if (Math.random() < 0.1) {
+    // 10% chance
     cleanupOldSuggestions();
   }
 
@@ -515,12 +516,12 @@ export function addAutoregulationFeatures() {
  */
 function suggestLoadIncrease(formData) {
   const { muscle, perfChange, actualRIR, currentSets } = formData;
-  
+
   // Only suggest if performance improved and RIR indicates capacity
   if (perfChange < 1 || actualRIR < 2) {
     return null;
   }
-  
+
   // Get muscle-specific load progression recommendations
   const muscleSuggestions = {
     Chest: { increment: "5-10lbs", type: "barbell/dumbbell" },
@@ -535,34 +536,40 @@ function suggestLoadIncrease(formData) {
     Abs: { increment: "5-10lbs", type: "weighted exercises" },
     Forearms: { increment: "2.5-5lbs", type: "grip exercises" },
     Neck: { increment: "2.5-5lbs", type: "neck exercises" },
-    Traps: { increment: "5-10lbs", type: "shrugs/pulls" }
+    Traps: { increment: "5-10lbs", type: "shrugs/pulls" },
   };
-  
-  const suggestion = muscleSuggestions[muscle] || { increment: "5-10lbs", type: "exercises" };
-  
+
+  const suggestion = muscleSuggestions[muscle] || {
+    increment: "5-10lbs",
+    type: "exercises",
+  };
+
   // Store suggestion in localStorage for tracking
   const suggestions = getStoredLoadSuggestions();
   const weekKey = `${trainingState.blockNo}-${trainingState.weekNo}`;
-  
+
   if (!suggestions[weekKey]) {
     suggestions[weekKey] = {};
   }
-  
+
   suggestions[weekKey][muscle] = {
     increment: suggestion.increment,
     reason: `Performance +${perfChange}, RIR ${actualRIR}`,
     timestamp: new Date().toISOString(),
-    currentSets
+    currentSets,
   };
-  
-  localStorage.setItem('loadProgressionSuggestions', JSON.stringify(suggestions));
-  
+
+  localStorage.setItem(
+    "loadProgressionSuggestions",
+    JSON.stringify(suggestions),
+  );
+
   return {
     muscle,
     increment: suggestion.increment,
     type: suggestion.type,
     reason: `Great progress! Performance improved (+${perfChange}) with ${actualRIR} RIR remaining`,
-    confidence: actualRIR >= 3 ? "high" : "moderate"
+    confidence: actualRIR >= 3 ? "high" : "moderate",
   };
 }
 
@@ -572,10 +579,10 @@ function suggestLoadIncrease(formData) {
  */
 function getStoredLoadSuggestions() {
   try {
-    const stored = localStorage.getItem('loadProgressionSuggestions');
+    const stored = localStorage.getItem("loadProgressionSuggestions");
     return stored ? JSON.parse(stored) : {};
   } catch (error) {
-    console.warn('Error parsing load suggestions from localStorage:', error);
+    console.warn("Error parsing load suggestions from localStorage:", error);
     return {};
   }
 }
@@ -586,19 +593,22 @@ function getStoredLoadSuggestions() {
 function cleanupOldSuggestions() {
   const suggestions = getStoredLoadSuggestions();
   const currentWeek = `${trainingState.blockNo}-${trainingState.weekNo}`;
-  const [currentBlock, currentWeekNum] = currentWeek.split('-').map(Number);
-  
+  const [currentBlock, currentWeekNum] = currentWeek.split("-").map(Number);
+
   // Remove suggestions older than 4 weeks
-  Object.keys(suggestions).forEach(weekKey => {
-    const [block, week] = weekKey.split('-').map(Number);
+  Object.keys(suggestions).forEach((weekKey) => {
+    const [block, week] = weekKey.split("-").map(Number);
     const weeksAgo = (currentBlock - block) * 4 + (currentWeekNum - week);
-    
+
     if (weeksAgo > 4) {
       delete suggestions[weekKey];
     }
   });
-  
-  localStorage.setItem('loadProgressionSuggestions', JSON.stringify(suggestions));
+
+  localStorage.setItem(
+    "loadProgressionSuggestions",
+    JSON.stringify(suggestions),
+  );
 }
 
 export {

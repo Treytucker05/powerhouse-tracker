@@ -20,38 +20,41 @@ export function initIntelligence(state = trainingState) {
       weeklyLoad: 0,
       volumeConsistency: 0,
       progressionRate: 0,
-      deloadFrequency: 0
+      deloadFrequency: 0,
     },
     baselines: {},
     recommendations: [],
-    confidence: 0.5
+    confidence: 0.5,
   };
 
   // Calculate baseline KPIs from existing data
   const workoutHistory = state.workoutHistory || [];
   const progressionHistory = state.weeklyProgressionHistory || [];
-  
+
   if (workoutHistory.length > 0) {
     // Calculate average RPE/RIR
     let totalRPE = 0;
     let rpeCount = 0;
-    
-    workoutHistory.forEach(workout => {
-      workout.exercises?.forEach(exercise => {
-        exercise.sets?.forEach(set => {
+
+    workoutHistory.forEach((workout) => {
+      workout.exercises?.forEach((exercise) => {
+        exercise.sets?.forEach((set) => {
           if (set.rir !== null && set.rir !== undefined) {
-            totalRPE += (10 - set.rir); // Convert RIR to RPE
+            totalRPE += 10 - set.rir; // Convert RIR to RPE
             rpeCount++;
           }
         });
       });
     });
-    
+
     intelligence.kpis.avgRPE = rpeCount > 0 ? totalRPE / rpeCount : 7;
-    
+
     // Calculate weekly load trend
     const recentWorkouts = workoutHistory.slice(-4); // Last 4 workouts
-    intelligence.kpis.weeklyLoad = recentWorkouts.reduce((sum, w) => sum + (w.totalVolume || 0), 0);
+    intelligence.kpis.weeklyLoad = recentWorkouts.reduce(
+      (sum, w) => sum + (w.totalVolume || 0),
+      0,
+    );
   }
 
   // Calculate progression rate from history
@@ -60,52 +63,58 @@ export function initIntelligence(state = trainingState) {
     const progressionSum = recentProgression.reduce((sum, week) => {
       return sum + (week.totalVolumeAdded || 0);
     }, 0);
-    
-    intelligence.kpis.progressionRate = progressionSum / recentProgression.length;
+
+    intelligence.kpis.progressionRate =
+      progressionSum / recentProgression.length;
   }
 
   // Set baselines
   intelligence.baselines = {
-    startingVolume: state.getTotalWeeklyVolume ? state.getTotalWeeklyVolume() : 0,
+    startingVolume: state.getTotalWeeklyVolume
+      ? state.getTotalWeeklyVolume()
+      : 0,
     avgRPE: intelligence.kpis.avgRPE,
     weeklyLoad: intelligence.kpis.weeklyLoad,
-    recordDate: new Date().toISOString()
+    recordDate: new Date().toISOString(),
   };
 
   // Generate initial recommendations
-  intelligence.recommendations = generateInitialRecommendations(intelligence, state);
-    // Store in state
+  intelligence.recommendations = generateInitialRecommendations(
+    intelligence,
+    state,
+  );
+  // Store in state
   state.intelligence = intelligence;
-  
+
   // Return expected format for tests
   const result = {
     success: true,
-    status: 'initialized',
+    status: "initialized",
     intelligenceConfig: {
       adaptiveThresholds: {
         fatigue: 0.8,
         volume: 0.9,
-        intensity: 0.85
+        intensity: 0.85,
       },
       learningRate: 0.1,
-      optimizationFrequency: 'weekly'
+      optimizationFrequency: "weekly",
     },
     capabilities: [
-      'volumeOptimization',
-      'fatigueAnalysis', 
-      'adaptiveRIR',
-      'progressionTracking'
+      "volumeOptimization",
+      "fatigueAnalysis",
+      "adaptiveRIR",
+      "progressionTracking",
     ],
     recommendations: intelligence.recommendations,
-    warnings: []
+    warnings: [],
   };
   if (workoutHistory.length === 0) {
-    result.warnings.push('No workout history available for analysis');
+    result.warnings.push("No workout history available for analysis");
   }
   if (Object.keys(state.volumeLandmarks || {}).length === 0) {
-    result.warnings.push('No volume landmarks configured');
+    result.warnings.push("No volume landmarks configured");
   }
-  
+
   debugLog("Intelligence system initialized", result);
   return result;
 }
@@ -115,7 +124,8 @@ export function initIntelligence(state = trainingState) {
  * @param {Object} state - Training state object
  * @returns {Object} - Optimization summary
  */
-export function optimizeVolumeLandmarks(state = trainingState) {  const optimization = {
+export function optimizeVolumeLandmarks(state = trainingState) {
+  const optimization = {
     success: true,
     adjustments: {},
     confidence: 0.0,
@@ -124,38 +134,43 @@ export function optimizeVolumeLandmarks(state = trainingState) {  const optimiza
     metrics: {
       optimizationScore: 0,
       dataQuality: 0,
-      confidenceLevel: 'medium',
+      confidenceLevel: "medium",
       totalAdjustments: 0,
       avgConfidence: 0,
-      musclesOptimized: []
+      musclesOptimized: [],
     },
     optimizedLandmarks: {},
     changes: {
       adjustments: [],
-      reasoning: []
-    }
+      reasoning: [],
+    },
   };
 
   const intelligence = state.intelligence;
   const landmarks = state.volumeLandmarks;
   const progressionHistory = state.weeklyProgressionHistory || [];
-    if (!intelligence || !landmarks) {
+  if (!intelligence || !landmarks) {
     optimization.success = false;
-    optimization.reasoning.push("Intelligence system or landmarks not initialized");
+    optimization.reasoning.push(
+      "Intelligence system or landmarks not initialized",
+    );
     optimization.optimizedLandmarks = state.volumeLandmarks || {};
     optimization.changes = {
       adjustments: Object.values(optimization.adjustments),
-      reasoning: optimization.reasoning
+      reasoning: optimization.reasoning,
     };
     return optimization;
   }
 
   // Analyze each muscle group
-  Object.keys(landmarks).forEach(muscle => {
+  Object.keys(landmarks).forEach((muscle) => {
     const current = landmarks[muscle];
-    const recentProgress = getRecentProgressForMuscle(muscle, progressionHistory);
+    const recentProgress = getRecentProgressForMuscle(
+      muscle,
+      progressionHistory,
+    );
     const fatiguePattern = getFatiguePatternForMuscle(muscle, state);
-    
+
     let mevAdjustment = 0;
     let mrvAdjustment = 0;
     const reasoning = [];
@@ -188,41 +203,46 @@ export function optimizeVolumeLandmarks(state = trainingState) {  const optimiza
         before: { ...current },
         after: { MEV: newMEV, MAV: newMAV, MRV: newMRV },
         changes: { MEV: mevAdjustment, MRV: mrvAdjustment },
-        reasoning: reasoning
+        reasoning: reasoning,
       };
 
       // Update landmarks
       state.volumeLandmarks[muscle] = { MEV: newMEV, MAV: newMAV, MRV: newMRV };
       optimization.totalChanges++;
     }
-  });  // Calculate confidence based on data quality
+  }); // Calculate confidence based on data quality
   const dataQuality = Math.min(1, progressionHistory.length / 8); // 8 weeks of data = full confidence
   optimization.confidence = dataQuality * 100; // Convert to 0-100 scale
   optimization.metrics.dataQuality = dataQuality;
   optimization.metrics.optimizationScore = optimization.totalChanges * 0.2; // Basic scoring  optimization.metrics.totalAdjustments = optimization.totalChanges;
   optimization.metrics.avgConfidence = optimization.confidence;
   optimization.metrics.musclesOptimized = Object.keys(optimization.adjustments);
-  optimization.metrics.confidenceLevel = dataQuality > 0.7 ? 'high' : dataQuality > 0.4 ? 'medium' : 'low';
+  optimization.metrics.confidenceLevel =
+    dataQuality > 0.7 ? "high" : dataQuality > 0.4 ? "medium" : "low";
 
   // Add required properties for tests
   optimization.optimizedLandmarks = state.volumeLandmarks || {};
   optimization.changes = {
     adjustments: Object.values(optimization.adjustments),
-    reasoning: optimization.reasoning
+    reasoning: optimization.reasoning,
   };
 
   if (optimization.totalChanges > 0) {
-    optimization.reasoning.push(`Optimized landmarks for ${optimization.totalChanges} muscle groups`);
+    optimization.reasoning.push(
+      `Optimized landmarks for ${optimization.totalChanges} muscle groups`,
+    );
   } else {
-    optimization.reasoning.push("No significant adjustments needed based on current data");
-  }  // Check if intelligence is properly initialized
+    optimization.reasoning.push(
+      "No significant adjustments needed based on current data",
+    );
+  } // Check if intelligence is properly initialized
   if (!intelligence?.isInitialized) {
     optimization.success = false;
     optimization.error = "intelligence system not properly initialized";
     optimization.optimizedLandmarks = state.volumeLandmarks || {};
     optimization.changes = {
       adjustments: Object.values(optimization.adjustments),
-      reasoning: optimization.reasoning
+      reasoning: optimization.reasoning,
     };
     return optimization;
   }
@@ -248,52 +268,56 @@ export function adaptiveRIRRecommendations(state = trainingState) {
     adjustments: {},
     warnings: [],
     rationale: {
-      phase: 'accumulation', // Default
-      volumeStatus: 'moderate',
-      fatigueLevel: 'normal',
-      factorsConsidered: ['volume', 'fatigue', 'phase', 'progression'],
-      adaptationLevel: 'intermediate',
-      riskAssessment: 'moderate'
-    }
+      phase: "accumulation", // Default
+      volumeStatus: "moderate",
+      fatigueLevel: "normal",
+      factorsConsidered: ["volume", "fatigue", "phase", "progression"],
+      adaptationLevel: "intermediate",
+      riskAssessment: "moderate",
+    },
   };
 
   const intelligence = state.intelligence;
   const landmarks = state.volumeLandmarks;
-  
+
   if (!intelligence || !landmarks) {
     recommendations.success = false;
-    recommendations.reasoning.push("Intelligence system or landmarks not initialized");
+    recommendations.reasoning.push(
+      "Intelligence system or landmarks not initialized",
+    );
     recommendations.warnings.push("Missing required data for analysis");
     return recommendations;
   }
 
   // Check for missing performance metrics
   if (!intelligence.performanceMetrics) {
-    recommendations.warnings.push("Performance metrics not available - using default assumptions");
+    recommendations.warnings.push(
+      "Performance metrics not available - using default assumptions",
+    );
   }
   // Analyze current fatigue and volume status
   let totalFatigue = 0;
   let muscleCount = 0;
-  
-  // Ensure we have landmarks to work with  
+
+  // Ensure we have landmarks to work with
   if (Object.keys(landmarks).length === 0) {
     recommendations.warnings.push("No volume landmarks available for analysis");
     recommendations.success = false;
     return recommendations;
   }
-    Object.keys(landmarks).forEach(muscle => {
+  Object.keys(landmarks).forEach((muscle) => {
     const currentSets = state.getWeeklySets ? state.getWeeklySets(muscle) : 0;
     const mrv = landmarks[muscle].MRV || landmarks[muscle].mrv;
     const mav = landmarks[muscle].MAV || landmarks[muscle].mav;
     const mev = landmarks[muscle].MEV || landmarks[muscle].mev;
     const fatigueRatio = mrv > 0 ? currentSets / mrv : 0;
-    
+
     totalFatigue += fatigueRatio;
     muscleCount++;
-    
+
     let recommendedRIR = 2; // Default
     const reasoning = [];
-    
+
     // Adjust RIR based on volume position and fatigue
     if (currentSets <= mev) {
       recommendedRIR = 1; // Push harder at low volumes
@@ -305,7 +329,7 @@ export function adaptiveRIRRecommendations(state = trainingState) {
       recommendedRIR = 2; // Standard middle range
       reasoning.push("Moderate volume - standard intensity");
     }
-    
+
     // Adjust for recent fatigue patterns
     const recentFatigue = getRecentFatigueForMuscle(muscle, state);
     if (recentFatigue > 0.9) {
@@ -315,22 +339,25 @@ export function adaptiveRIRRecommendations(state = trainingState) {
       recommendedRIR = Math.max(0, recommendedRIR - 1);
       reasoning.push("Low recent fatigue - can push harder");
     }
-      recommendations.muscleSpecific[muscle] = {
+    recommendations.muscleSpecific[muscle] = {
       recommendedRIR: Math.max(0, Math.min(4, recommendedRIR)),
       reasoning: reasoning,
       currentVolume: currentSets,
-      fatigueRatio: fatigueRatio
+      fatigueRatio: fatigueRatio,
     };
 
     // Also add to main recommendations object (simplified format for tests)
-    recommendations.recommendations[muscle] = Math.max(0, Math.min(4, recommendedRIR));
-    
+    recommendations.recommendations[muscle] = Math.max(
+      0,
+      Math.min(4, recommendedRIR),
+    );
+
     // Store adjustments for this muscle
     recommendations.adjustments[muscle] = {
       baseRIR: 2,
       adjustedRIR: recommendedRIR,
       adjustment: recommendedRIR - 2,
-      reason: reasoning.join(', ')
+      reason: reasoning.join(", "),
     };
   });
 
@@ -347,56 +374,61 @@ export function adaptiveRIRRecommendations(state = trainingState) {
     recommendations.reasoning.push("Moderate fatigue - standard RIR 2");
   }
   // Confidence based on data availability
-  const dataPoints = (state.workoutHistory?.length || 0) + (state.weeklyProgressionHistory?.length || 0);
+  const dataPoints =
+    (state.workoutHistory?.length || 0) +
+    (state.weeklyProgressionHistory?.length || 0);
   recommendations.confidence = Math.min(1, dataPoints / 20);
 
   // Determine mesocycle phase for phaseAdjustment
   const currentWeek = state.currentMesocycle?.currentWeek || 1;
   const totalWeeks = state.currentMesocycle?.length || 4;
   const phaseProgress = currentWeek / totalWeeks;
-  
+
   if (phaseProgress <= 0.33) {
-    recommendations.rationale.phase = 'accumulation';
+    recommendations.rationale.phase = "accumulation";
   } else if (phaseProgress <= 0.66) {
-    recommendations.rationale.phase = 'intensification';
+    recommendations.rationale.phase = "intensification";
   } else {
-    recommendations.rationale.phase = 'realization';
+    recommendations.rationale.phase = "realization";
   }
 
   // Set volume status based on average fatigue
   if (avgFatigue > 0.9) {
-    recommendations.rationale.volumeStatus = 'high';
-    recommendations.rationale.fatigueLevel = 'elevated';
+    recommendations.rationale.volumeStatus = "high";
+    recommendations.rationale.fatigueLevel = "elevated";
   } else if (avgFatigue < 0.6) {
-    recommendations.rationale.volumeStatus = 'low';
-    recommendations.rationale.fatigueLevel = 'low';
+    recommendations.rationale.volumeStatus = "low";
+    recommendations.rationale.fatigueLevel = "low";
   } else {
-    recommendations.rationale.volumeStatus = 'moderate';
-    recommendations.rationale.fatigueLevel = 'normal';
-  }  debugLog("Adaptive RIR recommendations generated", recommendations);
-  
+    recommendations.rationale.volumeStatus = "moderate";
+    recommendations.rationale.fatigueLevel = "normal";
+  }
+  debugLog("Adaptive RIR recommendations generated", recommendations);
+
   return recommendations;
 }
 
 // Helper functions
 function generateInitialRecommendations(intelligence, state) {
   const recs = [];
-  
+
   if (intelligence.kpis.avgRPE > 8) {
     recs.push("Consider reducing intensity - average RPE is high");
   } else if (intelligence.kpis.avgRPE < 6) {
     recs.push("Consider increasing intensity - average RPE is low");
   }
-  
+
   if (intelligence.kpis.progressionRate < 1) {
     recs.push("Slow progression rate - consider volume increases");
   }
-  
-  const totalVolume = state.getTotalWeeklyVolume ? state.getTotalWeeklyVolume() : 0;
+
+  const totalVolume = state.getTotalWeeklyVolume
+    ? state.getTotalWeeklyVolume()
+    : 0;
   if (totalVolume < 50) {
     recs.push("Low total volume - ensure adequate stimulus");
   }
-  
+
   return recs;
 }
 
@@ -404,14 +436,14 @@ function getRecentProgressForMuscle(muscle, history) {
   // Simplified - would analyze progression patterns
   return {
     belowMEVProgress: 1.0, // average progression when below MEV
-    overallTrend: "stable"
+    overallTrend: "stable",
   };
 }
 
 function getFatiguePatternForMuscle(muscle, state) {
   // Simplified - would analyze fatigue accumulation patterns
   return {
-    avgFatigueAtMRV: 1.0 // average fatigue ratio when at/near MRV
+    avgFatigueAtMRV: 1.0, // average fatigue ratio when at/near MRV
   };
 }
 

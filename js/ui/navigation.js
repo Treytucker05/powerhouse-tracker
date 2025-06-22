@@ -6,30 +6,30 @@ import { saveState } from "../core/trainingState.js";
  */
 export function initNavigation() {
   console.log("Initializing navigation system");
-  
+
   // Attach click listeners to navigation buttons
-  const navButtons = ['navMacro', 'navMeso', 'navMicro', 'navTrack'];
-  
-  navButtons.forEach(buttonId => {
+  const navButtons = ["navMacro", "navMeso", "navMicro", "navTrack"];
+
+  navButtons.forEach((buttonId) => {
     const button = document.getElementById(buttonId);
     if (button) {
-      button.addEventListener('click', () => {
+      button.addEventListener("click", () => {
         const sectionMap = {
-          'navMacro': 'macrocycleSection',
-          'navMeso': 'mesocycleSection', 
-          'navMicro': 'microcycleSection',
-          'navTrack': 'trackingSection'
+          navMacro: "macrocycleSection",
+          navMeso: "mesocycleSection",
+          navMicro: "microcycleSection",
+          navTrack: "trackingSection",
         };
-        
+
         showSection(sectionMap[buttonId]);
         setActiveNavButton(buttonId);
       });
     }
   });
-  
+
   // Show default section (macrocycle)
-  showSection('macrocycleSection');
-  setActiveNavButton('navMacro');
+  showSection("macrocycleSection");
+  setActiveNavButton("navMacro");
 }
 
 /**
@@ -38,37 +38,39 @@ export function initNavigation() {
  */
 export function showSection(sectionId) {
   console.log(`Switching to section: ${sectionId}`);
-  
+
   // Hide all sections
   const allSections = [
-    'macrocycleSection',
-    'mesocycleSection', 
-    'microcycleSection',
-    'trackingSection'
+    "macrocycleSection",
+    "mesocycleSection",
+    "microcycleSection",
+    "trackingSection",
   ];
-  
-  allSections.forEach(id => {
+
+  allSections.forEach((id) => {
     const section = document.getElementById(id);
     if (section) {
-      section.style.display = 'none';
+      section.style.display = "none";
     }
   });
-  
+
   // Show the requested section
   const targetSection = document.getElementById(sectionId);
   if (targetSection) {
-    targetSection.style.display = 'block';
+    targetSection.style.display = "block";
   }
-  
+
   // Save current section to training state
   window.trainingState = window.trainingState || {};
   window.trainingState.currentSection = sectionId;
   saveState?.();
-  
+
   // Dispatch section change event for other components to listen
-  window.dispatchEvent(new CustomEvent('navigation-section-changed', {
-    detail: { sectionId }
-  }));
+  window.dispatchEvent(
+    new CustomEvent("navigation-section-changed", {
+      detail: { sectionId },
+    }),
+  );
 }
 
 /**
@@ -76,15 +78,15 @@ export function showSection(sectionId) {
  * @param {string} activeButtonId - The ID of the button to set as active
  */
 function setActiveNavButton(activeButtonId) {
-  const navButtons = ['navMacro', 'navMeso', 'navMicro', 'navTrack'];
-  
-  navButtons.forEach(buttonId => {
+  const navButtons = ["navMacro", "navMeso", "navMicro", "navTrack"];
+
+  navButtons.forEach((buttonId) => {
     const button = document.getElementById(buttonId);
     if (button) {
       if (buttonId === activeButtonId) {
-        button.classList.add('active');
+        button.classList.add("active");
       } else {
-        button.classList.remove('active');
+        button.classList.remove("active");
       }
     }
   });

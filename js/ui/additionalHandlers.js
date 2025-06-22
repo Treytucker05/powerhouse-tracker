@@ -8,27 +8,37 @@ import { processRPData } from "../core/rpAlgorithms.js";
 export async function btnOptimizeFrequency() {
   const volumeLandmarks = trainingState.volumeLandmarks;
   if (!volumeLandmarks || Object.keys(volumeLandmarks).length === 0) {
-    alert("Please set volume landmarks (MV → MRV) for muscles before optimizing frequency.");
+    alert(
+      "Please set volume landmarks (MV → MRV) for muscles before optimizing frequency.",
+    );
     return;
   }
-  
+
   const muscles = Object.keys(volumeLandmarks);
-  
+
   // Check if any muscle has incomplete landmarks
-  const incompleteMuscles = muscles.filter(m => {
+  const incompleteMuscles = muscles.filter((m) => {
     const landmarks = volumeLandmarks[m];
     return !landmarks || landmarks.MAV == null || landmarks.MRV == null;
   });
-  
+
   if (incompleteMuscles.length > 0) {
-    alert(`Please complete volume landmarks for: ${incompleteMuscles.join(", ")} before optimizing frequency.`);
+    alert(
+      `Please complete volume landmarks for: ${incompleteMuscles.join(", ")} before optimizing frequency.`,
+    );
     return;
   }
-  
+
   const results = muscles.map((m) => {
     const landmarks = volumeLandmarks[m];
-    const currentFreq = trainingState.currentFrequency?.[m] ?? trainingState.currentFrequency ?? 0;
-    return { muscle: m, optimal: calculateOptimalFrequency(landmarks, currentFreq) };
+    const currentFreq =
+      trainingState.currentFrequency?.[m] ??
+      trainingState.currentFrequency ??
+      0;
+    return {
+      muscle: m,
+      optimal: calculateOptimalFrequency(landmarks, currentFreq),
+    };
   });
   const out = document.getElementById("freqOut") || document.body;
   out.innerHTML = `<pre>${JSON.stringify(results, null, 2)}</pre>`;
@@ -64,7 +74,10 @@ export async function btnExportProgram() {
 
 export async function btnAnalyzeVolume() {
   const muscles = Object.keys(trainingState.volumeLandmarks);
-  const report = muscles.map((m) => ({ muscle: m, sets: trainingState.getWeeklySets(m) }));
+  const report = muscles.map((m) => ({
+    muscle: m,
+    sets: trainingState.getWeeklySets(m),
+  }));
   console.log("Volume report", report);
 }
 
@@ -81,7 +94,8 @@ export async function btnAdaptiveRIR() {
 }
 
 export async function btnSaveToCloud() {
-  const data = JSON.stringify(trainingState);  localStorage.setItem("ph-backup", data);
+  const data = JSON.stringify(trainingState);
+  localStorage.setItem("ph-backup", data);
   alert("Saved to cloud (localStorage)");
 }
 
