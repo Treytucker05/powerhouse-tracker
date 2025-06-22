@@ -1,4 +1,10 @@
 import { vi } from 'vitest';
 
-// Provide jest global for compatibility with older tests
-global.jest = vi;
+import { vi } from 'vitest';
+
+// Provide jest global for legacy specs
+globalThis.jest = vi;
+
+// Optional but harmless: expose afterAll on global for parity
+globalThis.afterAll = afterAll;
+
