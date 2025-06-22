@@ -1,4 +1,6 @@
 // index.js — Main entry point with auto-bootstrap for Node.js environments
+import "./node-bootstrap.js";
+
 if (typeof window === 'undefined') {
   await import('./node-bootstrap.js');
 }
