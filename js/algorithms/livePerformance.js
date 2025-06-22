@@ -637,9 +637,7 @@ class LivePerformanceMonitor {
     };
 
     if (isHighFatigue(sessionData.muscle, fatigueData, trainingState)) {
-      debugLog(
-        `High fatigue detected for ${sessionData.muscle} after session`,
-      );
+      debugLog(`High fatigue detected for ${sessionData.muscle} after session`);
     }
   }
 

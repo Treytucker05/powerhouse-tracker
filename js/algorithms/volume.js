@@ -3,7 +3,7 @@
  * Implements RP Table 2.2 (MEV Stimulus Estimator) and Table 2.3 (Set Progression Algorithm)
  */
 
-import Chart from 'chart.js/auto';
+import Chart from "chart.js/auto";
 import trainingState from "../core/trainingState.js";
 import { isHighFatigue } from "./fatigue.js";
 import { debugLog } from "../utils/debug.js";
@@ -83,15 +83,23 @@ function autoSetIncrement(muscle, feedback = {}, state) {
 
   // Enhanced RP logic: +2 sets when stimulus ≤3 AND near MRV (≥4 sets to MRV)
   if (lowStim && nearMRV && goodRec) {
-    return { add: true, delta: 2, reason: "Low stimulus near MRV - aggressive progression" };
+    return {
+      add: true,
+      delta: 2,
+      reason: "Low stimulus near MRV - aggressive progression",
+    };
   }
 
   // Standard progressions
-  if (["low"].includes(vStat) && lowStim) 
+  if (["low"].includes(vStat) && lowStim)
     return { add: true, delta: 1, reason: "Low volume, low stimulus" };
   if (vStat === "suboptimal" && lowStim && goodRec)
-    return { add: true, delta: 1, reason: "Suboptimal volume, low stimulus, good recovery" };
-  
+    return {
+      add: true,
+      delta: 1,
+      reason: "Suboptimal volume, low stimulus, good recovery",
+    };
+
   return { add: false, delta: 0, reason: "No progression criteria met" };
 }
 
@@ -104,7 +112,7 @@ function autoSetIncrement(muscle, feedback = {}, state) {
 function processWeeklyVolumeProgression(weeklyFeedback, state) {
   const progressionLog = {};
   let deloadTriggered = false;
-  let mrvHits = 0;  // Process each muscle's auto-progression
+  let mrvHits = 0; // Process each muscle's auto-progression
   Object.keys(weeklyFeedback).forEach((muscle) => {
     const feedback = weeklyFeedback[muscle];
 
@@ -125,7 +133,9 @@ function processWeeklyVolumeProgression(weeklyFeedback, state) {
     // Apply set changes (enhanced to handle +2 sets)
     if (increment.add) {
       state.addSets(muscle, increment.delta);
-      debugLog(`Added ${increment.delta} sets to ${muscle}: ${increment.reason}`);
+      debugLog(
+        `Added ${increment.delta} sets to ${muscle}: ${increment.reason}`,
+      );
     }
 
     // Track MRV hits for deload logic
@@ -141,7 +151,9 @@ function processWeeklyVolumeProgression(weeklyFeedback, state) {
       increment: increment.delta,
       reason: increment.reason,
       status: state.getVolumeStatus(muscle),
-      stimulusScore: feedback.stimulus ? scoreStimulus(feedback.stimulus).score : null,
+      stimulusScore: feedback.stimulus
+        ? scoreStimulus(feedback.stimulus).score
+        : null,
     };
   });
 

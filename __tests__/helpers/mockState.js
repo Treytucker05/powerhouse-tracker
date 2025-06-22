@@ -14,20 +14,20 @@ export function makeTrainingState() {
     getWeeklySets: () => 0,
     getTotalWeeklyVolume: () => 0,
     settings: { autoBackup: true },
-    lastBackup: null
+    lastBackup: null,
   };
 }
 
 export const mockTrainingState = {
   currentMesocycle: 1,
-  weeklyProgram:   [],
-  logs:            [],
-  backups:         [],
+  weeklyProgram: [],
+  logs: [],
+  backups: [],
   options: { autoBackup: true, backupFrequencyDays: 7 },
   getWeeklySets: () => 0,
   getTotalWeeklyVolume: () => 0,
   settings: { autoBackup: true },
-  lastBackup: null
+  lastBackup: null,
 };
 
 export default {
@@ -39,5 +39,5 @@ export default {
   weeklyProgram: [],
   logs: [],
   backups: [],
-  options: { autoBackup: true, backupFrequencyDays: 7 }
+  options: { autoBackup: true, backupFrequencyDays: 7 },
 };

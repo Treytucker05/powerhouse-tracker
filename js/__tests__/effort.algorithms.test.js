@@ -1,4 +1,7 @@
-import { calculateTargetRIR, validateEffortLevel } from "../algorithms/effort.js";
+import {
+  calculateTargetRIR,
+  validateEffortLevel,
+} from "../algorithms/effort.js";
 
 describe("calculateTargetRIR", () => {
   test("week 1 of 4-week mesocycle", () => {

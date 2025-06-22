@@ -1,8 +1,8 @@
-# PowerHouse Tracker - Renaissance Periodization Toolkit v0.9.0-beta
+# PowerHouse Tracker - Renaissance Periodization Toolkit v0.9.0-beta.1
 
 A comprehensive evidence-based training toolkit implementing Renaissance Periodization methodology with **automated volume progression**, **intelligent deload analysis**, and **data management**.
 
-## 🎯 Latest Features (v0.9.0-beta)
+## 🎯 Latest Features (v0.9.0-beta.1)
 
 ### ✅ **Complete Handler Coverage (0 Missing)**
 All 35 button handlers are now implemented across 7 training phases:
@@ -32,6 +32,24 @@ All 35 button handlers are now implemented across 7 training phases:
 - **`initializeAtMEV()`** - Smart volume reset to MEV levels
 
 ## 🚀 Quick Start
+
+### Setup & Verify
+```bash
+# Install dependencies  
+pnpm install
+
+# Verify build, tests & linting
+pnpm run verify
+
+# Development server
+pnpm run dev
+
+# Run tests only
+pnpm run test:unit
+
+# Build for production
+pnpm run build
+```
 
 ### Development Setup
 ```bash

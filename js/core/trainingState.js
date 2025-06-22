@@ -70,9 +70,9 @@ class TrainingState {
     this.totalMusclesNeedingRecovery = 0;
 
     // Diet phase integration (RP methodology)
-    this.dietPhase = 'maintenance'; // 'bulk', 'cut', 'maintenance'
+    this.dietPhase = "maintenance"; // 'bulk', 'cut', 'maintenance'
     this.originalLandmarks = {}; // Store original values before diet adjustments
-    
+
     // Store original landmarks before any diet modifications
     this.originalLandmarks = JSON.parse(JSON.stringify(this.volumeLandmarks));
 
@@ -132,7 +132,7 @@ class TrainingState {
     this.saveState();
     if (typeof window !== "undefined" && window.updateAllDisplays)
       window.updateAllDisplays();
-  }  // Check if deload is needed with adaptive mesocycle logic
+  } // Check if deload is needed with adaptive mesocycle logic
   shouldDeload() {
     // Check 1: Consecutive weeks at MRV
     if (this.consecutiveMRVWeeks >= 2) return true;
@@ -161,33 +161,40 @@ class TrainingState {
   getAdaptiveMesoLength() {
     // Base mesocycle length
     let adaptiveLength = this.mesoLen;
-    
+
     // Factor 1: Rate of MRV approach
-    const musclesNearMRV = Object.keys(this.volumeLandmarks).filter(muscle => {
-      const current = this.getWeeklySets(muscle);
-      const mrv = this.volumeLandmarks[muscle].MRV;
-      return current >= mrv - 2; // Within 2 sets of MRV
-    }).length;
-    
+    const musclesNearMRV = Object.keys(this.volumeLandmarks).filter(
+      (muscle) => {
+        const current = this.getWeeklySets(muscle);
+        const mrv = this.volumeLandmarks[muscle].MRV;
+        return current >= mrv - 2; // Within 2 sets of MRV
+      },
+    ).length;
+
     const totalMuscles = Object.keys(this.volumeLandmarks).length;
     const mrvApproachRate = musclesNearMRV / totalMuscles;
-    
+
     // Factor 2: Recovery demand
     const recoveryPressure = this.totalMusclesNeedingRecovery / totalMuscles;
-    
+
     // Factor 3: Training history (advanced trainees need longer mesos)
     const experienceModifier = Math.min(this.blockNo / 10, 0.5); // Cap at 0.5
-    
+
     // Adjust mesocycle length
     if (mrvApproachRate > 0.6 || recoveryPressure > 0.4) {
       // High fatigue/volume pressure → shorter meso
       adaptiveLength = Math.max(3, this.mesoLen - 1);
     } else if (mrvApproachRate < 0.3 && recoveryPressure < 0.2) {
       // Low pressure → longer meso for advanced trainees
-      adaptiveLength = Math.min(6, this.mesoLen + Math.floor(experienceModifier * 2));
+      adaptiveLength = Math.min(
+        6,
+        this.mesoLen + Math.floor(experienceModifier * 2),
+      );
     }
-    
-    debugLog(`Adaptive meso length: ${adaptiveLength} (base: ${this.mesoLen}, MRV rate: ${mrvApproachRate.toFixed(2)}, recovery pressure: ${recoveryPressure.toFixed(2)})`);
+
+    debugLog(
+      `Adaptive meso length: ${adaptiveLength} (base: ${this.mesoLen}, MRV rate: ${mrvApproachRate.toFixed(2)}, recovery pressure: ${recoveryPressure.toFixed(2)})`,
+    );
     return adaptiveLength;
   }
 
@@ -198,21 +205,23 @@ class TrainingState {
   // Start deload phase with adaptive strategy
   startDeload() {
     // Import deload algorithms dynamically to avoid circular dependency
-    import("../algorithms/deload.js").then(({ calculateDeloadStrategy, executeDeload }) => {
-      const strategy = calculateDeloadStrategy(this);
-      executeDeload(this, strategy);
-      debugLog(`Started ${strategy.type} deload: ${strategy.recommendation}`);
-    }).catch(err => {
-      // Fallback to simple deload if import fails
-      debugLog("Deload import failed, using fallback strategy", err);
-      this.deloadPhase = true;
-      this.loadReduction = 0.5;
-      Object.keys(this.volumeLandmarks).forEach((muscle) => {
-        const deloadSets = Math.round(this.volumeLandmarks[muscle].MEV * 0.5);
-        this.currentWeekSets[muscle] = deloadSets;
+    import("../algorithms/deload.js")
+      .then(({ calculateDeloadStrategy, executeDeload }) => {
+        const strategy = calculateDeloadStrategy(this);
+        executeDeload(this, strategy);
+        debugLog(`Started ${strategy.type} deload: ${strategy.recommendation}`);
+      })
+      .catch((err) => {
+        // Fallback to simple deload if import fails
+        debugLog("Deload import failed, using fallback strategy", err);
+        this.deloadPhase = true;
+        this.loadReduction = 0.5;
+        Object.keys(this.volumeLandmarks).forEach((muscle) => {
+          const deloadSets = Math.round(this.volumeLandmarks[muscle].MEV * 0.5);
+          this.currentWeekSets[muscle] = deloadSets;
+        });
+        this.saveState();
       });
-      this.saveState();
-    });
   }
 
   // Start resensitization phase
@@ -446,16 +455,16 @@ class TrainingState {
    * @param {string} phase - 'bulk', 'cut', 'maintenance'
    */
   setDietPhase(phase) {
-    if (!['bulk', 'cut', 'maintenance'].includes(phase)) {
+    if (!["bulk", "cut", "maintenance"].includes(phase)) {
       throw new Error(`Invalid diet phase: ${phase}`);
     }
-    
+
     const previousPhase = this.dietPhase;
     this.dietPhase = phase;
-    
+
     // Apply landmark adjustments
     this.adjustLandmarksForDiet();
-    
+
     debugLog(`Diet phase changed from ${previousPhase} to ${phase}`);
     this.saveState();
   }
@@ -466,47 +475,47 @@ class TrainingState {
    */
   adjustLandmarksForDiet() {
     const phase = this.dietPhase;
-    
+
     // Reset to original landmarks first
     this.volumeLandmarks = JSON.parse(JSON.stringify(this.originalLandmarks));
-    
-    Object.keys(this.volumeLandmarks).forEach(muscle => {
+
+    Object.keys(this.volumeLandmarks).forEach((muscle) => {
       const original = this.originalLandmarks[muscle];
-      
+
       switch (phase) {
-        case 'bulk':
+        case "bulk":
           // Bulk: MEV * 0.8, MRV * 1.0 (need less volume to grow)
           this.volumeLandmarks[muscle].MEV = Math.round(original.MEV * 0.8);
           this.volumeLandmarks[muscle].MRV = original.MRV; // Keep MRV same
           break;
-          
-        case 'cut':
+
+        case "cut":
           // Cut: MEV * 1.2, MRV * 0.8 (need more volume, can handle less)
           this.volumeLandmarks[muscle].MEV = Math.round(original.MEV * 1.2);
           this.volumeLandmarks[muscle].MRV = Math.round(original.MRV * 0.8);
           break;
-          
-        case 'maintenance':
+
+        case "maintenance":
         default:
           // Maintenance: use original values
           this.volumeLandmarks[muscle] = { ...original };
           break;
       }
-      
+
       // Ensure MEV doesn't exceed MRV
       this.volumeLandmarks[muscle].MEV = Math.min(
         this.volumeLandmarks[muscle].MEV,
-        this.volumeLandmarks[muscle].MRV - 1
+        this.volumeLandmarks[muscle].MRV - 1,
       );
-      
+
       // Update MAV to be between MEV and MRV
       const mev = this.volumeLandmarks[muscle].MEV;
       const mrv = this.volumeLandmarks[muscle].MRV;
       this.volumeLandmarks[muscle].MAV = Math.round(mev + (mrv - mev) * 0.7);
     });
-    
+
     // Update weekly volume tracking with new landmarks
-    Object.keys(this.volumeLandmarks).forEach(muscle => {
+    Object.keys(this.volumeLandmarks).forEach((muscle) => {
       if (this.weeklyVolume[muscle]) {
         this.weeklyVolume[muscle] = {
           current: this.currentWeekSets[muscle],
@@ -514,7 +523,7 @@ class TrainingState {
         };
       }
     });
-    
+
     debugLog(`Volume landmarks adjusted for ${phase} phase`);
   }
 
@@ -527,9 +536,9 @@ class TrainingState {
       current: this.dietPhase,
       landmarks: {
         original: this.originalLandmarks,
-        adjusted: this.volumeLandmarks
+        adjusted: this.volumeLandmarks,
       },
-      recommendations: this.getDietPhaseRecommendations()
+      recommendations: this.getDietPhaseRecommendations(),
     };
   }
 
@@ -538,29 +547,31 @@ class TrainingState {
    */
   getDietPhaseRecommendations() {
     switch (this.dietPhase) {
-      case 'bulk':
+      case "bulk":
         return {
-          volume: "Start conservative with volume - growth stimulus is easier to achieve",
+          volume:
+            "Start conservative with volume - growth stimulus is easier to achieve",
           intensity: "Focus on progressive overload with controlled increases",
           recovery: "Expect better recovery due to caloric surplus",
-          progression: "Be aggressive with load progression, conservative with volume"
+          progression:
+            "Be aggressive with load progression, conservative with volume",
         };
-        
-      case 'cut':
+
+      case "cut":
         return {
           volume: "Higher volume may be needed for muscle retention",
           intensity: "Maintain intensity but expect reduced capacity",
           recovery: "Recovery will be impaired - monitor fatigue closely",
-          progression: "Prioritize maintaining strength over gaining"
+          progression: "Prioritize maintaining strength over gaining",
         };
-        
-      case 'maintenance':
+
+      case "maintenance":
       default:
         return {
           volume: "Standard RP volume recommendations apply",
           intensity: "Balance volume and intensity progression",
           recovery: "Normal recovery patterns expected",
-          progression: "Follow standard progression algorithms"
+          progression: "Follow standard progression algorithms",
         };
     }
   }
@@ -580,7 +591,7 @@ if (trainingState.settings.enableAdvancedDashboard) {
 export default trainingState;
 
 // Export saveState function as requested for handlers
-export function saveState() { 
+export function saveState() {
   trainingState.saveState();
 }
 

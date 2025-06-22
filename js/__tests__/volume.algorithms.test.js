@@ -1,4 +1,7 @@
-import { autoSetIncrement, processWeeklyVolumeProgression } from "../algorithms/volume.js";
+import {
+  autoSetIncrement,
+  processWeeklyVolumeProgression,
+} from "../algorithms/volume.js";
 
 function createMockState() {
   return {
@@ -40,14 +43,22 @@ function createMockState() {
   };
 }
 
-describe("autoSetIncrement", () => {  test("adds a set when volume low and stimulus poor", () => {
+describe("autoSetIncrement", () => {
+  test("adds a set when volume low and stimulus poor", () => {
     const state = createMockState();
     const result = autoSetIncrement(
       "Chest",
-      { stimulus: { mmc: 1, pump: 1, disruption: 1 }, recoveryMuscle: "recovered" },
+      {
+        stimulus: { mmc: 1, pump: 1, disruption: 1 },
+        recoveryMuscle: "recovered",
+      },
       state,
     );
-    expect(result).toEqual({ add: true, delta: 1, reason: "Low volume, low stimulus" });
+    expect(result).toEqual({
+      add: true,
+      delta: 1,
+      reason: "Low volume, low stimulus",
+    });
   });
 });
 

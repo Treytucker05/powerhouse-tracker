@@ -3,10 +3,10 @@ import { initNavigation } from "./navigation.js";
 
 /*  Maps module functions onto window so legacy inline onclick="" handlers keep working */
 
-import { 
-  beginnerPreset, 
-  intermediatePreset, 
-  advancedPreset, 
+import {
+  beginnerPreset,
+  intermediatePreset,
+  advancedPreset,
   customConfiguration,
   saveVolumeLandmarks,
   setupMesocycle,
@@ -25,7 +25,7 @@ import {
   undoLastSetHandler,
   finishWorkoutHandler,
   btnOptimizeFrequency,
-  btnProcessWithRPAlgorithms, 
+  btnProcessWithRPAlgorithms,
   btnAutoProgressWeekly,
   btnGenerateMesocycle,
   btnExportProgram,
@@ -39,7 +39,7 @@ import {
   createBackupHandler,
   autoBackupHandler,
   importDataHandler,
-  exportFeedbackHandler
+  exportFeedbackHandler,
 } from "./buttonHandlers.js";
 
 import {
@@ -109,7 +109,7 @@ window.toggleSection = function (sectionId) {
   // Complex case: handle structured sections with animations
   const content = document.getElementById(sectionId + "-content");
   if (!content) return; // Neither direct element nor structured section found
-  
+
   const banner = content.previousElementSibling;
   const icon = banner?.querySelector(".expand-icon");
 
@@ -1376,20 +1376,27 @@ window.processWithRPAlgorithms = function () {
   }
 
   const exercise = trainingState.currentExercise;
-  const currentVolume = trainingState.exerciseProgress[exercise]?.weeklyVolume || 0;
-  const targetRIR = window.calculateTargetRIR?.(trainingState.currentWeek, trainingState.mesocycleLength) || 2;
+  const currentVolume =
+    trainingState.exerciseProgress[exercise]?.weeklyVolume || 0;
+  const targetRIR =
+    window.calculateTargetRIR?.(
+      trainingState.currentWeek,
+      trainingState.mesocycleLength,
+    ) || 2;
 
   // Apply RP algorithm logic
   const recommendation = {
     sets: Math.ceil(currentVolume / 3), // Rough estimate
     reps: 8,
-    load: '75-85% 1RM',
+    load: "75-85% 1RM",
     rir: targetRIR,
-    notes: `RP algorithm suggests ${targetRIR} RIR for week ${trainingState.currentWeek}`
+    notes: `RP algorithm suggests ${targetRIR} RIR for week ${trainingState.currentWeek}`,
   };
 
   // Update UI with recommendations
-  const output = document.getElementById("output") || document.getElementById("liveSessionData");
+  const output =
+    document.getElementById("output") ||
+    document.getElementById("liveSessionData");
   if (output) {
     output.innerHTML += `
       <div class="rp-recommendation">
@@ -1404,7 +1411,9 @@ window.processWithRPAlgorithms = function () {
     `;
   }
 
-  alert(`RP Algorithm recommendation: ${recommendation.sets} sets of ${recommendation.reps} reps at ${recommendation.load} with ${recommendation.rir} RIR`);
+  alert(
+    `RP Algorithm recommendation: ${recommendation.sets} sets of ${recommendation.reps} reps at ${recommendation.load} with ${recommendation.rir} RIR`,
+  );
 };
 
 /* ----- Authentication handlers removed
@@ -1497,16 +1506,16 @@ export function updateAllDisplays() {
 debugLog("globals loaded – auth handlers ready");
 /* ----- placeholder handlers for future implementation ----- */
 
-window.importData = function() {
+window.importData = function () {
   debugLog("📥 Import Data functionality");
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.json,.csv';
-  input.onchange = function(e) {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".json,.csv";
+  input.onchange = function (e) {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         try {
           const data = JSON.parse(e.target.result);
           // TODO: Implement data import logic
@@ -1522,19 +1531,22 @@ window.importData = function() {
   input.click();
 };
 
-window.autoBackup = function() {
+window.autoBackup = function () {
   debugLog("🔄 Auto Backup functionality");
-  
+
   // Enable auto-backup interval
   if (window.autoBackupInterval) {
     clearInterval(window.autoBackupInterval);
     window.autoBackupInterval = null;
     alert("Auto-backup disabled");
   } else {
-    window.autoBackupInterval = setInterval(() => {
-      window.createBackup();
-      debugLog("🔄 Auto-backup completed");
-    }, 5 * 60 * 1000); // Every 5 minutes
+    window.autoBackupInterval = setInterval(
+      () => {
+        window.createBackup();
+        debugLog("🔄 Auto-backup completed");
+      },
+      5 * 60 * 1000,
+    ); // Every 5 minutes
     alert("Auto-backup enabled (every 5 minutes)");
   }
 };
@@ -1565,68 +1577,120 @@ document
 
 // Ensure all button handlers are exposed for audit script compatibility
 window.btnBeginnerPreset = window.btnBeginnerPreset || window.beginnerPreset;
-window.btnIntermediatePreset = window.btnIntermediatePreset || window.intermediatePreset;
+window.btnIntermediatePreset =
+  window.btnIntermediatePreset || window.intermediatePreset;
 window.btnAdvancedPreset = window.btnAdvancedPreset || window.advancedPreset;
-window.btnCustomConfiguration = window.btnCustomConfiguration || window.customConfiguration;
-window.btnSaveVolumeLandmarks = window.btnSaveVolumeLandmarks || window.saveVolumeLandmarks;
+window.btnCustomConfiguration =
+  window.btnCustomConfiguration || window.customConfiguration;
+window.btnSaveVolumeLandmarks =
+  window.btnSaveVolumeLandmarks || window.saveVolumeLandmarks;
 
-document.getElementById("btnSetupMesocycle")?.addEventListener("click", window.btnSetupMesocycle);
-document.getElementById("btnShowRIRSchedule")?.addEventListener("click", window.btnShowRIRSchedule);
-document.getElementById("btnGenerateWeeklyProgram")?.addEventListener("click", window.btnGenerateWeeklyProgram);
-document.getElementById("btnSmartExerciseSelection")?.addEventListener("click", window.btnSmartExerciseSelection);
-document.getElementById("btnRiskAssessment")?.addEventListener("click", window.btnRiskAssessment);
-document.getElementById("btnRunWeeklyAutoProgression")?.addEventListener("click", window.btnRunWeeklyAutoProgression);
-document.getElementById("btnNextWeek")?.addEventListener("click", window.btnNextWeek);
-document.getElementById("btnProcessWeeklyAdjustments")?.addEventListener("click", window.btnProcessWeeklyAdjustments);
-document.getElementById("btnWeeklyIntelligenceReport")?.addEventListener("click", window.btnWeeklyIntelligenceReport);
-document.getElementById("btnPredictDeloadTiming")?.addEventListener("click", window.btnPredictDeloadTiming);
-document.getElementById("btnPlateauAnalysis")?.addEventListener("click", window.btnPlateauAnalysis);
-document.getElementById("btnStartLiveSession")?.addEventListener("click", window.btnStartLiveSession);
-document.getElementById("btnLogSet")?.addEventListener("click", window.btnLogSet);
-document.getElementById("btnUndoLastSet")?.addEventListener("click", window.btnUndoLastSet);
-document.getElementById("btnFinishWorkout")?.addEventListener("click", window.btnFinishWorkout);
+document
+  .getElementById("btnSetupMesocycle")
+  ?.addEventListener("click", window.btnSetupMesocycle);
+document
+  .getElementById("btnShowRIRSchedule")
+  ?.addEventListener("click", window.btnShowRIRSchedule);
+document
+  .getElementById("btnGenerateWeeklyProgram")
+  ?.addEventListener("click", window.btnGenerateWeeklyProgram);
+document
+  .getElementById("btnSmartExerciseSelection")
+  ?.addEventListener("click", window.btnSmartExerciseSelection);
+document
+  .getElementById("btnRiskAssessment")
+  ?.addEventListener("click", window.btnRiskAssessment);
+document
+  .getElementById("btnRunWeeklyAutoProgression")
+  ?.addEventListener("click", window.btnRunWeeklyAutoProgression);
+document
+  .getElementById("btnNextWeek")
+  ?.addEventListener("click", window.btnNextWeek);
+document
+  .getElementById("btnProcessWeeklyAdjustments")
+  ?.addEventListener("click", window.btnProcessWeeklyAdjustments);
+document
+  .getElementById("btnWeeklyIntelligenceReport")
+  ?.addEventListener("click", window.btnWeeklyIntelligenceReport);
+document
+  .getElementById("btnPredictDeloadTiming")
+  ?.addEventListener("click", window.btnPredictDeloadTiming);
+document
+  .getElementById("btnPlateauAnalysis")
+  ?.addEventListener("click", window.btnPlateauAnalysis);
+document
+  .getElementById("btnStartLiveSession")
+  ?.addEventListener("click", window.btnStartLiveSession);
+document
+  .getElementById("btnLogSet")
+  ?.addEventListener("click", window.btnLogSet);
+document
+  .getElementById("btnUndoLastSet")
+  ?.addEventListener("click", window.btnUndoLastSet);
+document
+  .getElementById("btnFinishWorkout")
+  ?.addEventListener("click", window.btnFinishWorkout);
 
 // Ensure all Phase-2 button handlers are exposed for audit script compatibility
 window.btnSetupMesocycle = window.btnSetupMesocycle || window.setupMesocycle;
 window.btnShowRIRSchedule = window.btnShowRIRSchedule || window.showRIRSchedule;
-window.btnGenerateWeeklyProgram = window.btnGenerateWeeklyProgram || window.generateWeeklyProgram;
-window.btnSmartExerciseSelection = window.btnSmartExerciseSelection || window.smartExerciseSelection;
+window.btnGenerateWeeklyProgram =
+  window.btnGenerateWeeklyProgram || window.generateWeeklyProgram;
+window.btnSmartExerciseSelection =
+  window.btnSmartExerciseSelection || window.smartExerciseSelection;
 window.btnRiskAssessment = window.btnRiskAssessment || window.riskAssessment;
 
 // Ensure all Phase-3 button handlers are exposed for audit script compatibility
-window.btnRunWeeklyAutoProgression = window.btnRunWeeklyAutoProgression || window.runWeeklyAutoProgression;
+window.btnRunWeeklyAutoProgression =
+  window.btnRunWeeklyAutoProgression || window.runWeeklyAutoProgression;
 window.btnNextWeek = window.btnNextWeek || window.nextWeek;
-window.btnProcessWeeklyAdjustments = window.btnProcessWeeklyAdjustments || window.processWeeklyAdjustments;
-window.btnWeeklyIntelligenceReport = window.btnWeeklyIntelligenceReport || window.weeklyIntelligenceReport;
-window.btnPredictDeloadTiming = window.btnPredictDeloadTiming || window.predictDeloadTiming;
+window.btnProcessWeeklyAdjustments =
+  window.btnProcessWeeklyAdjustments || window.processWeeklyAdjustments;
+window.btnWeeklyIntelligenceReport =
+  window.btnWeeklyIntelligenceReport || window.weeklyIntelligenceReport;
+window.btnPredictDeloadTiming =
+  window.btnPredictDeloadTiming || window.predictDeloadTiming;
 window.btnPlateauAnalysis = window.btnPlateauAnalysis || window.plateauAnalysis;
 
 // Ensure all Phase-4 button handlers are exposed for audit script compatibility
-window.btnStartLiveSession = window.btnStartLiveSession || window.startWorkoutHandler;
+window.btnStartLiveSession =
+  window.btnStartLiveSession || window.startWorkoutHandler;
 window.btnLogSet = window.btnLogSet || window.logSetHandler;
 window.btnUndoLastSet = window.btnUndoLastSet || window.undoLastSetHandler;
-window.btnFinishWorkout = window.btnFinishWorkout || window.finishWorkoutHandler;
+window.btnFinishWorkout =
+  window.btnFinishWorkout || window.finishWorkoutHandler;
 
 // Ensure all new RP methodology handlers are exposed
-window.btnOptimizeFrequency = window.btnOptimizeFrequency || btnOptimizeFrequency;
-window.btnProcessWithRPAlgorithms = window.btnProcessWithRPAlgorithms || btnProcessWithRPAlgorithms;
-window.btnAutoProgressWeekly = window.btnAutoProgressWeekly || btnAutoProgressWeekly;
-window.btnGenerateMesocycle = window.btnGenerateMesocycle || btnGenerateMesocycle;
+window.btnOptimizeFrequency =
+  window.btnOptimizeFrequency || btnOptimizeFrequency;
+window.btnProcessWithRPAlgorithms =
+  window.btnProcessWithRPAlgorithms || btnProcessWithRPAlgorithms;
+window.btnAutoProgressWeekly =
+  window.btnAutoProgressWeekly || btnAutoProgressWeekly;
+window.btnGenerateMesocycle =
+  window.btnGenerateMesocycle || btnGenerateMesocycle;
 window.btnExportProgram = window.btnExportProgram || btnExportProgram;
 
 // Phase 5: Deload Analysis handlers
 window.analyzeDeloadNeed = window.analyzeDeloadNeed || analyzeDeloadNeedHandler;
-window.btnAnalyzeDeloadNeed = window.btnAnalyzeDeloadNeed || analyzeDeloadNeedHandler;
+window.btnAnalyzeDeloadNeed =
+  window.btnAnalyzeDeloadNeed || analyzeDeloadNeedHandler;
 window.initializeAtMEV = window.initializeAtMEV || initializeAtMEVHandler;
 window.btnInitializeAtMEV = window.btnInitializeAtMEV || initializeAtMEVHandler;
 
 // Phase 6: Advanced Intelligence handlers
-window.initializeIntelligence = window.initializeIntelligence || initializeIntelligenceHandler;
-window.btnInitializeIntelligence = window.btnInitializeIntelligence || initializeIntelligenceHandler;
-window.optimizeVolumeLandmarks = window.optimizeVolumeLandmarks || optimizeVolumeLandmarksHandler;
-window.btnOptimizeVolumeLandmarks = window.btnOptimizeVolumeLandmarks || optimizeVolumeLandmarksHandler;
-window.adaptiveRIRRecommendations = window.adaptiveRIRRecommendations || adaptiveRIRRecommendationsHandler;
-window.btnAdaptiveRIRRecommendations = window.btnAdaptiveRIRRecommendations || adaptiveRIRRecommendationsHandler;
+window.initializeIntelligence =
+  window.initializeIntelligence || initializeIntelligenceHandler;
+window.btnInitializeIntelligence =
+  window.btnInitializeIntelligence || initializeIntelligenceHandler;
+window.optimizeVolumeLandmarks =
+  window.optimizeVolumeLandmarks || optimizeVolumeLandmarksHandler;
+window.btnOptimizeVolumeLandmarks =
+  window.btnOptimizeVolumeLandmarks || optimizeVolumeLandmarksHandler;
+window.adaptiveRIRRecommendations =
+  window.adaptiveRIRRecommendations || adaptiveRIRRecommendationsHandler;
+window.btnAdaptiveRIRRecommendations =
+  window.btnAdaptiveRIRRecommendations || adaptiveRIRRecommendationsHandler;
 
 // Phase 7: Data Management handlers
 window.exportAllData = window.exportAllData || exportAllDataHandler;
@@ -1643,19 +1707,19 @@ window.exportFeedback = window.exportFeedback || exportFeedbackHandler;
 window.btnExportFeedback = window.btnExportFeedback || exportFeedbackHandler;
 
 // Initialize new UI components
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   // Initialize status panel with fatigue indicators
   initStatusPanel();
-  
+
   // Initialize workout logger with RIR tracking
   initWorkoutLogger();
-  
+
   // Update status panel when training state changes
-  window.addEventListener('trainingStateChanged', () => {
+  window.addEventListener("trainingStateChanged", () => {
     updateFatigueIndicator();
     refreshStatusPanel();
   });
-  
+
   debugLog("All RP methodology components initialized");
 });
 
@@ -1663,7 +1727,11 @@ document.addEventListener('DOMContentLoaded', () => {
 initNavigation();
 
 // Status Panel initialization
-import { initStatusPanel, updateFatigueIndicator, refreshStatusPanel } from "./statusPanel.js";
+import {
+  initStatusPanel,
+  updateFatigueIndicator,
+  refreshStatusPanel,
+} from "./statusPanel.js";
 import { initWorkoutLogger } from "./workoutLogger.js";
 
 initStatusPanel();

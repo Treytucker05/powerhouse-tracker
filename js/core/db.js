@@ -6,7 +6,10 @@ import { debugLog } from "../utils/debug.js";
 export const supa = {
   auth: {
     signUp: async () => ({ data: null, error: new Error("Auth disabled") }),
-    signInWithPassword: async () => ({ data: null, error: new Error("Auth disabled") }),
+    signInWithPassword: async () => ({
+      data: null,
+      error: new Error("Auth disabled"),
+    }),
     signOut: async () => ({ error: new Error("Auth disabled") }),
     onAuthStateChange: () => {
       debugLog("Auth system disabled; onAuthStateChange ignored.");
