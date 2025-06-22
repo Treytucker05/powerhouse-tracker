@@ -66,7 +66,7 @@ export function initIntelligence(state = trainingState) {
 
   // Set baselines
   intelligence.baselines = {
-    startingVolume: state.getTotalWeeklyVolume(),
+    startingVolume: state.getTotalWeeklyVolume ? state.getTotalWeeklyVolume() : 0,
     avgRPE: intelligence.kpis.avgRPE,
     weeklyLoad: intelligence.kpis.weeklyLoad,
     recordDate: new Date().toISOString()
@@ -191,7 +191,7 @@ export function adaptiveRIRRecommendations(state = trainingState) {
   let muscleCount = 0;
   
   Object.keys(landmarks).forEach(muscle => {
-    const currentSets = state.getWeeklySets(muscle);
+    const currentSets = state.getWeeklySets ? state.getWeeklySets(muscle) : 0;
     const mrv = landmarks[muscle].MRV;
     const mav = landmarks[muscle].MAV;
     const fatigueRatio = currentSets / mrv;
@@ -267,7 +267,7 @@ function generateInitialRecommendations(intelligence, state) {
     recs.push("Slow progression rate - consider volume increases");
   }
   
-  const totalVolume = state.getTotalWeeklyVolume();
+  const totalVolume = state.getTotalWeeklyVolume ? state.getTotalWeeklyVolume() : 0;
   if (totalVolume < 50) {
     recs.push("Low total volume - ensure adequate stimulus");
   }

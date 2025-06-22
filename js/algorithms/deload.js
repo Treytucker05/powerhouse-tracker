@@ -63,9 +63,8 @@ function assessOverallFatigue(state) {
   const muscles = Object.keys(state.volumeLandmarks);
   let totalFatigueScore = 0;
   let totalMuscles = 0;
-  
-  muscles.forEach(muscle => {
-    const currentSets = state.getWeeklySets(muscle);
+    muscles.forEach(muscle => {
+    const currentSets = state.getWeeklySets ? state.getWeeklySets(muscle) : 0;
     const mrv = state.volumeLandmarks[muscle].MRV;
     const mev = state.volumeLandmarks[muscle].MEV;
     
@@ -97,9 +96,8 @@ function assessVolumePressure(state) {
   const muscles = Object.keys(state.volumeLandmarks);
   let atOrNearMRV = 0;
   let totalMuscles = muscles.length;
-  
-  muscles.forEach(muscle => {
-    const currentSets = state.getWeeklySets(muscle);
+    muscles.forEach(muscle => {
+    const currentSets = state.getWeeklySets ? state.getWeeklySets(muscle) : 0;
     const mrv = state.volumeLandmarks[muscle].MRV;
     
     // Count muscles at or within 2 sets of MRV
@@ -254,10 +252,9 @@ export function analyzeDeloadNeed(state) {
   let totalFatigueIndex = 0;
   let muscleCount = 0;
   let highFatigueMuscles = 0;
-
   // Calculate fatigue index for each muscle
   Object.keys(landmarks).forEach(muscle => {
-    const currentSets = state.getWeeklySets(muscle);
+    const currentSets = state.getWeeklySets ? state.getWeeklySets(muscle) : 0;
     const mrv = landmarks[muscle].MRV;
     const fatigueIndex = currentSets / mrv;
     
@@ -333,19 +330,20 @@ export function initializeAtMEV(state) {
   if (!landmarks || Object.keys(landmarks).length === 0) {
     throw new Error("Volume landmarks must be set before initializing at MEV");
   }
-
   // Reset each muscle to MEV
   Object.keys(landmarks).forEach(muscle => {
     const mev = landmarks[muscle].MEV;
-    const currentVolume = state.getWeeklySets(muscle);
+    const currentVolume = state.getWeeklySets ? state.getWeeklySets(muscle) : 0;
     
     summary.previousVolumes[muscle] = currentVolume;
     summary.newVolumes[muscle] = mev;
     summary.totalReduction += (currentVolume - mev);
     summary.resetMuscles.push(muscle);
     
-    // Update state
-    state.setWeeklySets(muscle, mev);
+    // Update state if setter exists
+    if (state.setWeeklySets) {
+      state.setWeeklySets(muscle, mev);
+    }
   });
 
   // Reset week counter

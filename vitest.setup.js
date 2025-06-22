@@ -12,18 +12,31 @@ globalThis.beforeEach = beforeEach;
 
 import { beforeAll } from 'vitest';
 
+// Canvas stub for chart.js in JSDOM
+if (!global.HTMLCanvasElement) {
+  class HTMLCanvasElement extends global.HTMLElement {}
+  global.HTMLCanvasElement = HTMLCanvasElement;
+  const _create = document.createElement.bind(document);
+  document.createElement = (t)=> t==='canvas'
+    ? new HTMLCanvasElement()
+    : _create(t);
+}
+
 beforeAll(() => {
   // ── canvas stub for chart-export tests ──────────────────────────────
   const canvas = document.createElement('canvas');
   canvas.id    = 'weeklyChart';
-  
-  // Only append if document.body exists
+    // Only append if document.body exists
   if (document.body) {
-    document.body.appendChild(canvas);
+    try {
+      document.body.appendChild(canvas);
+    } catch (e) {
+      // Ignore appendChild errors in test environment
+    }
   }
 
   HTMLCanvasElement.prototype.getContext = () => ({ measureText: () => ({ width: 100 }) });
-  HTMLCanvasElement.prototype.toDataURL  = () => '';
+  HTMLCanvasElement.prototype.toDataURL  = () => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
 
   // ── minimal FileReader mock for importData tests ────────────────────
   global.FileReader = class {
