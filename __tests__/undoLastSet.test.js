@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { jest } from '@jest/globals';
+import { vi } from 'vitest';
 
 import { undoLastSet } from '../js/algorithms/workout.js';
 import { undoLastSetHandler } from '../js/ui/buttonHandlers.js';
@@ -267,7 +267,7 @@ describe('UndoLastSet Handler Integration', () => {
     beforeEach(() => {
     // Mock DOM events
     global.window = Object.create(window);
-    const mockDispatchEvent = jest.fn();
+    const mockDispatchEvent = vi.fn();
     global.window.dispatchEvent = mockDispatchEvent;
     window.dispatchEvent = mockDispatchEvent;
     
@@ -302,8 +302,8 @@ describe('UndoLastSet Handler Integration', () => {
     // Reset training state
     trainingState.currentWorkout = null;
       // Mock console methods
-    const mockConsoleLog = jest.fn();
-    const mockConsoleError = jest.fn();
+    const mockConsoleLog = vi.fn();
+    const mockConsoleError = vi.fn();
     console.log = mockConsoleLog;
     console.error = mockConsoleError;
   });
