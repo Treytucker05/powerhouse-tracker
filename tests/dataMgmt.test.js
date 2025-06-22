@@ -4,14 +4,15 @@
 
 import * as ts from "../js/core/trainingState.js";
 import { exportAllData, exportChart, createBackup, autoBackup, importData, exportFeedback } from "../js/algorithms/dataExport.js";
+import { vi } from 'vitest';
 
 // Mock file system operations for testing
 global.URL = {
-  createObjectURL: jest.fn(() => 'mock-object-url'),
-  revokeObjectURL: jest.fn()
+  createObjectURL: vi.fn(() => 'mock-object-url'),
+  revokeObjectURL: vi.fn()
 };
 
-global.Blob = jest.fn((content, options) => ({
+global.Blob = vi.fn((content, options) => ({
   content,
   options,
   size: content[0].length,
@@ -19,12 +20,12 @@ global.Blob = jest.fn((content, options) => ({
 }));
 
 // Mock DOM elements
-document.createElement = jest.fn((tagName) => {
+document.createElement = vi.fn((tagName) => {
   const element = {
     tagName: tagName.toUpperCase(),
-    click: jest.fn(),
-    setAttribute: jest.fn(),
-    getAttribute: jest.fn(),
+    click: vi.fn(),
+    setAttribute: vi.fn(),
+    getAttribute: vi.fn(),
     style: {},
     href: '',
     download: ''
@@ -40,8 +41,8 @@ document.createElement = jest.fn((tagName) => {
 });
 
 document.body = {
-  appendChild: jest.fn(),
-  removeChild: jest.fn()
+  appendChild: vi.fn(),
+  removeChild: vi.fn()
 };
 
 // ----- isolate global singleton so later test-suites aren't polluted -----
@@ -54,7 +55,7 @@ beforeEach(() => {
   }
   
   // Reset mocks
-  jest.clearAllMocks();
+  vi.clearAllMocks();
 });
 
 afterAll(() => {

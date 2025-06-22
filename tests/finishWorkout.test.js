@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { vi as jest } from 'vitest';
++import { vi as jest } from 'vitest';
 
 import { finishWorkout } from '../js/algorithms/workout.js';
 import { finishWorkoutHandler } from '../js/ui/buttonHandlers.js';
@@ -39,7 +39,7 @@ describe('finishWorkoutHandler integration', () => {
       exercises: []
     };
     trainingState.workoutHistory = [];
-    window.dispatchEvent = jest.fn();
+    window.dispatchEvent = vi.fn();
   });
 
   test('should dispatch workout-finished event and clear state', () => {
