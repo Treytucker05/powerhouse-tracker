@@ -3,7 +3,7 @@
  * Tests for Phase-4 workout session management
  */
 
-import { jest } from '@jest/globals';
+import { vi } from 'vitest';
 
 // Mock the trainingState module
 const mockTrainingState = {
@@ -21,7 +21,7 @@ const mockTrainingState = {
 // Mock the core module
 jest.unstable_mockModule('../js/core/trainingState.js', () => ({
   default: mockTrainingState,
-  saveState: jest.fn()
+  saveState: vi.fn()
 }));
 
 // Import the modules after mocking
