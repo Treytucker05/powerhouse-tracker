@@ -33,22 +33,28 @@ All 35 button handlers are now implemented across 7 training phases:
 
 ## 🚀 Quick Start
 
-### Setup & Verify
+### Quick Start
 ```bash
 # Install dependencies  
 pnpm install
 
-# Verify build, tests & linting
+# Verify everything works (build + tests + linting)
 pnpm run verify
 
-# Development server
+# Development server (opens on http://localhost:5173)
 pnpm run dev
+```
 
+### Development Commands
+```bash
 # Run tests only
 pnpm run test:unit
 
 # Build for production
 pnpm run build
+
+# Lint check
+pnpm run lint:ci
 ```
 
 ### Development Setup
