@@ -1,10 +1,21 @@
 import { saveState } from "../core/trainingState.js";
 
 /**
+ * Check if running in browser environment
+ */
+const isBrowser = () =>
+  typeof window !== "undefined" && typeof document !== "undefined";
+
+/**
  * Initialize the navigation system
  * Attaches click listeners to nav buttons and sets up initial state
  */
 export function initNavigation() {
+  if (!isBrowser()) {
+    console.log("[Navigation] initNavigation() skipped (Node)");
+    return;
+  }
+
   console.log("Initializing navigation system");
 
   // Attach click listeners to navigation buttons
@@ -37,6 +48,11 @@ export function initNavigation() {
  * @param {string} sectionId - The ID of the section to show
  */
 export function showSection(sectionId) {
+  if (!isBrowser()) {
+    console.log(`[Navigation] showSection(${sectionId}) skipped (Node)`);
+    return;
+  }
+
   console.log(`Switching to section: ${sectionId}`);
 
   // Hide all sections
