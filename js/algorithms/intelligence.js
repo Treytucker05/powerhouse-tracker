@@ -373,9 +373,8 @@ export function adaptiveRIRRecommendations(state = trainingState) {
   } else {
     recommendations.rationale.volumeStatus = 'moderate';
     recommendations.rationale.fatigueLevel = 'normal';
-  }
-
-  debugLog("Adaptive RIR recommendations generated", recommendations);
+  }  debugLog("Adaptive RIR recommendations generated", recommendations);
+  
   return recommendations;
 }
 
