@@ -110,13 +110,16 @@ describe("Button Handlers", () => {
       expect(source).not.toMatch(/TODO|stub/i);
     });
   });
-  test("handlers should dispatch proper events when called", () => {
+  test("handlers should dispatch proper events when called", async () => {
     let eventFired = false;
     window.addEventListener("beginner-preset-selected", () => {
       eventFired = true;
     });
 
     window.btnBeginnerPreset();
+
+    // Give a small delay for event to be processed
+    await new Promise(resolve => setTimeout(resolve, 0));
 
     expect(eventFired).toBe(true);
     expect(window.trainingState.currentPreset).toBe("beginner");
