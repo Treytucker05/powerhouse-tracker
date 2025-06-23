@@ -10,10 +10,8 @@ export default function NavBar({ user, onSignOut }) {
     { path: '/mesocycle', label: 'Mesocycle', icon: '📅' },
     { path: '/microcycle', label: 'Microcycle', icon: '🔄' },
     { path: '/macrocycle', label: 'Macrocycle', icon: '📈' },
-  ];
-
-  return (
-    <nav className="sticky top-0 z-50 bg-black border-b border-accent shadow-lg">
+  ];  return (
+    <nav className="sticky top-0 z-50 bg-gray-950 border-b border-accent shadow-lg">
       <div className="container mx-auto px-4 py-3">
         <div className="flex justify-between items-center">
           {/* Logo/Brand */}

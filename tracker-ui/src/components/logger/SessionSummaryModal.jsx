@@ -63,13 +63,12 @@ export default function SessionSummaryModal({ isOpen, onClose, session, sets }) 
       duration
     }
   }
-
   if (!isOpen) return null
 
-  const summary = calculateSummary()
-
+  const summary = calculateSummary();
+  
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-gray-950 bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div 
         className={`bg-white dark:bg-gray-800 rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto transform transition-all duration-150 ${
           isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'

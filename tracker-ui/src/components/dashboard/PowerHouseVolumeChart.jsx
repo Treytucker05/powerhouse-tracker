@@ -28,7 +28,7 @@ const PowerHouseVolumeChart = ({ className = '' }) => {  // Sample data - replac
       let status = 'Optimal';
       if (volume < mev) status = 'Below MEV';
       else if (volume > mrv) status = 'Above MRV';      return (
-        <div className="bg-black border border-accent p-3 rounded-lg shadow-lg">
+        <div className="bg-gray-950 border border-accent p-3 rounded-lg shadow-lg">
           <p className="text-offwhite font-medium">{label}</p>
           <p className="text-green-400">Volume: {volume} sets</p>
           <p className="text-yellow-400">MEV: {mev} sets</p>

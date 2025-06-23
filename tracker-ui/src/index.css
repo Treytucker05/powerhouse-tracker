@@ -4,9 +4,9 @@
 
 /* PowerHouse Brand Theme */
 body {
-  @apply bg-black text-offwhite;
+  @apply bg-gray-950 text-offwhite;
 }
 
 html {
-  @apply bg-black;
+  @apply bg-gray-950;
 }
