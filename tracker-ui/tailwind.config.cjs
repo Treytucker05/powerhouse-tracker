@@ -1,9 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./index.html", "./src/**/*.{js,jsx}"],
-  darkMode: 'class',
-  theme: { 
+  darkMode: 'class',  theme: { 
     extend: {
+      colors: {
+        primary: '#ff1a1a',     // bright red – filled buttons, highlights
+        accent:  '#c50505',     // deeper red – borders, hovers, nav underline
+        offwhite:'#f2f2f2',
+        black:   '#000000',
+      },
       container: {
         center: true,
         padding: { DEFAULT: "1rem", sm: "2rem", lg: "4rem", xl: "5rem" },

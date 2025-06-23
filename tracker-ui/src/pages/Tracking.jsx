@@ -3,9 +3,8 @@ import useWorkoutSessions from "../lib/useWorkoutSessions";
 import useSessionSets from "../lib/useSessionSets";
 import Drawer from "../components/Drawer";
 import VolumeHeatmap from "../components/dashboard/VolumeHeatmap";
-import VolumeTrackingChart from "../components/dashboard/VolumeTrackingChart";
 import PowerHouseVolumeChart from "../components/dashboard/PowerHouseVolumeChart";
-import CardWrapper from "../components/dashboard/CardWrapper";
+import CardWrapper from "../components/ui/CardWrapper";
 import WeekOverview from "../components/dashboard/WeekOverview";
 import QuickActions from "../components/dashboard/QuickActions";
 import ProgressMetrics from "../components/dashboard/ProgressMetrics";
@@ -26,22 +25,22 @@ export default function Tracking() {
       <TrainingStateProvider>
         <div className="min-h-screen bg-gray-900">
           <Header />
-          <NavBar />
-          <main className="container mx-auto px-4 py-6 space-y-8">{/* PowerHouse Volume Tracking Graph */}
-            <PowerHouseVolumeChart className="col-span-full" />
+          <NavBar />          <main className="container mx-auto px-6 py-8 space-y-8 max-w-7xl">
+            {/* PowerHouse Volume Tracking Graph */}
+            <PowerHouseVolumeChart />
 
             {/* Dashboard Widgets Grid */}
             <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              <CardWrapper className="col-span-1">
+              <CardWrapper title="Week Overview" subtitle="Current training week" className="col-span-1">
                 <WeekOverview />
               </CardWrapper>
-              <CardWrapper className="col-span-1">
+              <CardWrapper title="Quick Actions" subtitle="Training tools" className="col-span-1">
                 <QuickActions />
               </CardWrapper>
-              <CardWrapper className="col-span-1 md:col-span-2 lg:col-span-1">
+              <CardWrapper title="Progress Metrics" subtitle="Performance tracking" className="col-span-1 md:col-span-2 lg:col-span-1">
                 <ProgressMetrics />
               </CardWrapper>
-              <CardWrapper className="col-span-1">
+              <CardWrapper title="Deload Indicator" subtitle="Recovery status" className="col-span-1">
                 <DeloadIndicator />
               </CardWrapper>
             </div>
