@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabaseClient';
+import { useNavigate } from 'react-router-dom';
 import './AuthPage.css';
 
 export default function AuthPage() {
@@ -10,6 +11,18 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const navigate = useNavigate();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        navigate('/');
+      }
+    };
+    checkUser();
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,6 +49,9 @@ export default function AuthPage() {
 
         if (data.user && !data.user.email_confirmed_at) {
           setMessage('Check your email for the confirmation link!');
+        } else {
+          // User is signed up and confirmed, redirect to home
+          navigate('/');
         }
       } else {        // Sign in
         const { error } = await supabase.auth.signInWithPassword({
@@ -45,7 +61,8 @@ export default function AuthPage() {
 
         if (error) throw error;
         
-        // User will be redirected automatically by the auth state change
+        // Redirect to home after successful sign in
+        navigate('/');
       }
     } catch (err) {
       setError(err.message);
