@@ -27,12 +27,13 @@ export default function QuickActions() {
         </div>
       </div>
     )
-  }
-  const actionButtons = [
+  }  const actionButtons = [
     { 
       label: actions?.startTodayLabel || 'Start Today\'s Workout', 
       icon: '🏋️', 
-      color: actions?.startTodayDisabled ? 'bg-gray-400' : 'bg-red-600 hover:bg-red-700',
+      color: actions?.startTodayDisabled 
+        ? 'bg-gray-400 dark:bg-gray-600' 
+        : 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-lg hover:shadow-xl',
       onClick: actions?.startToday,
       disabled: actions?.startTodayDisabled,
       primary: true
@@ -40,14 +41,18 @@ export default function QuickActions() {
     { 
       label: 'Open Logger', 
       icon: '📊', 
-      color: actions?.openLoggerDisabled ? 'bg-gray-400' : 'bg-slate-600 hover:bg-slate-700',
+      color: actions?.openLoggerDisabled 
+        ? 'bg-gray-400 dark:bg-gray-600' 
+        : 'bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 shadow-md hover:shadow-lg',
       onClick: actions?.openLogger,
       disabled: actions?.openLoggerDisabled
     },
     { 
       label: 'View Program', 
       icon: '📈', 
-      color: actions?.viewProgramDisabled ? 'bg-gray-400' : 'bg-slate-600 hover:bg-slate-700',
+      color: actions?.viewProgramDisabled 
+        ? 'bg-gray-400 dark:bg-gray-600' 
+        : 'bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 shadow-md hover:shadow-lg',
       onClick: actions?.viewProgram,
       disabled: actions?.viewProgramDisabled
     }
@@ -58,14 +63,20 @@ export default function QuickActions() {
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
         Quick Actions
       </h3>
-      
-      {actions?.hasPlannedSession && (
-        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-          <div className="text-sm font-medium text-red-900 dark:text-red-100">
-            Today's Session: {actions.todaySession?.name || 'Planned Workout'}
-          </div>
-          <div className="text-xs text-red-700 dark:text-red-300">
-            {actions.sessionCompleted ? 'Completed ✓' : 'Ready to start'}
+        {actions?.hasPlannedSession && (
+        <div className="mb-4 p-4 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-lg border border-red-200 dark:border-red-700">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm font-bold text-red-900 dark:text-red-100">
+                Today's Session: {actions.todaySession?.name || 'Planned Workout'}
+              </div>
+              <div className="text-xs text-red-700 dark:text-red-300 mt-1">
+                {actions.sessionCompleted ? 'Completed ✓' : 'Ready to start'}
+              </div>
+            </div>
+            <div className="text-2xl">
+              {actions.sessionCompleted ? '✅' : '⏰'}
+            </div>
           </div>
         </div>
       )}
@@ -75,10 +86,10 @@ export default function QuickActions() {
           <button
             key={index}
             onClick={action.onClick}
-            disabled={action.disabled}
-            className={`
-              ${action.color} text-white rounded-lg font-medium transition-all duration-200 
+            disabled={action.disabled}            className={`
+              ${action.color} text-white rounded-lg font-medium transition-all duration-300 
               flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed
+              transform hover:scale-105 active:scale-95
               ${action.primary 
                 ? 'px-4 py-3 text-base w-full hover:shadow-lg' 
                 : 'px-3 py-2 text-sm w-full'
