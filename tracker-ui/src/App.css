@@ -1,21 +1,52 @@
+/* PowerHouse Tracker - Custom Styles */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  margin: 0;
+  padding: 0;
+  background-color: #111827; /* gray-900 */
+  color: #ffffff;
+  min-height: 100vh;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+/* PowerHouse Branding Colors */
+:root {
+  --powerhouse-red: #ef4444;
+  --powerhouse-dark: #1a1a1a;
+  --powerhouse-gray: #374151;
+  --powerhouse-light-gray: #9ca3af;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
 }
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+
+::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* PowerHouse button styles */
+.btn-powerhouse {
+  background-color: var(--powerhouse-red);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.btn-powerhouse:hover {
+  background-color: #dc2626;
+  transform: translateY(-1px);
 }
 
 @keyframes logo-spin {
