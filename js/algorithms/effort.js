@@ -704,4 +704,5 @@ export {
   processWeeklyLoadAdjustments,
   getLoadProgression,
   simulateWeeklyRIRFeedback,
+  RIR_SCHEDULE,
 };
