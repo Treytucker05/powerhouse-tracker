@@ -1,9 +1,14 @@
 // Vitest setup file
-import { vi, afterEach } from 'vitest';
+import { vi, afterEach, beforeAll } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 
 // Make vi globally available
 global.vi = vi;
+
+// Stub console.error to prevent noise in test output
+beforeAll(() => {
+  vi.spyOn(console, 'error').mockImplementation(() => {});
+});
 
 // Mock DOM methods
 Object.defineProperty(window, 'matchMedia', {

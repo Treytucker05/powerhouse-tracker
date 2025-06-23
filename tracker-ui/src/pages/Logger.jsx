@@ -1,174 +1,132 @@
-import { useState } from "react";
-import useActiveSession from "../lib/useActiveSession";
-import useSessionSets from "../lib/useSessionSets";
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/api/supabaseClient";
+import useActiveSession from "../hooks/useActiveSession";
+import useLogSet from "../hooks/useLogSet";
+import SetEntryForm from "../components/logger/SetEntryForm";
+import SessionSummaryModal from "../components/logger/SessionSummaryModal";
 
 export default function Logger() {
-  const { activeSession, loading, startSession, finishSession, addSet } = useActiveSession();
-  const sets = useSessionSets(activeSession?.id);
+  const { activeSession, finishSession, isFinishingSession } = useActiveSession();
+  const { logSet, isLogging } = useLogSet();
   
-  const [sessionNotes, setSessionNotes] = useState('');
-  const [setForm, setSetForm] = useState({
-    exercise: '',
-    weight: '',
-    reps: '',
-    rir: '',
-    set_number: 1
-  });
+  const [showSummaryModal, setShowSummaryModal] = useState(false);
+  const [completedSession, setCompletedSession] = useState(null);
+  const [sessionSets, setSessionSets] = useState([]);
 
-  const handleStartSession = async () => {
-    try {
-      await startSession(sessionNotes);
-      setSessionNotes('');
-    } catch (error) {
-      alert('Error starting session: ' + error.message);
-    }
-  };
+  // Listen for session completion events
+  useEffect(() => {
+    const handleSessionCompleted = () => {
+      setCompletedSession(activeSession);
+      setShowSummaryModal(true);
+    };
+
+    window.addEventListener('session:completed', handleSessionCompleted);
+    
+    return () => {
+      window.removeEventListener('session:completed', handleSessionCompleted);
+    };
+  }, [activeSession]);
+
+  // Fetch session sets for display
+  useEffect(() => {
+    const fetchSessionSets = async () => {
+      if (activeSession?.id) {
+        try {
+          const { data, error } = await supabase
+            .from('sets')
+            .select('*')
+            .eq('session_id', activeSession.id)
+            .order('logged_at', { ascending: true });
+
+          if (!error) {
+            setSessionSets(data || []);
+          }
+        } catch (error) {
+          console.error('Error fetching session sets:', error);
+        }
+      } else {
+        setSessionSets([]);
+      }
+    };
+
+    fetchSessionSets();
+  }, [activeSession?.id, isLogging]); // Refetch when new sets are logged
 
   const handleFinishSession = async () => {
     try {
-      await finishSession();
-      setSetForm({ exercise: '', weight: '', reps: '', rir: '', set_number: 1 });
+      const completed = await finishSession();
+      setCompletedSession(completed);
+      setShowSummaryModal(true);
     } catch (error) {
       alert('Error finishing session: ' + error.message);
     }
   };
 
-  const handleAddSet = async (e) => {
-    e.preventDefault();
-    try {
-      await addSet({
-        exercise: setForm.exercise,
-        weight: parseFloat(setForm.weight) || 0,
-        reps: parseInt(setForm.reps) || 0,
-        rir: parseFloat(setForm.rir) || null,
-        set_number: sets.length + 1
-      });
-      
-      // Reset form except exercise (keep for convenience)
-      setSetForm(prev => ({
-        ...prev,
-        weight: '',
-        reps: '',
-        rir: '',
-        set_number: sets.length + 2
-      }));
-    } catch (error) {
-      alert('Error adding set: ' + error.message);
-    }
+  const handleCloseSummaryModal = () => {
+    setShowSummaryModal(false);
+    setCompletedSession(null);
   };
 
-  return (
-    <section className="p-4">
+  return (    <section className="p-4">
       <h2 className="text-2xl font-bold mb-4">Workout Logger</h2>
       
       {!activeSession ? (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Start New Session</h3>
-          <div>
-            <label className="block text-sm font-medium mb-1">Session Notes (optional)</label>
-            <input
-              type="text"
-              value={sessionNotes}
-              onChange={(e) => setSessionNotes(e.target.value)}
-              placeholder="e.g., Push workout, feeling strong"
-              className="w-full border rounded px-3 py-2"
-            />
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h3 className="text-lg font-semibold text-blue-800">No Active Session</h3>
+            <p className="text-sm text-blue-600 mt-1">
+              You need to start a training session from your dashboard or program to begin logging sets.
+            </p>
+            <button
+              onClick={() => window.location.href = '/'}
+              className="mt-3 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            >
+              Go to Dashboard
+            </button>
           </div>
-          <button
-            onClick={handleStartSession}
-            disabled={loading}
-            className="bg-emerald-500 text-white px-4 py-2 rounded hover:bg-emerald-600 disabled:opacity-50"
-          >
-            {loading ? 'Starting...' : 'Start Session'}
-          </button>
         </div>
       ) : (
         <div className="space-y-6">
           {/* Active Session Info */}
           <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
-            <h3 className="text-lg font-semibold text-emerald-800">Active Session</h3>
+            <h3 className="text-lg font-semibold text-emerald-800">
+              Active Session: {activeSession.name || 'Workout Session'}
+            </h3>
             <p className="text-sm text-emerald-600">
-              Started: {new Date(activeSession.start_time).toLocaleString()}
+              Started: {new Date(activeSession.created_at).toLocaleString()}
             </p>
             {activeSession.notes && (
               <p className="text-sm text-emerald-600">Notes: {activeSession.notes}</p>
             )}
+            {activeSession.planned_sets && (
+              <p className="text-sm text-emerald-600">
+                Planned Sets: {activeSession.planned_sets.length}
+              </p>
+            )}
           </div>
 
-          {/* Add Set Form */}
-          <form onSubmit={handleAddSet} className="space-y-4">
-            <h3 className="text-lg font-semibold">Add Set</h3>
-            
-            <div>
-              <label className="block text-sm font-medium mb-1">Exercise</label>
-              <input
-                type="text"
-                value={setForm.exercise}
-                onChange={(e) => setSetForm(prev => ({ ...prev, exercise: e.target.value }))}
-                placeholder="e.g., Bench Press"
-                required
-                className="w-full border rounded px-3 py-2"
-              />
-            </div>
-            
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Weight</label>
-                <input
-                  type="number"
-                  step="0.5"
-                  value={setForm.weight}
-                  onChange={(e) => setSetForm(prev => ({ ...prev, weight: e.target.value }))}
-                  placeholder="135"
-                  required
-                  className="w-full border rounded px-3 py-2"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-1">Reps</label>
-                <input
-                  type="number"
-                  value={setForm.reps}
-                  onChange={(e) => setSetForm(prev => ({ ...prev, reps: e.target.value }))}
-                  placeholder="10"
-                  required
-                  className="w-full border rounded px-3 py-2"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium mb-1">RIR</label>
-                <input
-                  type="number"
-                  step="0.5"
-                  value={setForm.rir}
-                  onChange={(e) => setSetForm(prev => ({ ...prev, rir: e.target.value }))}
-                  placeholder="2"
-                  className="w-full border rounded px-3 py-2"
-                />
-              </div>
-            </div>
-            
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
-              Add Set #{setForm.set_number}
-            </button>
-          </form>
+          {/* Set Entry Form */}
+          <SetEntryForm
+            onSubmit={logSet}
+            isLoading={isLogging}
+            disabled={isFinishingSession}
+            nextSetNumber={sessionSets.length + 1}
+          />
 
           {/* Current Session Sets */}
-          {sets.length > 0 && (
+          {sessionSets.length > 0 && (
             <div>
               <h3 className="text-lg font-semibold mb-2">Current Session Sets</h3>
               <div className="space-y-2">
-                {sets.map(set => (
+                {sessionSets.map(set => (
                   <div key={set.id} className="bg-gray-50 border rounded p-3 text-sm">
                     <span className="font-medium">#{set.set_number} {set.exercise}</span>
                     <span className="ml-2 text-gray-600">
                       {set.weight}lbs × {set.reps} reps
                       {set.rir !== null && ` @ ${set.rir} RIR`}
+                    </span>
+                    <span className="ml-2 text-gray-400 text-xs">
+                      {new Date(set.logged_at).toLocaleTimeString()}
                     </span>
                   </div>
                 ))}
@@ -179,13 +137,21 @@ export default function Logger() {
           {/* Finish Session */}
           <button
             onClick={handleFinishSession}
-            disabled={loading}
+            disabled={isFinishingSession || isLogging}
             className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:opacity-50"
           >
-            {loading ? 'Finishing...' : 'Finish Session'}
+            {isFinishingSession ? 'Finishing...' : 'Finish Session'}
           </button>
         </div>
       )}
+
+      {/* Session Summary Modal */}
+      <SessionSummaryModal
+        isOpen={showSummaryModal}
+        onClose={handleCloseSummaryModal}
+        session={completedSession}
+        sets={sessionSets}
+      />
     </section>
   );
 }

@@ -191,8 +191,14 @@ function trainingStateReducer(state, action) {
           exercises: action.payload.exercises || []
         }
       };
+        case TRAINING_ACTIONS.LOG_SET:
+      // Emit volume:updated event for other components to listen
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('volume:updated', { 
+          detail: { setData: action.payload } 
+        }))
+      }, 0)
       
-    case TRAINING_ACTIONS.LOG_SET:
       return {
         ...state,
         currentWorkout: {

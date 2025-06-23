@@ -1,24 +1,64 @@
+import { useWeeklyVolume } from '../../hooks/useWeeklyVolume'
+import Skeleton from '../ui/Skeleton'
+
 export default function VolumeHeatmap({ className = '' }) {
-  // Placeholder data - will be replaced with real data from context
-  const heatmapData = [
-    { muscle: 'Chest', week1: 8, week2: 10, week3: 12, week4: 14 },
-    { muscle: 'Back', week1: 12, week2: 14, week3: 16, week4: 18 },
-    { muscle: 'Shoulders', week1: 6, week2: 8, week3: 10, week4: 12 },
-    { muscle: 'Arms', week1: 8, week2: 10, week3: 12, week4: 14 },
-    { muscle: 'Legs', week1: 16, week2: 18, week3: 20, week4: 22 },
-    { muscle: 'Core', week1: 4, week2: 6, week3: 8, week4: 10 },
-  ];
+  const { data: weeklyVolumeData, isLoading, error } = useWeeklyVolume()
 
-  const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+  const getIntensityColor = (mrvPercentage) => {
+    if (mrvPercentage <= 20) return 'bg-green-100 dark:bg-green-900'
+    if (mrvPercentage <= 40) return 'bg-green-200 dark:bg-green-800'
+    if (mrvPercentage <= 60) return 'bg-yellow-200 dark:bg-yellow-800'
+    if (mrvPercentage <= 80) return 'bg-orange-300 dark:bg-orange-700'
+    return 'bg-red-400 dark:bg-red-600'
+  }
 
-  const getIntensityColor = (value, max = 25) => {
-    const intensity = Math.min(value / max, 1);
-    if (intensity <= 0.2) return 'bg-green-100 dark:bg-green-900';
-    if (intensity <= 0.4) return 'bg-green-200 dark:bg-green-800';
-    if (intensity <= 0.6) return 'bg-yellow-200 dark:bg-yellow-800';
-    if (intensity <= 0.8) return 'bg-orange-300 dark:bg-orange-700';
-    return 'bg-red-400 dark:bg-red-600';
-  };
+  if (isLoading) {
+    return (
+      <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 ${className}`}>
+        <div className="flex items-center justify-between mb-6">
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-4 w-20" />
+        </div>
+        <div className="space-y-4">
+          {Array.from({ length: 6 }, (_, i) => (
+            <div key={i} className="flex items-center space-x-4">
+              <Skeleton className="h-4 w-20" />
+              <div className="flex space-x-2">
+                {Array.from({ length: 4 }, (_, j) => (
+                  <Skeleton key={j} className="h-8 w-12" />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 ${className}`}>
+        <div className="text-center py-8">
+          <p className="text-red-600 dark:text-red-400">Failed to load volume data</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            Please check your connection and try again
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // Transform data for heatmap display
+  const muscleGroups = ['Chest', 'Back', 'Shoulders', 'Arms', 'Legs', 'Core']
+  const heatmapData = muscleGroups.map(muscle => {
+    const weekData = {}
+    weeklyVolumeData?.forEach((week, index) => {
+      weekData[`week${index + 1}`] = week.volumes[muscle]?.sets || 0
+    })
+    return { muscle, ...weekData }
+  })
+
+  const weeks = weeklyVolumeData?.map(week => week.weekLabel) || ['Week 1', 'Week 2', 'Week 3', 'Week 4']
 
   return (
     <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 ${className}`}>
@@ -52,33 +92,28 @@ export default function VolumeHeatmap({ className = '' }) {
                 </th>
               ))}
             </tr>
-          </thead>
-          <tbody className="space-y-2">
+          </thead>          <tbody className="space-y-2">
             {heatmapData.map((row) => (
               <tr key={row.muscle}>
                 <td className="text-sm font-medium text-gray-900 dark:text-white py-2">
                   {row.muscle}
                 </td>
-                <td className="px-2 py-2">
-                  <div className={`w-12 h-8 rounded ${getIntensityColor(row.week1)} flex items-center justify-center text-xs font-medium`}>
-                    {row.week1}
-                  </div>
-                </td>
-                <td className="px-2 py-2">
-                  <div className={`w-12 h-8 rounded ${getIntensityColor(row.week2)} flex items-center justify-center text-xs font-medium`}>
-                    {row.week2}
-                  </div>
-                </td>
-                <td className="px-2 py-2">
-                  <div className={`w-12 h-8 rounded ${getIntensityColor(row.week3)} flex items-center justify-center text-xs font-medium`}>
-                    {row.week3}
-                  </div>
-                </td>
-                <td className="px-2 py-2">
-                  <div className={`w-12 h-8 rounded ${getIntensityColor(row.week4)} flex items-center justify-center text-xs font-medium`}>
-                    {row.week4}
-                  </div>
-                </td>
+                {weeks.map((week, weekIndex) => {
+                  const weekData = weeklyVolumeData?.[weekIndex]?.volumes[row.muscle]
+                  const sets = weekData?.sets || row[`week${weekIndex + 1}`] || 0
+                  const mrvPercentage = weekData?.mrvPercentage || 0
+                  
+                  return (
+                    <td key={week} className="px-2 py-2">
+                      <div 
+                        className={`w-12 h-8 rounded ${getIntensityColor(mrvPercentage)} flex items-center justify-center text-xs font-medium`}
+                        title={`${sets} sets (${mrvPercentage}% MRV)`}
+                      >
+                        {sets}
+                      </div>
+                    </td>
+                  )
+                })}
               </tr>
             ))}
           </tbody>

@@ -1,47 +1,51 @@
+import { useRecentWorkouts } from '../../hooks/useRecentWorkouts'
+import Skeleton from '../ui/Skeleton'
+
 export default function RecentWorkouts({ className = "" }) {
-  // Placeholder data for recent workouts
-  const recentWorkouts = [
-    {
-      id: 1,
-      date: "2025-06-20",
-      name: "Push Day A",
-      duration: "68 mins",
-      exercises: 6,
-      sets: 18,
-      volume: 8250,
-      completed: true
-    },
-    {
-      id: 2,
-      date: "2025-06-18",
-      name: "Pull Day A",
-      duration: "72 mins",
-      exercises: 5,
-      sets: 16,
-      volume: 7890,
-      completed: true
-    },
-    {
-      id: 3,
-      date: "2025-06-16",
-      name: "Legs & Core",
-      duration: "81 mins",
-      exercises: 7,
-      sets: 20,
-      volume: 12300,
-      completed: true
-    },
-    {
-      id: 4,
-      date: "2025-06-14",
-      name: "Push Day B",
-      duration: "65 mins",
-      exercises: 6,
-      sets: 17,
-      volume: 7950,
-      completed: false
-    }
-  ];
+  const { data: recentWorkouts, isLoading, error } = useRecentWorkouts()
+
+  if (isLoading) {
+    return (
+      <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 ${className}`}>
+        <div className="flex items-center justify-between mb-6">
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-4 w-16" />
+        </div>
+        <div className="space-y-4">
+          {Array.from({ length: 4 }, (_, i) => (
+            <div key={i} className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-16" />
+                  </div>
+                  <Skeleton className="h-3 w-full" />
+                </div>
+                <div className="text-right ml-4">
+                  <Skeleton className="h-5 w-16 mb-1" />
+                  <Skeleton className="h-3 w-12" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 ${className}`}>
+        <div className="text-center py-8">
+          <p className="text-red-600 dark:text-red-400">Failed to load recent workouts</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+            Please check your connection and try again
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={`bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 ${className}`}>
