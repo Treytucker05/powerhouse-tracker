@@ -55,36 +55,56 @@ export default function AppShell() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-gray-800 text-white p-4">
-        <div className="flex justify-between items-center">
-          <div className="flex space-x-4">
+    <div className="min-h-screen bg-gray-900">
+      <nav className="bg-black border-b border-gray-800 text-white p-4">
+        <div className="flex justify-between items-center">          <div className="flex space-x-1">
             <button 
               onClick={() => navigate('/')}
-              className={`px-3 py-1 rounded ${location.pathname === '/' ? 'bg-gray-600' : 'hover:bg-gray-700'}`}
+              className={`px-4 py-2 transition-colors duration-200 relative ${
+                location.pathname === '/' 
+                  ? 'text-white border-b-4 border-red-500' 
+                  : 'text-gray-400 hover:text-white'
+              }`}
             >
               Home
-            </button>            <button 
+            </button>
+            <div className="w-px h-6 bg-gray-600 self-center"></div>            <button 
               onClick={() => navigate('/tracking')}
-              className={`px-3 py-1 rounded ${location.pathname === '/tracking' ? 'bg-gray-600' : 'hover:bg-gray-700'}`}
+              className={`px-4 py-2 transition-colors duration-200 relative ${
+                location.pathname === '/tracking' 
+                  ? 'text-white border-b-4 border-red-500' 
+                  : 'text-gray-400 hover:text-white'
+              }`}
             >
               Tracking
             </button>
-            <button 
+            <div className="w-px h-6 bg-gray-600 self-center"></div>            <button 
               onClick={() => navigate('/mesocycle')}
-              className={`px-3 py-1 rounded ${location.pathname === '/mesocycle' ? 'bg-gray-600' : 'hover:bg-gray-700'}`}
+              className={`px-4 py-2 transition-colors duration-200 relative ${
+                location.pathname === '/mesocycle' 
+                  ? 'text-white border-b-4 border-red-500' 
+                  : 'text-gray-400 hover:text-white'
+              }`}
             >
               Mesocycle
             </button>
-            <button 
+            <div className="w-px h-6 bg-gray-600 self-center"></div>            <button 
               onClick={() => navigate('/microcycle')}
-              className={`px-3 py-1 rounded ${location.pathname === '/microcycle' ? 'bg-gray-600' : 'hover:bg-gray-700'}`}
+              className={`px-4 py-2 transition-colors duration-200 relative ${
+                location.pathname === '/microcycle' 
+                  ? 'text-white border-b-4 border-red-500' 
+                  : 'text-gray-400 hover:text-white'
+              }`}
             >
               Microcycle
             </button>
-            <button 
+            <div className="w-px h-6 bg-gray-600 self-center"></div>            <button 
               onClick={() => navigate('/macrocycle')}
-              className={`px-3 py-1 rounded ${location.pathname === '/macrocycle' ? 'bg-gray-600' : 'hover:bg-gray-700'}`}
+              className={`px-4 py-2 transition-colors duration-200 relative ${
+                location.pathname === '/macrocycle' 
+                  ? 'text-white border-b-4 border-red-500' 
+                  : 'text-gray-400 hover:text-white'
+              }`}
             >
               Macrocycle
             </button>

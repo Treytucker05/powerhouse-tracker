@@ -6,14 +6,13 @@ import Microcycle from "./pages/Microcycle.jsx";
 import Macrocycle from "./pages/Macrocycle.jsx";
 import Home from "./pages/Home.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
-import Dashboard from "./pages/Dashboard.jsx";
 import './App.css';
 
 function App() {
   return (
     <Router>
-      <Routes>        <Route path="/auth" element={<AuthPage />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+      <Routes>
+        <Route path="/auth" element={<AuthPage />} />
         <Route path="/" element={<AppShell />}>
           <Route index element={<Home />} />
           <Route path="tracking" element={<Tracking />} />
