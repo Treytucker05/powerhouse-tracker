@@ -1,12 +1,14 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import useWeeklyVolume from "../lib/useWeeklyVolume";
 import BarMiniChart from "../components/BarMiniChart";
 import DeloadDrawer from "../components/DeloadDrawer";
 
-export default function Home({ onNavigate }) {
+export default function Home() {
   const { data: weeklyVolume, loading } = useWeeklyVolume();
   const [deloadDrawerOpen, setDeloadDrawerOpen] = useState(false);
   const [deloadOffenders, setDeloadOffenders] = useState([]);
+  const navigate = useNavigate();
 
   // Calculate fatigue status (simplified logic)
   const calculateFatigueStatus = () => {
@@ -73,19 +75,19 @@ export default function Home({ onNavigate }) {
       </div>      {/* Quick Actions */}
       <div className="space-y-2">
         <button 
-          onClick={() => onNavigate?.('sessions')}
+          onClick={() => navigate('/sessions')}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-2"
         >
           View Sessions
         </button>
         <button 
-          onClick={() => onNavigate?.('intelligence')}
+          onClick={() => navigate('/intelligence')}
           className="bg-emerald-500 text-white px-4 py-2 rounded hover:bg-emerald-600 mr-2"
         >
           View Intelligence
         </button>
         <button 
-          onClick={() => onNavigate?.('logger')}
+          onClick={() => navigate('/logger')}
           className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600 mr-2"
         >
           Start Workout
