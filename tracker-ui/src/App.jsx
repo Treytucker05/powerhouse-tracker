@@ -1,9 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AppShell from './layout/AppShell.jsx';
 import Tracking from "./pages/Tracking.jsx";
-import Mesocycle from "./pages/Mesocycle.jsx";
-import Microcycle from "./pages/Microcycle.jsx";
-import Macrocycle from "./pages/Macrocycle.jsx";
+import Mesocycle from "./pages/MesocycleNew.jsx";
+import Microcycle from "./pages/MicrocycleNew.jsx";
+import Macrocycle from "./pages/MacrocycleNew.jsx";
 import Home from "./pages/Home.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
 import './App.css';
