@@ -30,7 +30,7 @@ export default function AppShell() {
   // Protected routes - redirect to auth if not logged in
   useEffect(() => {
     if (!loading && !user) {
-      const protectedRoutes = ['/logger', '/sessions', '/intelligence'];
+      const protectedRoutes = ['/tracking', '/mesocycle', '/microcycle', '/macrocycle'];
       const isProtectedRoute = protectedRoutes.some(route => 
         location.pathname.startsWith(route)
       );
@@ -64,24 +64,29 @@ export default function AppShell() {
               className={`px-3 py-1 rounded ${location.pathname === '/' ? 'bg-gray-600' : 'hover:bg-gray-700'}`}
             >
               Home
+            </button>            <button 
+              onClick={() => navigate('/tracking')}
+              className={`px-3 py-1 rounded ${location.pathname === '/tracking' ? 'bg-gray-600' : 'hover:bg-gray-700'}`}
+            >
+              Tracking
             </button>
             <button 
-              onClick={() => navigate('/sessions')}
-              className={`px-3 py-1 rounded ${location.pathname === '/sessions' ? 'bg-gray-600' : 'hover:bg-gray-700'}`}
+              onClick={() => navigate('/mesocycle')}
+              className={`px-3 py-1 rounded ${location.pathname === '/mesocycle' ? 'bg-gray-600' : 'hover:bg-gray-700'}`}
             >
-              Sessions
+              Mesocycle
             </button>
             <button 
-              onClick={() => navigate('/intelligence')}
-              className={`px-3 py-1 rounded ${location.pathname === '/intelligence' ? 'bg-gray-600' : 'hover:bg-gray-700'}`}
+              onClick={() => navigate('/microcycle')}
+              className={`px-3 py-1 rounded ${location.pathname === '/microcycle' ? 'bg-gray-600' : 'hover:bg-gray-700'}`}
             >
-              Intelligence
+              Microcycle
             </button>
             <button 
-              onClick={() => navigate('/logger')}
-              className={`px-3 py-1 rounded ${location.pathname === '/logger' ? 'bg-gray-600' : 'hover:bg-gray-700'}`}
+              onClick={() => navigate('/macrocycle')}
+              className={`px-3 py-1 rounded ${location.pathname === '/macrocycle' ? 'bg-gray-600' : 'hover:bg-gray-700'}`}
             >
-              Logger
+              Macrocycle
             </button>
           </div>
           
