@@ -9,11 +9,19 @@ import trainingState from "../core/trainingState.js";
  * Weekly RIR Schedule for Mesocycle Progression
  * Standard RP approach: [3, 2, 1, 0] across 4-6 week mesocycle
  */
-const RIR_SCHEDULE = {
+const RIR_SCHEDULE_INTERNAL = {
   4: [3, 2, 1, 0], // 4-week meso
   5: [3, 2.5, 2, 1, 0], // 5-week meso
   6: [3, 2.5, 2, 1.5, 1, 0], // 6-week meso
 };
+
+// Default RIR schedule for legacy test pages
+export const RIR_SCHEDULE = [
+  /* week 1 */ [3, 3, 2, 2, 1, 1, 0],
+  /* week 2 */ [3, 2, 2, 1, 1, 0, 0],
+  /* week 3 */ [2, 2, 1, 1, 0, 0, 0],
+  /* week 4 */ [2, 1, 1, 0, 0, 0, 0],
+];
 
 /**
  * Calculate target RIR based on meso progression
@@ -81,7 +89,7 @@ function calculateTargetRIR(
  * @returns {number} - Target RIR for the week
  */
 function getScheduledRIR(week, mesoLength) {
-  const schedule = RIR_SCHEDULE[mesoLength];
+  const schedule = RIR_SCHEDULE_INTERNAL[mesoLength];
   if (!schedule) {
     // Fallback to linear progression for non-standard lengths
     const startRIR = 3;
@@ -704,5 +712,4 @@ export {
   processWeeklyLoadAdjustments,
   getLoadProgression,
   simulateWeeklyRIRFeedback,
-  RIR_SCHEDULE,
 };
