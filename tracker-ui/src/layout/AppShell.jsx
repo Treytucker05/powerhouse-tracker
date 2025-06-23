@@ -44,11 +44,9 @@ export default function AppShell() {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate('/');
-  };
-
-  if (loading) {
+  };  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="min-h-screen flex items-center justify-center bg-gray-950">
         <div className="text-lg text-offwhite">Loading...</div>
       </div>
     );

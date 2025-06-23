@@ -6,11 +6,10 @@ export default function Header() {
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
     document.documentElement.classList.toggle('dark');
-  };  return (
-    <header
+  };  return (    <header
       className="
         sticky top-0 z-50 backdrop-blur-md
-        bg-black/90 border-b border-gray-800
+        bg-gray-950/90 border-b border-gray-800
         shadow-sm
       "
     >
