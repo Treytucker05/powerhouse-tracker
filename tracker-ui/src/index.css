@@ -24,12 +24,51 @@ html {
   border-radius: 5px;
 }
 
+/* Custom PowerHouse utilities */
+@layer utilities {
+  .bg-powerhouse-red {
+    background-color: #ff0000;
+  }
+  .text-powerhouse-red {
+    color: #ff0000;
+  }
+  .border-powerhouse-red {
+    border-color: #ff0000;
+  }
+  .hover\:bg-powerhouse-red:hover {
+    background-color: #ff0000;
+  }
+  .hover\:border-powerhouse-red:hover {
+    border-color: #ff0000;
+  }
+}
+
 /* Button styles */
 .btn-powerhouse {
-  @apply bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-all duration-200 hover:shadow-lg hover:shadow-red-600/50;
+  background-color: #dc2626;
+  color: #ffffff;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease-in-out;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-powerhouse:hover {
+  background-color: #b91c1c;
+  box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.5), 0 4px 6px -2px rgba(220, 38, 38, 0.5);
 }
 
 /* Card styles */
 .card-powerhouse {
-  @apply bg-gray-900 border border-gray-800 rounded-lg p-6 hover:border-red-600/50 transition-all duration-200;
+  background-color: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.card-powerhouse:hover {
+  border-color: rgba(220, 38, 38, 0.5);
 }
