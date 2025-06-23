@@ -48,31 +48,52 @@ export default function Home() {
   };
 
   const fatigueStatus = calculateFatigueStatus();
-
   return (
     <div className="p-4">
-      <h1 className="text-emerald-600 text-3xl font-bold mb-4">
+      <h1 className="text-emerald-600 text-3xl font-bold mb-6">
         PowerHouse Tracker
       </h1>
-      <p className="mb-6">Welcome to the PowerHouse Training Tracker</p>
       
-      {/* Weekly Volume Widget */}
-      <div className="bg-white border rounded-lg p-4 mb-6 shadow-sm">
-        <h3 className="text-lg font-semibold mb-2">Weekly Volume</h3>
-        {loading ? (
-          <div className="text-sm text-gray-500">Loading...</div>
-        ) : (
-          <BarMiniChart data={weeklyVolume} />
-        )}
-        
-        {/* Fatigue Status Badge */}
-        <div className="mt-3 flex items-center gap-2">
-          <span className="text-sm font-medium">Fatigue Status:</span>
-          <span className={`px-2 py-1 rounded-full text-xs font-medium bg-${fatigueStatus.color}-100 text-${fatigueStatus.color}-800`}>
-            {fatigueStatus.level}
-          </span>
+      {/* Weekly Volume Card */}
+      <div className="bg-white border rounded-lg p-6 mb-6 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-gray-800">Weekly Volume</h2>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-gray-600">Fatigue Status:</span>
+            <span className={`px-3 py-1 rounded-full text-xs font-medium bg-${fatigueStatus.color}-100 text-${fatigueStatus.color}-800`}>
+              {fatigueStatus.level}
+            </span>
+          </div>
         </div>
-      </div>      {/* Quick Actions */}
+        
+        {loading ? (
+          <div className="flex items-center justify-center h-32">
+            <div className="text-gray-500">Loading volume data...</div>
+          </div>
+        ) : weeklyVolume.length === 0 ? (
+          <div className="flex items-center justify-center h-32 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+            <div className="text-center">
+              <div className="text-gray-500 text-sm mb-2">No volume data available</div>
+              <button 
+                onClick={() => navigate('/logger')}
+                className="text-emerald-600 hover:text-emerald-700 text-sm font-medium"
+              >
+                Start your first workout →
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <BarMiniChart data={weeklyVolume} />
+            <div className="mt-3 text-xs text-gray-500">
+              Total exercises tracked: {weeklyVolume.length} • 
+              Total volume: {weeklyVolume.reduce((sum, item) => sum + item.volume, 0)} sets
+            </div>
+          </>
+        )}
+      </div>
+
+      <p className="mb-6 text-gray-600">Welcome to the PowerHouse Training Tracker</p>{/* Quick Actions */}
       <div className="space-y-2">
         <button 
           onClick={() => navigate('/sessions')}
