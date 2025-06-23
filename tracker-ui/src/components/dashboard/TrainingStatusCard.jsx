@@ -2,37 +2,50 @@ import React from 'react';
 
 const TrainingStatusCard = () => {
   return (
-    <div className="bg-gray-900 border border-red-600 rounded-lg p-6 text-center">
+    <div style={{
+      backgroundColor: '#111827',
+      border: '1px solid #dc2626',
+      borderRadius: '0.5rem',
+      padding: '1.5rem',
+      textAlign: 'center'
+    }}>
       <h2 className="text-xl font-bold text-white mb-4">Current Training Status</h2>
       <div className="grid grid-cols-4 gap-4">
         <div>
-          <div className="text-3xl font-bold text-red-600">1</div>
-          <div className="text-gray-400 text-sm">WEEK</div>
+          <div style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#dc2626' }}>1</div>
+          <div style={{ color: '#9ca3af', fontSize: '0.875rem' }}>WEEK</div>
         </div>
         <div>
-          <div className="text-3xl font-bold text-red-600">4</div>
-          <div className="text-gray-400 text-sm">MESO LENGTH</div>
+          <div style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#dc2626' }}>4</div>
+          <div style={{ color: '#9ca3af', fontSize: '0.875rem' }}>MESO LENGTH</div>
         </div>
         <div>
-          <div className="text-3xl font-bold text-red-600">1</div>
-          <div className="text-gray-400 text-sm">BLOCK</div>
+          <div style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#dc2626' }}>1</div>
+          <div style={{ color: '#9ca3af', fontSize: '0.875rem' }}>BLOCK</div>
         </div>
         <div>
-          <div className="text-3xl font-bold text-red-600">3</div>
-          <div className="text-gray-400 text-sm">TARGET RIR</div>
+          <div style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#dc2626' }}>3</div>
+          <div style={{ color: '#9ca3af', fontSize: '0.875rem' }}>TARGET RIR</div>
         </div>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-4">
         <div>
-          <div className="text-xl font-bold text-yellow-500">Accumulation</div>
-          <div className="text-gray-400 text-sm">PHASE</div>
+          <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#eab308' }}>Accumulation</div>
+          <div style={{ color: '#9ca3af', fontSize: '0.875rem' }}>PHASE</div>
         </div>
         <div>
-          <div className="text-xl font-bold text-red-600">2600%</div>
-          <div className="text-gray-400 text-sm">SYSTEM FATIGUE</div>
+          <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#dc2626' }}>2600%</div>
+          <div style={{ color: '#9ca3af', fontSize: '0.875rem' }}>SYSTEM FATIGUE</div>
         </div>
       </div>
-      <div className="mt-4 bg-red-600 text-white py-2 px-4 rounded font-bold">
+      <div style={{
+        marginTop: '1rem',
+        backgroundColor: '#dc2626',
+        color: '#ffffff',
+        padding: '0.5rem 1rem',
+        borderRadius: '0.375rem',
+        fontWeight: 'bold'
+      }}>
         Deload strongly recommended!
       </div>
     </div>

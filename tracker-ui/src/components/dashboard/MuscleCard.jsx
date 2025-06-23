@@ -16,25 +16,24 @@ const MuscleCard = ({
   };
 
   const status = getStatus();
-
   // Get border and badge colors based on status
   const getBorderColor = () => {
     switch (status) {
-      case 'optimal': return 'border-green-500';
-      case 'high': return 'border-yellow-500';
+      case 'optimal': return '#22c55e';
+      case 'high': return '#eab308';
       case 'low':
       case 'maximum':
-      default: return 'border-red-500';
+      default: return '#dc2626';
     }
   };
 
   const getBadgeColor = () => {
     switch (status) {
-      case 'optimal': return 'bg-green-500/20 text-green-400';
-      case 'high': return 'bg-yellow-500/20 text-yellow-400';
+      case 'optimal': return { backgroundColor: 'rgba(34, 197, 94, 0.2)', color: '#4ade80' };
+      case 'high': return { backgroundColor: 'rgba(234, 179, 8, 0.2)', color: '#facc15' };
       case 'low':
       case 'maximum':
-      default: return 'bg-red-500/20 text-red-400';
+      default: return { backgroundColor: 'rgba(220, 38, 38, 0.2)', color: '#f87171' };
     }
   };
 
@@ -43,40 +42,82 @@ const MuscleCard = ({
   
   // Calculate landmark positions as percentages
   const mevPosition = (MEV / MRV) * 100;
-  const mavPosition = (MAV / MRV) * 100;
-  return (
-    <div className={`bg-gray-900 rounded-lg p-4 border-l-4 ${getBorderColor()} border border-gray-800`}>
+  const mavPosition = (MAV / MRV) * 100;  return (
+    <div style={{
+      backgroundColor: '#111827',
+      borderRadius: '0.5rem',
+      padding: '1rem',
+      borderLeft: `4px solid ${getBorderColor()}`,
+      border: '1px solid #1f2937'
+    }}>
       {/* Header Row */}
       <div className="flex justify-between items-center">
         <h3 className="text-sm font-semibold text-white">{muscle}</h3>
-        <span className={`px-2 py-0.5 rounded text-xs font-semibold ${getBadgeColor()}`}>
+        <span style={{
+          ...getBadgeColor(),
+          padding: '0.125rem 0.5rem',
+          borderRadius: '0.375rem',
+          fontSize: '0.75rem',
+          fontWeight: '600'
+        }}>
           {sets} sets
         </span>
       </div>
 
       {/* Progress Bar Container */}
-      <div className="relative bg-gray-700 h-2 rounded overflow-hidden mt-2">
+      <div style={{
+        position: 'relative',
+        backgroundColor: '#374151',
+        height: '0.5rem',
+        borderRadius: '0.375rem',
+        overflow: 'hidden',
+        marginTop: '0.5rem'
+      }}>
         {/* Progress Fill */}
         <div 
-          className="absolute top-0 left-0 h-full bg-red-600 transition-all duration-300"
-          style={{ width: `${progressWidth}%` }}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            height: '100%',
+            backgroundColor: '#dc2626',
+            transition: 'all 0.3s ease-in-out',
+            width: `${progressWidth}%`
+          }}
         />
         
         {/* MEV Landmark Line */}
         <div 
-          className="absolute w-[2px] h-3 bg-yellow-400 top-[-2px]"
-          style={{ left: `${mevPosition}%` }}
+          style={{
+            position: 'absolute',
+            width: '2px',
+            height: '0.75rem',
+            backgroundColor: '#facc15',
+            top: '-2px',
+            left: `${mevPosition}%`
+          }}
         />
         
         {/* MAV Landmark Line */}
         <div 
-          className="absolute w-[2px] h-3 bg-green-400 top-[-2px]"
-          style={{ left: `${mavPosition}%` }}
+          style={{
+            position: 'absolute',
+            width: '2px',
+            height: '0.75rem',
+            backgroundColor: '#4ade80',
+            top: '-2px',
+            left: `${mavPosition}%`
+          }}
         />
       </div>
 
       {/* Footer Line */}
-      <div className="text-xs text-gray-400 text-center mt-1">
+      <div style={{
+        fontSize: '0.75rem',
+        color: '#9ca3af',
+        textAlign: 'center',
+        marginTop: '0.25rem'
+      }}>
         MEV {MEV} | MAV {MAV} | MRV {MRV}
       </div>
     </div>
