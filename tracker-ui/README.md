@@ -87,6 +87,7 @@ The application expects the following Supabase tables/views:
 - `muscle` (text)
 - `volume` (numeric)
 - `week` (integer)
+- `user_id` (uuid, NOT NULL, default: auth.uid())
 
 ## Testing
 
