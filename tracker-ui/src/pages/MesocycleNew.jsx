@@ -1,5 +1,3 @@
-import Header from "../components/dashboard/Header";
-import NavBar from "../components/dashboard/NavBar";
 import CardWrapper from "../components/ui/CardWrapper";
 import MesocycleBuilder from "../components/dashboard/MesocycleBuilder";
 import { TrainingStateProvider } from "../context/trainingStateContext";
@@ -40,23 +38,19 @@ export default function Mesocycle() {
       </div>
     </div>
   );
-
   return (
     <ErrorBoundary>
       <TrainingStateProvider>
-        <div className="min-h-screen bg-gray-900">
-          <Header />
-          <NavBar />
-          <main className="container mx-auto px-6 py-8 space-y-8 max-w-7xl">
-            {/* Page Header */}
-            <div className="mb-8">
-              <h1 className="text-4xl font-bold text-white mb-2">
-                🗓️ Mesocycle Planning
-              </h1>
-              <p className="text-gray-400 text-lg">
-                Plan and configure your training blocks (3-6 weeks) with volume progression
-              </p>
-            </div>
+        <div className="space-y-8 max-w-7xl">
+          {/* Page Header */}
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-white mb-2">
+              🗓️ Mesocycle Planning
+            </h1>
+            <p className="text-gray-400 text-lg">
+              Plan and configure your training blocks (3-6 weeks) with volume progression
+            </p>
+          </div>
 
             <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
               {/* Volume Landmarks Configuration */}
@@ -92,14 +86,12 @@ export default function Mesocycle() {
                     <h4 className="text-white font-medium">Intensification Phase</h4>
                     <p className="text-gray-400 text-sm">Week 4: High intensity, reduced volume</p>
                   </div>
-                  <div className="bg-gray-700 p-4 rounded-lg border-l-4 border-blue-500">
-                    <h4 className="text-white font-medium">Deload Phase</h4>
+                  <div className="bg-gray-700 p-4 rounded-lg border-l-4 border-blue-500">                    <h4 className="text-white font-medium">Deload Phase</h4>
                     <p className="text-gray-400 text-sm">Week 5: Recovery and adaptation</p>
                   </div>
                 </div>
               </CardWrapper>
             </div>
-          </main>
         </div>
       </TrainingStateProvider>
     </ErrorBoundary>

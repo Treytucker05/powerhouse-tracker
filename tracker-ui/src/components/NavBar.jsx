@@ -11,13 +11,13 @@ export default function NavBar({ user, onSignOut }) {
     { path: '/microcycle', label: 'Microcycle', icon: '🔄' },
     { path: '/macrocycle', label: 'Macrocycle', icon: '📈' },
   ];  return (
-    <nav className="sticky top-0 z-50 bg-gray-950 border-b border-accent shadow-lg">
+    <nav className="bg-gray-900 border-b border-gray-800">
       <div className="container mx-auto px-4 py-3">
         <div className="flex justify-between items-center">
           {/* Logo/Brand */}
           <div className="flex items-center space-x-3">
-            <div className="text-2xl font-bold text-primary">PowerHouse</div>
-            <div className="text-sm text-offwhite/70">Tracker</div>
+            <div className="text-2xl font-bold text-red-600">PowerHouse</div>
+            <div className="text-sm text-white/70">Tracker</div>
           </div>
 
           {/* Navigation Links */}
@@ -26,10 +26,10 @@ export default function NavBar({ user, onSignOut }) {
               <button
                 key={path}
                 onClick={() => navigate(path)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+                className={`flex items-center space-x-2 px-6 py-3 rounded-lg transition-all duration-200 ${
                   location.pathname === path
-                    ? 'bg-primary text-black font-semibold shadow-md'
-                    : 'text-offwhite/80 hover:text-offwhite hover:bg-accent/20'
+                    ? 'bg-red-600 text-white font-bold'
+                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
                 }`}
               >
                 <span className="text-lg">{icon}</span>
@@ -42,12 +42,12 @@ export default function NavBar({ user, onSignOut }) {
           <div className="flex items-center space-x-4">
             {user ? (
               <>
-                <span className="text-sm text-offwhite/70 hidden md:inline">
+                <span className="text-sm text-white/70 hidden md:inline">
                   {user.email}
                 </span>
                 <button 
                   onClick={onSignOut}
-                  className="px-4 py-2 rounded-lg bg-accent hover:bg-accent/80 text-offwhite text-sm font-medium transition-colors duration-200"
+                  className="btn-powerhouse"
                 >
                   Sign Out
                 </button>
@@ -55,7 +55,7 @@ export default function NavBar({ user, onSignOut }) {
             ) : (
               <button 
                 onClick={() => navigate('/auth')}
-                className="px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-black text-sm font-medium transition-colors duration-200"
+                className="btn-powerhouse"
               >
                 Login / Sign Up
               </button>

@@ -2,7 +2,7 @@ import React from 'react';
 
 const CardWrapper = ({ children, className = '', title, subtitle, action }) => {
   return (
-    <div className={`bg-gray-800 rounded-lg shadow-xl p-6 border border-gray-700 ${className}`}>
+    <div className={`card-powerhouse ${className}`}>
       {(title || subtitle || action) && (
         <div className="flex items-center justify-between mb-4">
           <div>

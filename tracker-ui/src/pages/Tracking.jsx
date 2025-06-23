@@ -2,16 +2,9 @@ import { useState } from "react";
 import useWorkoutSessions from "../lib/useWorkoutSessions";
 import useSessionSets from "../lib/useSessionSets";
 import Drawer from "../components/Drawer";
-import VolumeHeatmap from "../components/dashboard/VolumeHeatmap";
-import PowerHouseVolumeChart from "../components/dashboard/PowerHouseVolumeChart";
-import CardWrapper from "../components/ui/CardWrapper";
-import WeekOverview from "../components/dashboard/WeekOverview";
-import QuickActions from "../components/dashboard/QuickActions";
-import ProgressMetrics from "../components/dashboard/ProgressMetrics";
-import DeloadIndicator from "../components/dashboard/DeloadIndicator";
-import RecentWorkouts from "../components/dashboard/RecentWorkouts";
-import Header from "../components/dashboard/Header";
-import NavBar from "../components/dashboard/NavBar";
+import SimpleVolumeChart from "../components/dashboard/SimpleVolumeChart";
+import TrainingStatusCard from "../components/dashboard/TrainingStatusCard";
+import MuscleCard from "../components/dashboard/MuscleCard";
 import { TrainingStateProvider } from "../context/trainingStateContext";
 import ErrorBoundary from "../components/ErrorBoundary";
 import "../components/dashboard/DashboardLayout.css";
@@ -21,126 +14,43 @@ export default function Tracking() {
   const [selected, setSelected] = useState(null);
   const sets = useSessionSets(selected?.id);
 
-  return (    <ErrorBoundary>
+  // Sample muscle data - in a real app this would come from your data store
+  const muscleData = [
+    { muscle: 'Chest', sets: 12, MEV: 8, MAV: 18, MRV: 22 },
+    { muscle: 'Back', sets: 16, MEV: 10, MAV: 20, MRV: 25 },
+    { muscle: 'Shoulders', sets: 10, MEV: 6, MAV: 16, MRV: 20 },
+    { muscle: 'Biceps', sets: 8, MEV: 6, MAV: 12, MRV: 16 },
+    { muscle: 'Triceps', sets: 10, MEV: 6, MAV: 14, MRV: 18 },
+    { muscle: 'Quads', sets: 20, MEV: 10, MAV: 20, MRV: 25 },
+    { muscle: 'Hamstrings', sets: 12, MEV: 8, MAV: 16, MRV: 20 },
+    { muscle: 'Glutes', sets: 14, MEV: 8, MAV: 12, MRV: 16 },
+    { muscle: 'Calves', sets: 6, MEV: 8, MAV: 16, MRV: 20 }
+  ];  return (
+    <ErrorBoundary>
       <TrainingStateProvider>
-        <div className="min-h-screen bg-gray-900">
-          <Header />
-          <NavBar />          <main className="container mx-auto px-6 py-8 space-y-8 max-w-7xl">
-            {/* PowerHouse Volume Tracking Graph */}
-            <PowerHouseVolumeChart />
+        <div className="space-y-8 max-w-7xl">
+          {/* Training Status Card */}
+          <TrainingStatusCard />
 
-            {/* Dashboard Widgets Grid */}
-            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              <CardWrapper title="Week Overview" subtitle="Current training week" className="col-span-1">
-                <WeekOverview />
-              </CardWrapper>
-              <CardWrapper title="Quick Actions" subtitle="Training tools" className="col-span-1">
-                <QuickActions />
-              </CardWrapper>
-              <CardWrapper title="Progress Metrics" subtitle="Performance tracking" className="col-span-1 md:col-span-2 lg:col-span-1">
-                <ProgressMetrics />
-              </CardWrapper>
-              <CardWrapper title="Deload Indicator" subtitle="Recovery status" className="col-span-1">
-                <DeloadIndicator />
-              </CardWrapper>
+          {/* Weekly Volume Tracker Chart */}
+          <SimpleVolumeChart />
+
+          {/* Muscle Volume Cards Grid */}
+          <div className="card-powerhouse">
+            <h2 className="text-2xl font-bold text-red-600 mb-4">💪 Muscle Volume Tracking</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {muscleData.map((muscle, index) => (
+                <MuscleCard
+                  key={index}
+                  muscle={muscle.muscle}
+                  sets={muscle.sets}
+                  MEV={muscle.MEV}
+                  MAV={muscle.MAV}
+                  MRV={muscle.MRV}
+                />
+              ))}
             </div>
-
-            {/* Volume Heatmap */}
-            <CardWrapper>
-              <VolumeHeatmap />
-            </CardWrapper>
-
-            {/* Recent Workouts */}
-            <CardWrapper>
-              <RecentWorkouts />
-            </CardWrapper>
-
-            {/* Workout Sessions Table */}
-            <CardWrapper>
-              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Recent Workout Sessions</h2>
-              <div className="overflow-x-auto">
-                <table className="min-w-full">
-                  <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-700 text-left">
-                      <th className="p-3 text-sm font-medium text-gray-500 dark:text-gray-400">Date</th>
-                      <th className="p-3 text-sm font-medium text-gray-500 dark:text-gray-400">Duration</th>
-                      <th className="p-3 text-sm font-medium text-gray-500 dark:text-gray-400">Focus</th>
-                      <th className="p-3 text-sm font-medium text-gray-500 dark:text-gray-400">Sets</th>
-                      <th className="p-3 text-sm font-medium text-gray-500 dark:text-gray-400">Notes</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sessions.map(s => {
-                      const duration = s.end_time 
-                        ? Math.round((new Date(s.end_time) - new Date(s.start_time)) / (1000 * 60))
-                        : null;
-                      
-                      return (
-                        <tr key={s.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
-                            onClick={() => setSelected(s)}>
-                          <td className="p-3 text-sm text-gray-900 dark:text-gray-100">
-                            {new Date(s.start_time).toLocaleDateString()}
-                          </td>
-                          <td className="p-3 text-sm text-gray-900 dark:text-gray-100">
-                            {duration ? `${duration} min` : "—"}
-                          </td>
-                          <td className="p-3 text-sm text-gray-500 dark:text-gray-400">
-                            {s.focus || "General"}
-                          </td>
-                          <td className="p-3 text-sm text-gray-500 dark:text-gray-400">
-                            {s.total_sets || "—"}
-                          </td>
-                          <td className="p-3 text-sm text-gray-500 dark:text-gray-400">
-                            {s.notes ?? "—"}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </CardWrapper>
-
-            <Drawer open={!!selected} onClose={() => setSelected(null)}>
-              <h3 className="text-xl font-bold mb-2">Workout Details</h3>
-              {selected && (
-                <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <div className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                    {new Date(selected.start_time).toLocaleDateString()} - {selected.focus || "General Training"}
-                  </div>
-                  <div className="text-xs text-blue-700 dark:text-blue-300">
-                    {selected.notes && `Notes: ${selected.notes}`}
-                  </div>
-                </div>
-              )}
-              
-              {sets.length === 0 && <p>No sets recorded for this session.</p>}
-              {sets.length > 0 && (
-                <table className="min-w-full border">
-                  <thead>
-                    <tr className="bg-slate-100 dark:bg-slate-700 text-left">
-                      <th className="p-2">#</th>
-                      <th className="p-2">Exercise</th>
-                      <th className="p-2">Weight</th>
-                      <th className="p-2">Reps</th>
-                      <th className="p-2">RIR</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sets.map(st => (
-                      <tr key={st.id} className="border-t border-slate-200 dark:border-slate-600">
-                        <td className="p-2">{st.set_number}</td>
-                        <td className="p-2">{st.exercise}</td>
-                        <td className="p-2">{st.weight} kg</td>
-                        <td className="p-2">{st.reps}</td>
-                        <td className="p-2">{st.rir ?? "—"}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </Drawer>
-          </main>
+          </div>
         </div>
       </TrainingStateProvider>
     </ErrorBoundary>
