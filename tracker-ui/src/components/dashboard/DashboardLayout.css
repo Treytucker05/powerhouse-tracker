@@ -1,0 +1,54 @@
+/* hide mobile scrollbar for horizontal nav */
+.navbar::-webkit-scrollbar { 
+  display: none; 
+}
+
+.navbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes fadeIn { 
+  from { opacity: 0; } 
+  to { opacity: 1; } 
+}
+
+@keyframes slideUp { 
+  from { transform: translateY(6px); } 
+  to { transform: translateY(0); } 
+}
+
+/* Smooth hover transitions for dashboard cards */
+.dashboard-card {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Custom scrollbar for better UX */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgb(241 245 249);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgb(148 163 184);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgb(100 116 139);
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background: rgb(30 41 59);
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgb(71 85 105);
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgb(51 65 85);
+}

@@ -1,8 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AppShell from './layout/AppShell.jsx';
-import Sessions from "./pages/Sessions.jsx";
-import Intelligence from "./pages/Intelligence.jsx";
-import Logger from "./pages/Logger.jsx";
+import Tracking from "./pages/Tracking.jsx";
+import Mesocycle from "./pages/Mesocycle.jsx";
+import Microcycle from "./pages/Microcycle.jsx";
+import Macrocycle from "./pages/Macrocycle.jsx";
 import Home from "./pages/Home.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
@@ -15,9 +16,10 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/" element={<AppShell />}>
           <Route index element={<Home />} />
-          <Route path="sessions" element={<Sessions />} />
-          <Route path="intelligence" element={<Intelligence />} />
-          <Route path="logger" element={<Logger />} />
+          <Route path="tracking" element={<Tracking />} />
+          <Route path="mesocycle" element={<Mesocycle />} />
+          <Route path="microcycle" element={<Microcycle />} />
+          <Route path="macrocycle" element={<Macrocycle />} />
         </Route>
       </Routes>
     </Router>

@@ -7,20 +7,18 @@ export default function Header() {
     setIsDarkMode(!isDarkMode);
     document.documentElement.classList.toggle('dark');
   };
-
   return (
-    <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-            PowerHouse Tracker
-          </h1>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            Dashboard
-          </span>
-        </div>
-        
-        <div className="flex items-center space-x-4">
+    <header
+      className="
+        sticky top-0 z-50 backdrop-blur-md
+        bg-white/80 dark:bg-slate-900/80
+        shadow-sm dark:shadow-slate-900/50
+      "
+    >
+      <div className="mx-auto container flex items-center justify-between py-4">
+        <span className="text-2xl font-bold text-red-600">PowerHouse&nbsp;Tracker</span>
+        {/* user avatar placeholder */}
+        <div className="flex items-center gap-3">
           <button
             onClick={toggleDarkMode}
             className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
@@ -36,12 +34,10 @@ export default function Header() {
               </svg>
             )}
           </button>
-          
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-medium">U</span>
-            </div>
-          </div>
+          <span className="hidden md:block text-sm font-medium text-slate-700 dark:text-slate-300">
+            John&nbsp;Doe
+          </span>
+          <div className="h-8 w-8 rounded-full bg-slate-300 dark:bg-slate-600" />
         </div>
       </div>
     </header>

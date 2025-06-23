@@ -21,10 +21,9 @@ export default function WeekOverview() {
       default: return 'bg-red-400'
     }
   }
-
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+      <div>
         <div className="flex items-center justify-between mb-4">
           <Skeleton className="h-6 w-32" />
           <Skeleton className="h-4 w-20" />
@@ -50,19 +49,19 @@ export default function WeekOverview() {
 
   if (error) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+      <div>
         <div className="text-center py-4">
           <p className="text-red-600 dark:text-red-400">Failed to load week data</p>
         </div>
       </div>
     )
   }
-
   const weekProgress = weekStatus?.totalPlanned > 0 
     ? Math.round((weekStatus.completedCount / weekStatus.totalPlanned) * 100)
     : 0
+
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+    <div>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
           Week Overview
@@ -81,38 +80,51 @@ export default function WeekOverview() {
         </div>
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
           <div 
-            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+            className="bg-red-500 h-2 rounded-full transition-all duration-300"
             style={{ width: `${weekProgress}%` }}
           />
         </div>
       </div>
 
       <div className="grid grid-cols-7 gap-2">
-        {weekStatus?.days?.map((day, index) => (
-          <div key={index} className="text-center">
-            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-              {day.label}
+        {weekStatus?.days?.map((day, index) => {
+          const isToday = day.isToday
+          const status = day.status
+          
+          return (
+            <div key={index} className="text-center">
+              <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                {day.label}
+              </div>
+              <div 
+                className={`
+                  day-block relative rounded-lg p-2 flex flex-col items-center
+                  transition-all duration-200 hover:shadow-md w-8 h-8 mx-auto
+                  ${status === "completed" && "bg-green-50 dark:bg-green-800/20"}
+                  ${status === "planned" && "bg-blue-50 dark:bg-blue-800/20"}
+                  ${status === "rest" && "bg-gray-50 dark:bg-gray-800/20"}
+                  ${isToday && "ring-2 ring-red-500"}
+                  ${getStatusColor(status)}
+                `}
+                title={day.focus}
+              >
+                <span className="text-white text-xs font-bold">
+                  {getStatusIcon(status)}
+                </span>
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
+                {status !== 'rest' ? day.focus : ''}
+              </div>
             </div>
-            <div 
-              className={`w-8 h-8 rounded-full ${getStatusColor(day.status)} mx-auto flex items-center justify-center`}
-              title={day.focus}
-            >
-              <span className="text-white text-xs font-bold">
-                {getStatusIcon(day.status)}
-              </span>
-            </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
-              {day.status !== 'rest' ? day.focus : ''}
-            </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
-      <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-        <div className="text-sm font-medium text-blue-900 dark:text-blue-100">
+      <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+        <div className="text-sm font-medium text-red-900 dark:text-red-100">
           Week Progress: {weekProgress}%
         </div>
-        <div className="text-xs text-blue-700 dark:text-blue-300">
+        <div className="text-xs text-red-700 dark:text-red-300">
           {weekStatus?.completedCount > 0 
             ? `${weekStatus.completedCount} sessions completed this week`
             : 'Ready to start your training week'
