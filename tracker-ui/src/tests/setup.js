@@ -1,6 +1,6 @@
 // Vitest setup file
-import '@testing-library/jest-dom';
 import { vi, afterEach } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 
 // Make vi globally available
 global.vi = vi;

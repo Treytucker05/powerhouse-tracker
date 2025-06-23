@@ -1,5 +1,3 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import WeeklyVolumeCard from "../components/WeeklyVolumeCard";
 import useWeeklyVolume from "../hooks/useWeeklyVolume";
 import DeloadDrawer from "../components/DeloadDrawer";
