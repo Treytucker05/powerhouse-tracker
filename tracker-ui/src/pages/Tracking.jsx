@@ -4,6 +4,7 @@ import useSessionSets from "../lib/useSessionSets";
 import Drawer from "../components/Drawer";
 import VolumeHeatmap from "../components/dashboard/VolumeHeatmap";
 import VolumeTrackingChart from "../components/dashboard/VolumeTrackingChart";
+import PowerHouseVolumeChart from "../components/dashboard/PowerHouseVolumeChart";
 import CardWrapper from "../components/dashboard/CardWrapper";
 import WeekOverview from "../components/dashboard/WeekOverview";
 import QuickActions from "../components/dashboard/QuickActions";
@@ -21,17 +22,13 @@ export default function Tracking() {
   const [selected, setSelected] = useState(null);
   const sets = useSessionSets(selected?.id);
 
-  return (
-    <ErrorBoundary>
+  return (    <ErrorBoundary>
       <TrainingStateProvider>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen bg-gray-900">
           <Header />
           <NavBar />
-          <main className="container mx-auto px-4 py-6 space-y-8">
-            {/* Volume Tracking Graph */}
-            <CardWrapper>
-              <VolumeTrackingChart />
-            </CardWrapper>
+          <main className="container mx-auto px-4 py-6 space-y-8">{/* PowerHouse Volume Tracking Graph */}
+            <PowerHouseVolumeChart className="col-span-full" />
 
             {/* Dashboard Widgets Grid */}
             <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
