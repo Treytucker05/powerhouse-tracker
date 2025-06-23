@@ -1,199 +1,137 @@
-import { useEffect, useRef, useState } from 'react';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
+import React from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine, ResponsiveContainer } from 'recharts';
 
-// Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip,
-  Legend
-);
+const PowerHouseVolumeChart = ({ className = '' }) => {
+  // Sample data - replace with real data from context/props
+  const data = [
+    { muscle: 'Chest', volume: 12, mev: 8, mrv: 22 },
+    { muscle: 'Back', volume: 16, mev: 10, mrv: 25 },
+    { muscle: 'Shoulders', volume: 10, mev: 6, mrv: 20 },
+    { muscle: 'Biceps', volume: 8, mev: 6, mrv: 16 },
+    { muscle: 'Triceps', volume: 10, mev: 6, mrv: 18 },
+    { muscle: 'Quads', volume: 20, mev: 10, mrv: 25 },
+    { muscle: 'Hamstrings', volume: 12, mev: 8, mrv: 20 },
+    { muscle: 'Glutes', volume: 14, mev: 8, mrv: 16 },
+  ];
 
-export default function PowerHouseVolumeChart({ className = '' }) {
-  const chartRef = useRef(null);
-  const chartInstanceRef = useRef(null);
-
-  // Sample data matching the legacy version structure
-  const [volumeData, setVolumeData] = useState({
-    muscles: ['Chest', 'Back', 'Shoulders', 'Arms', 'Legs', 'Core'],
-    currentSets: [8, 12, 6, 10, 14, 8], // Current weekly sets
-    volumeLandmarks: {
-      Chest: { MEV: 6, MRV: 22 },
-      Back: { MEV: 10, MRV: 25 },
-      Shoulders: { MEV: 8, MRV: 20 },
-      Arms: { MEV: 6, MRV: 20 },
-      Legs: { MEV: 10, MRV: 20 },
-      Core: { MEV: 6, MRV: 25 }
-    }
-  });
-
-  // PowerHouse color scheme
-  const getVolumeColor = (muscle, sets) => {
-    const landmarks = volumeData.volumeLandmarks[muscle];
-    if (!landmarks) return 'rgba(107, 114, 128, 0.6)'; // gray fallback
-    
-    if (sets < landmarks.MEV) return 'rgba(239, 68, 68, 0.6)'; // red - below MEV
-    if (sets > landmarks.MRV) return 'rgba(239, 68, 68, 0.8)'; // darker red - above MRV
-    return 'rgba(34, 197, 94, 0.6)'; // green - optimal range
+  const getBarColor = (volume, mev, mrv) => {
+    if (volume < mev || volume > mrv) return '#ef4444'; // red
+    return '#22c55e'; // green
   };
 
-  useEffect(() => {
-    if (!chartRef.current) return;
+  // Custom tooltip component
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      const volume = data.volume;
+      const mev = data.mev;
+      const mrv = data.mrv;
+      
+      let status = 'Optimal';
+      if (volume < mev) status = 'Below MEV';
+      else if (volume > mrv) status = 'Above MRV';
 
-    const ctx = chartRef.current.getContext('2d');
-    
-    // Destroy existing chart if it exists
-    if (chartInstanceRef.current) {
-      chartInstanceRef.current.destroy();
+      return (
+        <div className="bg-gray-800 p-3 border border-gray-600 rounded-lg shadow-lg">
+          <p className="text-white font-medium">{label}</p>
+          <p className="text-green-400">Volume: {volume} sets</p>
+          <p className="text-yellow-400">MEV: {mev} sets</p>
+          <p className="text-red-400">MRV: {mrv} sets</p>
+          <p className={`font-bold ${status === 'Optimal' ? 'text-green-400' : 'text-red-400'}`}>
+            Status: {status}
+          </p>
+        </div>
+      );
     }
+    return null;
+  };
 
-    const backgroundColors = volumeData.muscles.map((muscle, index) => 
-      getVolumeColor(muscle, volumeData.currentSets[index])
-    );
-
-    chartInstanceRef.current = new ChartJS(ctx, {
-      type: 'bar',
-      data: {
-        labels: volumeData.muscles,
-        datasets: [
-          {
-            label: 'Current Sets',
-            data: volumeData.currentSets,
-            backgroundColor: backgroundColors,
-            borderColor: backgroundColors.map(color => color.replace('0.6', '1')),
-            borderWidth: 2,
-          },
-          {
-            label: 'MEV',
-            data: volumeData.muscles.map(muscle => volumeData.volumeLandmarks[muscle]?.MEV || 0),
-            type: 'line',
-            borderColor: 'rgba(255, 255, 0, 0.8)',
-            backgroundColor: 'transparent',
-            borderWidth: 2,
-            pointRadius: 3,
-            pointBackgroundColor: 'rgba(255, 255, 0, 1)',
-            borderDash: [5, 5],
-          },
-          {
-            label: 'MRV',
-            data: volumeData.muscles.map(muscle => volumeData.volumeLandmarks[muscle]?.MRV || 0),
-            type: 'line',
-            borderColor: 'rgba(255, 0, 0, 0.8)',
-            backgroundColor: 'transparent',
-            borderWidth: 2,
-            pointRadius: 3,
-            pointBackgroundColor: 'rgba(255, 0, 0, 1)',
-            borderDash: [10, 5],
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            labels: {
-              color: '#fff',
-            },
-          },
-          tooltip: {
-            callbacks: {
-              afterLabel: function (context) {
-                const muscle = context.label;
-                const sets = context.parsed.y;
-                const landmarks = volumeData.volumeLandmarks[muscle];
-                
-                let status = 'Unknown';
-                if (landmarks) {
-                  if (sets < landmarks.MEV) status = 'Below MEV';
-                  else if (sets > landmarks.MRV) status = 'Above MRV';
-                  else status = 'Optimal Range';
-                }
-                
-                return [
-                  `Status: ${status}`,
-                  `MEV: ${landmarks?.MEV || 0} | MRV: ${landmarks?.MRV || 0}`,
-                  `Target RIR: 1-3`,
-                ];
-              },
-            },
-          },
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(255, 255, 255, 0.1)',
-            },
-            ticks: {
-              color: '#fff',
-              stepSize: 1,
-            },
-          },
-          x: {
-            grid: {
-              color: 'rgba(255, 255, 255, 0.1)',
-            },
-            ticks: {
-              color: '#fff',
-            },
-          },
-        },
-      },
-    });
-
-    // Cleanup
-    return () => {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-    };
-  }, [volumeData]);
+  // Create bars with dynamic colors
+  const CustomizedBar = (props) => {
+    const { fill, payload, ...rest } = props;
+    const color = getBarColor(payload.volume, payload.mev, payload.mrv);
+    return <Bar {...rest} fill={color} stroke={color} strokeWidth={2} />;
+  };
 
   return (
-    <div className={`bg-gray-900 rounded-lg p-6 ${className}`}>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-white">
-          📊 Weekly Volume Tracking
-        </h2>
-        <div className="flex items-center space-x-4">
+    <div className={`bg-gray-900 p-6 rounded-lg border border-gray-700 ${className}`}>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold text-white">📊 Weekly Volume by Muscle Group</h2>
+        <div className="flex items-center space-x-4 text-sm">
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 rounded-full bg-green-500"></div>
-            <span className="text-sm text-gray-300">Optimal</span>
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <span className="text-gray-300">Optimal</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-px bg-yellow-500"></div>
-            <span className="text-sm text-gray-300">MEV</span>
+            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+            <span className="text-gray-300">Sub-optimal</span>
           </div>
           <div className="flex items-center space-x-2">
-            <div className="w-3 h-px bg-red-500"></div>
-            <span className="text-sm text-gray-300">MRV</span>
+            <div className="w-4 h-0.5 bg-yellow-500"></div>
+            <span className="text-gray-300">MEV</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-4 h-0.5 bg-red-500"></div>
+            <span className="text-gray-300">MRV</span>
           </div>
         </div>
       </div>
       
-      <div className="relative h-64">
-        <canvas ref={chartRef} />
-      </div>
+      <ResponsiveContainer width="100%" height={400}>
+        <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+          <XAxis 
+            dataKey="muscle" 
+            stroke="#fff" 
+            tick={{ fill: '#fff', fontSize: 12 }}
+            angle={-45}
+            textAnchor="end"
+            height={60}
+          />
+          <YAxis 
+            stroke="#fff" 
+            tick={{ fill: '#fff', fontSize: 12 }}
+            label={{ value: 'Sets', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle', fill: '#fff' } }}
+          />
+          <Tooltip content={<CustomTooltip />} />
+          
+          {/* Render individual bars with dynamic colors */}
+          <Bar dataKey="volume" shape={<CustomizedBar />} />
+          
+          {/* MEV reference lines - one per muscle group */}
+          {data.map((entry, index) => (
+            <ReferenceLine 
+              key={`mev-${index}`} 
+              x={entry.muscle}
+              y={entry.mev} 
+              stroke="#eab308" 
+              strokeDasharray="5 5"
+              strokeWidth={2}
+            />
+          ))}
+          
+          {/* MRV reference lines - one per muscle group */}
+          {data.map((entry, index) => (
+            <ReferenceLine 
+              key={`mrv-${index}`} 
+              x={entry.muscle}
+              y={entry.mrv} 
+              stroke="#ef4444" 
+              strokeDasharray="10 5"
+              strokeWidth={2}
+            />
+          ))}
+        </BarChart>
+      </ResponsiveContainer>
       
       <div className="mt-4 text-sm text-gray-400">
-        <p>Green bars: Optimal training volume (between MEV and MRV)</p>
-        <p>Red bars: Below MEV or above MRV - adjust volume accordingly</p>
+        <p>• <span className="text-green-400">Green bars</span>: Optimal training volume (between MEV and MRV)</p>
+        <p>• <span className="text-red-400">Red bars</span>: Sub-optimal volume (below MEV or above MRV)</p>
+        <p>• <span className="text-yellow-400">Yellow lines</span>: Minimum Effective Volume (MEV)</p>
+        <p>• <span className="text-red-400">Red lines</span>: Maximum Recoverable Volume (MRV)</p>
       </div>
     </div>
   );
-}
+};
+
+export default PowerHouseVolumeChart;
