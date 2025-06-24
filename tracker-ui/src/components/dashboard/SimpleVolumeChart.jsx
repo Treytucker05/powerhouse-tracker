@@ -1,274 +1,302 @@
 import React, { useState } from 'react';
 
-const SimpleVolumeChart = () => {
+const SimpleVolumeChart = ({ data }) => {
   const [hoveredBar, setHoveredBar] = useState(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  // Exact muscle order from legacy PowerHouse
-  const muscles = ['Chest', 'Back', 'Quads', 'Glutes', 'Hamstrings', 'Shoulders', 'Biceps', 'Triceps', 'Calves', 'Abs', 'Forearms', 'Neck', 'Traps'];
-  
-  // Current volume data (green if between MEV-MRV, red otherwise)
-  const currentSets = [12, 16, 20, 14, 12, 10, 14, 10, 8, 6, 4, 3, 4];
-  const mevValues = [8, 10, 10, 8, 8, 6, 6, 6, 6, 4, 4, 2, 4];
-  const mrvValues = [22, 25, 25, 16, 20, 20, 16, 18, 16, 16, 12, 8, 12];
+  // Legacy PowerHouse muscle order - exact match to original
+  const muscleOrder = [
+    'Chest', 'Shoulders', 'Biceps', 'Triceps', 'Lats', 'Mid-Traps', 
+    'Rear Delts', 'Abs', 'Glutes', 'Quads', 'Hamstrings', 'Calves', 'Forearms'
+  ];
 
-  const maxValue = 26; // Fixed max for consistent scaling  // Calculate proper dimensions and spacing for better bar fit
-  const chartWidth = 1000;
+  const chartData = muscleOrder.map(muscle => ({
+    name: muscle,
+    volume: data?.[muscle] || 0,
+    mev: data?.mev?.[muscle] || 8,
+    mrv: data?.mrv?.[muscle] || 20
+  }));
+
+  const maxValue = Math.max(...chartData.map(d => Math.max(d.volume, d.mrv))) * 1.1;
+  const chartWidth = 900;
   const chartHeight = 500;
-  const chartLeftMargin = 120;
-  const chartRightMargin = 50;
-  const chartTopMargin = 70;
-  const chartBottomMargin = 80;
-  const chartAreaWidth = chartWidth - chartLeftMargin - chartRightMargin;
-  const chartAreaHeight = 385;
-  const barWidth = 50;
-  const barSpacing = chartAreaWidth / muscles.length;
+  const margin = { top: 40, right: 40, bottom: 100, left: 80 };
+  const barWidth = (chartWidth - margin.left - margin.right) / chartData.length * 0.7;
+  const barSpacing = (chartWidth - margin.left - margin.right) / chartData.length * 0.3;
 
-  const handleMouseMove = (event, index) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    setMousePosition({
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top
-    });
-    setHoveredBar(index);
+  const getBarColor = (volume, mev, mrv) => {
+    if (volume < mev) return '#dc2626'; // Red for under-recovery
+    if (volume >= mev && volume <= mrv) return '#16a34a'; // Green for optimal
+    return '#dc2626'; // Red for over-recovery
   };
 
-  const handleMouseLeave = () => {
-    setHoveredBar(null);
-  };
+  return (
+    <div style={{
+      background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 100%)',
+      border: '2px solid #dc2626',
+      borderRadius: '12px',
+      padding: '24px',
+      boxShadow: '0 8px 32px rgba(220, 38, 38, 0.3)'
+    }}>
+      <h3 style={{
+        color: '#dc2626',
+        fontSize: '1.5rem',
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: '20px',
+        textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
+      }}>
+        Weekly Volume by Muscle Group
+      </h3>
+      
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <svg width={chartWidth} height={chartHeight} style={{ background: '#000000', borderRadius: '8px' }}>
+          {/* Background grid */}
+          <defs>
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#333333" strokeWidth="1"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" opacity="0.3"/>
 
-  return (    <div className="card-powerhouse" style={{ height: '650px' }}>
-      <h3 className="text-xl font-bold text-white mb-4">Weekly Volume by Muscle Group</h3>
-      <div className="relative" style={{ height: '580px', overflow: 'hidden' }}>        <svg 
-          width="100%" 
-          height="100%" 
-          viewBox={`0 0 ${chartWidth + 120} ${chartHeight + 150}`}
-          style={{ backgroundColor: '#111827', border: '2px solid #374151', borderRadius: '8px' }}
-        >          {/* Enhanced Background Grid Lines - Start at 0, intervals of 2 */}
-          {[...Array(14)].map((_, i) => {
-            const y = chartTopMargin + chartAreaHeight - (i * (chartAreaHeight / 13)); // 13 intervals from 0 to 26
-            const value = i * 2; // Values: 0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26
+          {/* Horizontal grid lines with labels */}
+          {Array.from({ length: 6 }, (_, i) => {
+            const y = margin.top + (chartHeight - margin.top - margin.bottom) * i / 5;
+            const value = Math.round(maxValue - (maxValue * i / 5));
             return (
               <g key={i}>
                 <line
-                  x1={chartLeftMargin}
+                  x1={margin.left}
                   y1={y}
-                  x2={chartLeftMargin + chartAreaWidth}
+                  x2={chartWidth - margin.right}
                   y2={y}
-                  stroke="rgba(255,255,255,0.4)"
-                  strokeWidth="1.5"
-                  strokeDasharray="3,2"
+                  stroke="#555555"
+                  strokeWidth="1"
+                  opacity="0.8"
                 />
                 <text
-                  x={chartLeftMargin - 15}
-                  y={y + 5}
+                  x={margin.left - 10}
+                  y={y + 4}
                   fill="#ffffff"
                   fontSize="14"
                   textAnchor="end"
-                  fontFamily="Arial"
-                  fontWeight="600"
+                  fontWeight="bold"
                 >
                   {value}
                 </text>
               </g>
             );
-          })}          {/* Enhanced Vertical Grid Lines for Maximum Readability */}
-          {muscles.map((_, index) => {
-            const x = chartLeftMargin + (index * barSpacing) + (barSpacing / 2);
-            return (
-              <line
-                key={`vgrid-${index}`}
-                x1={x}
-                y1={chartTopMargin}
-                x2={x}
-                y2={chartTopMargin + chartAreaHeight}
-                stroke="rgba(255,255,255,0.25)"
-                strokeWidth="1.5"
-                strokeDasharray="4,3"
-              />
-            );
-          })}          {/* Y-axis label */}
-          <text
-            x="30"
-            y={chartTopMargin + (chartAreaHeight / 2)}
-            fill="#ffffff"
-            fontSize="16"
-            textAnchor="middle"
-            fontFamily="Arial"
-            fontWeight="700"
-            transform={`rotate(-90, 30, ${chartTopMargin + (chartAreaHeight / 2)})`}
-          >
-            Sets
-          </text>          {/* Chart Data with Interactive Bars */}
-          {muscles.map((muscle, index) => {
-            const x = chartLeftMargin + (index * barSpacing) + (barSpacing / 2);
-            const currentSet = currentSets[index];
-            const mev = mevValues[index];
-            const mrv = mrvValues[index];
+          })}
+
+          {/* Main axes */}
+          <line
+            x1={margin.left}
+            y1={chartHeight - margin.bottom}
+            x2={chartWidth - margin.right}
+            y2={chartHeight - margin.bottom}
+            stroke="#ffffff"
+            strokeWidth="3"
+          />
+          
+          <line
+            x1={margin.left}
+            y1={margin.top}
+            x2={margin.left}
+            y2={chartHeight - margin.bottom}
+            stroke="#ffffff"
+            strokeWidth="3"
+          />
+
+          {/* Bars and reference lines */}
+          {chartData.map((d, i) => {
+            const x = margin.left + i * (barWidth + barSpacing) + barSpacing / 2;
+            const barHeight = Math.max((d.volume / maxValue) * (chartHeight - margin.top - margin.bottom), 2);
+            const y = chartHeight - margin.bottom - barHeight;
             
-            const barHeight = (currentSet / 26) * chartAreaHeight; // Scale to 0-26 range
-            const barBottom = chartTopMargin + chartAreaHeight;
-            const isOptimal = currentSet >= mev && currentSet <= mrv;
-            const isHovered = hoveredBar === index;
+            const mevY = chartHeight - margin.bottom - (d.mev / maxValue) * (chartHeight - margin.top - margin.bottom);
+            const mrvY = chartHeight - margin.bottom - (d.mrv / maxValue) * (chartHeight - margin.top - margin.bottom);
             
             return (
-              <g key={muscle}>
-                {/* Interactive Volume Bar */}
-                <rect
-                  x={x - barWidth/2}
-                  y={barBottom - barHeight}
-                  width={barWidth}
-                  height={barHeight}
-                  fill={isOptimal ? (isHovered ? '#16a34a' : '#22c55e') : (isHovered ? '#dc2626' : '#ef4444')}
-                  stroke={isHovered ? '#ffffff' : '#000000'}
-                  strokeWidth={isHovered ? '3' : '2'}
-                  style={{ cursor: 'pointer', transition: 'all 0.2s ease' }}
-                  onMouseMove={(e) => handleMouseMove(e, index)}
-                  onMouseLeave={handleMouseLeave}
+              <g key={d.name}>
+                {/* MEV line (yellow dashed) */}
+                <line
+                  x1={x - 5}
+                  y1={mevY}
+                  x2={x + barWidth + 5}
+                  y2={mevY}
+                  stroke="#fbbf24"
+                  strokeWidth="3"
+                  strokeDasharray="8,4"
                 />
                 
-                {/* Muscle Label */}
-                <text
+                {/* MRV line (red dashed) */}
+                <line
+                  x1={x - 5}
+                  y1={mrvY}
+                  x2={x + barWidth + 5}
+                  y2={mrvY}
+                  stroke="#dc2626"
+                  strokeWidth="3"
+                  strokeDasharray="8,4"
+                />
+                
+                {/* Volume bar with gradient */}
+                <defs>
+                  <linearGradient id={`barGradient${i}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor={getBarColor(d.volume, d.mev, d.mrv)} stopOpacity="1"/>
+                    <stop offset="100%" stopColor={getBarColor(d.volume, d.mev, d.mrv)} stopOpacity="0.8"/>
+                  </linearGradient>
+                </defs>
+                
+                <rect
                   x={x}
-                  y={barBottom + 25}
+                  y={y}
+                  width={barWidth}
+                  height={barHeight}
+                  fill={`url(#barGradient${i})`}
+                  stroke="#ffffff"
+                  strokeWidth="2"
+                  style={{ cursor: 'pointer', filter: hoveredBar === i ? 'brightness(1.2)' : 'none' }}
+                  onMouseEnter={() => setHoveredBar(i)}
+                  onMouseLeave={() => setHoveredBar(null)}
+                />
+                
+                {/* Volume value on top of bar */}
+                <text
+                  x={x + barWidth / 2}
+                  y={y - 8}
                   fill="#ffffff"
-                  fontSize="13"
+                  fontSize="12"
+                  fontWeight="bold"
                   textAnchor="middle"
-                  fontFamily="Arial"
-                  fontWeight="600"
-                  transform={`rotate(-45, ${x}, ${barBottom + 25})`}
                 >
-                  {muscle}
+                  {d.volume}
                 </text>
+                
+                {/* X-axis labels */}
+                <text
+                  x={x + barWidth / 2}
+                  y={chartHeight - margin.bottom + 25}
+                  fill="#ffffff"
+                  fontSize="12"
+                  fontWeight="bold"
+                  textAnchor="middle"
+                  transform={`rotate(-45, ${x + barWidth / 2}, ${chartHeight - margin.bottom + 25})`}
+                >
+                  {d.name}
+                </text>
+                
+                {/* Hover tooltip */}
+                {hoveredBar === i && (
+                  <g>
+                    <rect
+                      x={x - 40}
+                      y={y - 80}
+                      width="140"
+                      height="65"
+                      fill="rgba(0,0,0,0.95)"
+                      stroke="#dc2626"
+                      strokeWidth="2"
+                      rx="8"
+                    />
+                    <text x={x + barWidth/2} y={y - 55} fill="#dc2626" fontSize="14" fontWeight="bold" textAnchor="middle">
+                      {d.name}
+                    </text>
+                    <text x={x + barWidth/2} y={y - 38} fill="#ffffff" fontSize="12" textAnchor="middle">
+                      Current: {d.volume} sets
+                    </text>
+                    <text x={x + barWidth/2} y={y - 23} fill="#fbbf24" fontSize="11" textAnchor="middle">
+                      MEV: {d.mev} sets
+                    </text>
+                    <text x={x + barWidth/2} y={y - 8} fill="#dc2626" fontSize="11" textAnchor="middle">
+                      MRV: {d.mrv} sets
+                    </text>
+                  </g>
+                )}
               </g>
             );
-          })}          {/* MEV Line (continuous across chart) */}
-          <g>
-            {muscles.map((muscle, index) => {
-              const x = chartLeftMargin + (index * barSpacing) + (barSpacing / 2);
-              const mev = mevValues[index];
-              const mevY = chartTopMargin + chartAreaHeight - (mev / 26) * chartAreaHeight; // Scale to 0-26 range
-              const nextX = index < muscles.length - 1 ? chartLeftMargin + ((index + 1) * barSpacing) + (barSpacing / 2) : x + (barSpacing / 2);
-              const nextMev = index < muscles.length - 1 ? mevValues[index + 1] : mev;
-              const nextMevY = chartTopMargin + chartAreaHeight - (nextMev / 26) * chartAreaHeight;
-              
-              return (
-                <line
-                  key={`mev-${index}`}
-                  x1={x}
-                  y1={mevY}
-                  x2={index < muscles.length - 1 ? nextX : x + (barSpacing / 2)}
-                  y2={index < muscles.length - 1 ? nextMevY : mevY}
-                  stroke="#eab308"
-                  strokeWidth="4"
-                  strokeDasharray="8,5"
-                />
-              );
-            })}
-          </g>
+          })}
 
-          {/* MRV Line (continuous across chart) */}
-          <g>
-            {muscles.map((muscle, index) => {
-              const x = chartLeftMargin + (index * barSpacing) + (barSpacing / 2);
-              const mrv = mrvValues[index];
-              const mrvY = chartTopMargin + chartAreaHeight - (mrv / 26) * chartAreaHeight; // Scale to 0-26 range
-              const nextX = index < muscles.length - 1 ? chartLeftMargin + ((index + 1) * barSpacing) + (barSpacing / 2) : x + (barSpacing / 2);
-              const nextMrv = index < muscles.length - 1 ? mrvValues[index + 1] : mrv;
-              const nextMrvY = chartTopMargin + chartAreaHeight - (nextMrv / 26) * chartAreaHeight;
-              
-              return (
-                <line
-                  key={`mrv-${index}`}
-                  x1={x}
-                  y1={mrvY}
-                  x2={index < muscles.length - 1 ? nextX : x + (barSpacing / 2)}
-                  y2={index < muscles.length - 1 ? nextMrvY : mrvY}
-                  stroke="#ef4444"
-                  strokeWidth="4"
-                  strokeDasharray="8,5"
-                />
-              );
-            })}
-          </g>
-        </svg>
-
-        {/* Interactive Tooltip */}
-        {hoveredBar !== null && (
-          <div
-            style={{
-              position: 'absolute',
-              left: mousePosition.x + 10,
-              top: mousePosition.y - 80,
-              backgroundColor: 'rgba(0, 0, 0, 0.9)',
-              color: '#ffffff',
-              padding: '12px',
-              borderRadius: '8px',
-              border: '2px solid #dc2626',
-              fontSize: '14px',
-              fontFamily: 'Arial',
-              fontWeight: '500',
-              pointerEvents: 'none',
-              zIndex: 1000,
-              minWidth: '150px',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)'
-            }}
+          {/* Y-axis label */}
+          <text
+            x={25}
+            y={chartHeight / 2}
+            fill="#ffffff"
+            fontSize="16"
+            fontWeight="bold"
+            textAnchor="middle"
+            transform={`rotate(-90, 25, ${chartHeight / 2})`}
           >
-            <div style={{ fontWeight: 'bold', marginBottom: '8px', color: '#dc2626' }}>
-              {muscles[hoveredBar]}
-            </div>
-            <div style={{ marginBottom: '4px' }}>
-              <span style={{ color: '#22c55e' }}>Current:</span> {currentSets[hoveredBar]} sets
-            </div>
-            <div style={{ marginBottom: '4px' }}>
-              <span style={{ color: '#eab308' }}>MEV:</span> {mevValues[hoveredBar]} sets
-            </div>
-            <div>
-              <span style={{ color: '#ef4444' }}>MRV:</span> {mrvValues[hoveredBar]} sets
-            </div>
-          </div>
-        )}
-          {/* Professional Legend */}
-        <div style={{
-          position: 'absolute',
-          bottom: '15px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          gap: '25px',
-          backgroundColor: 'rgba(0,0,0,0.95)',
-          padding: '12px 22px',
-          borderRadius: '10px',
-          border: '2px solid #374151',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: '18px', height: '14px', backgroundColor: '#22c55e', borderRadius: '3px' }}></div>
-            <span style={{ color: '#ffffff', fontSize: '13px', fontFamily: 'Arial', fontWeight: '600' }}>Volume (Optimal)</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: '18px', height: '14px', backgroundColor: '#ef4444', borderRadius: '3px' }}></div>
-            <span style={{ color: '#ffffff', fontSize: '13px', fontFamily: 'Arial', fontWeight: '600' }}>Volume (Sub/Excessive)</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ 
-              width: '24px', 
-              height: '4px', 
-              backgroundColor: '#eab308',
-              borderRadius: '2px'
-            }}></div>
-            <span style={{ color: '#ffffff', fontSize: '13px', fontFamily: 'Arial', fontWeight: '600' }}>MEV</span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ 
-              width: '24px', 
-              height: '4px', 
-              backgroundColor: '#ef4444',
-              borderRadius: '2px'
-            }}></div>
-            <span style={{ color: '#ffffff', fontSize: '13px', fontFamily: 'Arial', fontWeight: '600' }}>MRV</span>
-          </div>
+            Weekly Sets
+          </text>
+          
+          {/* X-axis label */}
+          <text
+            x={chartWidth / 2}
+            y={chartHeight - 10}
+            fill="#ffffff"
+            fontSize="16"
+            fontWeight="bold"
+            textAnchor="middle"
+          >
+            Muscle Groups
+          </text>
+        </svg>
+      </div>
+
+      {/* Legend */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        gap: '30px',
+        marginTop: '20px',
+        flexWrap: 'wrap'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{
+            width: '20px',
+            height: '12px',
+            background: '#16a34a',
+            border: '1px solid #ffffff'
+          }} />
+          <span style={{ color: '#ffffff', fontSize: '14px', fontWeight: 'bold' }}>
+            Optimal Volume (MEV-MRV)
+          </span>
         </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{
+            width: '20px',
+            height: '12px',
+            background: '#dc2626',
+            border: '1px solid #ffffff'
+          }} />
+          <span style={{ color: '#ffffff', fontSize: '14px', fontWeight: 'bold' }}>
+            Sub/Over Volume
+          </span>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{
+            width: '20px',
+            height: '3px',
+            background: '#fbbf24',
+            borderTop: '3px dashed #fbbf24'
+          }} />
+          <span style={{ color: '#ffffff', fontSize: '14px', fontWeight: 'bold' }}>
+            MEV (Minimum Effective)
+          </span>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{
+            width: '20px',
+            height: '3px',
+            background: '#dc2626',
+            borderTop: '3px dashed #dc2626'
+          }} />
+          <span style={{ color: '#ffffff', fontSize: '14px', fontWeight: 'bold' }}>
+            MRV (Maximum Recoverable)
+          </span>        </div>
       </div>
     </div>
   );
