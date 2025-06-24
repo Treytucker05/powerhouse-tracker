@@ -1,5 +1,3 @@
-import Header from "../components/dashboard/Header";
-import NavBar from "../components/dashboard/NavBar";
 import CardWrapper from "../components/dashboard/CardWrapper";
 import MicrocycleCalendar from "../components/dashboard/MicrocycleCalendar";
 import { TrainingStateProvider } from "../context/trainingStateContext";
@@ -23,22 +21,18 @@ export default function Microcycle() {
     'Core': 12
   };
 
-  return (
-    <ErrorBoundary>
+  return (    <ErrorBoundary>
       <TrainingStateProvider>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-          <Header />
-          <NavBar />
-          <main className="container py-6">
-            {/* Page Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                Microcycle Planning
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                Design your weekly training schedule and exercise distribution
-              </p>
-            </div>
+        <div className="space-y-6">
+          {/* Page Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Microcycle Planning
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Design your weekly training schedule and exercise distribution
+            </p>
+          </div>
 
             <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
               {/* Training Calendar - Takes up 2 columns */}
@@ -197,11 +191,9 @@ export default function Microcycle() {
                         {template}
                       </button>
                     ))}
-                  </div>
-                </div>
+                  </div>                </div>
               </CardWrapper>
             </div>
-          </main>
         </div>
       </TrainingStateProvider>
     </ErrorBoundary>
