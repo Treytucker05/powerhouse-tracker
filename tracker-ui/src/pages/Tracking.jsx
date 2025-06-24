@@ -1,6 +1,5 @@
 import { useState } from "react";
-import useWorkoutSessions from "../lib/useWorkoutSessions";
-import useSessionSets from "../lib/useSessionSets";
+import { useWorkoutSessions } from "../hooks/useWorkoutSessions";
 import Drawer from "../components/Drawer";
 import SimpleVolumeChart from "../components/dashboard/SimpleVolumeChart";
 import TrainingStatusCard from "../components/dashboard/TrainingStatusCard";

@@ -29,6 +29,33 @@ function QuickStatsCard() {
 }
 
 export default function Home() {
+  // Sample data for the volume chart
+  const sampleVolumeData = {
+    'Chest': 12,
+    'Shoulders': 8,
+    'Biceps': 6,
+    'Triceps': 8,
+    'Lats': 10,
+    'Mid-Traps': 6,
+    'Rear Delts': 4,
+    'Abs': 8,
+    'Glutes': 12,
+    'Quads': 16,
+    'Hamstrings': 10,
+    'Calves': 6,
+    'Forearms': 4,
+    mev: {
+      'Chest': 8, 'Shoulders': 6, 'Biceps': 6, 'Triceps': 6, 'Lats': 10,
+      'Mid-Traps': 4, 'Rear Delts': 4, 'Abs': 4, 'Glutes': 8, 'Quads': 10,
+      'Hamstrings': 8, 'Calves': 6, 'Forearms': 4
+    },
+    mrv: {
+      'Chest': 22, 'Shoulders': 20, 'Biceps': 16, 'Triceps': 18, 'Lats': 25,
+      'Mid-Traps': 12, 'Rear Delts': 12, 'Abs': 16, 'Glutes': 16, 'Quads': 25,
+      'Hamstrings': 20, 'Calves': 16, 'Forearms': 12
+    }
+  };
+
   return (
     <div className="space-y-6">
       
@@ -44,7 +71,7 @@ export default function Home() {
       <div className="grid gap-6 lg:grid-cols-12">
         {/* Volume Chart - Main Feature */}
         <div className="lg:col-span-8">
-          <SimpleVolumeChart />
+          <SimpleVolumeChart data={sampleVolumeData} />
         </div>
         
         {/* Side Cards */}
