@@ -11,8 +11,6 @@ import "../components/dashboard/DashboardLayout.css";
 export default function Tracking() {
   const sessions = useWorkoutSessions();
   const [selected, setSelected] = useState(null);
-  const sets = useSessionSets(selected?.id);
-
   // Sample muscle data - in a real app this would come from your data store
   const muscleData = [
     { muscle: 'Chest', sets: 12, MEV: 8, MAV: 18, MRV: 22 },
@@ -24,15 +22,40 @@ export default function Tracking() {
     { muscle: 'Hamstrings', sets: 12, MEV: 8, MAV: 16, MRV: 20 },
     { muscle: 'Glutes', sets: 14, MEV: 8, MAV: 12, MRV: 16 },
     { muscle: 'Calves', sets: 6, MEV: 8, MAV: 16, MRV: 20 }
-  ];  return (
+  ];
+
+  // Sample data for the volume chart - matches the legacy PowerHouse muscle order
+  const volumeChartData = {
+    'Chest': 12,
+    'Shoulders': 10,
+    'Biceps': 8,
+    'Triceps': 10,
+    'Lats': 16,
+    'Mid-Traps': 8,
+    'Rear Delts': 6,
+    'Abs': 4,
+    'Glutes': 14,
+    'Quads': 20,
+    'Hamstrings': 12,
+    'Calves': 6,
+    'Forearms': 4,
+    mev: {
+      'Chest': 8, 'Shoulders': 6, 'Biceps': 6, 'Triceps': 6, 'Lats': 10,
+      'Mid-Traps': 6, 'Rear Delts': 4, 'Abs': 6, 'Glutes': 8, 'Quads': 10,
+      'Hamstrings': 8, 'Calves': 8, 'Forearms': 4
+    },
+    mrv: {
+      'Chest': 22, 'Shoulders': 20, 'Biceps': 16, 'Triceps': 18, 'Lats': 25,
+      'Mid-Traps': 18, 'Rear Delts': 16, 'Abs': 20, 'Glutes': 16, 'Quads': 25,
+      'Hamstrings': 20, 'Calves': 20, 'Forearms': 16
+    }
+  };return (
     <ErrorBoundary>
       <TrainingStateProvider>
         <div className="space-y-8 max-w-7xl">
           {/* Training Status Card */}
-          <TrainingStatusCard />
-
-          {/* Weekly Volume Tracker Chart */}
-          <SimpleVolumeChart />
+          <TrainingStatusCard />          {/* Weekly Volume Tracker Chart */}
+          <SimpleVolumeChart data={volumeChartData} />
 
           {/* Muscle Volume Cards Grid */}
           <div className="card-powerhouse">
