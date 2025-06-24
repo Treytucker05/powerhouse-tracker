@@ -1,5 +1,3 @@
-import Header from "../components/dashboard/Header";
-import NavBar from "../components/dashboard/NavBar";
 import CardWrapper from "../components/ui/CardWrapper";
 import MesocycleBuilder from "../components/dashboard/MesocycleBuilder";
 import { TrainingStateProvider } from "../context/trainingStateContext";
@@ -17,7 +15,6 @@ export default function Mesocycle() {
     'Legs': { mev: 12, mav: 22, mrv: 28 },
     'Core': { mev: 0, mav: 12, mrv: 16 }
   };
-
   const VolumeSlider = ({ muscle, landmarks }) => (
     <div className="space-y-2">
       <div className="flex justify-between items-center">
@@ -40,22 +37,20 @@ export default function Mesocycle() {
       </div>
     </div>
   );
+
   return (
     <ErrorBoundary>
       <TrainingStateProvider>
-        <div className="min-h-screen bg-gray-900">
-          <Header />
-          <NavBar />
-          <main className="container mx-auto px-6 py-8 space-y-8 max-w-7xl">
-            {/* Page Header */}
-            <div className="mb-8">
-              <h1 className="text-4xl font-bold text-white mb-2">
-                🗓️ Mesocycle Planning
-              </h1>
-              <p className="text-gray-400 text-lg">
-                Plan and configure your training blocks (3-6 weeks) with volume progression
-              </p>
-            </div>
+        <div className="space-y-8">
+          {/* Page Header */}
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-white mb-2">
+              🗓️ Mesocycle Planning
+            </h1>
+            <p className="text-gray-400 text-lg">
+              Plan and configure your training blocks (3-6 weeks) with volume progression
+            </p>
+          </div>
 
             <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
               {/* Volume Landmarks Configuration */}

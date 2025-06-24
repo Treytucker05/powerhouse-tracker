@@ -336,124 +336,48 @@ export default function Macrocycle() {
                         <div className="text-xs text-gray-400 mt-1">PROGRESS</div>
                       </div>
                     </div>
-                  </div>                  {/* Phase Objectives */}
+                  </div>
+
+                  {/* Phase Objectives */}
                   <div className="bg-gradient-to-br from-green-900/40 to-green-800/30 rounded-2xl p-6 border border-green-500/30 backdrop-blur-sm">
-                    <h3 className="text-green-300 font-bold mb-6 flex items-center text-lg">
+                    <h3 className="text-green-300 font-bold mb-4 flex items-center text-lg">
                       <span className="w-3 h-3 bg-gradient-to-r from-green-400 to-green-600 rounded-full mr-3"></span>
                       Phase Objectives
                     </h3>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Muscle Growth Objective */}
-                      <div className="bg-gradient-to-br from-green-800/30 to-green-700/20 rounded-xl p-4 border border-green-500/20 hover:border-green-400/40 transition-all duration-200 group">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center">
-                            <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center mr-3">
-                              <span className="text-green-400 text-lg">🧬</span>
-                            </div>
-                            <div>
-                              <h4 className="text-green-300 font-bold text-sm">Muscle Growth</h4>
-                              <div className="flex items-center mt-1">
-                                <div className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></div>
-                                <span className="text-xs text-green-500 font-medium">ON TRACK</span>
-                              </div>
-                            </div>
-                          </div>
+                    <ul className="text-gray-200 space-y-3">
+                      <li className="flex items-start">
+                        <span className="text-green-400 mr-3 mt-1">▸</span>
+                        <div>
+                          <span className="font-semibold">Maximize muscle growth</span>
+                          <p className="text-sm text-gray-400">Primary focus on hypertrophic adaptations</p>
                         </div>
-                        <p className="text-gray-300 text-sm mb-3">Primary focus on hypertrophic adaptations</p>
-                        <div className="bg-green-900/20 rounded-lg p-2">
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="text-xs text-green-400">Progress</span>
-                            <span className="text-xs text-green-300">78%</span>
-                          </div>
-                          <div className="w-full bg-green-900/40 rounded-full h-2">
-                            <div className="bg-gradient-to-r from-green-500 to-green-400 h-2 rounded-full transition-all duration-300" style={{width: '78%'}}></div>
-                          </div>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-green-400 mr-3 mt-1">▸</span>
+                        <div>
+                          <span className="font-semibold">Volume progression 8-18 sets per muscle</span>
+                          <p className="text-sm text-gray-400">Systematic increase in training volume</p>
                         </div>
-                      </div>
-
-                      {/* Volume Progression Objective */}
-                      <div className="bg-gradient-to-br from-blue-800/30 to-blue-700/20 rounded-xl p-4 border border-blue-500/20 hover:border-blue-400/40 transition-all duration-200 group">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center">
-                            <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center mr-3">
-                              <span className="text-blue-400 text-lg">📊</span>
-                            </div>
-                            <div>
-                              <h4 className="text-blue-300 font-bold text-sm">Volume Progression</h4>
-                              <div className="flex items-center mt-1">
-                                <div className="w-2 h-2 bg-blue-400 rounded-full mr-2 animate-pulse"></div>
-                                <span className="text-xs text-blue-500 font-medium">ACTIVE</span>
-                              </div>
-                            </div>
-                          </div>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-green-400 mr-3 mt-1">▸</span>
+                        <div>
+                          <span className="font-semibold">6-12 rep range focus</span>
+                          <p className="text-sm text-gray-400">Optimal rep range for muscle growth</p>
                         </div>
-                        <p className="text-gray-300 text-sm mb-3">8-18 sets per muscle group weekly</p>
-                        <div className="bg-blue-900/20 rounded-lg p-2">
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="text-xs text-blue-400">Volume Load</span>
-                            <span className="text-xs text-blue-300">65%</span>
-                          </div>
-                          <div className="w-full bg-blue-900/40 rounded-full h-2">
-                            <div className="bg-gradient-to-r from-blue-500 to-blue-400 h-2 rounded-full transition-all duration-300" style={{width: '65%'}}></div>
-                          </div>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="text-green-400 mr-3 mt-1">▸</span>
+                        <div>
+                          <span className="font-semibold">Moderate intensity (70-85% 1RM)</span>
+                          <p className="text-sm text-gray-400">Balanced load for volume accumulation</p>
                         </div>
-                      </div>
-
-                      {/* Rep Range Focus */}
-                      <div className="bg-gradient-to-br from-purple-800/30 to-purple-700/20 rounded-xl p-4 border border-purple-500/20 hover:border-purple-400/40 transition-all duration-200 group">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center">
-                            <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center mr-3">
-                              <span className="text-purple-400 text-lg">🎯</span>
-                            </div>
-                            <div>
-                              <h4 className="text-purple-300 font-bold text-sm">Rep Range Focus</h4>
-                              <div className="flex items-center mt-1">
-                                <div className="w-2 h-2 bg-purple-400 rounded-full mr-2"></div>
-                                <span className="text-xs text-purple-500 font-medium">OPTIMIZED</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <p className="text-gray-300 text-sm mb-3">6-12 reps for optimal muscle growth</p>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                            <span className="text-xs text-purple-300">6-12 reps</span>
-                          </div>
-                          <span className="text-xs text-purple-400 font-medium">✓ Target Range</span>
-                        </div>
-                      </div>
-
-                      {/* Intensity Control */}
-                      <div className="bg-gradient-to-br from-orange-800/30 to-orange-700/20 rounded-xl p-4 border border-orange-500/20 hover:border-orange-400/40 transition-all duration-200 group">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center">
-                            <div className="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center mr-3">
-                              <span className="text-orange-400 text-lg">⚡</span>
-                            </div>
-                            <div>
-                              <h4 className="text-orange-300 font-bold text-sm">Intensity Control</h4>
-                              <div className="flex items-center mt-1">
-                                <div className="w-2 h-2 bg-orange-400 rounded-full mr-2"></div>
-                                <span className="text-xs text-orange-500 font-medium">BALANCED</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <p className="text-gray-300 text-sm mb-3">70-85% 1RM for volume accumulation</p>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
-                            <span className="text-xs text-orange-300">70-85% 1RM</span>
-                          </div>
-                          <span className="text-xs text-orange-400 font-medium">✓ Optimal Load</span>
-                        </div>
-                      </div>
-                    </div>
+                      </li>
+                    </ul>
                   </div>
-                </div>                {/* Progress Metrics */}
+                </div>
+
+                {/* Progress Metrics */}
                 <div className="space-y-6">
                   {/* Key Performance Indicators */}
                   <div className="bg-gradient-to-br from-gray-800/60 to-gray-700/40 rounded-2xl p-6 border border-gray-600/30 backdrop-blur-sm">
@@ -461,121 +385,38 @@ export default function Macrocycle() {
                       <span className="w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-600 rounded-full mr-3"></span>
                       Progress Metrics
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {/* Volume Load Metric */}
-                      <div className="bg-gradient-to-br from-green-900/30 to-green-800/20 rounded-xl p-5 border border-green-500/30 hover:border-green-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/10 group cursor-pointer">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center">
-                            <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mr-3 group-hover:bg-green-500/30 transition-colors">
-                              <span className="text-green-400 text-xl">📈</span>
-                            </div>
-                            <div>
-                              <h4 className="text-green-300 font-bold text-sm">Volume Load</h4>
-                              <p className="text-xs text-green-400/80">Weekly progression</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                          </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-green-900/20 rounded-xl p-4 border border-green-500/20">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-gray-300 text-sm">Volume Load</span>
+                          <span className="text-green-400 text-lg">📈</span>
                         </div>
-                        <div className="flex items-end justify-between">
-                          <div>
-                            <p className="text-green-400 font-bold text-2xl mb-1">+15%</p>
-                            <p className="text-xs text-green-300/70">vs. last phase</p>
-                          </div>
-                          <div className="text-right">
-                            <div className="bg-green-900/40 rounded-lg px-2 py-1">
-                              <span className="text-xs text-green-300 font-medium">TRENDING UP</span>
-                            </div>
-                          </div>
-                        </div>
+                        <p className="text-green-400 font-bold text-xl">+15%</p>
+                        <p className="text-xs text-green-300/70">vs. last phase</p>
                       </div>
-
-                      {/* Body Weight Metric */}
-                      <div className="bg-gradient-to-br from-blue-900/30 to-blue-800/20 rounded-xl p-5 border border-blue-500/30 hover:border-blue-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 group cursor-pointer">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center">
-                            <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mr-3 group-hover:bg-blue-500/30 transition-colors">
-                              <span className="text-blue-400 text-xl">⚖️</span>
-                            </div>
-                            <div>
-                              <h4 className="text-blue-300 font-bold text-sm">Body Weight</h4>
-                              <p className="text-xs text-blue-400/80">Lean mass tracking</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
-                          </div>
+                      <div className="bg-blue-900/20 rounded-xl p-4 border border-blue-500/20">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-gray-300 text-sm">Body Weight</span>
+                          <span className="text-blue-400 text-lg">⚖️</span>
                         </div>
-                        <div className="flex items-end justify-between">
-                          <div>
-                            <p className="text-blue-400 font-bold text-2xl mb-1">+2.3 lbs</p>
-                            <p className="text-xs text-blue-300/70">lean mass gain</p>
-                          </div>
-                          <div className="text-right">
-                            <div className="bg-blue-900/40 rounded-lg px-2 py-1">
-                              <span className="text-xs text-blue-300 font-medium">ON TARGET</span>
-                            </div>
-                          </div>
-                        </div>
+                        <p className="text-blue-400 font-bold text-xl">+2.3 lbs</p>
+                        <p className="text-xs text-blue-300/70">lean mass gain</p>
                       </div>
-
-                      {/* Strength Metric */}
-                      <div className="bg-gradient-to-br from-orange-900/30 to-orange-800/20 rounded-xl p-5 border border-orange-500/30 hover:border-orange-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-orange-500/10 group cursor-pointer">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center">
-                            <div className="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center mr-3 group-hover:bg-orange-500/30 transition-colors">
-                              <span className="text-orange-400 text-xl">💪</span>
-                            </div>
-                            <div>
-                              <h4 className="text-orange-300 font-bold text-sm">Strength</h4>
-                              <p className="text-xs text-orange-400/80">Compound lifts</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
-                          </div>
+                      <div className="bg-orange-900/20 rounded-xl p-4 border border-orange-500/20">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-gray-300 text-sm">Strength</span>
+                          <span className="text-orange-400 text-lg">💪</span>
                         </div>
-                        <div className="flex items-end justify-between">
-                          <div>
-                            <p className="text-orange-400 font-bold text-2xl mb-1">+8%</p>
-                            <p className="text-xs text-orange-300/70">total improvement</p>
-                          </div>
-                          <div className="text-right">
-                            <div className="bg-orange-900/40 rounded-lg px-2 py-1">
-                              <span className="text-xs text-orange-300 font-medium">EXCELLENT</span>
-                            </div>
-                          </div>
-                        </div>
+                        <p className="text-orange-400 font-bold text-xl">+8%</p>
+                        <p className="text-xs text-orange-300/70">compound lifts</p>
                       </div>
-
-                      {/* Recovery Metric */}
-                      <div className="bg-gradient-to-br from-yellow-900/30 to-yellow-800/20 rounded-xl p-5 border border-yellow-500/30 hover:border-yellow-400/50 transition-all duration-300 hover:shadow-lg hover:shadow-yellow-500/10 group cursor-pointer">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center">
-                            <div className="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center mr-3 group-hover:bg-yellow-500/30 transition-colors">
-                              <span className="text-yellow-400 text-xl">😴</span>
-                            </div>
-                            <div>
-                              <h4 className="text-yellow-300 font-bold text-sm">Recovery</h4>
-                              <p className="text-xs text-yellow-400/80">Sleep & stress</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                          </div>
+                      <div className="bg-yellow-900/20 rounded-xl p-4 border border-yellow-500/20">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-gray-300 text-sm">Recovery</span>
+                          <span className="text-yellow-400 text-lg">😴</span>
                         </div>
-                        <div className="flex items-end justify-between">
-                          <div>
-                            <p className="text-yellow-400 font-bold text-2xl mb-1">7.2/10</p>
-                            <p className="text-xs text-yellow-300/70">daily average</p>
-                          </div>
-                          <div className="text-right">
-                            <div className="bg-yellow-900/40 rounded-lg px-2 py-1">
-                              <span className="text-xs text-yellow-300 font-medium">GOOD</span>
-                            </div>
-                          </div>
-                        </div>
+                        <p className="text-yellow-400 font-bold text-xl">Good</p>
+                        <p className="text-xs text-yellow-300/70">7.2/10 avg</p>
                       </div>
                     </div>
                   </div>

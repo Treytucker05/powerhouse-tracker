@@ -1,5 +1,3 @@
-import Header from "../components/dashboard/Header";
-import NavBar from "../components/dashboard/NavBar";
 import CardWrapper from "../components/dashboard/CardWrapper";
 import MacrocycleTimeline from "../components/dashboard/MacrocycleTimeline";
 import { TrainingStateProvider } from "../context/trainingStateContext";
@@ -22,23 +20,19 @@ export default function Macrocycle() {
     { week: 16, milestone: 'Competition ready', status: 'upcoming' },
     { week: 20, milestone: 'Annual goals met', status: 'planned' }
   ];
-
   return (
     <ErrorBoundary>
       <TrainingStateProvider>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-          <Header />
-          <NavBar />
-          <main className="container py-6">
-            {/* Page Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                Macrocycle Planning
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400">
-                Plan your annual training progression and long-term goals
-              </p>
-            </div>
+        <div className="space-y-6">
+          {/* Page Header */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              Macrocycle Planning
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400">
+              Plan your annual training progression and long-term goals
+            </p>
+          </div>
 
             <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
               {/* Timeline - Takes up 2 columns */}
@@ -202,12 +196,10 @@ export default function Macrocycle() {
                     Next Milestone: Week 16
                   </div>
                   <div className="text-xs text-blue-700 dark:text-blue-300">
-                    Competition ready - 4 weeks remaining
-                  </div>
+                    Competition ready - 4 weeks remaining                  </div>
                 </div>
               </CardWrapper>
             </div>
-          </main>
         </div>
       </TrainingStateProvider>
     </ErrorBoundary>

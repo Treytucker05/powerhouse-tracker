@@ -1,7 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function SimpleVolumeChart({ data = {} }) {
   const [hoveredBar, setHoveredBar] = useState(null);
+  const [dimensions, setDimensions] = useState({ width: 900, height: 500 });
+
+  // Responsive dimensions
+  useEffect(() => {
+    const updateDimensions = () => {
+      const screenWidth = window.innerWidth;
+      if (screenWidth < 640) {
+        setDimensions({ width: Math.min(screenWidth - 40, 400), height: 350 });
+      } else if (screenWidth < 768) {
+        setDimensions({ width: Math.min(screenWidth - 60, 600), height: 400 });
+      } else if (screenWidth < 1024) {
+        setDimensions({ width: Math.min(screenWidth - 80, 800), height: 450 });
+      } else {
+        setDimensions({ width: 900, height: 500 });
+      }
+    };
+
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
 
   // Legacy PowerHouse muscle order - exact match to original trainingState.js
   const muscleOrder = [
@@ -15,11 +36,15 @@ function SimpleVolumeChart({ data = {} }) {
   if (muscles.length === 0) {
     return <div className="text-white">No data available</div>;
   }
-
-  // Chart dimensions
-  const width = 900;
-  const height = 500;
-  const margin = { top: 60, right: 80, bottom: 80, left: 60 };
+  // Chart dimensions - now responsive
+  const width = dimensions.width;
+  const height = dimensions.height;
+  const margin = { 
+    top: Math.max(40, width * 0.067), 
+    right: Math.max(50, width * 0.089), 
+    bottom: Math.max(60, width * 0.089), 
+    left: Math.max(40, width * 0.067) 
+  };
   const chartWidth = width - margin.left - margin.right;
   const chartHeight = height - margin.top - margin.bottom;
 
@@ -57,28 +82,62 @@ function SimpleVolumeChart({ data = {} }) {
   for (let i = 0; i <= yMax; i += 2) {
     yTicks.push(i);
   }
-
   return (
     <div style={{
-      background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 100%)',
+      background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #0f0f0f 100%)',
       border: '2px solid #dc2626',
-      borderRadius: '12px',
-      padding: '24px',
-      boxShadow: '0 8px 32px rgba(220, 38, 38, 0.3)'
+      borderRadius: '16px',
+      padding: 'clamp(16px, 4vw, 32px)',
+      boxShadow: '0 12px 40px rgba(220, 38, 38, 0.4), 0 4px 12px rgba(0, 0, 0, 0.6)',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      position: 'relative',
+      overflow: 'hidden'
     }}>
+      {/* Subtle animated background glow */}
+      <div style={{
+        position: 'absolute',
+        top: '-50%',
+        left: '-50%',
+        width: '200%',
+        height: '200%',
+        background: 'radial-gradient(circle, rgba(220, 38, 38, 0.1) 0%, transparent 70%)',
+        animation: 'pulse 4s ease-in-out infinite',
+        pointerEvents: 'none'
+      }} />
+      
       <h3 style={{
         color: '#dc2626',
-        fontSize: '1.5rem',
-        fontWeight: 'bold',
+        fontSize: 'clamp(1.25rem, 3vw, 1.75rem)',
+        fontWeight: '800',
         textAlign: 'center',
-        marginBottom: '20px',
-        textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
+        marginBottom: 'clamp(16px, 3vw, 24px)',
+        textShadow: '2px 2px 8px rgba(0,0,0,0.9), 0 0 20px rgba(220, 38, 38, 0.3)',
+        letterSpacing: '0.5px',
+        textTransform: 'uppercase',
+        position: 'relative',
+        zIndex: 1
       }}>
         Weekly Volume by Muscle Group
-      </h3>
-
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <svg width={width} height={height} style={{ background: '#000000', borderRadius: '8px' }}>
+      </h3>      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center',
+        position: 'relative',
+        zIndex: 1
+      }}>
+        <svg 
+          width={width} 
+          height={height} 
+          style={{ 
+            background: 'linear-gradient(145deg, #000000 0%, #111111 50%, #000000 100%)',
+            borderRadius: '12px',
+            boxShadow: 'inset 0 2px 8px rgba(0, 0, 0, 0.8), 0 4px 16px rgba(220, 38, 38, 0.2)',
+            transition: 'all 0.3s ease',
+            maxWidth: '100%',
+            height: 'auto'
+          }}
+          viewBox={`0 0 ${width} ${height}`}
+          preserveAspectRatio="xMidYMid meet"
+        >
           <g transform={`translate(${margin.left},${margin.top})`}>
             
             {/* Horizontal grid lines (white dashed) */}
@@ -143,8 +202,7 @@ function SimpleVolumeChart({ data = {} }) {
                       <stop offset="0%" stopColor={color} stopOpacity="1"/>
                       <stop offset="100%" stopColor={color} stopOpacity="0.8"/>
                     </linearGradient>
-                  </defs>
-                    <rect
+                  </defs>                  <rect
                     x={x}
                     y={y}
                     width={barWidth}
@@ -153,67 +211,116 @@ function SimpleVolumeChart({ data = {} }) {
                     stroke="#ffffff"
                     strokeWidth="2"
                     style={{ 
-                      cursor: 'pointer', 
+                      cursor: 'pointer',
+                      transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                      transformOrigin: 'center bottom',
                       filter: hoveredBar === muscle 
-                        ? 'brightness(1.3) drop-shadow(0 0 15px rgba(255,255,255,0.8)) drop-shadow(0 0 25px rgba(34,197,94,0.6))' 
-                        : 'none' 
+                        ? 'brightness(1.4) drop-shadow(0 0 20px rgba(255,255,255,0.9)) drop-shadow(0 0 35px rgba(34,197,94,0.7)) drop-shadow(0 8px 25px rgba(0,0,0,0.4))' 
+                        : 'drop-shadow(0 2px 8px rgba(0,0,0,0.3))'
                     }}
                     onMouseEnter={() => setHoveredBar(muscle)}
                     onMouseLeave={() => setHoveredBar(null)}
                   />
-                  
-                  {/* Volume value on top of bar */}
+                    {/* Volume value on top of bar */}
                   <text
                     x={x + barWidth / 2}
                     y={y - 8}
                     fill="#ffffff"
-                    fontSize="12"
+                    fontSize="13"
                     fontWeight="bold"
                     textAnchor="middle"
+                    style={{
+                      textShadow: '0 0 8px rgba(0,0,0,0.9), 0 0 4px rgba(255,255,255,0.3)',
+                      transition: 'all 0.3s ease',
+                      opacity: hoveredBar === muscle ? 1 : 0.9
+                    }}
                   >
                     {current}
                   </text>
                 </g>
               );
-            })}            {/* MEV Line (Yellow - connected across entire chart width) */}
+            })}            {/* MEV Line (Yellow - connected through data points only) */}
             <polyline
-              points={[
-                `0,${getYPosition(data.mev?.[muscles[0]] || 0)}`,
-                ...muscles.map((muscle, index) => {
-                  const mev = data.mev?.[muscle] || 0;
-                  const x = index * barSpacing + barSpacing / 2;
-                  const y = getYPosition(mev);
-                  return `${x},${y}`;
-                }),
-                `${chartWidth},${getYPosition(data.mev?.[muscles[muscles.length - 1]] || 0)}`
-              ].join(' ')}
+              points={muscles.map((muscle, index) => {
+                const mev = data.mev?.[muscle] || 0;
+                const x = index * barSpacing + barSpacing / 2;
+                const y = getYPosition(mev);
+                return `${x},${y}`;
+              }).join(' ')}
               fill="none"
               stroke="#fbbf24"
               strokeWidth="4"
               strokeDasharray="8,4"
               strokeLinecap="round"
               strokeLinejoin="round"
+              style={{
+                filter: 'drop-shadow(0 0 6px rgba(251, 191, 36, 0.6))',
+                transition: 'all 0.3s ease'
+              }}
             />
 
-            {/* MRV Line (Red - connected across entire chart width) */}
+            {/* MEV data point circles */}
+            {muscles.map((muscle, index) => {
+              const mev = data.mev?.[muscle] || 0;
+              const x = index * barSpacing + barSpacing / 2;
+              const y = getYPosition(mev);
+              return (
+                <circle
+                  key={`mev-point-${muscle}`}
+                  cx={x}
+                  cy={y}
+                  r="4"
+                  fill="#fbbf24"
+                  stroke="#ffffff"
+                  strokeWidth="2"
+                  style={{
+                    filter: 'drop-shadow(0 0 4px rgba(251, 191, 36, 0.8))',
+                    transition: 'all 0.3s ease'
+                  }}
+                />
+              );
+            })}
+
+            {/* MRV Line (Red - connected through data points only) */}
             <polyline
-              points={[
-                `0,${getYPosition(data.mrv?.[muscles[0]] || 0)}`,
-                ...muscles.map((muscle, index) => {
-                  const mrv = data.mrv?.[muscle] || 0;
-                  const x = index * barSpacing + barSpacing / 2;
-                  const y = getYPosition(mrv);
-                  return `${x},${y}`;
-                }),
-                `${chartWidth},${getYPosition(data.mrv?.[muscles[muscles.length - 1]] || 0)}`
-              ].join(' ')}
+              points={muscles.map((muscle, index) => {
+                const mrv = data.mrv?.[muscle] || 0;
+                const x = index * barSpacing + barSpacing / 2;
+                const y = getYPosition(mrv);
+                return `${x},${y}`;
+              }).join(' ')}
               fill="none"
               stroke="#ff4444"
               strokeWidth="4"
               strokeDasharray="8,4"
               strokeLinecap="round"
-              strokeLinejoin="round"
+              strokeLinejoin="round"              style={{
+                filter: 'drop-shadow(0 0 6px rgba(255, 68, 68, 0.6))',
+                transition: 'all 0.3s ease'
+              }}
             />
+
+            {/* MRV data point circles */}
+            {muscles.map((muscle, index) => {
+              const mrv = data.mrv?.[muscle] || 0;
+              const x = index * barSpacing + barSpacing / 2;
+              const y = getYPosition(mrv);
+              return (
+                <circle
+                  key={`mrv-point-${muscle}`}
+                  cx={x}
+                  cy={y}
+                  r="4"
+                  fill="#ff4444"
+                  stroke="#ffffff"
+                  strokeWidth="2"
+                  style={{
+                    filter: 'drop-shadow(0 0 4px rgba(255, 68, 68, 0.8))',
+                    transition: 'all 0.3s ease'
+                  }}
+                />
+              );
+            })}
 
             {/* X-axis labels */}
             {muscles.map((muscle, index) => (
@@ -244,31 +351,32 @@ function SimpleVolumeChart({ data = {} }) {
               >
                 {tick}
               </text>
-            ))}
-
-            {/* Hover tooltip */}
+            ))}            {/* Hover tooltip */}
             {hoveredBar && (
-              <g>
+              <g style={{ opacity: 0, animation: 'fadeIn 0.3s ease forwards' }}>
                 <rect
                   x={muscles.indexOf(hoveredBar) * barSpacing + 10}
                   y={10}
                   width={200}
-                  height={80}
+                  height={90}
                   fill="rgba(0,0,0,0.95)"
                   stroke="#dc2626"
                   strokeWidth="2"
-                  rx="8"
+                  rx="12"
+                  style={{
+                    filter: 'drop-shadow(0 8px 25px rgba(0,0,0,0.6))',
+                  }}
                 />
-                <text x={muscles.indexOf(hoveredBar) * barSpacing + 20} y={30} fill="#dc2626" fontSize="14" fontWeight="bold">
+                <text x={muscles.indexOf(hoveredBar) * barSpacing + 20} y={35} fill="#dc2626" fontSize="16" fontWeight="bold">
                   {hoveredBar}
                 </text>
-                <text x={muscles.indexOf(hoveredBar) * barSpacing + 20} y={45} fill="#ffffff" fontSize="12">
+                <text x={muscles.indexOf(hoveredBar) * barSpacing + 20} y={52} fill="#ffffff" fontSize="13">
                   Current: {data[hoveredBar]} sets
                 </text>
-                <text x={muscles.indexOf(hoveredBar) * barSpacing + 20} y={60} fill="#fbbf24" fontSize="11">
+                <text x={muscles.indexOf(hoveredBar) * barSpacing + 20} y={68} fill="#fbbf24" fontSize="12">
                   MEV: {data.mev?.[hoveredBar] || 0} sets
                 </text>
-                <text x={muscles.indexOf(hoveredBar) * barSpacing + 20} y={75} fill="#ff4444" fontSize="11">
+                <text x={muscles.indexOf(hoveredBar) * barSpacing + 20} y={84} fill="#ff4444" fontSize="12">
                   MRV: {data.mrv?.[hoveredBar] || 0} sets
                 </text>
               </g>
@@ -300,64 +408,52 @@ function SimpleVolumeChart({ data = {} }) {
             </text>
           </g>
         </svg>
-      </div>
-
-      {/* Legend */}
+      </div>      {/* Legend */}
       <div style={{
         display: 'flex',
         justifyContent: 'center',
-        gap: '30px',
-        marginTop: '20px',
-        flexWrap: 'wrap'
+        gap: 'clamp(15px, 4vw, 35px)',
+        marginTop: 'clamp(16px, 3vw, 24px)',
+        flexWrap: 'wrap',
+        position: 'relative',
+        zIndex: 1
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{
-            width: '20px',
-            height: '12px',
-            background: '#44ff44',
-            border: '1px solid #ffffff'
-          }} />
-          <span style={{ color: '#ffffff', fontSize: '14px', fontWeight: 'bold' }}>
-            Optimal Volume (MEV-MRV)
-          </span>
-        </div>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{
-            width: '20px',
-            height: '12px',
-            background: '#ff4444',
-            border: '1px solid #ffffff'
-          }} />
-          <span style={{ color: '#ffffff', fontSize: '14px', fontWeight: 'bold' }}>
-            Sub/Over Volume
-          </span>
-        </div>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{
-            width: '20px',
-            height: '3px',
-            background: '#fbbf24',
-            borderTop: '3px dashed #fbbf24'
-          }} />
-          <span style={{ color: '#ffffff', fontSize: '14px', fontWeight: 'bold' }}>
-            MEV (Minimum Effective)
-          </span>
-        </div>
-        
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{
-            width: '20px',
-            height: '3px',
-            background: '#ff4444',
-            borderTop: '3px dashed #ff4444'
-          }} />
-          <span style={{ color: '#ffffff', fontSize: '14px', fontWeight: 'bold' }}>
-            MRV (Maximum Recoverable)
-          </span>
-        </div>
-      </div>    </div>
+        {[
+          { color: '#44ff44', label: 'Optimal Volume (MEV-MRV)', type: 'solid' },
+          { color: '#ff4444', label: 'Sub/Over Volume', type: 'solid' },
+          { color: '#fbbf24', label: 'MEV (Minimum Effective)', type: 'dashed' },
+          { color: '#ff4444', label: 'MRV (Maximum Recoverable)', type: 'dashed' }
+        ].map((item, index) => (
+          <div key={index} style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '10px',
+            transition: 'transform 0.2s ease',
+            cursor: 'default'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            <div style={{
+              width: '24px',
+              height: item.type === 'dashed' ? '4px' : '14px',
+              background: item.color,
+              border: item.type === 'solid' ? '1px solid #ffffff' : 'none',
+              borderTop: item.type === 'dashed' ? `3px dashed ${item.color}` : 'none',
+              borderRadius: item.type === 'solid' ? '2px' : '0',
+              boxShadow: `0 0 8px ${item.color}40`
+            }} />
+            <span style={{ 
+              color: '#ffffff', 
+              fontSize: 'clamp(12px, 2.5vw, 14px)', 
+              fontWeight: 'bold',
+              textShadow: '0 1px 3px rgba(0,0,0,0.8)'
+            }}>
+              {item.label}
+            </span>
+          </div>
+        ))}
+      </div></div>
   );
 }
 
