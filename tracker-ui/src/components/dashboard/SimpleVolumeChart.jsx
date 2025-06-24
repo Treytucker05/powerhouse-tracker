@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 
 const SimpleVolumeChart = ({ data }) => {
   const [hoveredBar, setHoveredBar] = useState(null);
-
-  // Legacy PowerHouse muscle order - exact match to original
+  // Legacy PowerHouse muscle order - exact match to original trainingState.js
   const muscleOrder = [
-    'Chest', 'Shoulders', 'Biceps', 'Triceps', 'Lats', 'Mid-Traps', 
-    'Rear Delts', 'Abs', 'Glutes', 'Quads', 'Hamstrings', 'Calves', 'Forearms'
+    'Chest', 'Back', 'Quads', 'Glutes', 'Hamstrings', 'Shoulders', 
+    'Biceps', 'Triceps', 'Calves', 'Abs', 'Forearms', 'Neck', 'Traps'
   ];
 
   const chartData = muscleOrder.map(muscle => ({
@@ -22,11 +21,11 @@ const SimpleVolumeChart = ({ data }) => {
   const margin = { top: 40, right: 40, bottom: 100, left: 80 };
   const barWidth = (chartWidth - margin.left - margin.right) / chartData.length * 0.7;
   const barSpacing = (chartWidth - margin.left - margin.right) / chartData.length * 0.3;
-
   const getBarColor = (volume, mev, mrv) => {
-    if (volume < mev) return '#dc2626'; // Red for under-recovery
-    if (volume >= mev && volume <= mrv) return '#16a34a'; // Green for optimal
-    return '#dc2626'; // Red for over-recovery
+    // Legacy PowerHouse color logic - exact match
+    if (volume < mev) return '#ff4444'; // Red for under MEV (maintenance/under-minimum)
+    if (volume >= mev && volume < mrv) return '#44ff44'; // Green for optimal (MEV to MRV)
+    return '#ff4444'; // Red for over MRV (maximum)
   };
 
   return (
@@ -48,20 +47,10 @@ const SimpleVolumeChart = ({ data }) => {
         Weekly Volume by Muscle Group
       </h3>
       
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <svg width={chartWidth} height={chartHeight} style={{ background: '#000000', borderRadius: '8px' }}>
-          {/* Background grid */}
-          <defs>
-            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#333333" strokeWidth="1"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" opacity="0.3"/>
-
-          {/* Horizontal grid lines with labels */}
-          {Array.from({ length: 6 }, (_, i) => {
-            const y = margin.top + (chartHeight - margin.top - margin.bottom) * i / 5;
-            const value = Math.round(maxValue - (maxValue * i / 5));
+      <div style={{ display: 'flex', justifyContent: 'center' }}>        <svg width={chartWidth} height={chartHeight} style={{ background: '#000000', borderRadius: '8px' }}>{/* Horizontal grid lines with labels - increment by 2's */}
+          {Array.from({ length: Math.ceil(maxValue / 2) + 1 }, (_, i) => {
+            const value = i * 2;
+            const y = chartHeight - margin.bottom - (value / maxValue) * (chartHeight - margin.top - margin.bottom);
             return (
               <g key={i}>
                 <line
@@ -69,9 +58,10 @@ const SimpleVolumeChart = ({ data }) => {
                   y1={y}
                   x2={chartWidth - margin.right}
                   y2={y}
-                  stroke="#555555"
+                  stroke="#ffffff"
                   strokeWidth="1"
-                  opacity="0.8"
+                  strokeDasharray="5,5"
+                  opacity="0.6"
                 />
                 <text
                   x={margin.left - 10}
@@ -84,6 +74,24 @@ const SimpleVolumeChart = ({ data }) => {
                   {value}
                 </text>
               </g>
+            );
+          })}
+
+          {/* Vertical grid lines */}
+          {chartData.map((d, i) => {
+            const x = margin.left + i * (barWidth + barSpacing) + barSpacing / 2 + barWidth / 2;
+            return (
+              <line
+                key={`vgrid-${i}`}
+                x1={x}
+                y1={margin.top}
+                x2={x}
+                y2={chartHeight - margin.bottom}
+                stroke="#ffffff"
+                strokeWidth="1"
+                strokeDasharray="5,5"
+                opacity="0.4"
+              />
             );
           })}
 
@@ -104,9 +112,83 @@ const SimpleVolumeChart = ({ data }) => {
             y2={chartHeight - margin.bottom}
             stroke="#ffffff"
             strokeWidth="3"
-          />
+          />          {/* Connected MEV and MRV reference lines */}
+          {chartData.map((d, i) => {
+            const x = margin.left + i * (barWidth + barSpacing) + barSpacing / 2;
+            const nextX = i < chartData.length - 1 ? 
+              margin.left + (i + 1) * (barWidth + barSpacing) + barSpacing / 2 : 
+              chartWidth - margin.right;
+            
+            const mevY = chartHeight - margin.bottom - (d.mev / maxValue) * (chartHeight - margin.top - margin.bottom);
+            const mrvY = chartHeight - margin.bottom - (d.mrv / maxValue) * (chartHeight - margin.top - margin.bottom);
+            
+            if (i < chartData.length - 1) {
+              const nextMevY = chartHeight - margin.bottom - (chartData[i + 1].mev / maxValue) * (chartHeight - margin.top - margin.bottom);
+              const nextMrvY = chartHeight - margin.bottom - (chartData[i + 1].mrv / maxValue) * (chartHeight - margin.top - margin.bottom);
+              
+              return (
+                <g key={`lines-${d.name}`}>
+                  {/* Connected MEV line (yellow dashed) */}
+                  <line
+                    x1={x + barWidth / 2}
+                    y1={mevY}
+                    x2={nextX + barWidth / 2}
+                    y2={nextMevY}
+                    stroke="#fbbf24"
+                    strokeWidth="4"
+                    strokeDasharray="10,6"
+                    opacity="0.9"
+                  />
+                  
+                  {/* Connected MRV line (red dashed) */}
+                  <line
+                    x1={x + barWidth / 2}
+                    y1={mrvY}
+                    x2={nextX + barWidth / 2}
+                    y2={nextMrvY}
+                    stroke="#ff4444"
+                    strokeWidth="4"
+                    strokeDasharray="10,6"
+                    opacity="0.9"
+                  />
+                </g>
+              );
+            }
+            return null;
+          })}
 
-          {/* Bars and reference lines */}
+          {/* MEV and MRV point markers */}
+          {chartData.map((d, i) => {
+            const x = margin.left + i * (barWidth + barSpacing) + barSpacing / 2;
+            const mevY = chartHeight - margin.bottom - (d.mev / maxValue) * (chartHeight - margin.top - margin.bottom);
+            const mrvY = chartHeight - margin.bottom - (d.mrv / maxValue) * (chartHeight - margin.top - margin.bottom);
+            
+            return (
+              <g key={`markers-${d.name}`}>
+                {/* MEV point marker */}
+                <circle
+                  cx={x + barWidth / 2}
+                  cy={mevY}
+                  r="4"
+                  fill="#fbbf24"
+                  stroke="#ffffff"
+                  strokeWidth="2"
+                />
+                
+                {/* MRV point marker */}
+                <circle
+                  cx={x + barWidth / 2}
+                  cy={mrvY}
+                  r="4"
+                  fill="#ff4444"
+                  stroke="#ffffff"
+                  strokeWidth="2"
+                />
+              </g>
+            );
+          })}
+
+          {/* Bars */}
           {chartData.map((d, i) => {
             const x = margin.left + i * (barWidth + barSpacing) + barSpacing / 2;
             const barHeight = Math.max((d.volume / maxValue) * (chartHeight - margin.top - margin.bottom), 2);
@@ -114,31 +196,8 @@ const SimpleVolumeChart = ({ data }) => {
             
             const mevY = chartHeight - margin.bottom - (d.mev / maxValue) * (chartHeight - margin.top - margin.bottom);
             const mrvY = chartHeight - margin.bottom - (d.mrv / maxValue) * (chartHeight - margin.top - margin.bottom);
-            
-            return (
+              return (
               <g key={d.name}>
-                {/* MEV line (yellow dashed) */}
-                <line
-                  x1={x - 5}
-                  y1={mevY}
-                  x2={x + barWidth + 5}
-                  y2={mevY}
-                  stroke="#fbbf24"
-                  strokeWidth="3"
-                  strokeDasharray="8,4"
-                />
-                
-                {/* MRV line (red dashed) */}
-                <line
-                  x1={x - 5}
-                  y1={mrvY}
-                  x2={x + barWidth + 5}
-                  y2={mrvY}
-                  stroke="#dc2626"
-                  strokeWidth="3"
-                  strokeDasharray="8,4"
-                />
-                
                 {/* Volume bar with gradient */}
                 <defs>
                   <linearGradient id={`barGradient${i}`} x1="0%" y1="0%" x2="0%" y2="100%">
@@ -187,18 +246,17 @@ const SimpleVolumeChart = ({ data }) => {
                 
                 {/* Hover tooltip */}
                 {hoveredBar === i && (
-                  <g>
-                    <rect
+                  <g>                    <rect
                       x={x - 40}
                       y={y - 80}
                       width="140"
                       height="65"
                       fill="rgba(0,0,0,0.95)"
-                      stroke="#dc2626"
+                      stroke="#ff4444"
                       strokeWidth="2"
                       rx="8"
                     />
-                    <text x={x + barWidth/2} y={y - 55} fill="#dc2626" fontSize="14" fontWeight="bold" textAnchor="middle">
+                    <text x={x + barWidth/2} y={y - 55} fill="#ff4444" fontSize="14" fontWeight="bold" textAnchor="middle">
                       {d.name}
                     </text>
                     <text x={x + barWidth/2} y={y - 38} fill="#ffffff" fontSize="12" textAnchor="middle">
@@ -206,8 +264,7 @@ const SimpleVolumeChart = ({ data }) => {
                     </text>
                     <text x={x + barWidth/2} y={y - 23} fill="#fbbf24" fontSize="11" textAnchor="middle">
                       MEV: {d.mev} sets
-                    </text>
-                    <text x={x + barWidth/2} y={y - 8} fill="#dc2626" fontSize="11" textAnchor="middle">
+                    </text>                    <text x={x + barWidth/2} y={y - 8} fill="#ff4444" fontSize="11" textAnchor="middle">
                       MRV: {d.mrv} sets
                     </text>
                   </g>
@@ -250,12 +307,11 @@ const SimpleVolumeChart = ({ data }) => {
         gap: '30px',
         marginTop: '20px',
         flexWrap: 'wrap'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      }}>        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{
             width: '20px',
             height: '12px',
-            background: '#16a34a',
+            background: '#44ff44',
             border: '1px solid #ffffff'
           }} />
           <span style={{ color: '#ffffff', fontSize: '14px', fontWeight: 'bold' }}>
@@ -267,7 +323,7 @@ const SimpleVolumeChart = ({ data }) => {
           <div style={{
             width: '20px',
             height: '12px',
-            background: '#dc2626',
+            background: '#ff4444',
             border: '1px solid #ffffff'
           }} />
           <span style={{ color: '#ffffff', fontSize: '14px', fontWeight: 'bold' }}>
@@ -287,16 +343,15 @@ const SimpleVolumeChart = ({ data }) => {
           </span>
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>          <div style={{
             width: '20px',
             height: '3px',
-            background: '#dc2626',
-            borderTop: '3px dashed #dc2626'
+            background: '#ff4444',
+            borderTop: '3px dashed #ff4444'
           }} />
           <span style={{ color: '#ffffff', fontSize: '14px', fontWeight: 'bold' }}>
             MRV (Maximum Recoverable)
-          </span>        </div>
+          </span></div>
       </div>
     </div>
   );

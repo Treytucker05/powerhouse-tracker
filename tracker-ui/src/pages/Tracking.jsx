@@ -23,38 +23,40 @@ export default function Tracking() {
     { muscle: 'Glutes', sets: 14, MEV: 8, MAV: 12, MRV: 16 },
     { muscle: 'Calves', sets: 6, MEV: 8, MAV: 16, MRV: 20 }
   ];
-
-  // Sample data for the volume chart - matches the legacy PowerHouse muscle order
+  // Sample data for the volume chart - matches the legacy PowerHouse muscle order and landmarks  
   const volumeChartData = {
-    'Chest': 12,
-    'Shoulders': 10,
+    'Chest': 14,
+    'Back': 16,
+    'Quads': 12,
+    'Glutes': 8,
+    'Hamstrings': 10,
+    'Shoulders': 12,
     'Biceps': 8,
     'Triceps': 10,
-    'Lats': 16,
-    'Mid-Traps': 8,
-    'Rear Delts': 6,
-    'Abs': 4,
-    'Glutes': 14,
-    'Quads': 20,
-    'Hamstrings': 12,
-    'Calves': 6,
-    'Forearms': 4,
+    'Calves': 12,
+    'Abs': 10,
+    'Forearms': 6,
+    'Neck': 4,
+    'Traps': 8,
     mev: {
-      'Chest': 8, 'Shoulders': 6, 'Biceps': 6, 'Triceps': 6, 'Lats': 10,
-      'Mid-Traps': 6, 'Rear Delts': 4, 'Abs': 6, 'Glutes': 8, 'Quads': 10,
-      'Hamstrings': 8, 'Calves': 8, 'Forearms': 4
+      'Chest': 6, 'Back': 10, 'Quads': 10, 'Glutes': 2, 'Hamstrings': 6,
+      'Shoulders': 8, 'Biceps': 6, 'Triceps': 6, 'Calves': 8, 'Abs': 6,
+      'Forearms': 4, 'Neck': 2, 'Traps': 4
     },
     mrv: {
-      'Chest': 22, 'Shoulders': 20, 'Biceps': 16, 'Triceps': 18, 'Lats': 25,
-      'Mid-Traps': 18, 'Rear Delts': 16, 'Abs': 20, 'Glutes': 16, 'Quads': 25,
-      'Hamstrings': 20, 'Calves': 20, 'Forearms': 16
+      'Chest': 22, 'Back': 25, 'Quads': 20, 'Glutes': 25, 'Hamstrings': 20,
+      'Shoulders': 20, 'Biceps': 20, 'Triceps': 18, 'Calves': 22, 'Abs': 25,
+      'Forearms': 16, 'Neck': 12, 'Traps': 16
     }
-  };return (
+  };
+
+  return (
     <ErrorBoundary>
-      <TrainingStateProvider>
-        <div className="space-y-8 max-w-7xl">
+      <TrainingStateProvider>        <div className="space-y-8 max-w-7xl">
           {/* Training Status Card */}
-          <TrainingStatusCard />          {/* Weekly Volume Tracker Chart */}
+          <TrainingStatusCard />
+
+          {/* Weekly Volume Tracker Chart */}
           <SimpleVolumeChart data={volumeChartData} />
 
           {/* Muscle Volume Cards Grid */}
