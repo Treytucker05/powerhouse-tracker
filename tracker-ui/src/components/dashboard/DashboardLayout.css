@@ -1,0 +1,66 @@
+/* Dashboard Layout Styles */
+.dashboard-layout {
+  min-height: 100vh;
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.dashboard-grid {
+  display: grid;
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  grid-column: 1 / -1;
+  margin-bottom: 1rem;
+}
+
+.dashboard-main {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-main {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.dashboard-section {
+  background-color: #111827;
+  border: 2px solid #1f2937;
+  border-radius: 1rem;
+  padding: 2rem;
+  transition: all 0.2s ease;
+}
+
+.dashboard-section:hover {
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+.dashboard-title {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.dashboard-subtitle {
+  font-size: 1rem;
+  color: #9ca3af;
+  margin-bottom: 2rem;
+}
+
+.powerhouse-glow {
+  box-shadow: 0 4px 20px rgba(220, 38, 38, 0.2);
+}
+
+.powerhouse-glow:hover {
+  box-shadow: 0 8px 30px rgba(220, 38, 38, 0.3);
+}
