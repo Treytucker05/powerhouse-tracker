@@ -1,11 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CardWrapper from "../components/ui/CardWrapper";
 import MesocycleBuilder from "../components/dashboard/MesocycleBuilder";
 import { TrainingStateProvider } from "../context/trainingStateContext";
 import ErrorBoundary from "../components/ErrorBoundary";
+import Breadcrumb from "../components/navigation/Breadcrumb";
+import SectionDivider from "../components/ui/SectionDivider";
+import FloatingActionButton, { PlanningActions } from "../components/ui/FloatingActionButton";
+import LoadingSkeleton from "../components/ui/LoadingSkeleton";
+import { CalendarIcon, ChartBarIcon, ClockIcon } from '@heroicons/react/24/outline';
 import "../components/dashboard/DashboardLayout.css";
 
 export default function Mesocycle() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate loading state
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
   // All muscles from the volume chart
   const muscleGroups = ['Chest', 'Back', 'Quads', 'Glutes', 'Hamstrings', 'Shoulders', 'Biceps', 'Triceps', 'Calves', 'Abs', 'Forearms', 'Neck', 'Traps'];
   
