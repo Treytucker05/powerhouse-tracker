@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useWorkoutSessions } from "../hooks/useWorkoutSessions";
 import Drawer from "../components/Drawer";
 import SimpleVolumeChart from "../components/dashboard/SimpleVolumeChart";
@@ -6,11 +6,23 @@ import TrainingStatusCard from "../components/dashboard/TrainingStatusCard";
 import MuscleCard from "../components/dashboard/MuscleCard";
 import { TrainingStateProvider } from "../context/trainingStateContext";
 import ErrorBoundary from "../components/ErrorBoundary";
+import Breadcrumb from "../components/navigation/Breadcrumb";
+import SectionDivider from "../components/ui/SectionDivider";
+import FloatingActionButton from "../components/ui/FloatingActionButton";
+import LoadingSkeleton, { TrackingLoading } from "../components/ui/LoadingSkeleton";
+import { ChartBarIcon, PlayIcon, PlusIcon } from '@heroicons/react/24/outline';
 import "../components/dashboard/DashboardLayout.css";
 
 export default function Tracking() {
   const sessions = useWorkoutSessions();
-  const [selected, setSelected] = useState(null);  // Complete muscle data - matches PowerHouse legacy order and includes all muscle groups
+  const [selected, setSelected] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate loading state
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);// Complete muscle data - matches PowerHouse legacy order and includes all muscle groups
   const muscleData = [
     { muscle: 'Chest', sets: 12, MEV: 8, MAV: 18, MRV: 22 },
     { muscle: 'Back', sets: 16, MEV: 10, MAV: 20, MRV: 25 },

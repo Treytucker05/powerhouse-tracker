@@ -1,10 +1,22 @@
 import CardWrapper from "../components/ui/CardWrapper";
 import { TrainingStateProvider } from "../context/trainingStateContext";
 import ErrorBoundary from "../components/ErrorBoundary";
-import { useState } from "react";
+import Breadcrumb from "../components/navigation/Breadcrumb";
+import SectionDivider from "../components/ui/SectionDivider";
+import FloatingActionButton, { PlanningActions } from "../components/ui/FloatingActionButton";
+import LoadingSkeleton from "../components/ui/LoadingSkeleton";
+import { useState, useEffect } from "react";
+import { CalendarIcon, ChartBarIcon, TrophyIcon, ClockIcon } from '@heroicons/react/24/outline';
 
 export default function Macrocycle() {
   const [expandedPhase, setExpandedPhase] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate loading state
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 1200);
+    return () => clearTimeout(timer);
+  }, []);
   
   const mesocycles = [
     { 
