@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 function SimpleVolumeChart({ data = {} }) {
   const [hoveredBar, setHoveredBar] = useState(null);
 
-  // Legacy PowerHouse muscle order
+  // Legacy PowerHouse muscle order - exact match to original trainingState.js
   const muscleOrder = [
     'Chest', 'Back', 'Quads', 'Glutes', 'Hamstrings', 'Shoulders', 
     'Biceps', 'Triceps', 'Calves', 'Abs', 'Forearms', 'Neck', 'Traps'
@@ -13,7 +13,7 @@ function SimpleVolumeChart({ data = {} }) {
   const muscles = muscleOrder.filter(muscle => data.hasOwnProperty(muscle));
   
   if (muscles.length === 0) {
-    return <div style={{ color: 'white' }}>No data available</div>;
+    return <div className="text-white">No data available</div>;
   }
 
   // Chart dimensions
@@ -49,7 +49,7 @@ function SimpleVolumeChart({ data = {} }) {
     
     if (current < mev) return '#ff4444'; // Red - under MEV
     if (current > mrv) return '#ff4444'; // Red - over MRV
-    return '#44ff44'; // Green - optimal
+    return '#44ff44'; // Green - optimal (between MEV and MRV)
   };
 
   // Generate Y-axis ticks (by 2's)
@@ -110,8 +110,23 @@ function SimpleVolumeChart({ data = {} }) {
             ))}
 
             {/* Main axes */}
-            <line x1={0} y1={chartHeight} x2={chartWidth} y2={chartHeight} stroke="#ffffff" strokeWidth="3" />
-            <line x1={0} y1={0} x2={0} y2={chartHeight} stroke="#ffffff" strokeWidth="3" />
+            <line
+              x1={0}
+              y1={chartHeight}
+              x2={chartWidth}
+              y2={chartHeight}
+              stroke="#ffffff"
+              strokeWidth="3"
+            />
+            
+            <line
+              x1={0}
+              y1={0}
+              x2={0}
+              y2={chartHeight}
+              stroke="#ffffff"
+              strokeWidth="3"
+            />
 
             {/* Bars (drawn first, so lines appear on top) */}
             {muscles.map((muscle, index) => {
@@ -123,18 +138,25 @@ function SimpleVolumeChart({ data = {} }) {
 
               return (
                 <g key={`bar-${muscle}`}>
-                  <rect
+                  <defs>
+                    <linearGradient id={`barGradient${index}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stopColor={color} stopOpacity="1"/>
+                      <stop offset="100%" stopColor={color} stopOpacity="0.8"/>
+                    </linearGradient>
+                  </defs>
+                    <rect
                     x={x}
                     y={y}
                     width={barWidth}
                     height={barHeight}
-                    fill={color}
+                    fill={`url(#barGradient${index})`}
                     stroke="#ffffff"
                     strokeWidth="2"
                     style={{ 
                       cursor: 'pointer', 
-                      filter: hoveredBar === muscle ? 'brightness(1.2)' : 'none',
-                      opacity: 0.9
+                      filter: hoveredBar === muscle 
+                        ? 'brightness(1.3) drop-shadow(0 0 15px rgba(255,255,255,0.8)) drop-shadow(0 0 25px rgba(34,197,94,0.6))' 
+                        : 'none' 
                     }}
                     onMouseEnter={() => setHoveredBar(muscle)}
                     onMouseLeave={() => setHoveredBar(null)}
@@ -153,49 +175,45 @@ function SimpleVolumeChart({ data = {} }) {
                   </text>
                 </g>
               );
-            })}
+            })}            {/* MEV Line (Yellow - connected across entire chart width) */}
+            <polyline
+              points={[
+                `0,${getYPosition(data.mev?.[muscles[0]] || 0)}`,
+                ...muscles.map((muscle, index) => {
+                  const mev = data.mev?.[muscle] || 0;
+                  const x = index * barSpacing + barSpacing / 2;
+                  const y = getYPosition(mev);
+                  return `${x},${y}`;
+                }),
+                `${chartWidth},${getYPosition(data.mev?.[muscles[muscles.length - 1]] || 0)}`
+              ].join(' ')}
+              fill="none"
+              stroke="#fbbf24"
+              strokeWidth="4"
+              strokeDasharray="8,4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
 
-            {/* MEV Line (Yellow - drawn on top of bars for visibility) */}
-            {muscles.map((muscle, index) => {
-              const mev = data.mev?.[muscle] || 0;
-              const x1 = index * barSpacing;
-              const x2 = (index + 1) * barSpacing;
-              const y = getYPosition(mev);
-              
-              return (
-                <line
-                  key={`mev-${muscle}`}
-                  x1={x1}
-                  y1={y}
-                  x2={x2}
-                  y2={y}
-                  stroke="#fbbf24"
-                  strokeWidth="4"
-                  strokeDasharray="8,4"
-                />
-              );
-            })}
-
-            {/* MRV Line (Red - drawn on top of bars for visibility) */}
-            {muscles.map((muscle, index) => {
-              const mrv = data.mrv?.[muscle] || 0;
-              const x1 = index * barSpacing;
-              const x2 = (index + 1) * barSpacing;
-              const y = getYPosition(mrv);
-              
-              return (
-                <line
-                  key={`mrv-${muscle}`}
-                  x1={x1}
-                  y1={y}
-                  x2={x2}
-                  y2={y}
-                  stroke="#ff4444"
-                  strokeWidth="4"
-                  strokeDasharray="8,4"
-                />
-              );
-            })}
+            {/* MRV Line (Red - connected across entire chart width) */}
+            <polyline
+              points={[
+                `0,${getYPosition(data.mrv?.[muscles[0]] || 0)}`,
+                ...muscles.map((muscle, index) => {
+                  const mrv = data.mrv?.[muscle] || 0;
+                  const x = index * barSpacing + barSpacing / 2;
+                  const y = getYPosition(mrv);
+                  return `${x},${y}`;
+                }),
+                `${chartWidth},${getYPosition(data.mrv?.[muscles[muscles.length - 1]] || 0)}`
+              ].join(' ')}
+              fill="none"
+              stroke="#ff4444"
+              strokeWidth="4"
+              strokeDasharray="8,4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
 
             {/* X-axis labels */}
             {muscles.map((muscle, index) => (
@@ -339,8 +357,7 @@ function SimpleVolumeChart({ data = {} }) {
             MRV (Maximum Recoverable)
           </span>
         </div>
-      </div>
-    </div>
+      </div>    </div>
   );
 }
 
