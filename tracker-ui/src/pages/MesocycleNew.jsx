@@ -23,22 +23,32 @@ export default function Mesocycle() {
     'Forearms': { mev: 4, mav: 4, mrv: 12 },
     'Neck': { mev: 2, mav: 3, mrv: 8 },
     'Traps': { mev: 4, mav: 4, mrv: 12 }
-  };
-  const VolumeSlider = ({ muscle, landmarks }) => {
+  };  const VolumeSlider = ({ muscle, landmarks }) => {
     const [currentValue, setCurrentValue] = useState(landmarks.mav);
     
     const getSliderColor = (value) => {
       if (value < landmarks.mev) return '#dc2626'; // Red - below MEV
       if (value > landmarks.mrv) return '#dc2626'; // Red - above MRV
       return '#22c55e'; // Green - optimal range
-    };    const getSliderBackground = (value) => {
-      // Create yellow-green-red gradient that matches the chart
+    };
+
+    const getSliderBackground = (value) => {
+      // Create gradient that spans the full range (0 to max)
+      const maxRange = Math.max(landmarks.mrv * 1.5, 30); // Allow 50% beyond MRV or minimum 30
+      const mevPercent = (landmarks.mev / maxRange) * 100;
+      const mrvPercent = (landmarks.mrv / maxRange) * 100;
+      
       return `linear-gradient(to right, 
-        #eab308 0%, 
-        #22c55e 50%, 
+        #dc2626 0%, 
+        #dc2626 ${mevPercent}%, 
+        #eab308 ${mevPercent}%, 
+        #22c55e ${(mevPercent + mrvPercent) / 2}%, 
+        #eab308 ${mrvPercent}%, 
+        #dc2626 ${mrvPercent}%, 
         #dc2626 100%)`;
     };
 
+    const maxRange = Math.max(landmarks.mrv * 1.5, 30); // Allow 50% beyond MRV
     const sliderColor = getSliderColor(currentValue);
 
     return (
@@ -69,11 +79,10 @@ export default function Mesocycle() {
             textShadow: `0 0 8px ${sliderColor}`
           }}>Current: {currentValue} sets</span>
         </div>
-        <div style={{ position: 'relative' }}>
-          <input 
+        <div style={{ position: 'relative' }}>          <input 
             type="range" 
-            min={landmarks.mev} 
-            max={landmarks.mrv} 
+            min={0} 
+            max={maxRange} 
             value={currentValue}
             style={{
               width: '100%',

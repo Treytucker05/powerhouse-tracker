@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const MuscleCard = ({ 
   muscle,
@@ -7,15 +7,18 @@ const MuscleCard = ({
   MAV,
   MRV
 }) => {
+  const [currentValue, setCurrentValue] = useState(sets);
+
   // Determine status based on volume
   const getStatus = () => {
-    if (sets < MEV) return 'low';
-    if (sets <= MAV) return 'optimal';
-    if (sets <= MRV) return 'high';
+    if (currentValue < MEV) return 'low';
+    if (currentValue <= MAV) return 'optimal';
+    if (currentValue <= MRV) return 'high';
     return 'maximum';
   };
 
   const status = getStatus();
+  
   // Get border and badge colors based on status
   const getBorderColor = () => {
     switch (status) {
@@ -27,98 +30,108 @@ const MuscleCard = ({
     }
   };
 
-  const getBadgeColor = () => {
-    switch (status) {
-      case 'optimal': return { backgroundColor: 'rgba(34, 197, 94, 0.2)', color: '#4ade80' };
-      case 'high': return { backgroundColor: 'rgba(234, 179, 8, 0.2)', color: '#facc15' };
-      case 'low':
-      case 'maximum':
-      default: return { backgroundColor: 'rgba(220, 38, 38, 0.2)', color: '#f87171' };
-    }
+  const getSliderColor = (value) => {
+    if (value < MEV) return '#dc2626'; // Red - below MEV
+    if (value > MRV) return '#dc2626'; // Red - above MRV
+    return '#22c55e'; // Green - optimal range
   };
 
-  // Calculate progress bar width (capped at 100%)
-  const progressWidth = Math.min((sets / MRV) * 100, 100);
-  
-  // Calculate landmark positions as percentages
-  const mevPosition = (MEV / MRV) * 100;
-  const mavPosition = (MAV / MRV) * 100;  return (
+  const getSliderBackground = () => {
+    // Create gradient that spans the full range (0 to max)
+    const maxRange = Math.max(MRV * 1.5, 30); // Allow 50% beyond MRV
+    const mevPercent = (MEV / maxRange) * 100;
+    const mavPercent = (MAV / maxRange) * 100;
+    const mrvPercent = (MRV / maxRange) * 100;
+    
+    return `linear-gradient(to right, 
+      #dc2626 0%, 
+      #dc2626 ${mevPercent}%, 
+      #eab308 ${mevPercent}%, 
+      #22c55e ${mavPercent}%, 
+      #eab308 ${mrvPercent}%, 
+      #dc2626 ${mrvPercent}%, 
+      #dc2626 100%)`;
+  };
+
+  const maxRange = Math.max(MRV * 1.5, 30);
+  const sliderColor = getSliderColor(currentValue);  return (
     <div style={{
-      backgroundColor: '#111827',
-      borderRadius: '0.5rem',
-      padding: '1rem',
-      borderLeft: `4px solid ${getBorderColor()}`,
-      border: '1px solid #1f2937'
+      backgroundColor: '#1f2937',
+      border: `2px solid ${sliderColor}`,
+      borderRadius: '0.75rem',
+      padding: '1.5rem',
+      transition: 'all 0.3s ease',
+      boxShadow: `0 4px 12px rgba(${sliderColor === '#22c55e' ? '34, 197, 94' : '220, 38, 38'}, 0.3)`
     }}>
       {/* Header Row */}
-      <div className="flex justify-between items-center">
-        <h3 className="text-sm font-semibold text-white">{muscle}</h3>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '1rem'
+      }}>
         <span style={{
-          ...getBadgeColor(),
-          padding: '0.125rem 0.5rem',
-          borderRadius: '0.375rem',
+          color: '#ffffff',
+          fontWeight: 'bold',
+          fontSize: '1.125rem',
+          textTransform: 'uppercase'
+        }}>{muscle}</span>
+        <span style={{
+          color: sliderColor,
+          fontSize: '1rem',
+          fontWeight: 'bold',
+          textShadow: `0 0 8px ${sliderColor}`
+        }}>Current: {currentValue} sets</span>
+      </div>
+
+      {/* Slider */}
+      <div style={{ position: 'relative' }}>
+        <input 
+          type="range" 
+          min={0} 
+          max={maxRange} 
+          value={currentValue}
+          style={{
+            width: '100%',
+            height: '12px',
+            background: getSliderBackground(),
+            borderRadius: '6px',
+            appearance: 'none',
+            cursor: 'pointer',
+            outline: 'none'
+          }}
+          onChange={(e) => {
+            setCurrentValue(parseInt(e.target.value));
+          }}
+        />
+        
+        {/* Landmark Labels */}
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
           fontSize: '0.75rem',
+          marginTop: '0.75rem',
           fontWeight: '600'
         }}>
-          {sets} sets
-        </span>
-      </div>
-
-      {/* Progress Bar Container */}
-      <div style={{
-        position: 'relative',
-        backgroundColor: '#374151',
-        height: '0.5rem',
-        borderRadius: '0.375rem',
-        overflow: 'hidden',
-        marginTop: '0.5rem'
-      }}>
-        {/* Progress Fill */}
-        <div 
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            height: '100%',
-            backgroundColor: '#dc2626',
-            transition: 'all 0.3s ease-in-out',
-            width: `${progressWidth}%`
-          }}
-        />
-        
-        {/* MEV Landmark Line */}
-        <div 
-          style={{
-            position: 'absolute',
-            width: '2px',
-            height: '0.75rem',
-            backgroundColor: '#facc15',
-            top: '-2px',
-            left: `${mevPosition}%`
-          }}
-        />
-        
-        {/* MAV Landmark Line */}
-        <div 
-          style={{
-            position: 'absolute',
-            width: '2px',
-            height: '0.75rem',
-            backgroundColor: '#4ade80',
-            top: '-2px',
-            left: `${mavPosition}%`
-          }}
-        />
-      </div>
-
-      {/* Footer Line */}
-      <div style={{
-        fontSize: '0.75rem',
-        color: '#9ca3af',
-        textAlign: 'center',
-        marginTop: '0.25rem'
-      }}>
-        MEV {MEV} | MAV {MAV} | MRV {MRV}
+          <span style={{ 
+            color: '#eab308', 
+            fontWeight: 'bold',
+            textShadow: '0 0 4px #eab308'
+          }}>MEV: {MEV}</span>
+          <span style={{ 
+            color: currentValue >= MEV && currentValue <= MRV ? '#22c55e' : '#dc2626', 
+            fontWeight: 'bold',
+            textTransform: 'uppercase',
+            textShadow: `0 0 4px ${currentValue >= MEV && currentValue <= MRV ? '#22c55e' : '#dc2626'}`
+          }}>
+            {currentValue >= MEV && currentValue <= MRV ? 'OPTIMAL RANGE' : 'OUT OF RANGE'}
+          </span>
+          <span style={{ 
+            color: '#dc2626', 
+            fontWeight: 'bold',
+            textShadow: '0 0 4px #dc2626'
+          }}>MRV: {MRV}</span>
+        </div>
       </div>
     </div>
   );
