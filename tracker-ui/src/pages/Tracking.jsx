@@ -10,18 +10,21 @@ import "../components/dashboard/DashboardLayout.css";
 
 export default function Tracking() {
   const sessions = useWorkoutSessions();
-  const [selected, setSelected] = useState(null);
-  // Sample muscle data - in a real app this would come from your data store
+  const [selected, setSelected] = useState(null);  // Complete muscle data - matches PowerHouse legacy order and includes all muscle groups
   const muscleData = [
     { muscle: 'Chest', sets: 12, MEV: 8, MAV: 18, MRV: 22 },
     { muscle: 'Back', sets: 16, MEV: 10, MAV: 20, MRV: 25 },
+    { muscle: 'Quads', sets: 20, MEV: 10, MAV: 20, MRV: 25 },
+    { muscle: 'Glutes', sets: 14, MEV: 8, MAV: 12, MRV: 16 },
+    { muscle: 'Hamstrings', sets: 12, MEV: 8, MAV: 16, MRV: 20 },
     { muscle: 'Shoulders', sets: 10, MEV: 6, MAV: 16, MRV: 20 },
     { muscle: 'Biceps', sets: 8, MEV: 6, MAV: 12, MRV: 16 },
     { muscle: 'Triceps', sets: 10, MEV: 6, MAV: 14, MRV: 18 },
-    { muscle: 'Quads', sets: 20, MEV: 10, MAV: 20, MRV: 25 },
-    { muscle: 'Hamstrings', sets: 12, MEV: 8, MAV: 16, MRV: 20 },
-    { muscle: 'Glutes', sets: 14, MEV: 8, MAV: 12, MRV: 16 },
-    { muscle: 'Calves', sets: 6, MEV: 8, MAV: 16, MRV: 20 }
+    { muscle: 'Calves', sets: 6, MEV: 8, MAV: 16, MRV: 20 },
+    { muscle: 'Abs', sets: 6, MEV: 4, MAV: 6, MRV: 16 },
+    { muscle: 'Forearms', sets: 4, MEV: 4, MAV: 4, MRV: 12 },
+    { muscle: 'Neck', sets: 3, MEV: 2, MAV: 3, MRV: 8 },
+    { muscle: 'Traps', sets: 4, MEV: 4, MAV: 4, MRV: 12 }
   ];
   // Sample data for the volume chart - matches the legacy PowerHouse muscle order and landmarks  
   const volumeChartData = {
