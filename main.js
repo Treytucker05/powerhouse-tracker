@@ -6,6 +6,7 @@ import "./js/core/trainingState.js";
 import { initChart } from "./js/ui/chartManager.js";
 import "./js/app.js";
 import "./js/ui/experienceToggle.js";
+import "./js/ui/navigation.js";
 
 // App initialization
 console.log("RP Toolkit initialized");
