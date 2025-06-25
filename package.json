@@ -17,12 +17,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "test": "vitest run",
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
     "lint:ci": "npx eslint \"{lib,tests,tracker-ui/src}/**/*.{js,jsx}\" --max-warnings 0",
     "verify": "pnpm run build && pnpm run test:unit && pnpm run lint:ci",
     "analyze": "node scripts/analyze-repo.js",
-    "gameplan": "python scripts/gameplan_generator.py"
+    "gameplan": "python scripts/gameplan_generator.py",
+    "update-progress": "node scripts/update-progress.js"
   },
   "keywords": [
     "fitness",

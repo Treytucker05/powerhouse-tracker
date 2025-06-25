@@ -1,6 +1,6 @@
 # PowerHouse Tracker – Gap Analysis (v0)
 
-_Last updated: <!-- KEEP_AUTOGEN_DATE -->_
+_Last updated: 2025-06-25_
 
 | Area / Feature            | Current State | Target MVP                               | Priority | Est. Effort |
 |---------------------------|---------------|------------------------------------------|----------|-------------|
