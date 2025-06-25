@@ -1,10 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useLogSet } from '../tracker-ui/src/hooks/useLogSet'
+import React from 'react'
+import { useLogSet } from '../../tracker-ui/src/hooks/useLogSet'
 
 // Mock the supabase client
-vi.mock('../tracker-ui/src/lib/api/supabaseClient', () => ({
+vi.mock('../../tracker-ui/src/lib/api/supabaseClient', () => ({
   supabase: {
     from: vi.fn(() => ({
       select: vi.fn(() => ({
@@ -23,7 +24,7 @@ vi.mock('../tracker-ui/src/lib/api/supabaseClient', () => ({
 }))
 
 // Mock the useActiveSession hook
-vi.mock('../tracker-ui/src/hooks/useActiveSession', () => ({
+vi.mock('../../tracker-ui/src/hooks/useActiveSession', () => ({
   useActiveSession: vi.fn(() => ({
     activeSession: {
       id: 'session-123',
@@ -116,7 +117,7 @@ describe('useLogSet', () => {
   })
 
   it('should finish session when all planned sets are completed', async () => {
-    const { useActiveSession } = await import('../tracker-ui/src/hooks/useActiveSession')
+    const { useActiveSession } = await import('../../tracker-ui/src/hooks/useActiveSession')
     const mockFinishSession = vi.fn(() => Promise.resolve())
     
     // Mock a session that's about to be completed
@@ -168,7 +169,7 @@ describe('useLogSet', () => {
   })
 
   it('should not finish session when planned sets are not complete', async () => {
-    const { useActiveSession } = await import('../tracker-ui/src/hooks/useActiveSession')
+    const { useActiveSession } = await import('../../tracker-ui/src/hooks/useActiveSession')
     const mockFinishSession = vi.fn(() => Promise.resolve())
     
     // Mock a session with incomplete sets
@@ -193,7 +194,7 @@ describe('useLogSet', () => {
     })
 
     // Mock Supabase to return only partial completion
-    const { supabase } = await import('../tracker-ui/src/lib/api/supabaseClient')
+    const { supabase } = await import('../../tracker-ui/src/lib/api/supabaseClient')
     supabase.from.mockReturnValue({
       select: vi.fn(() => ({
         eq: vi.fn(() => Promise.resolve({
@@ -230,7 +231,7 @@ describe('useLogSet', () => {
   })
 
   it('should handle errors gracefully', async () => {
-    const { useActiveSession } = await import('../tracker-ui/src/hooks/useActiveSession')
+    const { useActiveSession } = await import('../../tracker-ui/src/hooks/useActiveSession')
     
     useActiveSession.mockReturnValue({
       activeSession: {
@@ -254,7 +255,7 @@ describe('useLogSet', () => {
   })
 
   it('should handle session without planned sets', async () => {
-    const { useActiveSession } = await import('../tracker-ui/src/hooks/useActiveSession')
+    const { useActiveSession } = await import('../../tracker-ui/src/hooks/useActiveSession')
     const mockFinishSession = vi.fn(() => Promise.resolve())
     
     useActiveSession.mockReturnValue({
