@@ -5,7 +5,7 @@ import Breadcrumb from "../components/navigation/Breadcrumb";
 import SectionDivider from "../components/ui/SectionDivider";
 import FloatingActionButton, { PlanningActions } from "../components/ui/FloatingActionButton";
 import LoadingSkeleton from "../components/ui/LoadingSkeleton";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo, useCallback } from "react";
 import { CalendarIcon, ClockIcon, FireIcon, PlayIcon } from '@heroicons/react/24/outline';
 
 export default function Microcycle() {
@@ -83,8 +83,7 @@ export default function Microcycle() {
       muscleGroups: []
     }
   };
-
-  const getWorkoutIcon = (workoutType, muscleGroup) => {
+  const getWorkoutIcon = useCallback((workoutType, muscleGroup) => {
     if (workoutType === 'rest') return '😴';
     if (muscleGroup.includes('Chest')) return '💪';
     if (muscleGroup.includes('Back')) return '🏋️';
@@ -92,9 +91,9 @@ export default function Microcycle() {
     if (muscleGroup.includes('Legs') || muscleGroup.includes('Quads')) return '🦵';
     if (muscleGroup.includes('Arms') || muscleGroup.includes('Biceps')) return '💪';
     return '🏃';
-  };
+  }, []);
 
-  const getWorkoutGradient = (workoutType, completed, isRestDay) => {
+  const getWorkoutGradient = useCallback((workoutType, completed, isRestDay) => {
     if (isRestDay) {
       return completed 
         ? 'from-blue-600/30 to-indigo-700/20' 
@@ -110,9 +109,9 @@ export default function Microcycle() {
       return 'from-purple-500/30 to-pink-600/20';
     }
     return 'from-gray-600/30 to-gray-700/20';
-  };
+  }, []);
 
-  const getBorderColor = (workoutType, completed, isRestDay) => {
+  const getBorderColor = useCallback((workoutType, completed, isRestDay) => {
     if (isRestDay) {
       return completed ? 'border-blue-400/50' : 'border-blue-300/30';
     }
@@ -126,9 +125,7 @@ export default function Microcycle() {
       return 'border-purple-400/50';
     }
     return 'border-gray-500/40';
-  };
-
-  const DayCard = ({ day, workout }) => {
+  }, []);  const DayCard = memo(({ day, workout }) => {
     const isRestDay = workout.muscle === 'Rest Day';
     const gradient = getWorkoutGradient(workout.workoutType, workout.completed, isRestDay);
     const borderColor = getBorderColor(workout.workoutType, workout.completed, isRestDay);
@@ -136,7 +133,7 @@ export default function Microcycle() {
 
     return (
       <div className={`relative bg-gradient-to-br ${gradient} rounded-2xl p-5 border ${borderColor} 
-        backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:shadow-xl 
+        backdrop-blur-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-xl will-change-transform
         ${workout.completed ? 'hover:shadow-green-500/20' : isRestDay ? 'hover:shadow-blue-500/20' : 'hover:shadow-red-500/20'}
         group cursor-pointer`}>
         
@@ -233,23 +230,22 @@ export default function Microcycle() {
                   <div className="bg-gradient-to-r from-green-500 to-green-400 h-2 rounded-full transition-all duration-500"></div>
                 </div>
               </div>
-            )}
-
-            {/* Action Button */}
+            )}            {/* Action Button */}
             {!workout.completed && (
-              <button className={`mt-4 w-full py-2 px-4 rounded-xl font-semibold text-sm transition-all duration-200 
+              <button className={`mt-4 w-full py-2 px-4 rounded-xl font-semibold text-sm transition-all duration-150 will-change-transform
                 ${workout.workoutType === 'strength' 
                   ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white' 
                   : 'bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white'
-                } transform hover:scale-105 shadow-lg`}>
+                } transform hover:scale-[1.02] shadow-lg`}>
                 Start Workout
               </button>
             )}
-          </div>
-        )}
+          </div>        )}
       </div>
     );
-  };
+  });
+  
+  DayCard.displayName = 'DayCard';
   return (
     <ErrorBoundary>
       <TrainingStateProvider>
@@ -261,14 +257,13 @@ export default function Microcycle() {
             </div>
           </div>
 
-          <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
-            {isLoading ? (
+          <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">            {isLoading ? (
               <div className="space-y-8">
                 <LoadingSkeleton type="card" className="h-32" />
-                <div className="grid gap-4 grid-cols-7">
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 min-h-[200px]">
                   <LoadingSkeleton type="workout-card" count={7} />
                 </div>
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid gap-6 md:grid-cols-2 min-h-[300px]">
                   <LoadingSkeleton type="card" className="h-64" />
                   <LoadingSkeleton type="card" className="h-64" />
                 </div>
@@ -318,11 +313,9 @@ export default function Microcycle() {
                 <div className="space-y-8">
                   <CardWrapper 
                     title="This Week's Training Plan" 
-                    className="glass-morphism premium-card animate-slide-in-up"
-                  >
-                    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-7">
+                    className="glass-morphism premium-card animate-slide-in-up"                  >                    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
                       {days.map((day) => (
-                        <WorkoutCard key={day} day={day} workout={currentWeek[day]} />
+                        <DayCard key={day} day={day} workout={currentWeek[day]} />
                       ))}
                     </div>
                   </CardWrapper>
