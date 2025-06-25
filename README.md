@@ -1,5 +1,7 @@
 # PowerHouse Tracker - Renaissance Periodization Toolkit v0.9.0-beta.4
 
+![Vitest](https://img.shields.io/badge/tests-passing-brightgreen)
+
 A comprehensive evidence-based training toolkit implementing Renaissance Periodization methodology with **automated volume progression**, **intelligent deload analysis**, and **data management**.
 
 ## 🎯 Latest Features (v0.9.0-beta.4)
