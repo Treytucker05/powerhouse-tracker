@@ -14,16 +14,20 @@ echo "- Total Lines of Code: $(find . -name '*.js' -o -name '*.jsx' -o -name '*.
 
 # 🌿 Branch Status
 echo -e "\n🌿 Branch Status:"
-git branch -a
-echo "Current Branch: $(git branch --show-current)"
+git --no-pager branch -a
+echo "Current Branch: $(git --no-pager branch --show-current)"
 
-# 📁 Project Structure
 echo -e "\n📁 Project Structure:"
-if command -v tree &> /dev/null; then
-  tree -L 3 -I 'node_modules|dist|build|coverage' --dirsfirst
+if command -v tree >/dev/null 2>&1; then
+  # Windows 'tree.exe' doesn't support -L, so detect MSYS/Cygwin
+  if uname -o 2>/dev/null | grep -qiE "msys|cygwin"; then
+    # Use Windows tree syntax: /F shows files, /A uses ASCII chars
+    tree . /F /A | head -n 50
+  else
+    tree -L 1 -I 'node_modules|dist|build|coverage' --dirsfirst
+  fi
 else
-  echo "tree command not available - showing basic directory structure:"
-  find . -maxdepth 2 -type d -not -path '*/node_modules*' -not -path '*/.git*' | head -20
+  echo "(ℹ️  'tree' command not found on PATH)"
 fi
 
 # 📦 Dependencies
