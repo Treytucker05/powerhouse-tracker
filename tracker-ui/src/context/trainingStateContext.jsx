@@ -50,6 +50,12 @@ const initialState = {
     completedSets: []
   },
   
+  // Historical Data
+  loggedSets: [],
+  loggedSessions: [],
+  fatigueScore: 0,
+  mrvTable: {},
+  
   // Deload Analysis
   deloadData: {
     lastAnalysis: null,
@@ -246,6 +252,27 @@ function trainingStateReducer(state, action) {
         ...action.payload
       };
       
+    case TRAINING_ACTIONS.SEED_MOCK_DATA:
+      return {
+        ...state,
+        loggedSets: action.payload.loggedSets,
+        loggedSessions: action.payload.loggedSessions || state.loggedSessions,
+        volumeLandmarks: {
+          ...state.volumeLandmarks,
+          ...action.payload.volumeLandmarks
+        },
+        mrvTable: {
+          ...state.mrvTable,
+          ...action.payload.mrvTable
+        },
+        fatigueScore: action.payload.fatigueScore || state.fatigueScore,
+        cycleData: action.payload.cycleData || state.cycleData,
+        currentMesocycle: {
+          ...state.currentMesocycle,
+          ...action.payload.currentMesocycle
+        }
+      };
+      
     case TRAINING_ACTIONS.RESET_STATE:
       return initialState;
       
@@ -355,6 +382,11 @@ export function TrainingStateProvider({ children }) {
     removeNotification: (id) => dispatch({
       type: TRAINING_ACTIONS.REMOVE_NOTIFICATION,
       payload: id
+    }),
+    
+    seedMockData: (mockData) => dispatch({
+      type: TRAINING_ACTIONS.SEED_MOCK_DATA,
+      payload: mockData
     })
   };
   

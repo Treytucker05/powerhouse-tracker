@@ -4,10 +4,23 @@ module.exports = {
   darkMode: 'class',  theme: { 
     extend: {
       colors: {
-        primary: '#ff1a1a',     // bright red – filled buttons, highlights
-        accent:  '#c50505',     // deeper red – borders, hovers, nav underline
-        offwhite:'#f2f2f2',
+        // PowerHouse Premium Color Palette
+        'primary-black': '#0A0A0A',
+        'rich-black': '#1C1C1C',
+        'true-black': '#000',
+        'primary-red': '#DC2626',
+        'accent-red': '#EF4444',
+        'dark-red': '#991B1B',
+        'pure-white': '#FFF',
+        'off-white': '#FAFAFA',
+        'light-gray': '#F3F4F6',
+        
+        // Legacy support
+        primary: '#DC2626',
+        accent:  '#EF4444',
+        offwhite:'#FAFAFA',
         black:   '#000000',
+        
         // Define full red color palette for Tailwind v4 compatibility
         red: {
           50: '#fef2f2',
@@ -23,10 +36,12 @@ module.exports = {
         },
         // PowerHouse brand colors
         powerhouse: {
-          red: '#ff0000',
-          darkred: '#cc0000',
-          black: '#000000',
-          gray: '#1a1a1a',
+          red: '#DC2626',
+          'dark-red': '#991B1B',
+          'accent-red': '#EF4444',
+          black: '#0A0A0A',
+          'rich-black': '#1C1C1C',
+          gray: '#374151',
         },
         // Full gray palette for compatibility
         gray: {

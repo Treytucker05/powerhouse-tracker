@@ -91,8 +91,14 @@ function SimpleVolumeChart({ data = {} }) {
       boxShadow: '0 12px 40px rgba(220, 38, 38, 0.4), 0 4px 12px rgba(0, 0, 0, 0.6)',
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       position: 'relative',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      width: '100%',
+      maxWidth: '100%',
+      minWidth: 0
     }}>
+    
+    {/* Optional container for additional width control */}
+    <div style={{ width: '100%', overflowX: 'auto' }}>
       {/* Subtle animated background glow */}
       <div style={{
         position: 'absolute',
@@ -453,7 +459,9 @@ function SimpleVolumeChart({ data = {} }) {
             </span>
           </div>
         ))}
-      </div></div>
+      </div>
+    </div>
+    </div>
   );
 }
 
