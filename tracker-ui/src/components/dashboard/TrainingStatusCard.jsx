@@ -45,20 +45,20 @@ export default function TrainingStatusCard() {
   const currentDayName = getCurrentDayName(state);
 
   return (
-    <div className="border rounded-lg p-3 text-gray-100 w-full max-w-full overflow-hidden">
+    <div className="card-premium w-full max-w-full overflow-hidden">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:justify-between mb-3 gap-2">
+      <div className="flex flex-col sm:flex-row sm:justify-between mb-4 gap-2">
         <div className="min-w-0 flex-1">
-          <h2 className="text-base font-semibold truncate">{cycle?.goal || 'Training Program'}</h2>
+          <h2 className="text-premium-heading text-lg font-bold truncate">{cycle?.goal || 'Training Program'}</h2>
           {cycle?.specializations?.length > 0 && (
-            <p className="text-xs text-red-500 truncate">
+            <p className="text-xs text-premium-accent truncate mt-1">
               Focus: {cycle.specializations.map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(" • ")}
             </p>
           )}
         </div>
         <div className="text-right text-xs flex-shrink-0">
-          <div className="truncate">Week {cycle?.currentWeek || 1}/{cycle?.weeks || 6} • Day {cycle?.currentDay || 1} ({currentDayName})</div>
-          <div className="text-xs text-gray-400 mt-1 truncate">
+          <div className="text-pure-white font-semibold truncate">Week {cycle?.currentWeek || 1}/{cycle?.weeks || 6} • Day {cycle?.currentDay || 1} ({currentDayName})</div>
+          <div className="text-premium-secondary mt-1 truncate">
             {daysToDeload > 0 ? `${daysToDeload} days to deload` : 'Deload week'}
           </div>
         </div>

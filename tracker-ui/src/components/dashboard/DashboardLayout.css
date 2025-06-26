@@ -8,36 +8,88 @@
   scrollbar-width: none;
 }
 
+/* Premium Dashboard Animations */
 @keyframes fadeIn { 
-  from { opacity: 0; transform: translateY(10px); } 
-  to { opacity: 1; transform: translateY(0); } 
+  from { 
+    opacity: 0; 
+    transform: translateY(20px) scale(0.95); 
+  } 
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  } 
 }
 
 @keyframes slideUp { 
-  from { transform: translateY(6px); } 
-  to { transform: translateY(0); } 
+  from { 
+    transform: translateY(10px); 
+    opacity: 0;
+  } 
+  to { 
+    transform: translateY(0); 
+    opacity: 1;
+  } 
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  0%, 100% { 
+    transform: scale(1); 
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
+  }
+  50% { 
+    transform: scale(1.02); 
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.5);
+  }
 }
 
-/* Smooth hover transitions for dashboard cards */
+/* Premium Dashboard Cards */
 .dashboard-card {
-  animation: fadeIn 0.6s ease-out;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  animation: fadeIn 0.8s ease-out;
+  background: linear-gradient(135deg, 
+    rgba(28, 28, 28, 0.95) 0%, 
+    rgba(10, 10, 10, 0.9) 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 16px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    #DC2626 50%, 
+    transparent 100%
+  );
+  opacity: 0.6;
 }
 
 .dark .dashboard-card {
-  background: rgba(30, 41, 59, 0.95);
+  background: linear-gradient(135deg, 
+    rgba(28, 28, 28, 0.95) 0%, 
+    rgba(10, 10, 10, 0.9) 100%
+  );
 }
 
-/* Enhanced card hover effects */
+/* Enhanced premium card hover effects */
 .dashboard-card:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transform: translateY(-6px) scale(1.02);
+  border-color: #DC2626;
+  box-shadow: 
+    0 16px 48px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(220, 38, 38, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 /* Container styling */
