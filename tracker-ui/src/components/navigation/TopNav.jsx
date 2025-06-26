@@ -1,6 +1,6 @@
 import { Link, NavLink } from "react-router-dom";
 import { Avatar } from "../ui/avatar";
-import { Monitor, LogOut } from "lucide-react";
+import { Dumbbell, LogOut } from "lucide-react";
 
 export default function TopNav({ user, onSignOut }) {
   const navItems = [
@@ -12,50 +12,121 @@ export default function TopNav({ user, onSignOut }) {
   ];
 
   return (
-    <header className="h-20 w-full bg-gradient-to-r from-gray-900 via-gray-900 to-gray-800 backdrop-blur-md border-b border-gray-700/50 text-gray-100 shadow-lg flex items-center px-8 lg:px-12">
-      <Link to="/" className="flex items-center text-2xl font-bold tracking-wide hover:scale-105 transition-all duration-300 group">
-        <span className="bg-gradient-to-r from-red-400 to-red-500 bg-clip-text text-transparent">
-          PowerHouse
-        </span>
-        <span className="bg-gradient-to-r from-red-700 to-red-800 bg-clip-text text-transparent ml-0.5">
-          ATX
-        </span>
-      </Link>
+    <header 
+      className="sticky top-0 z-50 flex justify-between items-center"
+      style={{ 
+        backgroundColor: '#000', 
+        padding: '1.5rem 2rem',
+        boxShadow: '0 2px 10px rgba(255, 0, 0, 0.3)'
+      }}
+    >
+      <div className="flex items-center gap-2">
+        <Dumbbell className="w-6 h-6" style={{ color: '#FF0000' }} />
+        <div style={{ fontSize: '1.5rem', fontWeight: '700' }}>
+          <span style={{ color: '#FF0000' }}>Power</span>
+          <span style={{ color: '#FFF', margin: '0 0.2rem' }}>House</span>
+          <span style={{ 
+            color: '#000', 
+            backgroundColor: '#FFF', 
+            padding: '0.2rem 0.5rem', 
+            borderRadius: '5px' 
+          }}>ATX</span>
+        </div>
+      </div>
 
-      <nav className="flex ml-20 gap-10 text-base font-bold uppercase tracking-wider">
+      <nav className="flex" style={{ gap: '1rem', listStyle: 'none', margin: 0, padding: 0 }}>
         {navItems.map(({ to, label }) => (
           <NavLink
             key={to}
             to={to}
-            className={({ isActive }) =>
-              `relative px-6 py-3 rounded-xl transition-all duration-300 whitespace-nowrap ${
-                isActive
-                  ? "text-white bg-red-500/25 border border-red-500/40 shadow-lg scale-105"
-                  : "text-gray-300 hover:text-white hover:bg-white/10 hover:scale-105 border border-transparent"
-              }`
-            }
+            style={{ textDecoration: 'none' }}
           >
-            {label}
+            {({ isActive }) => (
+              <span 
+                style={{ 
+                  padding: '0.5rem 1rem',
+                  whiteSpace: 'nowrap',
+                  color: '#fff',
+                  fontSize: '1.1rem',
+                  transition: 'all 0.3s ease',
+                  backgroundColor: isActive ? '#FF0000' : 'transparent',
+                  color: isActive ? '#000' : '#fff',
+                  borderRadius: '5px',
+                  display: 'block'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.target.style.backgroundColor = '#FF0000';
+                    e.target.style.color = '#000';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.target.style.backgroundColor = 'transparent';
+                    e.target.style.color = '#fff';
+                  }
+                }}
+              >
+                {label}
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>
 
-      <div className="ml-auto flex items-center gap-5">
+      <div className="flex items-center gap-4">
         {user && (
-          <span className="text-base text-gray-300 hidden sm:inline px-4 py-2 rounded-lg bg-white/10 font-medium">
+          <span style={{ 
+            color: '#fff', 
+            fontSize: '0.9rem', 
+            padding: '0.3rem 0.8rem', 
+            backgroundColor: 'rgba(255, 255, 255, 0.1)', 
+            borderRadius: '5px' 
+          }}>
             {user.email}
           </span>
         )}
-        <div className="p-2 rounded-xl hover:bg-white/15 transition-colors">
+        <div 
+          style={{ 
+            padding: '0.5rem', 
+            borderRadius: '5px', 
+            transition: 'all 0.3s ease',
+            color: '#fff'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#FF0000';
+            e.currentTarget.style.color = '#000';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.color = '#fff';
+          }}
+        >
           <Avatar />
         </div>
         {user && onSignOut && (
           <button
             onClick={onSignOut}
-            className="text-gray-400 hover:text-white hover:bg-red-600/25 p-3 rounded-xl transition-all duration-200 group"
+            style={{ 
+              padding: '0.5rem', 
+              backgroundColor: 'transparent',
+              border: 'none',
+              borderRadius: '5px', 
+              transition: 'all 0.3s ease',
+              color: '#fff',
+              cursor: 'pointer'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = '#FF0000';
+              e.target.style.color = '#000';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'transparent';
+              e.target.style.color = '#fff';
+            }}
             title="Sign Out"
           >
-            <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            <LogOut className="w-5 h-5" />
           </button>
         )}
       </div>
