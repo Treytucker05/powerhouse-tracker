@@ -30,6 +30,9 @@ const VolumeTrackerChart = ({ volumeData = {} }) => {
   const mevValues = [8, 10, 6, 6, 6, 10, 8, 8];
   const mrvValues = [22, 25, 20, 16, 18, 25, 20, 16];
   
+  // volumeData prop is not used in this implementation but kept for API compatibility
+  const _volumeData = volumeData;
+  
   const data = {
     labels: muscleGroups,
     datasets: [

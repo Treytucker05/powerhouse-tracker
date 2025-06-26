@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useReducer, useEffect, useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import React, { useReducer, useEffect } from 'react';
+import { TrainingStateContext } from './TrainingStateContext';
 import { TRAINING_ACTIONS } from './trainingActions';
 
 // Training state initial values
@@ -254,9 +254,6 @@ function trainingStateReducer(state, action) {
   }
 }
 
-// Create context
-const TrainingStateContext = createContext();
-
 // Provider component
 export function TrainingStateProvider({ children }) {
   const [state, dispatch] = useReducer(trainingStateReducer, initialState);
@@ -368,41 +365,4 @@ export function TrainingStateProvider({ children }) {
   );
 }
 
-// Custom hook
-export function useTrainingState() {
-  const context = useContext(TrainingStateContext);
-  if (!context) {
-    throw new Error('useTrainingState must be used within a TrainingStateProvider');
-  }
-  return context;
-}
-
-// Auth hook
-export function useAuth() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Get initial session
-    const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
-      setLoading(false);
-    };
-    
-    getSession();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  return { user, loading };
-}
-
-export default TrainingStateContext;
-export { TRAINING_ACTIONS };
+export default TrainingStateProvider;

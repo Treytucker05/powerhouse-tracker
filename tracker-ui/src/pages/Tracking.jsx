@@ -14,9 +14,9 @@ import { ChartBarIcon, PlayIcon, PlusIcon } from '@heroicons/react/24/outline';
 import "../components/dashboard/DashboardLayout.css";
 
 export default function Tracking() {
-  const sessions = useWorkoutSessions();
-  const [selected, setSelected] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const _sessions = useWorkoutSessions();
+  const [_selected, _setSelected] = useState(null);
+  const [_isLoading, setIsLoading] = useState(true);
 
   // Simulate loading state
   useEffect(() => {

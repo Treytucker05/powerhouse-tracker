@@ -122,7 +122,7 @@ export default function Macrocycle() {
   };
 
   // Enhanced Timeline Card Component
-  const TimelineCard = ({ mesocycle, index }) => {
+  const TimelineCard = ({ mesocycle }) => {
     const isExpanded = expandedPhase === mesocycle.id;
     const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     

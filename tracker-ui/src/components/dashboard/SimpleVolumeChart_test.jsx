@@ -10,7 +10,7 @@ function SimpleVolumeChart({ data = {} }) {
   ];
   
   // Filter data to only include muscles that exist in our data
-  const muscles = muscleOrder.filter(muscle => data.hasOwnProperty(muscle));
+  const muscles = muscleOrder.filter(muscle => Object.prototype.hasOwnProperty.call(data, muscle));
   
   if (muscles.length === 0) {
     return <div style={{ color: 'white' }}>No data available</div>;

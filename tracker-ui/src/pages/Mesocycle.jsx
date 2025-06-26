@@ -52,6 +52,7 @@ export default function Mesocycle() {
             </p>
           </div>
 
+          <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
             <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
               {/* Volume Landmarks Configuration */}
               <CardWrapper 
@@ -93,6 +94,15 @@ export default function Mesocycle() {
                 </div>
               </CardWrapper>
             </div>
+
+            {/* Volume Landmarks Section */}
+            <div className="lg:col-span-2">
+              <CardWrapper title="Volume Landmarks" subtitle="Set MEV, MAV, and MRV for each muscle group">
+                <div className="space-y-4">
+                  {Object.keys(volumeLandmarks).map((muscle) => (
+                    <div key={muscle} className="bg-gray-800 p-4 rounded-lg">
+                      <div className="flex justify-between items-center mb-3">
+                        <h4 className="text-white font-medium">{muscle}</h4>
                         <div className="text-xs text-gray-500 dark:text-gray-400">sets/week</div>
                       </div>
                       
@@ -211,7 +221,7 @@ export default function Mesocycle() {
                 </div>
               </CardWrapper>
             </div>
-          </main>
+          </div>
         </div>
       </TrainingStateProvider>
     </ErrorBoundary>
