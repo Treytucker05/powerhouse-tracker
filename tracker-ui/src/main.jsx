@@ -5,6 +5,9 @@ import './index.css'
 import App from './App.jsx'
 import { TrainingStateProvider } from './context/trainingStateContext.jsx'
 
+// Ensure dark mode is always enabled
+document.documentElement.classList.add('dark');
+
 // Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
