@@ -26,7 +26,11 @@ export function beginnerPreset() {
   console.log("Beginner preset selected");
   window.trainingState = window.trainingState || {};
   window.trainingState.currentPreset = "beginner";
-  window.dispatchEvent(new CustomEvent("beginner-preset-selected"));
+  
+  const evt = new CustomEvent("preset-selected", {
+    detail: { preset: "beginner", timestamp: Date.now() }
+  });
+  window.dispatchEvent(evt);
 }
 window.btnBeginnerPreset = beginnerPreset;
 
@@ -38,7 +42,11 @@ export function intermediatePreset() {
   console.log("Intermediate preset selected");
   window.trainingState = window.trainingState || {};
   window.trainingState.currentPreset = "intermediate";
-  window.dispatchEvent(new CustomEvent("intermediate-preset-selected"));
+  
+  const evt = new CustomEvent("preset-selected", {
+    detail: { preset: "intermediate", timestamp: Date.now() }
+  });
+  window.dispatchEvent(evt);
 }
 
 // expose globally for legacy code
@@ -49,7 +57,11 @@ export function advancedPreset() {
   console.log("Advanced preset selected");
   window.trainingState = window.trainingState || {};
   window.trainingState.currentPreset = "advanced";
-  window.dispatchEvent(new CustomEvent("advanced-preset-selected"));
+  
+  const evt = new CustomEvent("preset-selected", {
+    detail: { preset: "advanced", timestamp: Date.now() }
+  });
+  window.dispatchEvent(evt);
 }
 
 // expose globally for legacy code
@@ -166,8 +178,8 @@ export function runWeeklyAutoProgression() {
   if (typeof window !== "undefined" && window.dispatchEvent) {
     window.dispatchEvent(
       new CustomEvent("weekly-auto-progression", {
-        detail: { progressionResult },
-      }),
+        detail: { progressionResult, timestamp: Date.now() }
+      })
     );
   }
 

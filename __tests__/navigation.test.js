@@ -102,7 +102,7 @@ describe("Navigation System", () => {
     let eventDetail = null;
 
     // Listen for navigation event
-    window.addEventListener("navigation-section-changed", (e) => {
+    window.addEventListener("section-change", (e) => {
       eventFired = true;
       eventDetail = e.detail;
     });
