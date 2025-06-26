@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect } from 'react';
+import React, { useReducer, useEffect, useContext } from 'react';
 import { TrainingStateContext } from './TrainingStateContext';
 import { TRAINING_ACTIONS } from './trainingActions';
 
@@ -363,6 +363,11 @@ export function TrainingStateProvider({ children }) {
       {children}
     </TrainingStateContext.Provider>
   );
+}
+
+// Hook for accessing training state
+export function useTrainingState() {
+  return useContext(TrainingStateContext);
 }
 
 export default TrainingStateProvider;

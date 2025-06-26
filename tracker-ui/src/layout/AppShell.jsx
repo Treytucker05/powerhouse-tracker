@@ -1,19 +1,24 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
-import DashboardLayout from './DashboardLayout';
+import TopNav from '../components/navigation/TopNav';
 
 export default function AppShell() {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Set to false by default for better UX
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
     // Get initial session
     const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        setUser(session?.user ?? null);
+      } catch (error) {
+        console.warn('Auth session check failed:', error);
+        setUser(null);
+      }
       setLoading(false);
     };
     
@@ -28,7 +33,7 @@ export default function AppShell() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Protected routes - redirect to auth if not logged in
+  // Protected routes - redirect to auth if not logged in (only for specific routes)
   useEffect(() => {
     if (!loading && !user) {
       const protectedRoutes = ['/tracking', '/mesocycle', '/microcycle', '/macrocycle'];
@@ -36,25 +41,32 @@ export default function AppShell() {
         location.pathname.startsWith(route)
       );
       
-      if (isProtectedRoute) {        navigate('/auth');
+      if (isProtectedRoute) {
+        navigate('/auth');
       }
     }
   }, [user, loading, location.pathname, navigate]);
 
-  const handleSignOut = async () => {
+  const _handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate('/');
-  };  if (loading) {
+  };
+
+  // Show loading only briefly and only if explicitly loading
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-950">
-        <div className="text-lg text-offwhite">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="text-lg text-gray-300">Loading...</div>
       </div>
     );
   }
 
   return (
-    <DashboardLayout user={user} onSignOut={handleSignOut}>
-      <Outlet />
-    </DashboardLayout>
+    <div className="min-h-screen bg-black">
+      <TopNav user={user} onSignOut={_handleSignOut} />
+      <main className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        <Outlet />
+      </main>
+    </div>
   );
 }

@@ -114,6 +114,9 @@ importers:
       chart.js:
         specifier: ^4.5.0
         version: 4.5.0
+      lucide-react:
+        specifier: ^0.523.0
+        version: 0.523.0(react@19.1.0)
       react:
         specifier: ^19.1.0
         version: 19.1.0
@@ -3751,6 +3754,11 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
+  lucide-react@0.523.0:
+    resolution: {integrity: sha512-rUjQoy7egZT9XYVXBK1je9ckBnNp7qzRZOhLQx5RcEp2dCGlXo+mv6vf7Am4LimEcFBJIIZzSGfgTqc9QCrPSw==}
+    peerDependencies:
+      react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
     hasBin: true
@@ -7377,7 +7385,7 @@ snapshots:
       magic-string: 0.30.17
       sirv: 3.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@24.0.3)(@vitest/browser@3.2.4)(jiti@2.4.2)(jsdom@22.1.0)(lightningcss@1.30.1)
+      vitest: 3.2.4(@types/node@24.0.3)(@vitest/browser@3.2.4)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.30.1)
       ws: 8.18.2
     optionalDependencies:
       playwright: 1.53.1
@@ -7418,7 +7426,7 @@ snapshots:
       std-env: 3.9.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@24.0.3)(@vitest/browser@3.2.4)(jiti@2.4.2)(jsdom@22.1.0)(lightningcss@1.30.1)
+      vitest: 3.2.4(@types/node@24.0.3)(@vitest/browser@3.2.4)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.30.1)
     optionalDependencies:
       '@vitest/browser': 3.2.4(playwright@1.53.1)(vite@6.3.5(@types/node@24.0.3)(jiti@2.4.2)(lightningcss@1.30.1))(vitest@3.2.4)
     transitivePeerDependencies:
@@ -9214,6 +9222,10 @@ snapshots:
   lru-cache@5.1.1:
     dependencies:
       yallist: 3.1.1
+
+  lucide-react@0.523.0(react@19.1.0):
+    dependencies:
+      react: 19.1.0
 
   lz-string@1.5.0: {}
 
