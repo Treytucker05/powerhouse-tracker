@@ -83,9 +83,9 @@ export function showSection(sectionId) {
 
   // Dispatch section change event for other components to listen
   window.dispatchEvent(
-    new CustomEvent("navigation-section-changed", {
-      detail: { sectionId },
-    }),
+    new CustomEvent("section-change", {
+      detail: { sectionId, timestamp: Date.now() }
+    })
   );
 }
 

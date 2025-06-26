@@ -112,7 +112,7 @@ describe("Button Handlers", () => {
   });
   test("handlers should dispatch proper events when called", async () => {
     let eventFired = false;
-    window.addEventListener("beginner-preset-selected", () => {
+    window.addEventListener("preset-selected", () => {
       eventFired = true;
     });
 

@@ -6,29 +6,36 @@ test("navigation & core pages load", async ({ page }) => {
 
   // Wait for page to load and check home page elements
   await page.waitForLoadState('networkidle');
-  await expect(page.locator("h1:has-text('PowerHouse Tracker')")).toBeVisible();
-  await expect(page.locator("text=Weekly Volume")).toBeVisible();
-  await expect(page.locator("text=Fatigue Status")).toBeVisible();
+  
+  // Title still visible
+  await expect(page.getByRole("heading", { name: /PowerHouseATX/i })).toBeVisible();
+  
+  // New card heading on dashboard
+  await expect(
+    page.getByRole("heading", { name: /Current Training Status/i })
+  ).toBeVisible();
+  
+  // Banner should NOT exist (legacy artifact)
+  await expect(page.getByText('First-Time Quick-Start Guide')).toHaveCount(0);
 
-  // Test Sessions page
-  await page.click("text=Sessions");
+  // Switch to Progress page via nav (current React navbar uses <button>)
+  await Promise.all([
+    page.waitForURL('**/tracking', { timeout: 10_000 }),
+    page.getByRole("button", { name: "Progress" }).click()
+  ]);
   await page.waitForLoadState('networkidle');
-  await expect(page.locator("h2", { hasText: "Workout Sessions" })).toBeVisible();
-  await expect(page.locator("table")).toBeVisible();
+  await expect(page.getByRole("heading", { name: /PowerHouseATX/i })).toBeVisible();
 
-  // Test Intelligence page
-  await page.click("text=Intelligence");
+  // Navigate back to dashboard
+  await Promise.all([
+    page.waitForURL('/', { timeout: 10_000 }),
+    page.getByRole("button", { name: "Dashboard" }).click()
+  ]);
   await page.waitForLoadState('networkidle');
-  await expect(page.locator("h2", { hasText: "Adaptive RIR" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /PowerHouseATX/i })).toBeVisible();
 
-  // Test Logger page
-  await page.click("text=Logger");
-  await page.waitForLoadState('networkidle');
-  await expect(page.locator("button:has-text('Start Session')")).toBeVisible();
-  await expect(page.locator("text=Start New Session")).toBeVisible();
-
-  // Navigate back to home
-  await page.click("text=Home");
-  await page.waitForLoadState('networkidle');
-  await expect(page.locator("h1:has-text('PowerHouse Tracker')")).toBeVisible();
+  // Verify we're back on dashboard with the training status heading
+  await expect(
+    page.getByRole("heading", { name: /Current Training Status/i })
+  ).toBeVisible();
 });

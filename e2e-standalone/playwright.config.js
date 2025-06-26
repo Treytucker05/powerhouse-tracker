@@ -1,10 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  // globalSetup: "./playwright.global-setup.js",
   /* Only run e2e specs, ignore unit *.test.js */
   testMatch: ["**/tracker-ui/e2e/*.spec.{js,ts}"],
-  testDir: "./",
+  testDir: "../",
   timeout: 30 * 1000,
   expect: {
     timeout: 5000
@@ -25,12 +24,10 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  
-  // ✅ Launch the React Vite dev server from tracker-ui
   webServer: {
-    command: "pnpm --filter tracker-ui dev",
-    cwd: "./tracker-ui",
-    url: "http://localhost:5173",
+    command: 'pnpm run dev',
+    port: 5173,
     reuseExistingServer: !process.env.CI,
+    cwd: '../',
   },
 });
