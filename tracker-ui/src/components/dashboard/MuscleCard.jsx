@@ -20,7 +20,7 @@ const MuscleCard = ({
   const status = getStatus();
   
   // Get border and badge colors based on status
-  const getBorderColor = () => {
+  const _getBorderColor = () => {
     switch (status) {
       case 'optimal': return '#22c55e';
       case 'high': return '#eab308';

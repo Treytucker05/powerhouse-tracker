@@ -12,7 +12,7 @@ const PowerHouseVolumeChart = ({ className = '' }) => {  // Sample data - replac
     { muscle: 'Hamstrings', volume: 12, mev: 8, mrv: 20 },
     { muscle: 'Glutes', volume: 14, mev: 8, mrv: 16 },
   ];
-  const getBarColor = (volume, mev, mrv) => {
+  const _getBarColor = (volume, mev, mrv) => {
     if (volume < mev || volume > mrv) return '#c50505'; // accent red
     return '#22c55e'; // green
   };

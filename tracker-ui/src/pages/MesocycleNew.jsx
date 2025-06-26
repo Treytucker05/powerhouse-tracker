@@ -5,13 +5,14 @@ import { TrainingStateProvider } from "../context/trainingStateContext";
 import ErrorBoundary from "../components/ErrorBoundary";
 import Breadcrumb from "../components/navigation/Breadcrumb";
 import SectionDivider from "../components/ui/SectionDivider";
-import FloatingActionButton, { PlanningActions } from "../components/ui/FloatingActionButton";
+import FloatingActionButton from "../components/ui/FloatingActionButton";
+import { PlanningActions } from "../components/ui/fabHelpers";
 import LoadingSkeleton from "../components/ui/LoadingSkeleton";
 import { CalendarIcon, ChartBarIcon, ClockIcon } from '@heroicons/react/24/outline';
 import "../components/dashboard/DashboardLayout.css";
 
 export default function Mesocycle() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
 
   // Simulate loading state
   useEffect(() => {
@@ -45,8 +46,9 @@ export default function Mesocycle() {
       return '#22c55e'; // Green - optimal range
     };
 
-    const getSliderBackground = (value) => {
+    const getSliderBackground = () => {
       // Create gradient that spans the full range (0 to max)
+      // Note: value parameter removed as it's not used in current implementation
       const maxRange = Math.max(landmarks.mrv * 1.5, 30); // Allow 50% beyond MRV or minimum 30
       const mevPercent = (landmarks.mev / maxRange) * 100;
       const mrvPercent = (landmarks.mrv / maxRange) * 100;

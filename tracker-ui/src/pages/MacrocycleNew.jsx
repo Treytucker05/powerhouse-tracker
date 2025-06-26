@@ -3,14 +3,15 @@ import { TrainingStateProvider } from "../context/trainingStateContext";
 import ErrorBoundary from "../components/ErrorBoundary";
 import Breadcrumb from "../components/navigation/Breadcrumb";
 import SectionDivider from "../components/ui/SectionDivider";
-import FloatingActionButton, { PlanningActions } from "../components/ui/FloatingActionButton";
+import FloatingActionButton from "../components/ui/FloatingActionButton";
+import { PlanningActions } from "../components/ui/fabHelpers";
 import LoadingSkeleton from "../components/ui/LoadingSkeleton";
 import { useState, useEffect } from "react";
 import { CalendarIcon, ChartBarIcon, TrophyIcon, ClockIcon } from '@heroicons/react/24/outline';
 
 export default function Macrocycle() {
   const [expandedPhase, setExpandedPhase] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [_isLoading, setIsLoading] = useState(true);
 
   // Simulate loading state
   useEffect(() => {
@@ -134,7 +135,7 @@ export default function Macrocycle() {
   };
 
   // Enhanced Timeline Card Component
-  const TimelineCard = ({ mesocycle, index }) => {
+  const TimelineCard = ({ mesocycle }) => {
     const isExpanded = expandedPhase === mesocycle.id;
     const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     

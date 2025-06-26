@@ -14,7 +14,7 @@ import { ChartBarIcon, PlayIcon, PlusIcon } from '@heroicons/react/24/outline';
 import "../components/dashboard/DashboardLayout.css";
 
 export default function Tracking() {
-  const sessions = useWorkoutSessions();
+  const _sessions = useWorkoutSessions();
   const [selected, setSelected] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
