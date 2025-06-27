@@ -95,6 +95,57 @@ module.exports = {
         "fade-in": "fadeIn 0.5s ease-in-out",
         "slide-up": "slideUp 0.3s ease-out",
       },
+      utilities: {
+        '.text-premium': {
+          fontFamily: '"Inter", "Segoe UI", "Roboto", system-ui, -apple-system, sans-serif',
+          fontWeight: '500',
+          letterSpacing: '-0.02em',
+          lineHeight: '1.5',
+        },
+        '.text-premium-heading': {
+          fontFamily: '"Inter", "Segoe UI", "Roboto", system-ui, -apple-system, sans-serif',
+          fontWeight: '700',
+          letterSpacing: '-0.03em',
+          lineHeight: '1.2',
+          background: 'linear-gradient(135deg, #FFF 0%, #FAFAFA 100%)',
+          '-webkit-background-clip': 'text',
+          '-webkit-text-fill-color': 'transparent',
+          'background-clip': 'text',
+        },
+        '.text-premium-accent': {
+          color: '#EF4444',
+          fontWeight: '600',
+          textShadow: '0 0 10px rgba(239, 68, 68, 0.3)',
+        },
+        '.text-premium-secondary': {
+          color: '#6B7280',
+          opacity: '0.8',
+          fontSize: '0.9em',
+        },
+        '.bg-premium': {
+          background: 'linear-gradient(135deg, #1C1C1C 0%, #0A0A0A 100%)',
+        },
+        '.bg-premium-glass': {
+          background: 'rgba(28, 28, 28, 0.8)',
+          backdropFilter: 'blur(20px)',
+          '-webkit-backdrop-filter': 'blur(20px)',
+        },
+        '.border-premium': {
+          border: '1px solid rgba(220, 38, 38, 0.2)',
+        },
+        '.shadow-premium': {
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+        },
+        '.shadow-premium-lg': {
+          boxShadow: '0 16px 48px rgba(0, 0, 0, 0.4), 0 0 30px rgba(220, 38, 38, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+        },
+        '.glow-red': {
+          boxShadow: '0 0 20px rgba(220, 38, 38, 0.4)',
+        },
+        '.glow-red-lg': {
+          boxShadow: '0 0 40px rgba(220, 38, 38, 0.5)',
+        },
+      }
     }
   },
   plugins: [],

@@ -33,39 +33,57 @@ export default function Home() {
   };
 
   return (
-    <div className="space-y-6 max-w-full overflow-hidden px-4 sm:px-6 lg:px-8">
-      {/* Welcome Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">
-          Welcome back, <span className="text-red-500">Trey</span>! 💪
+    <div className="space-y-8 overflow-hidden px-4 sm:px-6 lg:px-8 min-h-screen" style={{
+      background: 'linear-gradient(135deg, #1C1C1C 0%, #0A0A0A 100%)'
+    }}>
+      {/* Premium Welcome Header */}
+      <div className="pt-8 text-center">
+        <h1 className="text-4xl font-bold" style={{
+          background: 'linear-gradient(135deg, #FFF 0%, #FAFAFA 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text'
+        }}>
+          Welcome back, <span className="text-accent-red" style={{ textShadow: '0 0 10px rgba(239, 68, 68, 0.3)' }}>Trey</span>! 💪
         </h1>
-        <p className="text-gray-400">Ready to crush your training goals today?</p>
+        <p className="text-gray-400 opacity-80 text-lg">Ready to crush your training goals today?</p>
+        <div className="mt-8 w-32 h-px bg-gradient-to-r from-transparent via-accent-red to-transparent mx-auto opacity-50"></div>
       </div>
 
-      {/* Main Dashboard - Vertical Stack */}
-      <div className="space-y-6 max-w-3xl mx-auto w-full">
-        {/* Volume Chart - Full Width */}
-        <div className="w-full">
-          <div className="w-full max-w-full overflow-hidden">
+      {/* Volume Chart - Hero Section */}
+      <div className="max-w-6xl mx-auto">
+        <div className="py-12 px-6">
+          <div className="premium-card">
             <SimpleVolumeChart data={sampleVolumeData} />
           </div>
         </div>
-        
-        {/* Dashboard Cards - Stacked Vertically */}
-        <div className="space-y-6 w-full max-w-xl mx-auto">
-          <TrainingStatusCard />
+      </div>
+
+      {/* Main Dashboard - Secondary Content */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Dashboard Cards - Clean Layout */}
+        <div className="space-y-6">
+          {/* Primary Card - Training Status (Full Width) */}
+          <div className="w-full">
+            <TrainingStatusCard />
+          </div>
           
-          {/* Placeholder split until program builder feeds real data */}
-          <TrainingSplitOverview split={["Push", "Pull", "Legs", "Rest"]} />
-          
-          {/* Placeholder upcoming sessions */}
-          <UpcomingSessionsPreview
-            sessions={[
-              { id: "s1", dateStr: "Fri", focus: "Push" },
-              { id: "s2", dateStr: "Sun", focus: "Pull + Arms" },
-              { id: "s3", dateStr: "Tue", focus: "Legs" },
-            ]}
-          />
+          {/* Secondary Cards Row (Equal Width) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="h-full">
+              <TrainingSplitOverview split={["Push", "Pull", "Legs", "Rest"]} />
+            </div>
+            
+            <div className="h-full">
+              <UpcomingSessionsPreview
+                sessions={[
+                  { id: "s1", dateStr: "Friday", focus: "Push" },
+                  { id: "s2", dateStr: "Sunday", focus: "Pull + Arms" },
+                  { id: "s3", dateStr: "Tuesday", focus: "Legs" },
+                ]}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>

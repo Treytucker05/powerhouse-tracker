@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 function SimpleVolumeChart({ data = {} }) {
   const [hoveredBar, setHoveredBar] = useState(null);
-  const [dimensions, setDimensions] = useState({ width: 900, height: 500 });
+  const [dimensions, setDimensions] = useState({ width: 800, height: 450 });
 
   // Responsive dimensions
   useEffect(() => {
@@ -15,7 +15,7 @@ function SimpleVolumeChart({ data = {} }) {
       } else if (screenWidth < 1024) {
         setDimensions({ width: Math.min(screenWidth - 80, 800), height: 450 });
       } else {
-        setDimensions({ width: 900, height: 500 });
+        setDimensions({ width: 800, height: 450 });
       }
     };
 
@@ -66,15 +66,15 @@ function SimpleVolumeChart({ data = {} }) {
   const getYPosition = (value) => chartHeight - (value / yMax) * chartHeight;
   const getXPosition = (index) => index * barSpacing + (barSpacing - barWidth) / 2;
 
-  // Color function based on legacy logic
+  // Premium color function based on legacy logic
   const getBarColor = (muscle) => {
     const current = data[muscle] || 0;
     const mev = data.mev?.[muscle] || 0;
     const mrv = data.mrv?.[muscle] || 0;
     
-    if (current < mev) return '#ff4444'; // Red - under MEV
-    if (current > mrv) return '#ff4444'; // Red - over MRV
-    return '#44ff44'; // Green - optimal (between MEV and MRV)
+    if (current < mev) return '#DC2626'; // primary-red - under MEV
+    if (current > mrv) return '#DC2626'; // primary-red - over MRV
+    return '#22C55E'; // refined green - optimal (between MEV and MRV)
   };
 
   // Generate Y-axis ticks (by 2's)
@@ -84,42 +84,26 @@ function SimpleVolumeChart({ data = {} }) {
   }
   return (
     <div style={{
-      background: 'linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #0f0f0f 100%)',
-      border: '2px solid #dc2626',
+      background: 'linear-gradient(135deg, var(--rich-black) 0%, var(--primary-black) 100%)',
+      border: '1px solid var(--border-color)',
       borderRadius: '16px',
-      padding: 'clamp(16px, 4vw, 32px)',
-      boxShadow: '0 12px 40px rgba(220, 38, 38, 0.4), 0 4px 12px rgba(0, 0, 0, 0.6)',
+      padding: '20px',
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       position: 'relative',
       overflow: 'hidden',
-      width: '100%',
-      maxWidth: '100%',
-      minWidth: 0
+      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
     }}>
     
-    {/* Optional container for additional width control */}
-    <div style={{ width: '100%', overflowX: 'auto' }}>
-      {/* Subtle animated background glow */}
-      <div style={{
-        position: 'absolute',
-        top: '-50%',
-        left: '-50%',
-        width: '200%',
-        height: '200%',
-        background: 'radial-gradient(circle, rgba(220, 38, 38, 0.1) 0%, transparent 70%)',
-        animation: 'pulse 4s ease-in-out infinite',
-        pointerEvents: 'none'
-      }} />
-      
+    {/* Container for chart content */}
+    <div style={{ width: '100%' }}>
       <h3 style={{
-        color: '#dc2626',
-        fontSize: 'clamp(1.25rem, 3vw, 1.75rem)',
-        fontWeight: '800',
+        color: 'var(--accent-red)',
+        fontSize: '1.1rem',
+        fontWeight: '700',
         textAlign: 'center',
-        marginBottom: 'clamp(16px, 3vw, 24px)',
-        textShadow: '2px 2px 8px rgba(0,0,0,0.9), 0 0 20px rgba(220, 38, 38, 0.3)',
-        letterSpacing: '0.5px',
-        textTransform: 'uppercase',
+        marginBottom: '16px',
+        textShadow: '1px 1px 4px rgba(0,0,0,0.8)',
+        letterSpacing: '0.3px',
         position: 'relative',
         zIndex: 1
       }}>
@@ -134,10 +118,9 @@ function SimpleVolumeChart({ data = {} }) {
           width={width} 
           height={height} 
           style={{ 
-            background: 'linear-gradient(145deg, #000000 0%, #111111 50%, #000000 100%)',
-            borderRadius: '12px',
-            boxShadow: 'inset 0 2px 8px rgba(0, 0, 0, 0.8), 0 4px 16px rgba(220, 38, 38, 0.2)',
-            transition: 'all 0.3s ease',
+            background: 'linear-gradient(145deg, var(--rich-black) 0%, var(--primary-black) 100%)',
+            borderRadius: '8px',
+            boxShadow: 'inset 0 1px 4px rgba(0, 0, 0, 0.6)',
             maxWidth: '100%',
             height: 'auto'
           }}
@@ -414,46 +397,37 @@ function SimpleVolumeChart({ data = {} }) {
             </text>
           </g>
         </svg>
-      </div>      {/* Legend */}
+      </div>      {/* Legend - Simplified */}
       <div style={{
         display: 'flex',
         justifyContent: 'center',
-        gap: 'clamp(15px, 4vw, 35px)',
-        marginTop: 'clamp(16px, 3vw, 24px)',
-        flexWrap: 'wrap',
-        position: 'relative',
-        zIndex: 1
+        gap: '15px',
+        marginTop: '16px',
+        flexWrap: 'wrap'
       }}>
         {[
-          { color: '#44ff44', label: 'Optimal Volume (MEV-MRV)', type: 'solid' },
+          { color: '#44ff44', label: 'Optimal Volume', type: 'solid' },
           { color: '#ff4444', label: 'Sub/Over Volume', type: 'solid' },
-          { color: '#fbbf24', label: 'MEV (Minimum Effective)', type: 'dashed' },
-          { color: '#ff4444', label: 'MRV (Maximum Recoverable)', type: 'dashed' }
+          { color: '#fbbf24', label: 'MEV', type: 'dashed' },
+          { color: '#ff4444', label: 'MRV', type: 'dashed' }
         ].map((item, index) => (
           <div key={index} style={{ 
             display: 'flex', 
             alignItems: 'center', 
-            gap: '10px',
-            transition: 'transform 0.2s ease',
-            cursor: 'default'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-          >
+            gap: '6px'
+          }}>
             <div style={{
-              width: '24px',
-              height: item.type === 'dashed' ? '4px' : '14px',
+              width: '16px',
+              height: item.type === 'dashed' ? '3px' : '10px',
               background: item.color,
               border: item.type === 'solid' ? '1px solid #ffffff' : 'none',
-              borderTop: item.type === 'dashed' ? `3px dashed ${item.color}` : 'none',
-              borderRadius: item.type === 'solid' ? '2px' : '0',
-              boxShadow: `0 0 8px ${item.color}40`
+              borderTop: item.type === 'dashed' ? `2px dashed ${item.color}` : 'none',
+              borderRadius: item.type === 'solid' ? '2px' : '0'
             }} />
             <span style={{ 
               color: '#ffffff', 
-              fontSize: 'clamp(12px, 2.5vw, 14px)', 
-              fontWeight: 'bold',
-              textShadow: '0 1px 3px rgba(0,0,0,0.8)'
+              fontSize: '12px', 
+              fontWeight: '600'
             }}>
               {item.label}
             </span>
