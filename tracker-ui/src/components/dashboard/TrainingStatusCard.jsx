@@ -44,124 +44,161 @@ export default function TrainingStatusCard() {
   const mesocycleRIR = getMesocycleRIR(state);
   const currentDayName = getCurrentDayName(state);
 
+  // Helper function to format numbers with commas
+  const formatNumber = (num) => {
+    return num.toLocaleString();
+  };
+
   return (
-    <div className="premium-card h-full flex flex-col p-8">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-8 gap-4">
+    <div className="training-status-card overflow-safe">
+      {/* Enhanced Header with Better Typography Hierarchy */}
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start spacing-responsive-lg gap-4 lg:gap-6">
         <div className="min-w-0 flex-1">
-          <h2 className="text-3xl font-bold text-white mb-3 truncate text-left">{cycle?.goal || 'Training Program'}</h2>
+          {/* Main Program Title - More Prominent */}
+          <h1 className="responsive-text-4xl font-bold text-white spacing-responsive-md leading-tight">
+            {cycle?.goal || 'Hypertrophy'}
+          </h1>
+          {/* Subtitle - Smaller and Secondary */}
           {cycle?.specializations?.length > 0 && (
-            <p className="text-base text-gray-300 truncate mb-4 font-medium">
+            <p className="responsive-text-lg text-gray-300 font-medium">
               Focus: {cycle.specializations.map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(" • ")}
             </p>
           )}
         </div>
-        <div className="text-right flex-shrink-0 sm:mt-1">
-          <div className="text-white font-semibold truncate mb-2 text-base">
+        {/* Program Progress - Better Alignment */}
+        <div className="text-left lg:text-right flex-shrink-0 space-y-1 lg:space-y-2">
+          <div className="text-white font-bold responsive-text-lg leading-tight">
             Week {cycle?.currentWeek || 1}/{cycle?.weeks || 6} • Day {cycle?.currentDay || 1}
           </div>
-          <div className="text-gray-300 truncate font-medium text-sm mb-1">
+          <div className="text-gray-300 font-medium text-sm lg:text-base">
             {currentDayName}
           </div>
-          <div className="text-gray-400 truncate text-sm">
+          <div className="text-gray-400 text-xs lg:text-sm font-medium">
             {daysToDeload > 0 ? `${daysToDeload} days to deload` : 'Deload week'}
           </div>
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto mb-8 px-2">
-        <table className="w-full text-sm min-w-0">
-          <thead>
-            <tr className="text-white border-b-2 border-gray-600">
-              <th className="text-left pb-4 pr-6 font-semibold text-base">Muscle Group</th>
-              <th className="text-right pb-4 px-4 font-semibold text-base">Sets</th>
-              <th className="text-right pb-4 pl-4 font-semibold text-base">Tonnage (lb)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.keys(vol.sets)
-              .sort((a, b) => vol.tonnage[b] - vol.tonnage[a])
-              .map((m) => (
-                <tr key={m} className="border-b border-gray-700 hover:bg-gray-800/30 transition-colors">
-                  <td className="capitalize py-3 pr-6 text-white font-medium">{m}</td>
-                  <td className="text-right py-3 px-4 text-gray-300">{vol.sets[m]}</td>
-                  <td className="text-right py-3 pl-4 text-gray-300 font-medium">{vol.tonnage[m].toLocaleString()}</td>
-                </tr>
-              ))}
-          </tbody>
-          <tfoot>
-            <tr className="font-semibold text-white border-t-2 border-gray-600">
-              <td className="pt-4 pr-6">Total</td>
-              <td className="text-right pt-4 px-4">{agg.totalSets}</td>
-              <td className="text-right pt-4 pl-4">{agg.totalTon.toLocaleString()}</td>
-            </tr>
-          </tfoot>
-        </table>
+      {/* Professional Training Data Table */}
+      <div className="spacing-responsive-lg">
+        <div className="responsive-table-container bg-gray-800/20 border border-gray-700/50">
+          <table className="responsive-table">
+            <thead>
+              <tr className="bg-gray-800/50 border-b-2 border-gray-600">
+                <th className="text-left padding-responsive-md text-white font-bold responsive-text-lg tracking-wide">
+                  Muscle Group
+                </th>
+                <th className="text-right padding-responsive-md text-white font-bold responsive-text-lg tracking-wide">
+                  Sets
+                </th>
+                <th className="text-right padding-responsive-md text-white font-bold responsive-text-lg tracking-wide">
+                  Tonnage (lb)
+                </th>
+              </tr>
+            </thead>
+              <tbody>
+                {Object.keys(vol.sets)
+                  .sort((a, b) => vol.tonnage[b] - vol.tonnage[a])
+                  .map((muscle, index) => (
+                    <tr 
+                      key={muscle} 
+                      className={`border-b border-gray-700/40 hover:bg-gray-800/30 transition-colors duration-200 ${
+                        index % 2 === 0 ? 'bg-gray-800/10' : 'bg-transparent'
+                      }`}
+                    >
+                      <td className="padding-responsive-sm text-white font-medium responsive-text-lg capitalize">
+                        {muscle}
+                      </td>
+                      <td className="padding-responsive-sm text-gray-300 font-semibold responsive-text-lg text-right tabular-nums">
+                        {vol.sets[muscle]}
+                      </td>
+                      <td className="padding-responsive-sm text-gray-300 font-semibold responsive-text-lg text-right tabular-nums">
+                        {formatNumber(vol.tonnage[muscle])}
+                      </td>
+                    </tr>
+                  ))}
+            </tbody>
+            <tfoot>
+              <tr className="bg-gray-800/40 border-t-2 border-gray-600">
+                <td className="padding-responsive-md text-white font-bold responsive-text-lg">
+                  Total
+                </td>
+                <td className="padding-responsive-md text-white font-bold responsive-text-lg text-right tabular-nums">
+                  {agg.totalSets}
+                </td>
+                <td className="padding-responsive-md text-white font-bold responsive-text-lg text-right tabular-nums">
+                  {formatNumber(agg.totalTon)}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
       </div>
 
       {/* Visual Separator */}
-      <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent mb-8"></div>
+      <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent spacing-responsive-lg"></div>
 
       {/* Aggregate Volume & Load */}
-      <div className="grid grid-cols-3 gap-6 mb-8">
-        <div className="text-center p-6 bg-gray-800/30 border border-primary-red/20 rounded-lg backdrop-blur-sm">
-          <div className="text-gray-400 text-sm font-medium mb-2">Week</div>
-          <div className="text-2xl font-bold text-white mb-1">{agg.totalSets}</div>
+      <div className="grid-responsive-3 spacing-responsive-lg">
+        <div className="text-center padding-responsive-md bg-gray-800/30 border border-primary-red/20 rounded-lg backdrop-blur-sm min-w-0">
+          <div className="text-gray-400 text-xs lg:text-sm font-medium mb-2">Week</div>
+          <div className="responsive-text-3xl font-bold text-white mb-1">{agg.totalSets}</div>
           <div className="text-xs text-gray-400 mb-2">sets</div>
-          <div className="text-lg font-semibold text-white mb-1">{agg.totalTon.toLocaleString()}</div>
+          <div className="responsive-text-lg font-semibold text-white mb-1">{formatNumber(agg.totalTon)}</div>
           <div className="text-xs text-gray-400 mb-2">lb</div>
-          <div className="text-sm text-accent-red font-medium">{compliance.completed}/{compliance.scheduled} sessions</div>
+          <div className="text-xs lg:text-sm text-accent-red font-medium">{compliance.completed}/{compliance.scheduled} sessions</div>
         </div>
-        <div className="text-center p-6 bg-gray-800/30 border border-primary-red/20 rounded-lg backdrop-blur-sm">
-          <div className="text-gray-400 text-sm font-medium mb-2">Month</div>
-          <div className="text-2xl font-bold text-white mb-1">{monthlyAgg.sets}</div>
+        <div className="text-center padding-responsive-md bg-gray-800/30 border border-primary-red/20 rounded-lg backdrop-blur-sm min-w-0">
+          <div className="text-gray-400 text-xs lg:text-sm font-medium mb-2">Month</div>
+          <div className="responsive-text-3xl font-bold text-white mb-1">{monthlyAgg.sets}</div>
           <div className="text-xs text-gray-400 mb-2">sets</div>
-          <div className="text-lg font-semibold text-white mb-1">{monthlyAgg.tonnage.toLocaleString()}</div>
+          <div className="responsive-text-lg font-semibold text-white mb-1">{formatNumber(monthlyAgg.tonnage)}</div>
           <div className="text-xs text-gray-400 mb-2">lb</div>
-          <div className="text-sm text-accent-red font-medium">{monthlyAgg.sessions}/{monthlyAgg.plannedSessions} sessions</div>
+          <div className="text-xs lg:text-sm text-accent-red font-medium">{monthlyAgg.sessions}/{monthlyAgg.plannedSessions} sessions</div>
         </div>
-        <div className="text-center p-6 bg-gray-800/30 border border-primary-red/20 rounded-lg backdrop-blur-sm">
-          <div className="text-gray-400 text-sm font-medium mb-2">Program</div>
-          <div className="text-2xl font-bold text-white mb-1">{programAgg.sets}</div>
+        <div className="text-center padding-responsive-md bg-gray-800/30 border border-primary-red/20 rounded-lg backdrop-blur-sm min-w-0">
+          <div className="text-gray-400 text-xs lg:text-sm font-medium mb-2">Program</div>
+          <div className="responsive-text-3xl font-bold text-white mb-1">{programAgg.sets}</div>
           <div className="text-xs text-gray-400 mb-2">sets</div>
-          <div className="text-lg font-semibold text-white mb-1">{programAgg.tonnage.toLocaleString()}</div>
+          <div className="responsive-text-lg font-semibold text-white mb-1">{formatNumber(programAgg.tonnage)}</div>
           <div className="text-xs text-gray-400 mb-2">lb</div>
-          <div className="text-sm text-accent-red font-medium">{programAgg.sessions}/{programAgg.plannedSessions} sessions</div>
+          <div className="text-xs lg:text-sm text-accent-red font-medium">{programAgg.sessions}/{programAgg.plannedSessions} sessions</div>
         </div>
       </div>
 
       {/* Intensity & Effort */}
-      <div className="grid grid-cols-2 gap-6 mb-8">
-        <div className="p-6 bg-gray-800/30 rounded-lg border border-primary-red/20">
-          <div className="text-gray-400 text-sm font-medium mb-2">Weekly Average RIR</div>
-          <div className="text-2xl font-bold text-white">{weeklyRIR ?? "--"}</div>
+      <div className="grid-responsive-2 spacing-responsive-lg">
+        <div className="padding-responsive-md bg-gray-800/30 rounded-lg border border-primary-red/20 min-w-0">
+          <div className="text-gray-400 text-xs lg:text-sm font-medium mb-2">Weekly Average RIR</div>
+          <div className="responsive-text-3xl font-bold text-white">{weeklyRIR ?? "--"}</div>
           <div className="text-xs text-gray-400 mt-1">reps in reserve</div>
         </div>
-        <div className="p-6 bg-gray-800/30 rounded-lg border border-primary-red/20">
-          <div className="text-gray-400 text-sm font-medium mb-2">Mesocycle Average RIR</div>
-          <div className="text-2xl font-bold text-white">{mesocycleRIR ?? "--"}</div>
+        <div className="padding-responsive-md bg-gray-800/30 rounded-lg border border-primary-red/20 min-w-0">
+          <div className="text-gray-400 text-xs lg:text-sm font-medium mb-2">Mesocycle Average RIR</div>
+          <div className="responsive-text-3xl font-bold text-white">{mesocycleRIR ?? "--"}</div>
           <div className="text-xs text-gray-400 mt-1">reps in reserve</div>
         </div>
       </div>
 
       {/* Fatigue & Compliance */}
-      <div className="grid grid-cols-2 gap-6 mb-8">
+      <div className="grid-responsive-2 spacing-responsive-lg">
         {/* Fatigue Card */}
-        <div className="p-6 bg-gray-800/30 rounded-lg border border-primary-red/20 flex items-center justify-center">
-          <VintageFatigueGauge 
-            value={state?.fatigueScore || 45} 
-            label="Fatigue Level"
-          />
+        <div className="padding-responsive-md bg-gray-800/30 rounded-lg border border-primary-red/20 flex items-center justify-center min-w-0">
+          <div className="gauge-container">
+            <VintageFatigueGauge 
+              value={state?.fatigueScore || 45} 
+              label="Fatigue Level"
+            />
+          </div>
         </div>
 
         {/* Compliance & Performance Card */}
-        <div className="p-6 bg-gray-800/30 rounded-lg border border-primary-red/20">
-          <div className="text-gray-400 text-sm font-medium mb-3">Performance Metrics</div>
+        <div className="padding-responsive-md bg-gray-800/30 rounded-lg border border-primary-red/20 min-w-0">
+          <div className="text-gray-400 text-xs lg:text-sm font-medium mb-3">Performance Metrics</div>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-gray-300 text-sm">Session Adherence</span>
-              <span className="text-lg font-bold text-accent-red">{compliance.percentage}%</span>
+              <span className="text-gray-300 text-xs lg:text-sm">Session Adherence</span>
+              <span className="responsive-text-lg font-bold text-accent-red">{compliance.percentage}%</span>
             </div>
             <div className="w-full bg-gray-700 rounded-full h-2">
               <div 
@@ -170,8 +207,8 @@ export default function TrainingStatusCard() {
               ></div>
             </div>
             <div className="flex justify-between items-center mt-2">
-              <span className="text-gray-300 text-sm">Weekly RIR</span>
-              <span className="text-lg font-bold text-white">{weeklyRIR ?? "--"}</span>
+              <span className="text-gray-300 text-xs lg:text-sm">Weekly RIR</span>
+              <span className="responsive-text-lg font-bold text-white">{weeklyRIR ?? "--"}</span>
             </div>
           </div>
         </div>
@@ -179,7 +216,7 @@ export default function TrainingStatusCard() {
 
       {/* Deload banner */}
       {showDeloadBanner && (
-        <div className="p-4 bg-gradient-to-r from-dark-red/40 to-primary-red/40 text-white rounded-lg border border-accent-red/50 mb-6" style={{ boxShadow: '0 0 20px rgba(220, 38, 38, 0.4)' }}>
+        <div className="padding-responsive-md bg-gradient-to-r from-dark-red/40 to-primary-red/40 text-white rounded-lg border border-accent-red/50 spacing-responsive-md" style={{ boxShadow: '0 0 20px rgba(220, 38, 38, 0.4)' }}>
           <div className="flex items-center">
             <span className="mr-3 text-lg">🔔</span>
             <span className="font-semibold">High fatigue detected — consider deload soon!</span>
@@ -188,10 +225,10 @@ export default function TrainingStatusCard() {
       )}
 
       {/* Action Buttons */}
-      <div className="flex gap-4 mt-auto pt-4">
+      <div className="flex-responsive-column mt-auto spacing-responsive-md">
         <button
           onClick={() => context?.refreshDashboard?.() || console.log('Refresh clicked')}
-          className="btn-premium-outline flex-1 text-sm py-3"
+          className="btn-responsive btn-premium-outline flex-1 min-w-0"
         >
           Refresh
         </button>
@@ -200,7 +237,7 @@ export default function TrainingStatusCard() {
         {import.meta.env.DEV && (
           <button
             onClick={() => seedMockSets(context)}
-            className="btn-premium flex-1 text-sm py-3"
+            className="btn-responsive btn-premium flex-1 min-w-0"
           >
             Load sample data
           </button>
