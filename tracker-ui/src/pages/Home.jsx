@@ -33,11 +33,11 @@ export default function Home() {
   };
 
   return (
-    <div className="space-y-8 overflow-hidden px-4 sm:px-6 lg:px-8 min-h-screen" style={{
+    <div className="space-y-6 overflow-hidden px-4 sm:px-6 lg:px-8 min-h-screen" style={{
       background: 'linear-gradient(135deg, #1C1C1C 0%, #0A0A0A 100%)'
     }}>
       {/* Premium Welcome Header */}
-      <div className="pt-8 text-center">
+      <div className="pt-6 text-center">
         <h1 className="text-4xl font-bold" style={{
           background: 'linear-gradient(135deg, #FFF 0%, #FAFAFA 100%)',
           WebkitBackgroundClip: 'text',
@@ -47,12 +47,12 @@ export default function Home() {
           Welcome back, <span className="text-accent-red" style={{ textShadow: '0 0 10px rgba(239, 68, 68, 0.3)' }}>Trey</span>! 💪
         </h1>
         <p className="text-gray-400 opacity-80 text-lg">Ready to crush your training goals today?</p>
-        <div className="mt-8 w-32 h-px bg-gradient-to-r from-transparent via-accent-red to-transparent mx-auto opacity-50"></div>
+        <div className="mt-6 w-32 h-px bg-gradient-to-r from-transparent via-accent-red to-transparent mx-auto opacity-50"></div>
       </div>
 
       {/* Volume Chart - Hero Section */}
-      <div className="max-w-6xl mx-auto">
-        <div className="py-12 px-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="py-6 px-6">
           <div className="premium-card">
             <SimpleVolumeChart data={sampleVolumeData} />
           </div>
@@ -62,19 +62,21 @@ export default function Home() {
       {/* Main Dashboard - Secondary Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Dashboard Cards - Clean Layout */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Primary Card - Training Status (Full Width) */}
           <div className="w-full">
-            <TrainingStatusCard />
+            <div className="min-h-[600px]">
+              <TrainingStatusCard />
+            </div>
           </div>
           
           {/* Secondary Cards Row (Equal Width) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="h-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="min-h-[400px]">
               <TrainingSplitOverview split={["Push", "Pull", "Legs", "Rest"]} />
             </div>
             
-            <div className="h-full">
+            <div className="min-h-[400px]">
               <UpcomingSessionsPreview
                 sessions={[
                   { id: "s1", dateStr: "Friday", focus: "Push" },
