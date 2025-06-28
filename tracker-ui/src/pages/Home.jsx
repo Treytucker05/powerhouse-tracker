@@ -33,7 +33,7 @@ export default function Home() {
   };
 
   return (
-    <div className="space-y-6 overflow-hidden px-4 sm:px-6 lg:px-8 min-h-screen" style={{
+    <div className="dashboard-page space-y-responsive overflow-hidden px-4 sm:px-6 lg:px-8" style={{
       background: 'linear-gradient(135deg, #1C1C1C 0%, #0A0A0A 100%)'
     }}>
       {/* Premium Welcome Header */}
@@ -52,7 +52,7 @@ export default function Home() {
 
       {/* Volume Chart - Hero Section */}
       <div className="max-w-4xl mx-auto">
-        <div className="py-6 px-6">
+        <div className="chart-container py-6 px-6">
           <div className="premium-card">
             <SimpleVolumeChart data={sampleVolumeData} />
           </div>
@@ -62,21 +62,21 @@ export default function Home() {
       {/* Main Dashboard - Secondary Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Dashboard Cards - Clean Layout */}
-        <div className="space-y-8">
+        <div className="cards-container">
           {/* Primary Card - Training Status (Full Width) */}
           <div className="w-full">
-            <div className="min-h-[600px]">
+            <div className="training-status-card premium-card">
               <TrainingStatusCard />
             </div>
           </div>
           
           {/* Secondary Cards Row (Equal Width) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="min-h-[400px]">
+          <div className="responsive-grid grid-two-column">
+            <div className="secondary-card premium-card">
               <TrainingSplitOverview split={["Push", "Pull", "Legs", "Rest"]} />
             </div>
             
-            <div className="min-h-[400px]">
+            <div className="secondary-card premium-card">
               <UpcomingSessionsPreview
                 sessions={[
                   { id: "s1", dateStr: "Friday", focus: "Push" },
