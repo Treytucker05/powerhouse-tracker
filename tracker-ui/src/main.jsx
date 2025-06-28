@@ -5,8 +5,11 @@ import './index.css'
 import App from './App.jsx'
 import { TrainingStateProvider } from './context/trainingStateContext.jsx'
 
-// Ensure dark mode is always enabled
-document.documentElement.classList.add('dark');
+// Force global dark mode toggle with localStorage support
+if (!localStorage.theme) {
+  localStorage.theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+document.documentElement.classList.toggle('dark', localStorage.theme === 'dark');
 
 // Create a client
 const queryClient = new QueryClient({

@@ -4,6 +4,7 @@ import Drawer from "../components/Drawer";
 import SimpleVolumeChart from "../components/dashboard/SimpleVolumeChart";
 import TrainingStatusCard from "../components/dashboard/TrainingStatusCard";
 import MuscleCard from "../components/dashboard/MuscleCard";
+import DashboardCard from '../components/ui/DashboardCard';
 import { TrainingStateProvider } from "../context/trainingStateContext";
 import ErrorBoundary from "../components/ErrorBoundary";
 import Breadcrumb from "../components/navigation/Breadcrumb";
@@ -67,16 +68,21 @@ export default function Tracking() {
 
   return (
     <ErrorBoundary>
-      <TrainingStateProvider>        <div className="space-y-8 max-w-7xl">
+      <TrainingStateProvider>
+        <>
           {/* Training Status Card */}
-          <TrainingStatusCard />
+          <DashboardCard className="col-full">
+            <TrainingStatusCard />
+          </DashboardCard>
 
           {/* Weekly Volume Tracker Chart */}
-          <SimpleVolumeChart data={volumeChartData} />
+          <DashboardCard className="col-full">
+            <SimpleVolumeChart data={volumeChartData} />
+          </DashboardCard>
 
           {/* Muscle Volume Cards Grid */}
-          <div className="card-powerhouse">
-            <h2 className="text-2xl font-bold text-red-600 mb-4">💪 Muscle Volume Tracking</h2>
+          <DashboardCard className="col-full">
+            <h2 className="text-2xl font-bold text-accent mb-4">💪 Muscle Volume Tracking</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {muscleData.map((muscle, index) => (
                 <MuscleCard
@@ -89,8 +95,8 @@ export default function Tracking() {
                 />
               ))}
             </div>
-          </div>
-        </div>
+          </DashboardCard>
+        </>
       </TrainingStateProvider>
     </ErrorBoundary>
   );

@@ -61,7 +61,7 @@ export default function FatigueGauge({ pct = 0 }) {
         <span 
           className={`
             text-xs font-bold
-            ${isHigh ? 'text-accent-red animate-pulse' : 'text-white'}
+            ${isHigh ? 'text-accent animate-pulse' : 'text-white'}
           `}
           style={{ 
             textShadow: isHigh ? `0 0 8px ${gaugeColor}` : 'none',

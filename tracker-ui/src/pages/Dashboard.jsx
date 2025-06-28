@@ -5,6 +5,7 @@ import QuickActionsPanel from '../components/QuickActionsPanel';
 import FatigueRecoveryIndicator from '../components/FatigueRecoveryIndicator';
 import UpcomingSessionsPreview from '../components/dashboard/UpcomingSessionsPreview';
 import TrainingSplitOverview from '../components/dashboard/TrainingSplitOverview';
+import DashboardCard from '../components/ui/DashboardCard';
 import { useDashboardState } from '../lib/state/trainingState';
 
 export default function Dashboard() {
@@ -17,13 +18,25 @@ export default function Dashboard() {
   } = useDashboardState();
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div className="space-y-6">
+    <>
+      <DashboardCard>
         <TrainingStatusCard currentWeek={currentWeek} phase={phase} />
-        {/* Placeholder split until program builder feeds real data */}
+      </DashboardCard>
+      <DashboardCard>
+        <VolumeTrackingChart muscleVolumes={muscleVolumes} />
+      </DashboardCard>
+      {/* Placeholder split until program builder feeds real data */}
+      <DashboardCard>
         <TrainingSplitOverview split={["Push", "Pull", "Legs", "Rest"]} />
+      </DashboardCard>
+      <DashboardCard>
+        <FatigueRecoveryIndicator systemicFatigue={systemicFatigue} muscleVolumes={muscleVolumes} />
+      </DashboardCard>
+      <DashboardCard>
         <QuickActionsPanel onRefresh={refreshDashboard} />
-        {/* Placeholder upcoming sessions */}
+      </DashboardCard>
+      {/* Placeholder upcoming sessions */}
+      <DashboardCard>
         <UpcomingSessionsPreview
           sessions={[
             { id: "s1", dateStr: "Fri", focus: "Push" },
@@ -31,11 +44,7 @@ export default function Dashboard() {
             { id: "s3", dateStr: "Tue", focus: "Legs" },
           ]}
         />
-      </div>
-      <div className="space-y-6">
-        <VolumeTrackingChart muscleVolumes={muscleVolumes} />
-        <FatigueRecoveryIndicator systemicFatigue={systemicFatigue} muscleVolumes={muscleVolumes} />
-      </div>
-    </div>
+      </DashboardCard>
+    </>
   );
 }

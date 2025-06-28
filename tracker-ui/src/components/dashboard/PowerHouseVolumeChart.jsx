@@ -48,9 +48,9 @@ const PowerHouseVolumeChart = ({ className = '' }) => {  // Sample data - replac
   //   return <Bar {...rest} fill={color} stroke={color} strokeWidth={2} />;
   // };
   return (
-    <div className={`bg-gray-900 p-6 rounded-2xl border border-gray-700 shadow-lg ${className}`}>
+    <div className={className}>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-offwhite">📊 Weekly Volume by Muscle Group</h2>
+        <h2 className="text-2xl font-bold text-white">📊 Weekly Volume by Muscle Group</h2>
         <div className="flex items-center space-x-4 text-sm">
           <div className="flex items-center space-x-2">
             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
