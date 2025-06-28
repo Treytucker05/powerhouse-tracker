@@ -1,7 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./index.html", "./src/**/*.{js,jsx}"],
-  darkMode: 'class',  theme: { 
+  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
+  darkMode: 'class',
+  theme: { 
     extend: {
       colors: {
         // PowerHouse Premium Color Palette
@@ -94,6 +95,9 @@ module.exports = {
       animation: {
         "fade-in": "fadeIn 0.5s ease-in-out",
         "slide-up": "slideUp 0.3s ease-out",
+      },
+      backdropBlur: {
+        'xl': '24px'
       },
       utilities: {
         '.text-premium': {

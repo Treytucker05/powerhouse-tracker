@@ -566,19 +566,6 @@ html {
   box-shadow: 0 10px 15px -3px rgba(220, 38, 38, 0.5), 0 4px 6px -2px rgba(220, 38, 38, 0.5);
 }
 
-/* Card styles */
-.card-powerhouse {
-  background-color: #111827;
-  border: 1px solid #1f2937;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  transition: all 0.2s ease-in-out;
-}
-
-.card-powerhouse:hover {
-  border-color: rgba(220, 38, 38, 0.5);
-}
-
 /* Enhanced Sticky Header & Navigation */
 .sticky-header {
   will-change: transform, backdrop-filter;

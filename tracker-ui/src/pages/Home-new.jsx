@@ -1,14 +1,15 @@
 import React from 'react';
 import SimpleVolumeChart from '../components/dashboard/SimpleVolumeChart';
 import TrainingStatusCard from '../components/dashboard/TrainingStatusCard';
+import DashboardCard from '../components/ui/DashboardCard';
 
 function QuickStatsCard() {
   return (
-    <div className="card-powerhouse">
-      <h2 className="text-xl font-semibold text-red-500 mb-4">📊 Quick Stats</h2>
+    <DashboardCard>
+      <h2 className="text-xl font-semibold text-accent mb-4">📊 Quick Stats</h2>
       <div className="grid grid-cols-2 gap-4">
         <div className="text-center">
-          <div className="text-2xl font-bold text-red-500">142</div>
+          <div className="text-2xl font-bold text-accent">142</div>
           <div className="text-sm text-gray-400">Total Sets</div>
         </div>
         <div className="text-center">
@@ -16,7 +17,7 @@ function QuickStatsCard() {
           <div className="text-sm text-gray-400">Avg RIR</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-red-400">12</div>
+          <div className="text-2xl font-bold text-accent">12</div>
           <div className="text-sm text-gray-400">Sessions</div>
         </div>
         <div className="text-center">
@@ -24,7 +25,7 @@ function QuickStatsCard() {
           <div className="text-sm text-gray-400">RPE Avg</div>
         </div>
       </div>
-    </div>
+    </DashboardCard>
   );
 }
 
@@ -57,28 +58,25 @@ export default function Home() {
   };
 
   return (
-    <div className="space-y-6">
+    <>
       {/* Welcome Header */}
-      <div className="mb-8">
+      <DashboardCard className="col-full">
         <h1 className="text-3xl font-bold text-white mb-2">
-          Welcome back, <span className="text-red-500">Trey</span>! 💪
+          Welcome back, <span className="text-accent">Trey</span>! 💪
         </h1>
         <p className="text-gray-400">Ready to crush your training goals today?</p>
-      </div>
+      </DashboardCard>
 
-      {/* Main Dashboard Grid */}
-      <div className="grid gap-6 lg:grid-cols-12">
-        {/* Volume Chart - Main Feature */}
-        <div className="lg:col-span-8">
-          <SimpleVolumeChart data={sampleVolumeData} />
-        </div>
-        
-        {/* Side Cards */}
-        <div className="lg:col-span-4 space-y-6">
-          <TrainingStatusCard />
-          <QuickStatsCard />
-        </div>
-      </div>
-    </div>
+      <QuickStatsCard />
+      
+      <DashboardCard>
+        <TrainingStatusCard />
+      </DashboardCard>
+
+      {/* Volume Chart */}
+      <DashboardCard className="col-full">
+        <SimpleVolumeChart data={sampleVolumeData} />
+      </DashboardCard>
+    </>
   );
 }
