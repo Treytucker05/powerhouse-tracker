@@ -1,5 +1,5 @@
 import React, { useReducer, useEffect, useContext } from 'react';
-import { TrainingStateContext } from './TrainingStateContext';
+import { TrainingStateContext } from './TrainingStateContext.js';
 import { TRAINING_ACTIONS } from './trainingActions';
 
 // Training state initial values
@@ -55,6 +55,120 @@ const initialState = {
   loggedSessions: [],
   fatigueScore: 0,
   mrvTable: {},
+  
+  // Expanded Training Aggregates
+  volumeTotals: {
+    daily: {
+      sets: 0,
+      tonnage: 0,
+      volumeLoad: 0,
+      duration: 0,
+      avgRIR: 0,
+      muscleBreakdown: {}
+    },
+    weekly: {
+      sets: 0,
+      tonnage: 0,
+      volumeLoad: 0,
+      duration: 0,
+      avgRIR: 0,
+      muscleBreakdown: {},
+      sessions: 0
+    },
+    block: {
+      sets: 0,
+      tonnage: 0,
+      volumeLoad: 0,
+      duration: 0,
+      avgRIR: 0,
+      muscleBreakdown: {},
+      sessions: 0,
+      weeks: 0
+    },
+    program: {
+      sets: 0,
+      tonnage: 0,
+      volumeLoad: 0,
+      duration: 0,
+      avgRIR: 0,
+      muscleBreakdown: {},
+      sessions: 0,
+      weeks: 0,
+      blocks: 0
+    }
+  },
+  
+  // Body Metrics & Health Data
+  bodyMetrics: {
+    current: {
+      weight: null,
+      bodyFat: null,
+      muscleMass: null,
+      measurements: {
+        chest: null,
+        waist: null,
+        arms: null,
+        thighs: null,
+        shoulders: null
+      },
+      vitals: {
+        restingHR: null,
+        bloodPressure: { systolic: null, diastolic: null },
+        sleep: { duration: 0, quality: 0 },
+        stress: 0
+      }
+    },
+    daily: {
+      weight: null,
+      steps: 0,
+      calories: 0,
+      water: 0,
+      heartRate: { avg: null, max: null, resting: null },
+      recovery: 0
+    },
+    history: {
+      weight: [],
+      bodyFat: [],
+      measurements: {},
+      vitals: {}
+    }
+  },
+  
+  // Performance Metrics & 1RMs
+  performanceMetrics: {
+    oneRepMax: {
+      squat: null,
+      bench: null,
+      deadlift: null,
+      overheadPress: null,
+      pullUp: null,
+      dip: null,
+      lastUpdated: null
+    },
+    strengthRatios: {
+      squatToBench: 0,
+      deadliftToSquat: 0,
+      pushToPull: 0
+    },
+    volumeProgression: {
+      weekly: [],
+      monthly: [],
+      blocks: []
+    },
+    intensityMetrics: {
+      avgRPE: 0,
+      avgRIR: 0,
+      volumeAtIntensity: {},
+      peakIntensity: 0
+    },
+    performanceTests: {
+      maxPushUps: null,
+      maxPullUps: null,
+      plankTime: null,
+      vo2Max: null,
+      lastTested: null
+    }
+  },
   
   // Deload Analysis
   deloadData: {
@@ -400,6 +514,161 @@ export function TrainingStateProvider({ children }) {
 // Hook for accessing training state
 export function useTrainingState() {
   return useContext(TrainingStateContext);
+}
+
+// Enhanced selector hooks for expanded data model
+export function useVolumeTotals() {
+  const { state } = useTrainingState();
+  return {
+    daily: state.volumeTotals.daily,
+    weekly: state.volumeTotals.weekly,
+    block: state.volumeTotals.block,
+    program: state.volumeTotals.program,
+    
+    // Computed values
+    dailyProgress: state.volumeTotals.daily.sets / (state.volumeTotals.weekly.sets / 7) || 0,
+    weeklyProgress: state.volumeTotals.weekly.sets / (state.volumeTotals.block.sets / 4) || 0,
+    blockProgress: state.volumeTotals.block.sets / (state.volumeTotals.program.sets / 4) || 0
+  };
+}
+
+export function useBodyMetrics() {
+  const { state } = useTrainingState();
+  return {
+    current: state.bodyMetrics.current,
+    daily: state.bodyMetrics.daily,
+    history: state.bodyMetrics.history,
+    
+    // Computed trends
+    weightTrend: computeTrend(state.bodyMetrics.history.weight),
+    bodyFatTrend: computeTrend(state.bodyMetrics.history.bodyFat),
+    
+    // Health score calculation
+    healthScore: calculateHealthScore(state.bodyMetrics),
+    
+    // Daily targets vs actual
+    dailyTargets: {
+      steps: { target: 10000, actual: state.bodyMetrics.daily.steps },
+      water: { target: 3500, actual: state.bodyMetrics.daily.water },
+      calories: { target: 2200, actual: state.bodyMetrics.daily.calories }
+    }
+  };
+}
+
+export function usePerformanceMetrics() {
+  const { state } = useTrainingState();
+  return {
+    oneRepMax: state.performanceMetrics.oneRepMax,
+    strengthRatios: state.performanceMetrics.strengthRatios,
+    volumeProgression: state.performanceMetrics.volumeProgression,
+    intensityMetrics: state.performanceMetrics.intensityMetrics,
+    performanceTests: state.performanceMetrics.performanceTests,
+    
+    // Computed strength standards
+    strengthStandards: calculateStrengthStandards(
+      state.performanceMetrics.oneRepMax,
+      state.bodyMetrics.current.weight
+    ),
+    
+    // Training efficiency metrics
+    efficiencyScore: calculateEfficiencyScore(state.performanceMetrics),
+    
+    // Progressive overload tracking
+    overloadTrend: calculateOverloadTrend(state.performanceMetrics.volumeProgression)
+  };
+}
+
+// Helper functions for computations
+function computeTrend(dataArray) {
+  if (!dataArray || dataArray.length < 2) return 'stable';
+  
+  const recent = dataArray.slice(-5);
+  const avg = recent.reduce((sum, item) => sum + item.value, 0) / recent.length;
+  const firstValue = recent[0].value;
+  const lastValue = recent[recent.length - 1].value;
+  
+  const change = ((lastValue - firstValue) / firstValue) * 100;
+  
+  if (change > 2) return 'increasing';
+  if (change < -2) return 'decreasing';
+  return 'stable';
+}
+
+function calculateHealthScore(bodyMetrics) {
+  let score = 0;
+  let factors = 0;
+  
+  // Weight stability (±2% from baseline)
+  if (bodyMetrics.current.weight) {
+    score += 25;
+    factors += 1;
+  }
+  
+  // Sleep quality
+  if (bodyMetrics.current.vitals.sleep.quality >= 7) {
+    score += 25;
+    factors += 1;
+  }
+  
+  // Daily activity
+  if (bodyMetrics.daily.steps >= 8000) {
+    score += 25;
+    factors += 1;
+  }
+  
+  // Hydration
+  if (bodyMetrics.daily.water >= 2500) {
+    score += 25;
+    factors += 1;
+  }
+  
+  return factors > 0 ? Math.round(score / factors) : 0;
+}
+
+function calculateStrengthStandards(oneRepMax, bodyWeight) {
+  if (!bodyWeight) return {};
+  
+  return {
+    squat: {
+      ratio: oneRepMax.squat ? (oneRepMax.squat / bodyWeight).toFixed(2) : null,
+      standard: getStrengthStandard(oneRepMax.squat / bodyWeight, 'squat')
+    },
+    bench: {
+      ratio: oneRepMax.bench ? (oneRepMax.bench / bodyWeight).toFixed(2) : null,
+      standard: getStrengthStandard(oneRepMax.bench / bodyWeight, 'bench')
+    },
+    deadlift: {
+      ratio: oneRepMax.deadlift ? (oneRepMax.deadlift / bodyWeight).toFixed(2) : null,
+      standard: getStrengthStandard(oneRepMax.deadlift / bodyWeight, 'deadlift')
+    }
+  };
+}
+
+function getStrengthStandard(ratio, lift) {
+  const standards = {
+    squat: { beginner: 1.0, intermediate: 1.5, advanced: 2.0, elite: 2.5 },
+    bench: { beginner: 0.75, intermediate: 1.25, advanced: 1.75, elite: 2.25 },
+    deadlift: { beginner: 1.25, intermediate: 1.75, advanced: 2.25, elite: 2.75 }
+  };
+  
+  if (!ratio || !standards[lift]) return 'unknown';
+  
+  const thresholds = standards[lift];
+  if (ratio >= thresholds.elite) return 'elite';
+  if (ratio >= thresholds.advanced) return 'advanced';
+  if (ratio >= thresholds.intermediate) return 'intermediate';
+  if (ratio >= thresholds.beginner) return 'beginner';
+  return 'novice';
+}
+
+function calculateEfficiencyScore(performanceMetrics) {
+  // Placeholder - could include volume efficiency, strength gains per session, etc.
+  return Math.round(Math.random() * 100); // TODO: Implement proper calculation
+}
+
+function calculateOverloadTrend(volumeProgression) {
+  // Placeholder - analyze progressive overload over time
+  return 'positive'; // TODO: Implement proper calculation
 }
 
 export default TrainingStateProvider;
