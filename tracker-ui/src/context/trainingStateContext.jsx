@@ -1,6 +1,8 @@
-import React, { useReducer, useEffect, useContext } from 'react';
-import { TrainingStateContext } from './TrainingStateContext';
+import React, { createContext, useReducer, useEffect, useContext } from 'react';
 import { TRAINING_ACTIONS } from './trainingActions';
+
+// Create the context
+const TrainingStateContext = createContext();
 
 // Training state initial values
 const initialState = {
@@ -87,7 +89,10 @@ const initialState = {
     currentView: 'setup',
     sidebarCollapsed: false,
     notifications: []
-  }
+  },
+  
+  // AI Insights
+  aiInsight: 'Welcome to PowerHouse Tracker! Track your progress and optimize your gains. 💪'
 };
 
 // Reducer function
@@ -401,5 +406,11 @@ export function TrainingStateProvider({ children }) {
 export function useTrainingState() {
   return useContext(TrainingStateContext);
 }
+
+// ─── AI Insight selector (prevents build error) ───
+export const useAI = () => {
+  const state = useTrainingState();
+  return state?.aiInsight ?? '';
+};
 
 export default TrainingStateProvider;
