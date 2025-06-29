@@ -4,6 +4,11 @@ module.exports = {
   darkMode: 'class',  theme: { 
     extend: {
       colors: {
+        surface: '#121212',       // card / page bg
+        accent:  '#b91c1c',       // red CTA
+        brand:   '#6366f1',       // indigo charts / icons
+        textHi:  '#E0E0E0',
+        
         // PowerHouse Premium Color Palette
         'primary-black': '#0A0A0A',
         'rich-black': '#1C1C1C',
@@ -16,8 +21,8 @@ module.exports = {
         'light-gray': '#F3F4F6',
         
         // Legacy support
+        'textHigh': '#E0E0E0',
         primary: '#DC2626',
-        accent:  '#EF4444',
         offwhite:'#FAFAFA',
         black:   '#000000',
         
@@ -90,10 +95,27 @@ module.exports = {
       boxShadow: {
         lg: "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)",
         xl: "0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)",
+        insetCard: "inset 0 0 0 1px rgba(255,255,255,0.06)",
+        cardHover: "0 8px 24px rgba(0,0,0,0.4)",
+      },
+      borderRadius: {
+        card: "1rem",
+        button: "0.5rem",
+        badge: "0.375rem",
+      },
+      spacing: {
+        card: "1.5rem",
+        "card-sm": "1rem",
+        "card-lg": "2rem",
       },
       animation: {
         "fade-in": "fadeIn 0.5s ease-in-out",
         "slide-up": "slideUp 0.3s ease-out",
+        "pulse-glow": "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+      },
+      fontFamily: {
+        'premium': ['Inter', 'Segoe UI', 'Roboto', 'system-ui', '-apple-system', 'sans-serif'],
+        'mono': ['JetBrains Mono', 'Monaco', 'Cascadia Code', 'monospace'],
       },
       utilities: {
         '.text-premium': {
