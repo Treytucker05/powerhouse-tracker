@@ -299,7 +299,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 // Create typed Supabase client
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
@@ -319,7 +319,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 /**
  * Get the current authenticated user ID
  */
-export const getCurrentUserId = async (): Promise<string | null> => {
+const getCurrentUserId = async (): Promise<string | null> => {
   try {
     const { data: { user }, error } = await supabase.auth.getUser();
     if (error) {
@@ -336,7 +336,7 @@ export const getCurrentUserId = async (): Promise<string | null> => {
 /**
  * Get the current authenticated user profile
  */
-export const getCurrentUserProfile = async (): Promise<Profile | null> => {
+const getCurrentUserProfile = async (): Promise<Profile | null> => {
   try {
     const userId = await getCurrentUserId();
     if (!userId) return null;
@@ -362,7 +362,10 @@ export const getCurrentUserProfile = async (): Promise<Profile | null> => {
 /**
  * Check if user is authenticated
  */
-export const isAuthenticated = async (): Promise<boolean> => {
+/**
+ * Check if user is authenticated
+ */
+const isAuthenticated = async (): Promise<boolean> => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     return !!user;
@@ -375,7 +378,10 @@ export const isAuthenticated = async (): Promise<boolean> => {
 /**
  * Sign out the current user
  */
-export const signOut = async (): Promise<void> => {
+/**
+ * Sign out the current user
+ */
+const signOut = async (): Promise<void> => {
   try {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -391,7 +397,10 @@ export const signOut = async (): Promise<void> => {
 /**
  * Type-safe table access helpers
  */
-export const tables = {
+/**
+ * Type-safe table access helpers
+ */
+const tables = {
   profiles: () => supabase.from('profiles'),
   exercises: () => supabase.from('exercises'),
   programs: () => supabase.from('programs'),
@@ -409,7 +418,7 @@ export const tables = {
 /**
  * Type-safe RPC function helpers
  */
-export const rpc = {
+const rpc = {
   calculateVolumeMetrics: (params: Database['public']['Functions']['calculate_volume_metrics']['Args']) =>
     supabase.rpc('calculate_volume_metrics', params),
   
@@ -420,11 +429,21 @@ export const rpc = {
     supabase.rpc('get_volume_progression', params),
 } as const;
 
-// Export the client as default
-export default supabase;
+// Create an extended client with helper functions
+const extendedSupabase = Object.assign(supabase, {
+  getCurrentUserId,
+  getCurrentUserProfile,
+  isAuthenticated,
+  signOut,
+  tables,
+  rpc,
+});
+
+// Export the extended client as the default and only export
+export default extendedSupabase;
 
 // Export types for external use
-export type PowerHouseSupabaseClient = typeof supabase;
+export type PowerHouseSupabaseClient = typeof extendedSupabase;
 export type Tables = Database['public']['Tables'];
 export type Functions = Database['public']['Functions'];
 export type Enums = Database['public']['Enums'];

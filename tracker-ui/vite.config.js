@@ -10,4 +10,9 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      input: 'index.html',           // ignore debug_routes & test.html
+    },
+  },
 })

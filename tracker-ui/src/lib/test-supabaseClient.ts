@@ -1,14 +1,7 @@
 // Test file to verify TypeScript Supabase client functionality
 // Run this in development to test the new typed client
 
-import { 
-  supabase, 
-  tables, 
-  rpc, 
-  getCurrentUserId, 
-  getCurrentUserProfile,
-  isAuthenticated 
-} from './supabaseClient';
+import supabase from './supabaseClient';
 import type { 
   DatabaseExercise, 
   DatabaseWorkoutSession, 
@@ -24,14 +17,14 @@ export const testSupabaseClient = async () => {
   try {
     // Test authentication helpers
     console.log('Testing authentication...');
-    const isAuth = await isAuthenticated();
+    const isAuth = await supabase.isAuthenticated();
     console.log('✅ Authentication check:', isAuth);
     
     if (isAuth) {
-      const userId = await getCurrentUserId();
+      const userId = await supabase.getCurrentUserId();
       console.log('✅ Current user ID:', userId);
       
-      const profile = await getCurrentUserProfile();
+      const profile = await supabase.getCurrentUserProfile();
       console.log('✅ User profile:', profile?.name || 'No profile');
     }
     
@@ -39,7 +32,7 @@ export const testSupabaseClient = async () => {
     console.log('Testing table access...');
     
     // Test exercises table
-    const { data: exercises, error: exercisesError } = await tables.exercises()
+    const { data: exercises, error: exercisesError } = await supabase.tables.exercises()
       .select('*')
       .limit(5);
     
@@ -51,9 +44,9 @@ export const testSupabaseClient = async () => {
     
     // Test workout sessions for current user (if authenticated)
     if (isAuth) {
-      const userId = await getCurrentUserId();
+      const userId = await supabase.getCurrentUserId();
       if (userId) {
-        const { data: sessions, error: sessionsError } = await tables.workoutSessions()
+        const { data: sessions, error: sessionsError } = await supabase.tables.workoutSessions()
           .select('*')
           .eq('user_id', userId)
           .limit(5);
@@ -107,7 +100,7 @@ export const testRPCFunctions = async () => {
   console.log('🧪 Testing RPC function types...');
   
   try {
-    const userId = await getCurrentUserId();
+    const userId = await supabase.getCurrentUserId();
     if (!userId) {
       console.log('⚠️ Skipping RPC tests - not authenticated');
       return;
@@ -115,7 +108,7 @@ export const testRPCFunctions = async () => {
     
     // Test volume metrics RPC (if it exists)
     try {
-      const volumeResult = await rpc.calculateVolumeMetrics({
+      const volumeResult = await supabase.rpc.calculateVolumeMetrics({
         user_id: userId,
         start_date: '2025-01-01',
         end_date: '2025-01-31',

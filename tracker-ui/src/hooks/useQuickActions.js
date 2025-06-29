@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
-import { supabase, getCurrentUserId } from '../lib/api/supabaseClient'
+import supabase from '../lib/supabaseClient'
 
 export const useQuickActions = () => {
   return useQuery({
     queryKey: ['quickActions'],
     queryFn: async () => {
       try {
-        const userId = await getCurrentUserId()
+        const userId = await supabase.getCurrentUserId()
         if (!userId) {
           throw new Error('User not authenticated')
         }

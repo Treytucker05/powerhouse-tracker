@@ -4,19 +4,11 @@ export default defineConfig({
   root: '.',
   build: {
     rollupOptions: {
-      input: {
-        main: 'index.html'
-      }
-    }
+      input: 'index.html'
+    },
+    outDir: 'dist'
   },
   server: {
     port: 5173
-  },
-  optimizeDeps: {
-    exclude: [
-      'test-event-listeners.html',
-      'test-rir-system.html', 
-      'test-toggle.html'
-    ]
   }
 })

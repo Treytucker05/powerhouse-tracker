@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
-import { supabase, getCurrentUserId } from '../lib/api/supabaseClient'
+import supabase from '../lib/supabaseClient'
 
 export const useWeeklyVolume = () => {
   const queryClient = useQueryClient()
@@ -22,7 +22,7 @@ export const useWeeklyVolume = () => {
     queryKey: ['weeklyVolume'],
     queryFn: async () => {
       try {
-        const userId = await getCurrentUserId()
+        const userId = await supabase.getCurrentUserId()
         if (!userId) {
           throw new Error('User not authenticated')
         }
