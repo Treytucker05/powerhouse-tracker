@@ -70,14 +70,14 @@ const VolumeTonnageCard: React.FC<VolumeTonnageCardProps> = ({
 
   return (
     <DashboardCard className={className}>
-      <h3 className="text-lg font-semibold text-gray-100 mb-4">Volume & Tonnage</h3>
+      <h3 className="text-lg font-semibold text-textHi mb-4">Volume & Tonnage</h3>
       <Tabs defaultValue="day" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-4 bg-white/5 rounded-lg p-1">
+        <TabsList className="grid w-full grid-cols-4 mb-4 bg-surface/50 rounded-card p-1">
           {frames.map((frame: TimeFrame) => (
             <TabsTrigger 
               key={frame} 
               value={frame}
-              className="capitalize px-3 py-2 text-sm font-medium text-white/70 hover:text-white data-[state=active]:bg-accent data-[state=active]:text-white rounded-md transition-all"
+              className="capitalize px-3 py-2 text-sm font-medium text-textHi/70 hover:text-textHi data-[state=active]:bg-accent data-[state=active]:text-white rounded-md transition-all"
             >
               {frame}
             </TabsTrigger>
@@ -89,29 +89,29 @@ const VolumeTonnageCard: React.FC<VolumeTonnageCardProps> = ({
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-white/10">
-                    <th className="text-left py-2 px-3 text-white/80 font-medium">Muscle</th>
-                    <th className="text-right py-2 px-3 text-white/80 font-medium">Sets</th>
-                    <th className="text-right py-2 px-3 text-white/80 font-medium">Tonnage</th>
-                    <th className="text-right py-2 px-3 text-white/80 font-medium">Vol-Load</th>
+                  <tr className="border-b border-textHi/10">
+                    <th className="text-left py-2 px-3 text-textHi/80 font-medium">Muscle</th>
+                    <th className="text-right py-2 px-3 text-textHi/80 font-medium">Sets</th>
+                    <th className="text-right py-2 px-3 text-textHi/80 font-medium">Tonnage</th>
+                    <th className="text-right py-2 px-3 text-textHi/80 font-medium">Vol-Load</th>
                   </tr>
                 </thead>
                 <tbody>
                   {getFrameData(frame).map((muscleData: ExtendedVolumeData, index: number) => (
                     <tr 
                       key={`${frame}-${muscleData.muscle}-${index}`} 
-                      className="border-b border-white/5 hover:bg-white/5 transition-colors duration-150"
+                      className="border-b border-textHi/5 hover:bg-surface/30 transition-colors duration-150"
                     >
-                      <td className="py-2 px-3 text-gray-100 font-medium capitalize">
+                      <td className="py-2 px-3 text-textHi font-medium capitalize">
                         {muscleData.muscle}
                       </td>
-                      <td className="py-2 px-3 text-right text-white/90 tabular-nums">
+                      <td className="py-2 px-3 text-right text-textHi/90 tabular-nums">
                         {muscleData.sets}
                       </td>
-                      <td className="py-2 px-3 text-right text-white/90 tabular-nums">
+                      <td className="py-2 px-3 text-right text-textHi/90 tabular-nums">
                         {formatNumber(muscleData.tonnage)}
                       </td>
-                      <td className="py-2 px-3 text-right text-red-400 font-medium tabular-nums">
+                      <td className="py-2 px-3 text-right text-accent font-medium tabular-nums">
                         {formatNumber(muscleData.volumeLoad)}
                       </td>
                     </tr>
@@ -120,7 +120,7 @@ const VolumeTonnageCard: React.FC<VolumeTonnageCardProps> = ({
                   {/* Show empty state if no data */}
                   {getFrameData(frame).length === 0 && (
                     <tr>
-                      <td colSpan={4} className="py-8 px-3 text-center text-gray-400">
+                      <td colSpan={4} className="py-8 px-3 text-center text-textHi/40">
                         No data available for {frame}
                       </td>
                     </tr>
@@ -130,15 +130,15 @@ const VolumeTonnageCard: React.FC<VolumeTonnageCardProps> = ({
                 {/* Show totals row if data exists */}
                 {getFrameData(frame).length > 0 && (
                   <tfoot>
-                    <tr className="border-t border-white/20 bg-white/5">
-                      <td className="py-2 px-3 text-white font-bold">Total</td>
-                      <td className="py-2 px-3 text-right text-white font-bold tabular-nums">
+                    <tr className="border-t border-textHi/20 bg-surface/20">
+                      <td className="py-2 px-3 text-textHi font-bold">Total</td>
+                      <td className="py-2 px-3 text-right text-textHi font-bold tabular-nums">
                         {getFrameData(frame).reduce((sum, item) => sum + item.sets, 0)}
                       </td>
-                      <td className="py-2 px-3 text-right text-white font-bold tabular-nums">
+                      <td className="py-2 px-3 text-right text-textHi font-bold tabular-nums">
                         {formatNumber(getFrameData(frame).reduce((sum, item) => sum + item.tonnage, 0))}
                       </td>
-                      <td className="py-2 px-3 text-right text-red-400 font-bold tabular-nums">
+                      <td className="py-2 px-3 text-right text-accent font-bold tabular-nums">
                         {formatNumber(getFrameData(frame).reduce((sum, item) => sum + item.volumeLoad, 0))}
                       </td>
                     </tr>
