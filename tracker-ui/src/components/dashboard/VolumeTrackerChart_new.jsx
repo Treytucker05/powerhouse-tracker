@@ -133,7 +133,7 @@ const VolumeTrackerChart = ({ volumeData = {} }) => {
   };
 
   return (
-    <div className="h-96">
+    <div className="h-96 powerhouse-card">
       <Bar data={data} options={options} />
     </div>
   );

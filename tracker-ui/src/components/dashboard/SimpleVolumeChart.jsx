@@ -36,14 +36,14 @@ function SimpleVolumeChart({ data = {} }) {
   if (muscles.length === 0) {
     return <div className="text-white">No data available</div>;
   }
-  // Chart dimensions - now responsive with better margins
+  // Chart dimensions - now responsive
   const width = dimensions.width;
   const height = dimensions.height;
   const margin = { 
-    top: Math.max(50, width * 0.08), 
-    right: Math.max(60, width * 0.1), 
-    bottom: Math.max(75, width * 0.1), 
-    left: Math.max(55, width * 0.08) 
+    top: Math.max(40, width * 0.067), 
+    right: Math.max(50, width * 0.089), 
+    bottom: Math.max(60, width * 0.089), 
+    left: Math.max(40, width * 0.067) 
   };
   const chartWidth = width - margin.left - margin.right;
   const chartHeight = height - margin.top - margin.bottom;
@@ -72,8 +72,8 @@ function SimpleVolumeChart({ data = {} }) {
     const mev = data.mev?.[muscle] || 0;
     const mrv = data.mrv?.[muscle] || 0;
     
-    if (current < mev) return '#b91c1c'; // accent color - under MEV
-    if (current > mrv) return '#b91c1c'; // accent color - over MRV
+    if (current < mev) return '#DC2626'; // primary-red - under MEV
+    if (current > mrv) return '#DC2626'; // primary-red - over MRV
     return '#22C55E'; // refined green - optimal (between MEV and MRV)
   };
 
@@ -83,7 +83,16 @@ function SimpleVolumeChart({ data = {} }) {
     yTicks.push(i);
   }
   return (
-    <div className="w-full h-full p-4">
+    <div style={{
+      background: 'linear-gradient(135deg, var(--rich-black) 0%, var(--primary-black) 100%)',
+      border: '1px solid var(--border-color)',
+      borderRadius: '16px',
+      padding: '20px',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      position: 'relative',
+      overflow: 'hidden',
+      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
+    }}>
     
     {/* Container for chart content */}
     <div style={{ width: '100%' }}>
@@ -92,7 +101,7 @@ function SimpleVolumeChart({ data = {} }) {
         fontSize: '1.1rem',
         fontWeight: '700',
         textAlign: 'center',
-        marginBottom: '12px',
+        marginBottom: '16px',
         textShadow: '1px 1px 4px rgba(0,0,0,0.8)',
         letterSpacing: '0.3px',
         position: 'relative',
@@ -103,8 +112,7 @@ function SimpleVolumeChart({ data = {} }) {
         display: 'flex', 
         justifyContent: 'center',
         position: 'relative',
-        zIndex: 1,
-        padding: '15px'
+        zIndex: 1
       }}>
         <svg 
           width={width} 

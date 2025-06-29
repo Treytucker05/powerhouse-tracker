@@ -109,7 +109,7 @@ const VolumeTrackerChart = () => {
     }
   };
   return (
-    <div className="" style={{ height: '500px' }}>
+    <div className="card-powerhouse" style={{ height: '500px' }}>
       <Chart type='bar' data={data} options={options} />
     </div>
   );
