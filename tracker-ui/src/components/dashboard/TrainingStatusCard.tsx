@@ -16,9 +16,6 @@ import { seedMockSets } from "../../lib/dev/mockSetSeeder";
 import VintageFatigueGauge from "./VintageFatigueGauge";
 import type { 
   TrainingState, 
-  VolumeData, 
-  DashboardMetrics,
-  SessionCompliance,
   TrainingStateContextType 
 } from "../../types";
 
@@ -79,7 +76,7 @@ const TrainingStatusCard: React.FC<TrainingStatusCardProps> = ({ className = "" 
 
   const state: TrainingState = context.state;
   const cycle: CycleData = getCurrentCycle(state);
-  const vol: VolumeAggregates = getWeeklySetTonnageByMuscle(state);
+  const vol: VolumeAggregates = getWeeklySetTonnageByMuscle(state) || { sets: {}, tonnage: {} };
   const agg: AggregateVolume = getAggregateVolume(vol);
 
   // Debug logging with proper typing
@@ -92,17 +89,17 @@ const TrainingStatusCard: React.FC<TrainingStatusCardProps> = ({ className = "" 
 
   /* Helper functions with proper typing */
   const showDeloadBanner: boolean =
-    (state.fatigueScore ?? 0) >= 85 ||
+    (state?.fatigueScore ?? 0) >= 85 ||
     Object.values(vol.sets).some(
-      (sets: number, i: number) => sets >= (state.mrvTable[Object.keys(vol.sets)[i]] ?? 0) * 0.9
+      (sets: number, i: number) => sets >= (state?.mrvTable?.[Object.keys(vol.sets)[i]] ?? 0) * 0.9
     );
   
   const daysToDeload: number = getDaysToDeload(state);
   const monthlyAgg: MonthlyAggregates = getMonthlyAggregates(state);
   const programAgg: ProgramAggregates = getProgramAggregates(state);
   const compliance: ComplianceData = getSessionCompliance(state);
-  const weeklyRIR: number | null = getWeeklyRIR(state);
-  const mesocycleRIR: number | null = getMesocycleRIR(state);
+  const weeklyRIR: string | null = getWeeklyRIR(state);
+  const mesocycleRIR: string | null = getMesocycleRIR(state);
   const currentDayName: string = getCurrentDayName(state);
 
   // Helper function to format numbers with commas

@@ -1,15 +1,24 @@
-// Development seed data for quick testing
-export const seedDemo = async () => {
-  // Only seed in development mode
-  if (import.meta.env.PROD) return;
-  
-  console.log('🌱 Seeding demo data for development...');
-  
-  try {
-    // This would normally call Supabase RPC or populate demo data
-    // For now, just log that seeding would happen
-    console.log('📊 Demo data seeded successfully');
-  } catch (error) {
-    console.error('❌ Failed to seed demo data:', error);
-  }
+// This file is deprecated - use devSeed.ts instead
+// Re-export from the TypeScript version for backward compatibility
+
+export { 
+  seedDemo, 
+  seedQuick, 
+  seedExercises, 
+  seedVolumeLandmarks, 
+  seedWorkoutData, 
+  seedBodyMetrics, 
+  seedActivityData, 
+  clearSeedData 
+} from './devSeed';
+
+export default {
+  seedDemo,
+  seedQuick,
+  seedExercises,
+  seedVolumeLandmarks,
+  seedWorkoutData,
+  seedBodyMetrics,
+  seedActivityData,
+  clearSeedData,
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@radix-ui/react-tabs';
 import DashboardCard from '../ui/DashboardCard';
-import type { VolumeData, TimeFrame, MuscleGroup } from '../../types';
+import type { VolumeData, TimeFrame } from '../../types';
 
 // Extended VolumeData interface for this component
 interface ExtendedVolumeData extends Omit<VolumeData, 'muscle'> {
