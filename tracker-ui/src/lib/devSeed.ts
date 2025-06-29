@@ -1,7 +1,7 @@
 // Development seed data for PowerHouse Tracker
 // Implements comprehensive seeding using the new database schema
 
-import { supabase } from './supabaseClient';
+import supabase from './supabaseClient';
 import type { 
   Exercise,
   SessionType

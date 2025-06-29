@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { supabase } from '../lib/api/supabaseClient'
+import supabase from '../lib/supabaseClient'
 import { useActiveSession } from './useActiveSession'
 
 export const useLogSet = () => {

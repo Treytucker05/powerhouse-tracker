@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { supabase, getCurrentUserId } from '../lib/api/supabaseClient'
+import supabase from '../lib/supabaseClient'
 
 export const useActiveSession = () => {
   const queryClient = useQueryClient()
@@ -9,7 +9,7 @@ export const useActiveSession = () => {
     queryKey: ['activeSession'],
     queryFn: async () => {
       try {
-        const userId = await getCurrentUserId()
+        const userId = await supabase.getCurrentUserId()
         if (!userId) {
           throw new Error('User not authenticated')
         }
@@ -47,7 +47,7 @@ export const useActiveSession = () => {
   // Mutation to add a set
   const addSetMutation = useMutation({
     mutationFn: async (setData) => {
-      const userId = await getCurrentUserId()
+      const userId = await supabase.getCurrentUserId()
       if (!userId) {
         throw new Error('User not authenticated')
       }
@@ -83,7 +83,7 @@ export const useActiveSession = () => {
   // Mutation to finish session
   const finishSessionMutation = useMutation({
     mutationFn: async () => {
-      const userId = await getCurrentUserId()
+      const userId = await supabase.getCurrentUserId()
       if (!userId) {
         throw new Error('User not authenticated')
       }

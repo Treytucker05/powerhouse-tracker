@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { supabase } from '../lib/supabaseClient';
+import supabase from '../lib/supabaseClient';
 import TopNav from '../components/navigation/TopNav';
 
 export default function AppShell() {
