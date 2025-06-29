@@ -2,64 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Prevent horizontal scrolling globally - using stable units */
-html, body {
-  overflow-x: hidden;
-  max-width: 100%;
-}
+html { @apply bg-surface text-textHi antialiased; }
 
-/* Performance optimizations */
-* {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+a, a:visited  { @apply text-textHi no-underline; }
+a:hover       { @apply text-accent transition-colors; }
 
-/* Reduce motion for users who prefer it */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* PowerHouse Premium Dark Theme */
-:root {
-  /* Premium Color Palette */
-  --primary-black: #0A0A0A;
-  --rich-black: #1C1C1C;
-  --true-black: #000;
-  --primary-red: #DC2626;
-  --accent-red: #EF4444;
-  --dark-red: #991B1B;
-  --pure-white: #FFF;
-  --off-white: #FAFAFA;
-  --light-gray: #F3F4F6;
-  
-  /* Additional utility colors */
-  --medium-gray: #6B7280;
-  --dark-gray: #374151;
-  --border-color: rgba(220, 38, 38, 0.2);
-  --glass-bg: rgba(28, 28, 28, 0.8);
-  --glass-border: rgba(255, 255, 255, 0.1);
-}
-
-body {
-  background: linear-gradient(135deg, var(--true-black) 0%, var(--primary-black) 50%, var(--rich-black) 100%);
-  background-attachment: fixed;
-  color: var(--pure-white);
-  font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
-  font-weight: 400;
-  line-height: 1.6;
-  letter-spacing: -0.01em;
-}
-
-html {
-  background-color: var(--true-black);
-}
+/* quick utility tokens */
+.rounded-card   { @apply rounded-card; }
+.shadow-inset   { @apply shadow-insetCard; }
+.shadow-hover   { @apply shadow-cardHover; }
 
 /* Pulse animation for critical alerts */
 @keyframes pulse {
@@ -1424,4 +1375,114 @@ svg {
 
 /* ============================================================================
    END RESPONSIVE SCALING FIXES
+   ============================================================================ */
+
+/* ============================================================================
+   CUSTOM TOKEN UTILITIES
+   ============================================================================ */
+
+/* Design Token Utilities */
+.surface-primary {
+  background-color: #121212;
+}
+
+.surface-secondary {
+  background-color: #1C1C1C;
+}
+
+.surface-glass {
+  background: rgba(28, 28, 28, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.text-high-contrast {
+  color: #E0E0E0;
+}
+
+.text-accent {
+  color: #b91c1c;
+}
+
+.text-brand {
+  color: #6366f1;
+}
+
+/* Premium Card Styling */
+.card-premium {
+  background: rgba(28, 28, 28, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease-in-out;
+}
+
+.card-premium:hover {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), 0 0 30px rgba(220, 38, 38, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Typography Utilities */
+.text-premium {
+  font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.5;
+}
+
+.text-premium-heading {
+  font-family: 'Inter', 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  background: linear-gradient(135deg, #FFF 0%, #FAFAFA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-premium-accent {
+  color: #EF4444;
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+/* Interactive Elements */
+.btn-premium {
+  background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.btn-premium:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+}
+
+.btn-premium:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+/* Glow Effects */
+.glow-red {
+  box-shadow: 0 0 20px rgba(220, 38, 38, 0.4);
+}
+
+.glow-red-lg {
+  box-shadow: 0 0 40px rgba(220, 38, 38, 0.5);
+}
+
+/* ============================================================================
+   END CUSTOM TOKEN UTILITIES
    ============================================================================ */
