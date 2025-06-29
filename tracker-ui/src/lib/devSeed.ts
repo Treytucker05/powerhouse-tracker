@@ -3,10 +3,8 @@
 
 import { supabase } from './supabaseClient';
 import type { 
-  VolumeData, 
-  MuscleGroup,
-  SessionType,
-  TimeFrame
+  Exercise,
+  SessionType
 } from '../types';
 
 // Database table interfaces for seeding
@@ -31,7 +29,6 @@ interface DatabaseWorkoutSet {
   rir?: number;
   rest_time?: number;
   completed_at: string;
-  created_at?: string;
 }
 
 interface DatabaseExercise {
@@ -298,8 +295,8 @@ export const seedWorkoutData = async (
     }
 
     const sessionTypes: SessionType[] = ['push', 'pull', 'legs', 'upper'];
-    const sessions: Omit<WorkoutSession, 'id'>[] = [];
-    const allSets: Omit<WorkoutSet, 'id'>[] = [];
+    const sessions: DatabaseWorkoutSession[] = [];
+    const allSets: DatabaseWorkoutSet[] = [];
 
     // Generate sessions for each week
     for (let week = 0; week < finalConfig.weeksBack; week++) {
@@ -314,10 +311,9 @@ export const seedWorkoutData = async (
         const sessionId = `session_${week}_${session}_${Date.now()}`;
 
         // Create session
-        const workoutSession: Omit<WorkoutSession, 'id'> = {
+        const workoutSession: DatabaseWorkoutSession = {
           user_id: userId,
           program_id: undefined,
-          planned_session_id: undefined,
           session_type: sessionType,
           start_time: sessionDate.toISOString(),
           end_time: new Date(sessionDate.getTime() + 90 * 60 * 1000).toISOString(), // 90 min sessions
@@ -333,13 +329,13 @@ export const seedWorkoutData = async (
             // Filter exercises based on session type
             switch (sessionType) {
               case 'push':
-                return ex.muscle_groups.some(m => ['chest', 'shoulders', 'triceps'].includes(m));
+                return ex.muscle_groups.some((m: string) => ['chest', 'shoulders', 'triceps'].includes(m));
               case 'pull':
-                return ex.muscle_groups.some(m => ['back', 'biceps'].includes(m));
+                return ex.muscle_groups.some((m: string) => ['back', 'biceps'].includes(m));
               case 'legs':
-                return ex.muscle_groups.some(m => ['quads', 'hamstrings', 'glutes', 'calves'].includes(m));
+                return ex.muscle_groups.some((m: string) => ['quads', 'hamstrings', 'glutes', 'calves'].includes(m));
               case 'upper':
-                return ex.muscle_groups.some(m => ['chest', 'back', 'shoulders', 'biceps', 'triceps'].includes(m));
+                return ex.muscle_groups.some((m: string) => ['chest', 'back', 'shoulders', 'biceps', 'triceps'].includes(m));
               default:
                 return true;
             }
@@ -352,7 +348,7 @@ export const seedWorkoutData = async (
           for (let setNum = 1; setNum <= setsCount; setNum++) {
             const setDate = new Date(sessionDate.getTime() + (exerciseIndex * 10 + setNum * 2) * 60 * 1000);
             
-            const workoutSet: Omit<WorkoutSet, 'id'> = {
+            const workoutSet: DatabaseWorkoutSet = {
               session_id: sessionId, // This will need to be updated after session insertion
               exercise_id: exercise.id,
               set_number: setNum,
@@ -361,7 +357,6 @@ export const seedWorkoutData = async (
               rir: generateRIR(week % 8 + 1), // 8-week mesocycles
               rest_time: randomBetween(120, 240), // 2-4 minutes rest
               completed_at: setDate.toISOString(),
-              created_at: setDate.toISOString(),
             };
 
             allSets.push(workoutSet);
@@ -415,7 +410,7 @@ export const seedBodyMetrics = async (userId: string, weeksBack: number = 8): Pr
   console.log('📏 Seeding body metrics...');
   
   try {
-    const metrics = [];
+    const metrics: DatabaseBodyMetric[] = [];
     const startWeight = 180; // Starting weight in lbs
     
     for (let week = 0; week < weeksBack; week++) {
@@ -460,7 +455,7 @@ export const seedActivityData = async (userId: string, daysBack: number = 56): P
   console.log('📱 Seeding activity data...');
   
   try {
-    const activities = [];
+    const activities: DatabaseActivityData[] = [];
     
     for (let day = 0; day < daysBack; day++) {
       const date = new Date();
@@ -497,12 +492,12 @@ export const seedActivityData = async (userId: string, daysBack: number = 56): P
  */
 export const seedDemo = async (userId?: string, config: Partial<SeedConfig> = {}): Promise<void> => {
   // Only seed in development mode
-  if (import.meta.env.PROD) {
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    console.log('🌱 Starting comprehensive demo data seeding...');
+  } else {
     console.warn('🚫 Seeding disabled in production');
     return;
   }
-
-  console.log('🌱 Starting comprehensive demo data seeding...');
   
   try {
     // Get current user if not provided
@@ -566,7 +561,7 @@ export const seedQuick = async (userId?: string): Promise<void> => {
  * Clear all seeded data for a user
  */
 export const clearSeedData = async (userId?: string): Promise<void> => {
-  if (import.meta.env.PROD) {
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
     console.warn('🚫 Data clearing disabled in production');
     return;
   }

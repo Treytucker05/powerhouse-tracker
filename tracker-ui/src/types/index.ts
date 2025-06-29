@@ -1,3 +1,5 @@
+/// <reference path="./declarations.d.ts" />
+
 // src/types/index.ts
 // Core PowerHouse Tracker TypeScript Interfaces
 
@@ -222,6 +224,11 @@ export interface TrainingState {
   dashboardMetrics: DashboardMetrics | null;
   isLoading: boolean;
   error: string | null;
+  // Legacy state properties from context
+  fatigueScore?: number;
+  loggedSets?: WorkoutSet[];
+  currentMesocycle?: any;
+  mrvTable?: Record<string, number>;
 }
 
 export interface TrainingActions {
@@ -230,6 +237,21 @@ export interface TrainingActions {
   addSet: (set: Omit<WorkoutSet, 'id'>) => void;
   updateVolumeLandmarks: (muscle: MuscleGroup, landmarks: VolumeLandmarks) => void;
   loadDashboardData: () => Promise<void>;
+}
+
+// Training State Context Type
+export interface TrainingStateContextType {
+  state: TrainingState;
+  dispatch?: React.Dispatch<any>;
+  refreshDashboard?: () => void;
+  [key: string]: any;
+}
+
+// Session Compliance Type
+export interface SessionCompliance {
+  completed: number;
+  scheduled: number;
+  percentage: number;
 }
 
 // Component Props Types

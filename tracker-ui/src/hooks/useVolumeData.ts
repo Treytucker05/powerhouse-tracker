@@ -4,9 +4,7 @@ import type {
   VolumeData, 
   TimeFrame, 
   MuscleGroup, 
-  VolumeQueryParams,
-  FatigueCalculationParams,
-  ApiResponse 
+  VolumeQueryParams
 } from '../types';
 
 // ============================================================================
@@ -332,7 +330,7 @@ export const useUpdateVolumeLandmarks = () => {
 
       return data;
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       // Invalidate and refetch volume landmarks
       queryClient.invalidateQueries({
         queryKey: [...volumeQueryKeys.all, 'landmarks', variables.userId],
@@ -360,7 +358,7 @@ export const useRefreshVolumeData = () => {
       // This could trigger a recalculation or just invalidate cache
       return Promise.resolve(userId);
     },
-    onSuccess: (userId) => {
+    onSuccess: (_userId) => {
       // Invalidate all volume-related queries for this user
       queryClient.invalidateQueries({
         queryKey: volumeQueryKeys.all,
@@ -376,7 +374,7 @@ export const useRefreshVolumeData = () => {
 /**
  * Check if any volume queries are loading
  */
-export const useVolumeLoadingState = (userId: string | undefined) => {
+export const useVolumeLoadingState = (_userId: string | undefined) => {
   const queryClient = useQueryClient();
   
   // This is a simplified version - in practice, you might want to check specific queries

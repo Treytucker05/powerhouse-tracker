@@ -1,15 +1,14 @@
-import { createClient } from '@supabase/supabase-js'
+// This file is deprecated - use supabaseClient.ts instead
+// Re-export from the TypeScript version for backward compatibility
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://cqjzvbvmpcqohjarcydg.supabase.co'
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxanp2YnZtcGNxb2hqYXJjeWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3NzExNzksImV4cCI6MjA2NTM0NzE3OX0.wioeITJitSKZ9HrZ2iRPmC3xHHj-bL4xDYtT1iXws44'
+export { 
+  supabase,
+  getCurrentUserId,
+  getCurrentUserProfile,
+  isAuthenticated,
+  signOut,
+  tables,
+  rpc
+} from './supabaseClient';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Missing Supabase environment variables. Using fallback values.')
-}
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    autoRefreshToken: true,
-    persistSession: true
-  }
-})
+export { supabase as default } from './supabaseClient';
