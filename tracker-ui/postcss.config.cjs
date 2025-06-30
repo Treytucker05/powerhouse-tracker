@@ -1,8 +1,8 @@
 module.exports = {
-  plugins: [
-    require('@tailwindcss/postcss')({   // Tailwind v4 PostCSS bridge
-      config: './tailwind.config.cjs',  // points to your Tailwind config
-    }),
-    require('autoprefixer'),
-  ],
+  plugins: {
+    '@tailwindcss/postcss': {
+      config: './tailwind.config.js'  // explicitly point to config
+    },
+    autoprefixer: {},
+  },
 };

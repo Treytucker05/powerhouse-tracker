@@ -7,16 +7,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        surface: '#121212',      // dark bg  ─ bg-surface
-        accent : '#b91c1c',      // red      ─ text-accent / border-accent
-        brand  : '#6366f1',      // indigo   ─ hover:text-brand
-        textHi : '#E0E0E0',      // light text
+        surface: '#121212',
+        accent : '#b91c1c',
+        brand  : '#6366f1',
+        textHi : '#E0E0E0',
       },
       boxShadow: {
         insetCard: 'inset 0 0 0 1px rgba(255,255,255,0.06)',
         cardHover: '0 8px 24px rgba(0,0,0,0.4)',
       },
-      borderRadius: { card: '1rem' },      // rounded-card
+      borderRadius: { card: '1rem' },
     },
   },
   plugins: [],

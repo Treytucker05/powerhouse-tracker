@@ -10,6 +10,9 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  css: {
+    postcss: './postcss.config.cjs',   // ← point Vite to the bridge config
+  },
   build: {
     rollupOptions: {
       input: 'index.html',           // ignore debug_routes & test.html

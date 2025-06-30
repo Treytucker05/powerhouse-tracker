@@ -1,5 +1,6 @@
 import { vi } from 'vitest';
 import 'fake-indexeddb/auto';         // jsdom <-- storage/mock polyfills
+import '@testing-library/jest-dom';
 
 // Provide "jest" global so legacy tests (`@jest/globals`) keep working
 globalThis.jest = vi;
@@ -46,5 +47,15 @@ beforeAll(() => {
       else                       { this.onerror?.(new Error('mock FileReader expects string')); }
     }
   };
+
+  // ── ResizeObserver mock for components that observe element resizing ──
+  // 💡 lightweight stub so Recharts & other libs don't crash in jsdom
+  class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+  
+  globalThis.ResizeObserver = globalThis.ResizeObserver || ResizeObserver;
 });
 

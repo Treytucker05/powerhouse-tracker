@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html { @apply bg-surface text-textHi antialiased; }
+
+/* link palette */
+a, a:visited { @apply text-textHi no-underline; }
+a:hover      { @apply text-accent transition-colors; }
+
+/* card helpers */
+.rounded-card { @apply rounded-card; }
+.shadow-inset { @apply shadow-insetCard; }
+.shadow-hover { @apply shadow-cardHover; }
