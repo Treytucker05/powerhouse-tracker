@@ -7,7 +7,7 @@ describe('PowerHouseVolumeChart', () => {
     render(<PowerHouseVolumeChart />);
     
     // Check if the chart title is displayed
-    expect(screen.getByText('📊 Weekly Volume Tracking')).toBeInTheDocument();
+    expect(screen.getByText('📊 Weekly Volume by Muscle Group')).toBeInTheDocument();
     
     // Check if the legend items are displayed
     expect(screen.getByText('Optimal')).toBeInTheDocument();
