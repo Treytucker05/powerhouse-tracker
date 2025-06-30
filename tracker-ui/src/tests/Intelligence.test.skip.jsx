@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import Intelligence from '../src/pages/Intelligence';
+import Intelligence from '../pages/Intelligence';
 
 // Mock the useAdaptiveRIR hook
 vi.mock('../src/lib/useAdaptiveRIR', () => ({

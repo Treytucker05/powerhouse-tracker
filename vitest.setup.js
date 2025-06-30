@@ -1,5 +1,19 @@
-import { vi } from 'vitest';
+import { vi, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
+import React from 'react';
 import 'fake-indexeddb/auto';         // jsdom <-- storage/mock polyfills
+
+// Polyfill for ResizeObserver to support Recharts
+import ResizeObserver from 'resize-observer-polyfill';
+
+// Global stubs for DOM APIs and React
+globalThis.window = globalThis.window || global;
+globalThis.document = globalThis.document || {
+  getElementById: () => null,
+  createElement: () => ({ appendChild: () => {}, style: {} }),
+  body: { appendChild: () => {} }
+};
+globalThis.navigator = globalThis.navigator || { userAgent: 'test' };
+globalThis.React = React;
 
 // Provide "jest" global so legacy tests (`@jest/globals`) keep working
 globalThis.jest = vi;
@@ -10,7 +24,14 @@ globalThis.afterEach = afterEach;
 globalThis.beforeAll = beforeAll;
 globalThis.beforeEach = beforeEach;
 
-import { beforeAll } from 'vitest';
+// Polyfill ResizeObserver in test environment
+if (!global.ResizeObserver) {
+  global.ResizeObserver = ResizeObserver;
+}
+
+// Supabase environment variables
+process.env.VITE_SUPABASE_URL = 'https://test.supabase.co'
+process.env.VITE_SUPABASE_ANON_KEY = 'test-key'
 
 // Canvas stub for chart.js in JSDOM
 if (!global.HTMLCanvasElement) {

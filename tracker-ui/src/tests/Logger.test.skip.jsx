@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import Logger from '../src/pages/Logger';
+import Logger from '../pages/Logger';
 
 // Mock the hooks
 vi.mock('../src/lib/useActiveSession', () => ({

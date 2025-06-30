@@ -1,0 +1,1319 @@
+
+> tracker-ui@0.0.0 test C:\Users\treyt\OneDrive\Desktop\Projects\ProgramDesignWorkspace\tracker-ui-good\tracker-ui
+> vitest
+
+
+[1m[44m DEV [49m[22m [34mv3.2.4 [39m[90mC:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/tracker-ui[39m
+
+[2m8:55:48 PM[22m [33m[1m[vite][22m[39m [33m[2m(client)[22m[39m [33mwarning: [33mDuplicate key "color" in object literal[33m
+51 |                    transition: 'all 0.3s ease',
+52 |                    backgroundColor: isActive ? '#FF0000' : 'transparent',
+53 |                    color: isActive ? '#000' : '#fff',
+   |                    ^
+54 |                    borderRadius: '5px',
+55 |                    display: 'block'
+[39m
+  Plugin: [35mvite:esbuild[39m
+  File: [36mC:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/tracker-ui/src/components/navigation/TopNav.jsx[39m
+ [31m❯[39m src/__tests__/AppShell.spec.jsx [2m([22m[2m3 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 144[2mms[22m[39m
+[31m   [31m×[31m <AppShell />[2m > [22mcontains header with PowerHouse Tracker branding[39m[32m 100[2mms[22m[39m
+[31m     → Unable to find an element with the text: PowerHouse Tracker. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div[31m
+      [33mclass[31m=[32m"min-h-screen bg-black"[31m
+    [36m>[31m
+      [36m<header[31m
+        [33mclass[31m=[32m"sticky top-0 z-50 flex justify-between items-center"[31m
+        [33mstyle[31m=[32m"background-color: rgb(0, 0, 0); padding: 1.5rem 2rem; box-shadow: 0 2px 10px rgba(255, 0, 0, 0.3);"[31m
+      [36m>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"flex items-center gap-2"[31m
+        [36m>[31m
+          [36m<svg[31m
+            [33maria-hidden[31m=[32m"true"[31m
+            [33mclass[31m=[32m"lucide lucide-dumbbell w-6 h-6"[31m
+            [33mfill[31m=[32m"none"[31m
+            [33mheight[31m=[32m"24"[31m
+            [33mstroke[31m=[32m"currentColor"[31m
+            [33mstroke-linecap[31m=[32m"round"[31m
+            [33mstroke-linejoin[31m=[32m"round"[31m
+            [33mstroke-width[31m=[32m"2"[31m
+            [33mstyle[31m=[32m"color: rgb(255, 0, 0);"[31m
+            [33mviewBox[31m=[32m"0 0 24 24"[31m
+            [33mwidth[31m=[32m"24"[31m
+            [33mxmlns[31m=[32m"http://www.w3.org/2000/svg"[31m
+          [36m>[31m
+            [36m<path[31m
+              [33md[31m=[32m"M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829z"[31m
+            [36m/>[31m
+            [36m<path[31m
+              [33md[31m=[32m"m2.5 21.5 1.4-1.4"[31m
+            [36m/>[31m
+            [36m<path[31m
+              [33md[31m=[32m"m20.1 3.9 1.4-1.4"[31m
+            [36m/>[31m
+            [36m<path[31m
+              [33md[31m=[32m"M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829z"[31m
+            [36m/>[31m
+            [36m<path[31m
+              [33md[31m=[32m"m9.6 14.4 4.8-4.8"[31m
+            [36m/>[31m
+          [36m</svg>[31m
+          [36m<div[31m
+            [33mstyle[31m=[32m"font-size: 1.5rem; font-weight: 700;"[31m
+          [36m>[31m
+            [36m<span[31m
+              [33mstyle[31m=[32m"color: rgb(255, 0, 0);"[31m
+            [36m>[31m
+              [0mPower[0m
+            [36m</span>[31m
+            [36m<span[31m
+              [33mstyle[31m=[32m"color: rgb(255, 255, 255); margin: 0px 0.2rem;"[31m
+            [36m>[31m
+              [0mHouse[0m
+            [36m</span>[31m
+            [36m<span[31m
+              [33mstyle[31m=[32m"color: rgb(0, 0, 0); background-color: rgb(255, 255, 255); padding: 0.2rem 0.5rem; border-radius: 5px;"[31m
+            [36m>[31m
+              [0mATX[0m
+            [36m</span>[31m
+          [36m</div>[31m
+        [36m</div>[31m
+        [36m<nav[31m
+          [33mclass[31m=[32m"flex"[31m
+          [33mstyle[31m=[32m"gap: 1rem; list-style: none; margin: 0px; padding: 0px;"[31m
+        [36m>[31m
+          [36m<a[31m
+            [33maria-current[31m=[32m"page"[31m
+            [33mclass[31m=[32m"active"[31m
+            [33mdata-discover[31m=[32m"true"[31m
+            [33mhref[31m=[32m"/"[31m
+            [33mstyle[31m=[32m"text-decoration: none;"[31m
+          [36m>[31m
+            [36m<span[31m
+              [33mstyle[31m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(0, 0, 0); font-size: 1.1rem; transition: all 0.3s ease; background-color: rgb(255, 0, 0); border-radius: 5px; display: block;"[31m
+            [36m>[31m
+              [0mDashboard[0m
+            [36m</span>[31m
+          [36m</a>[31m
+          [36m<a[31m
+            [33mclass[31m=[32m""[31m
+            [33mdata-discover[31m=[32m"true"[31m
+            [33mhref[31m=[32m"/assessment"[31m
+            [33mstyle[31m=[32m"text-decoration: none;"[31m
+          [36m>[31m
+            [36m<span[31m
+              [33mstyle[31m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(255, 255, 255); font-size: 1.1rem; transition: all 0.3s ease; background-color: transparent; border-radius: 5px; display: block;"[31m
+            [36m>[31m
+              [0mAssessment[0m
+            [36m</span>[31m
+          [36m</a>[31m
+          [36m<a[31m
+            [33mclass[31m=[32m""[31m
+            [33mdata-discover[31m=[32m"true"[31m
+            [33mhref[31m=[32m"/program"[31m
+            [33mstyle[31m=[32m"text-decoration: none;"[31m
+          [36m>[31m
+            [36m<span[31m
+              [33mstyle[31m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(255, 255, 255); font-size: 1.1rem; transition: all 0.3s ease; background-color: transparent; border-radius: 5px; display: block;"[31m
+            [36m>[31m
+              [0mProgram Design[0m
+            [36m</span>[31m
+          [36m</a>[31m
+          [36m<a[31m
+            [33mclass[31m=[32m""[31m
+            [33mdata-discover[31m=[32m"true"[31m
+            [33mhref[31m=[32m"/tracking"[31m
+            [33mstyle[31m=[32m"text-decoration: none;"[31m
+          [36m>[31m
+            [36m<span[31m
+              [33mstyle[31m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(255, 255, 255); font-size: 1.1rem; transition: all 0.3s ease; background-color: transparent; border-radius: 5px; display: block;"[31m
+            [36m>[31m
+              [0mTracking[0m
+            [36m</span>[31m
+          [36m</a>[31m
+          [36m<a[31m
+            [33mclass[31m=[32m""[31m
+            [33mdata-discover[31m=[32m"true"[31m
+            [33mhref[31m=[32m"/analytics"[31m
+            [33mstyle[31m=[32m"text-decoration: none;"[31m
+          [36m>[31m
+            [36m<span[31m
+              [33mstyle[31m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(255, 255, 255); font-size: 1.1rem; transition: all 0.3s ease; background-color: transparent; border-radius: 5px; display: block;"[31m
+            [36m>[31m
+              [0mAnalytics[0m
+            [36m</span>[31m
+          [36m</a>[31m
+        [36m</nav>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"flex items-center gap-4"[31m
+        [36m>[31m
+          [36m<div[31m
+            [33mstyle[31m=[32m"padding: 0.5rem; border-radius: 5px; transition: all 0.3s ease; color: rgb(255, 255, 255);"[31m
+          [36m>[31m
+            [36m<div[31m
+              [33mclass[31m=[32m"w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center "[31m
+            [36m>[31m
+              [36m<svg[31m
+                [33maria-hidden[31m=[32m"true"[31m
+                [33mclass[31m=[32m"lucide lucide-user w-4 h-4 text-gray-300"[31m
+                [33mfill[31m=[32m"none"[31m
+                [33mheight[31m=[32m"24"[31m
+                [33mstroke[31m=[32m"currentColor"[31m
+                [33mstroke-linecap[31m=[32m"round"[31m
+                [33mstroke-linejoin[31m=[32m"round"[31m
+                [33mstroke-width[31m=[32m"2"[31m
+                [33mviewBox[31m=[32m"0 0 24 24"[31m
+                [33mwidth[31m=[32m"24"[31m
+                [33mxmlns[31m=[32m"http://www.w3.org/2000/svg"[31m
+              [36m>[31m
+                [36m<path[31m
+                  [33md[31m=[32m"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"[31m
+                [36m/>[31m
+                [36m<circle[31m
+                  [33mcx[31m=[32m"12"[31m
+                  [33mcy[31m=[32m"7"[31m
+                  [33mr[31m=[32m"4"[31m
+                [36m/>[31m
+              [36m</svg>[31m
+            [36m</div>[31m
+          [36m</div>[31m
+        [36m</div>[31m
+      [36m</header>[31m
+      [36m<main[31m
+        [33mclass[31m=[32m"w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6"[31m
+      [36m/>[31m
+    [36m</div>[31m
+  [36m</div>[31m
+[36m</body>[31m[39m
+[31m   [31m×[31m <AppShell />[2m > [22mcontains navigation links[39m[32m 24[2mms[22m[39m
+[31m     → Unable to find an element with the text: Program. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[31m
+  [36m<div>[31m
+    [36m<div[31m
+      [33mclass[31m=[32m"min-h-screen bg-black"[31m
+    [36m>[31m
+      [36m<header[31m
+        [33mclass[31m=[32m"sticky top-0 z-50 flex justify-between items-center"[31m
+        [33mstyle[31m=[32m"background-color: rgb(0, 0, 0); padding: 1.5rem 2rem; box-shadow: 0 2px 10px rgba(255, 0, 0, 0.3);"[31m
+      [36m>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"flex items-center gap-2"[31m
+        [36m>[31m
+          [36m<svg[31m
+            [33maria-hidden[31m=[32m"true"[31m
+            [33mclass[31m=[32m"lucide lucide-dumbbell w-6 h-6"[31m
+            [33mfill[31m=[32m"none"[31m
+            [33mheight[31m=[32m"24"[31m
+            [33mstroke[31m=[32m"currentColor"[31m
+            [33mstroke-linecap[31m=[32m"round"[31m
+            [33mstroke-linejoin[31m=[32m"round"[31m
+            [33mstroke-width[31m=[32m"2"[31m
+            [33mstyle[31m=[32m"color: rgb(255, 0, 0);"[31m
+            [33mviewBox[31m=[32m"0 0 24 24"[31m
+            [33mwidth[31m=[32m"24"[31m
+            [33mxmlns[31m=[32m"http://www.w3.org/2000/svg"[31m
+          [36m>[31m
+            [36m<path[31m
+              [33md[31m=[32m"M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829z"[31m
+            [36m/>[31m
+            [36m<path[31m
+              [33md[31m=[32m"m2.5 21.5 1.4-1.4"[31m
+            [36m/>[31m
+            [36m<path[31m
+              [33md[31m=[32m"m20.1 3.9 1.4-1.4"[31m
+            [36m/>[31m
+            [36m<path[31m
+              [33md[31m=[32m"M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829z"[31m
+            [36m/>[31m
+            [36m<path[31m
+              [33md[31m=[32m"m9.6 14.4 4.8-4.8"[31m
+            [36m/>[31m
+          [36m</svg>[31m
+          [36m<div[31m
+            [33mstyle[31m=[32m"font-size: 1.5rem; font-weight: 700;"[31m
+          [36m>[31m
+            [36m<span[31m
+              [33mstyle[31m=[32m"color: rgb(255, 0, 0);"[31m
+            [36m>[31m
+              [0mPower[0m
+            [36m</span>[31m
+            [36m<span[31m
+              [33mstyle[31m=[32m"color: rgb(255, 255, 255); margin: 0px 0.2rem;"[31m
+            [36m>[31m
+              [0mHouse[0m
+            [36m</span>[31m
+            [36m<span[31m
+              [33mstyle[31m=[32m"color: rgb(0, 0, 0); background-color: rgb(255, 255, 255); padding: 0.2rem 0.5rem; border-radius: 5px;"[31m
+            [36m>[31m
+              [0mATX[0m
+            [36m</span>[31m
+          [36m</div>[31m
+        [36m</div>[31m
+        [36m<nav[31m
+          [33mclass[31m=[32m"flex"[31m
+          [33mstyle[31m=[32m"gap: 1rem; list-style: none; margin: 0px; padding: 0px;"[31m
+        [36m>[31m
+          [36m<a[31m
+            [33maria-current[31m=[32m"page"[31m
+            [33mclass[31m=[32m"active"[31m
+            [33mdata-discover[31m=[32m"true"[31m
+            [33mhref[31m=[32m"/"[31m
+            [33mstyle[31m=[32m"text-decoration: none;"[31m
+          [36m>[31m
+            [36m<span[31m
+              [33mstyle[31m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(0, 0, 0); font-size: 1.1rem; transition: all 0.3s ease; background-color: rgb(255, 0, 0); border-radius: 5px; display: block;"[31m
+            [36m>[31m
+              [0mDashboard[0m
+            [36m</span>[31m
+          [36m</a>[31m
+          [36m<a[31m
+            [33mclass[31m=[32m""[31m
+            [33mdata-discover[31m=[32m"true"[31m
+            [33mhref[31m=[32m"/assessment"[31m
+            [33mstyle[31m=[32m"text-decoration: none;"[31m
+          [36m>[31m
+            [36m<span[31m
+              [33mstyle[31m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(255, 255, 255); font-size: 1.1rem; transition: all 0.3s ease; background-color: transparent; border-radius: 5px; display: block;"[31m
+            [36m>[31m
+              [0mAssessment[0m
+            [36m</span>[31m
+          [36m</a>[31m
+          [36m<a[31m
+            [33mclass[31m=[32m""[31m
+            [33mdata-discover[31m=[32m"true"[31m
+            [33mhref[31m=[32m"/program"[31m
+            [33mstyle[31m=[32m"text-decoration: none;"[31m
+          [36m>[31m
+            [36m<span[31m
+              [33mstyle[31m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(255, 255, 255); font-size: 1.1rem; transition: all 0.3s ease; background-color: transparent; border-radius: 5px; display: block;"[31m
+            [36m>[31m
+              [0mProgram Design[0m
+            [36m</span>[31m
+          [36m</a>[31m
+          [36m<a[31m
+            [33mclass[31m=[32m""[31m
+            [33mdata-discover[31m=[32m"true"[31m
+            [33mhref[31m=[32m"/tracking"[31m
+            [33mstyle[31m=[32m"text-decoration: none;"[31m
+          [36m>[31m
+            [36m<span[31m
+              [33mstyle[31m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(255, 255, 255); font-size: 1.1rem; transition: all 0.3s ease; background-color: transparent; border-radius: 5px; display: block;"[31m
+            [36m>[31m
+              [0mTracking[0m
+            [36m</span>[31m
+          [36m</a>[31m
+          [36m<a[31m
+            [33mclass[31m=[32m""[31m
+            [33mdata-discover[31m=[32m"true"[31m
+            [33mhref[31m=[32m"/analytics"[31m
+            [33mstyle[31m=[32m"text-decoration: none;"[31m
+          [36m>[31m
+            [36m<span[31m
+              [33mstyle[31m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(255, 255, 255); font-size: 1.1rem; transition: all 0.3s ease; background-color: transparent; border-radius: 5px; display: block;"[31m
+            [36m>[31m
+              [0mAnalytics[0m
+            [36m</span>[31m
+          [36m</a>[31m
+        [36m</nav>[31m
+        [36m<div[31m
+          [33mclass[31m=[32m"flex items-center gap-4"[31m
+        [36m>[31m
+          [36m<div[31m
+            [33mstyle[31m=[32m"padding: 0.5rem; border-radius: 5px; transition: all 0.3s ease; color: rgb(255, 255, 255);"[31m
+          [36m>[31m
+            [36m<div[31m
+              [33mclass[31m=[32m"w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center "[31m
+            [36m>[31m
+              [36m<svg[31m
+                [33maria-hidden[31m=[32m"true"[31m
+                [33mclass[31m=[32m"lucide lucide-user w-4 h-4 text-gray-300"[31m
+                [33mfill[31m=[32m"none"[31m
+                [33mheight[31m=[32m"24"[31m
+                [33mstroke[31m=[32m"currentColor"[31m
+                [33mstroke-linecap[31m=[32m"round"[31m
+                [33mstroke-linejoin[31m=[32m"round"[31m
+                [33mstroke-width[31m=[32m"2"[31m
+                [33mviewBox[31m=[32m"0 0 24 24"[31m
+                [33mwidth[31m=[32m"24"[31m
+                [33mxmlns[31m=[32m"http://www.w3.org/2000/svg"[31m
+              [36m>[31m
+                [36m<path[31m
+                  [33md[31m=[32m"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"[31m
+                [36m/>[31m
+                [36m<circle[31m
+                  [33mcx[31m=[32m"12"[31m
+                  [33mcy[31m=[32m"7"[31m
+                  [33mr[31m=[32m"4"[31m
+                [36m/>[31m
+              [36m</svg>[31m
+            [36m</div>[31m
+          [36m</div>[31m
+        [36m</div>[31m
+      [36m</header>[31m
+      [36m<main[31m
+        [33mclass[31m=[32m"w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6"[31m
+      [36m/>[31m
+    [36m</div>[31m
+  [36m</div>[31m
+[36m</body>[31m[39m
+   [32m✓[39m <AppShell />[2m > [22mrenders with dark theme background[32m 17[2mms[22m[39m
+ [31m❯[39m src/tests/PowerHouseVolumeChart.test.jsx [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 85[2mms[22m[39m
+[31m   [31m×[31m PowerHouseVolumeChart[2m > [22mrenders the chart with PowerHouse branding[39m[32m 81[2mms[22m[39m
+[31m     → ResizeObserver is not defined[39m
+ [31m❯[39m src/__tests__/Dashboard.spec.jsx [2m([22m[2m2 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 110[2mms[22m[39m
+[31m   [31m×[31m <Dashboard />[2m > [22mrenders snapshot[39m[32m 86[2mms[22m[39m
+[31m     → [39m
+[31m   [31m×[31m <Dashboard />[2m > [22mcalls refreshDashboard when Refresh is clicked[39m[32m 20[2mms[22m[39m
+[31m     → [39m
+ [31m❯[39m src/tests/Dashboard.test.jsx [2m([22m[2m2 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 114[2mms[22m[39m
+[31m   [31m×[31m Dashboard[2m > [22mrenders without crashing[39m[32m 93[2mms[22m[39m
+[31m     → [39m
+[31m   [31m×[31m Dashboard[2m > [22mrenders all dashboard components[39m[32m 16[2mms[22m[39m
+[31m     → [39m
+ [32m✓[39m src/tests/hooks/useWeekStatus.test.jsx [2m([22m[2m4 tests[22m[2m)[22m[32m 297[2mms[22m[39m
+ [32m✓[39m src/tests/hooks/useRecentWorkouts.test.jsx [2m([22m[2m4 tests[22m[2m)[22m[33m 340[2mms[22m[39m
+ [32m✓[39m __tests__/hooks/useLogSet.test.jsx [2m([22m[2m6 tests[22m[2m)[22m[32m 271[2mms[22m[39m
+ [32m✓[39m src/tests/hooks/useLogSet.test.jsx [2m([22m[2m6 tests[22m[2m)[22m[32m 293[2mms[22m[39m
+ [32m✓[39m src/tests/hooks/useWeeklyVolume.test.jsx [2m([22m[2m3 tests[22m[2m)[22m[32m 229[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m e2e/smoke.spec.js[2m [ e2e/smoke.spec.js ][22m
+[31m[1mError[22m: Playwright Test did not expect test() to be called here.
+Most common reasons include:
+- You are calling test() in a configuration file.
+- You are calling test() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.[39m
+[90m [2m❯[22m TestTypeImpl._currentSuite ../node_modules/.pnpm/playwright@1.53.1/node_modules/playwright/lib/common/testType.js:[2m74:13[22m[39m
+[90m [2m❯[22m TestTypeImpl._createTest ../node_modules/.pnpm/playwright@1.53.1/node_modules/playwright/lib/common/testType.js:[2m87:24[22m[39m
+[90m [2m❯[22m ../node_modules/.pnpm/playwright@1.53.1/node_modules/playwright/lib/transform/transform.js:[2m275:12[22m[39m
+[36m [2m❯[22m e2e/smoke.spec.js:[2m3:5[22m[39m
+    [90m  1| [39m[35mimport[39m { test[33m,[39m expect } [35mfrom[39m [32m"@playwright/test"[39m[33m;[39m
+    [90m  2| [39m
+    [90m  3| [39m[34mtest[39m([32m"navigation & core pages load"[39m[33m,[39m [35masync[39m ({ page }) [33m=>[39m {
+    [90m   | [39m    [31m^[39m
+    [90m  4| [39m  [90m// Navigate to the application[39m
+    [90m  5| [39m  [35mawait[39m page[33m.[39m[34mgoto[39m([32m"http://localhost:5173"[39m)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/tests/Home.test.jsx[2m [ src/tests/Home.test.jsx ][22m
+[31m[1mError[22m: Failed to resolve import "../src/pages/Home" from "src/tests/Home.test.jsx". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/tracker-ui/src/tests/Home.test.jsx[39m:3:0
+[33m  10 |  const __vi_import_0__ = await import("react/jsx-dev-runtime");
+  11 |  const __vi_import_1__ = await import("@testing-library/react");
+  12 |  const __vi_import_2__ = await import("../src/pages/Home");
+     |                                       ^
+  13 |  
+  14 |  [39m
+[90m [2m❯[22m TransformPluginContext._formatLog ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m42499:41[22m[39m
+[90m [2m❯[22m TransformPluginContext.error ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m42496:16[22m[39m
+[90m [2m❯[22m normalizeUrl ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m40475:23[22m[39m
+[90m [2m❯[22m ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m40594:37[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m40521:7[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m42294:18[22m[39m
+[90m [2m❯[22m loadAndTransform ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m35735:27[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/tests/Intelligence.test.jsx[2m [ src/tests/Intelligence.test.jsx ][22m
+[31m[1mError[22m: Failed to resolve import "../src/pages/Intelligence" from "src/tests/Intelligence.test.jsx". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/tracker-ui/src/tests/Intelligence.test.jsx[39m:3:0
+[33m  15 |  const __vi_import_0__ = await import("react/jsx-dev-runtime");
+  16 |  const __vi_import_1__ = await import("@testing-library/react");
+  17 |  const __vi_import_2__ = await import("../src/pages/Intelligence");
+     |                                       ^
+  18 |  
+  19 |  [39m
+[90m [2m❯[22m TransformPluginContext._formatLog ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m42499:41[22m[39m
+[90m [2m❯[22m TransformPluginContext.error ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m42496:16[22m[39m
+[90m [2m❯[22m normalizeUrl ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m40475:23[22m[39m
+[90m [2m❯[22m ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m40594:37[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m40521:7[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m42294:18[22m[39m
+[90m [2m❯[22m loadAndTransform ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m35735:27[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/tests/Logger.test.jsx[2m [ src/tests/Logger.test.jsx ][22m
+[31m[1mError[22m: Failed to resolve import "../src/pages/Logger" from "src/tests/Logger.test.jsx". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/tracker-ui/src/tests/Logger.test.jsx[39m:3:0
+[33m  13 |  const __vi_import_0__ = await import("react/jsx-dev-runtime");
+  14 |  const __vi_import_1__ = await import("@testing-library/react");
+  15 |  const __vi_import_2__ = await import("../src/pages/Logger");
+     |                                       ^
+  16 |  
+  17 |  [39m
+[90m [2m❯[22m TransformPluginContext._formatLog ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m42499:41[22m[39m
+[90m [2m❯[22m TransformPluginContext.error ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m42496:16[22m[39m
+[90m [2m❯[22m normalizeUrl ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m40475:23[22m[39m
+[90m [2m❯[22m ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m40594:37[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m40521:7[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m42294:18[22m[39m
+[90m [2m❯[22m loadAndTransform ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m35735:27[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/tests/Sessions.test.jsx[2m [ src/tests/Sessions.test.jsx ][22m
+[31m[1mError[22m: Failed to resolve import "../src/pages/Sessions" from "src/tests/Sessions.test.jsx". Does the file exist?[39m
+  Plugin: [35mvite:import-analysis[39m
+  File: [36mC:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/tracker-ui/src/tests/Sessions.test.jsx[39m:3:0
+[33m  23 |  const __vi_import_0__ = await import("react/jsx-dev-runtime");
+  24 |  const __vi_import_1__ = await import("@testing-library/react");
+  25 |  const __vi_import_2__ = await import("../src/pages/Sessions");
+     |                                       ^
+  26 |  
+  27 |  [39m
+[90m [2m❯[22m TransformPluginContext._formatLog ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m42499:41[22m[39m
+[90m [2m❯[22m TransformPluginContext.error ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m42496:16[22m[39m
+[90m [2m❯[22m normalizeUrl ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m40475:23[22m[39m
+[90m [2m❯[22m ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m40594:37[22m[39m
+[90m [2m❯[22m TransformPluginContext.transform ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m40521:7[22m[39m
+[90m [2m❯[22m EnvironmentPluginContainer.transform ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m42294:18[22m[39m
+[90m [2m❯[22m loadAndTransform ../node_modules/.pnpm/vite@6.3.5_@types+node@24.0.3_jiti@2.4.2_lightningcss@1.30.1/node_modules/vite/dist/node/chunks/dep-DBxKXgDP.js:[2m35735:27[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/lib/algorithms/__tests__/macrocyclePlanner.test.js[2m [ src/lib/algorithms/__tests__/macrocyclePlanner.test.js ][22m
+[31m[1mError[22m: No test suite found in file C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/tracker-ui/src/lib/algorithms/__tests__/macrocyclePlanner.test.js[39m
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/13]⎯[22m[39m
+
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 7 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/tests/Dashboard.test.jsx[2m > [22mDashboard[2m > [22mrenders without crashing
+{
+  stack: 'AggregateError: \n' +
+    '    at aggregateErrors (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react@19.1.0\\node_modules\\react\\cjs\\react.development.js:527:11)\n' +
+    '    at process.env.NODE_ENV.exports.act (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react@19.1.0\\node_modules\\react\\cjs\\react.development.js:872:24)\n' +
+    '    at C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f\\node_modules\\@testing-library\\react\\dist\\act-compat.js:47:25\n' +
+    '    at renderRoot (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f\\node_modules\\@testing-library\\react\\dist\\pure.js:190:26)\n' +
+    '    at render (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f\\node_modules\\@testing-library\\react\\dist\\pure.js:292:10)\n' +
+    '    at C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\tracker-ui\\src\\tests\\Dashboard.test.jsx:19:5\n' +
+    '    at file:///C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11\n' +
+    '    at file:///C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26\n' +
+    '    at file:///C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20\n' +
+    '    at new Promise (<anonymous>)',
+  errors: [
+    {
+      stack: 'ReferenceError: ResizeObserver is not defined\n' +
+        '    at C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\recharts@2.15.4_react-dom@19.1.0_react@19.1.0__react@19.1.0\\node_modules\\recharts\\lib\\component\\ResponsiveContainer.js:101:20\n' +
+        '    at Object.react-stack-bottom-frame (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:23949:20)\n' +
+        '    at runWithFiberInDEV (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:1522:13)\n' +
+        '    at commitHookEffectListMount (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:11905:29)\n' +
+        '    at commitHookPassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:12028:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13841:13)\n' +
+        '    at recursivelyTraversePassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13815:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13957:11)\n' +
+        '    at recursivelyTraversePassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13815:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13834:11)',
+      message: 'ResizeObserver is not defined',
+      constructor: 'Function<ReferenceError>',
+      name: 'ReferenceError',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'ReferenceError: ResizeObserver is not defined\n' +
+        '    at C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\recharts@2.15.4_react-dom@19.1.0_react@19.1.0__react@19.1.0\\node_modules\\recharts\\lib\\component\\ResponsiveContainer.js:101:20\n' +
+        '    at Object.react-stack-bottom-frame (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:23949:20)\n' +
+        '    at runWithFiberInDEV (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:1522:13)\n' +
+        '    at commitHookEffectListMount (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:11905:29)\n' +
+        '    at commitHookPassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:12028:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13841:13)\n' +
+        '    at recursivelyTraversePassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13815:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13957:11)\n' +
+        '    at recursivelyTraversePassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13815:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13834:11)',
+      message: 'ResizeObserver is not defined',
+      constructor: 'Function<ReferenceError>',
+      name: 'ReferenceError',
+      toString: 'Function<toString>'
+    }
+  ],
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'aggregateErrors',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/react@19.1.0/node_modules/react/cjs/react.development.js',
+      line: 527,
+      column: 11
+    },
+    {
+      method: 'process.env.NODE_ENV.exports.act',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/react@19.1.0/node_modules/react/cjs/react.development.js',
+      line: 872,
+      column: 24
+    },
+    {
+      method: '',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/act-compat.js',
+      line: 47,
+      column: 25
+    },
+    {
+      method: 'renderRoot',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/pure.js',
+      line: 190,
+      column: 26
+    },
+    {
+      method: 'render',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/pure.js',
+      line: 292,
+      column: 10
+    },
+    {
+      method: '',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/tracker-ui/src/tests/Dashboard.test.jsx',
+      line: 19,
+      column: 5
+    }
+  ]
+}
+[90m [2m❯[22m aggregateErrors ../node_modules/.pnpm/react@19.1.0/node_modules/react/cjs/react.development.js:[2m527:11[22m[39m
+[90m [2m❯[22m process.env.NODE_ENV.exports.act ../node_modules/.pnpm/react@19.1.0/node_modules/react/cjs/react.development.js:[2m872:24[22m[39m
+[90m [2m❯[22m ../node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot ../node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m render ../node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/tests/Dashboard.test.jsx:[2m19:5[22m[39m
+    [90m 17| [39m    [35mconst[39m queryClient [33m=[39m [34mcreateTestQueryClient[39m()[33m;[39m
+    [90m 18| [39m    
+    [90m 19| [39m    [34mrender[39m(
+    [90m   | [39m    [31m^[39m
+    [90m 20| [39m      [33m<[39m[33mQueryClientProvider[39m [33mclient[39m[33m=[39m[33m{[39mqueryClient[33m}[39m[33m>[39m
+    [90m 21| [39m        [33m<[39m[33mMemoryRouter[39m[33m>[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/tests/Dashboard.test.jsx[2m > [22mDashboard[2m > [22mrenders all dashboard components
+{
+  stack: 'AggregateError: \n' +
+    '    at aggregateErrors (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react@19.1.0\\node_modules\\react\\cjs\\react.development.js:527:11)\n' +
+    '    at process.env.NODE_ENV.exports.act (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react@19.1.0\\node_modules\\react\\cjs\\react.development.js:872:24)\n' +
+    '    at C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f\\node_modules\\@testing-library\\react\\dist\\act-compat.js:47:25\n' +
+    '    at renderRoot (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f\\node_modules\\@testing-library\\react\\dist\\pure.js:190:26)\n' +
+    '    at render (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f\\node_modules\\@testing-library\\react\\dist\\pure.js:292:10)\n' +
+    '    at C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\tracker-ui\\src\\tests\\Dashboard.test.jsx:32:5\n' +
+    '    at file:///C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11\n' +
+    '    at file:///C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26\n' +
+    '    at file:///C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20\n' +
+    '    at new Promise (<anonymous>)',
+  errors: [
+    {
+      stack: 'ReferenceError: ResizeObserver is not defined\n' +
+        '    at C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\recharts@2.15.4_react-dom@19.1.0_react@19.1.0__react@19.1.0\\node_modules\\recharts\\lib\\component\\ResponsiveContainer.js:101:20\n' +
+        '    at Object.react-stack-bottom-frame (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:23949:20)\n' +
+        '    at runWithFiberInDEV (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:1522:13)\n' +
+        '    at commitHookEffectListMount (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:11905:29)\n' +
+        '    at commitHookPassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:12028:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13841:13)\n' +
+        '    at recursivelyTraversePassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13815:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13957:11)\n' +
+        '    at recursivelyTraversePassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13815:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13834:11)',
+      message: 'ResizeObserver is not defined',
+      constructor: 'Function<ReferenceError>',
+      name: 'ReferenceError',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'ReferenceError: ResizeObserver is not defined\n' +
+        '    at C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\recharts@2.15.4_react-dom@19.1.0_react@19.1.0__react@19.1.0\\node_modules\\recharts\\lib\\component\\ResponsiveContainer.js:101:20\n' +
+        '    at Object.react-stack-bottom-frame (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:23949:20)\n' +
+        '    at runWithFiberInDEV (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:1522:13)\n' +
+        '    at commitHookEffectListMount (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:11905:29)\n' +
+        '    at commitHookPassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:12028:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13841:13)\n' +
+        '    at recursivelyTraversePassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13815:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13957:11)\n' +
+        '    at recursivelyTraversePassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13815:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13834:11)',
+      message: 'ResizeObserver is not defined',
+      constructor: 'Function<ReferenceError>',
+      name: 'ReferenceError',
+      toString: 'Function<toString>'
+    }
+  ],
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'aggregateErrors',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/react@19.1.0/node_modules/react/cjs/react.development.js',
+      line: 527,
+      column: 11
+    },
+    {
+      method: 'process.env.NODE_ENV.exports.act',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/react@19.1.0/node_modules/react/cjs/react.development.js',
+      line: 872,
+      column: 24
+    },
+    {
+      method: '',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/act-compat.js',
+      line: 47,
+      column: 25
+    },
+    {
+      method: 'renderRoot',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/pure.js',
+      line: 190,
+      column: 26
+    },
+    {
+      method: 'render',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/pure.js',
+      line: 292,
+      column: 10
+    },
+    {
+      method: '',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/tracker-ui/src/tests/Dashboard.test.jsx',
+      line: 32,
+      column: 5
+    }
+  ]
+}
+[90m [2m❯[22m aggregateErrors ../node_modules/.pnpm/react@19.1.0/node_modules/react/cjs/react.development.js:[2m527:11[22m[39m
+[90m [2m❯[22m process.env.NODE_ENV.exports.act ../node_modules/.pnpm/react@19.1.0/node_modules/react/cjs/react.development.js:[2m872:24[22m[39m
+[90m [2m❯[22m ../node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot ../node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m render ../node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/tests/Dashboard.test.jsx:[2m32:5[22m[39m
+    [90m 30| [39m    [35mconst[39m queryClient [33m=[39m [34mcreateTestQueryClient[39m()[33m;[39m
+    [90m 31| [39m    
+    [90m 32| [39m    [34mrender[39m(
+    [90m   | [39m    [31m^[39m
+    [90m 33| [39m      [33m<[39m[33mQueryClientProvider[39m [33mclient[39m[33m=[39m[33m{[39mqueryClient[33m}[39m[33m>[39m
+    [90m 34| [39m        [33m<[39m[33mMemoryRouter[39m[33m>[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/tests/PowerHouseVolumeChart.test.jsx[2m > [22mPowerHouseVolumeChart[2m > [22mrenders the chart with PowerHouse branding
+[31m[1mReferenceError[22m: ResizeObserver is not defined[39m
+[90m [2m❯[22m ../node_modules/.pnpm/recharts@2.15.4_react-dom@19.1.0_react@19.1.0__react@19.1.0/node_modules/recharts/lib/component/ResponsiveContainer.js:[2m101:20[22m[39m
+[90m [2m❯[22m Object.react-stack-bottom-frame ../node_modules/.pnpm/react-dom@19.1.0_react@19.1.0/node_modules/react-dom/cjs/react-dom-client.development.js:[2m23949:20[22m[39m
+[90m [2m❯[22m runWithFiberInDEV ../node_modules/.pnpm/react-dom@19.1.0_react@19.1.0/node_modules/react-dom/cjs/react-dom-client.development.js:[2m1522:13[22m[39m
+[90m [2m❯[22m commitHookEffectListMount ../node_modules/.pnpm/react-dom@19.1.0_react@19.1.0/node_modules/react-dom/cjs/react-dom-client.development.js:[2m11905:29[22m[39m
+[90m [2m❯[22m commitHookPassiveMountEffects ../node_modules/.pnpm/react-dom@19.1.0_react@19.1.0/node_modules/react-dom/cjs/react-dom-client.development.js:[2m12028:11[22m[39m
+[90m [2m❯[22m commitPassiveMountOnFiber ../node_modules/.pnpm/react-dom@19.1.0_react@19.1.0/node_modules/react-dom/cjs/react-dom-client.development.js:[2m13841:13[22m[39m
+[90m [2m❯[22m recursivelyTraversePassiveMountEffects ../node_modules/.pnpm/react-dom@19.1.0_react@19.1.0/node_modules/react-dom/cjs/react-dom-client.development.js:[2m13815:11[22m[39m
+[90m [2m❯[22m commitPassiveMountOnFiber ../node_modules/.pnpm/react-dom@19.1.0_react@19.1.0/node_modules/react-dom/cjs/react-dom-client.development.js:[2m13957:11[22m[39m
+[90m [2m❯[22m recursivelyTraversePassiveMountEffects ../node_modules/.pnpm/react-dom@19.1.0_react@19.1.0/node_modules/react-dom/cjs/react-dom-client.development.js:[2m13815:11[22m[39m
+[90m [2m❯[22m commitPassiveMountOnFiber ../node_modules/.pnpm/react-dom@19.1.0_react@19.1.0/node_modules/react-dom/cjs/react-dom-client.development.js:[2m13834:11[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/AppShell.spec.jsx[2m > [22m<AppShell />[2m > [22mcontains header with PowerHouse Tracker branding
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: PowerHouse Tracker. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"min-h-screen bg-black"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"sticky top-0 z-50 flex justify-between items-center"[39m
+        [33mstyle[39m=[32m"background-color: rgb(0, 0, 0); padding: 1.5rem 2rem; box-shadow: 0 2px 10px rgba(255, 0, 0, 0.3);"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-2"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-dumbbell w-6 h-6"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"24"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mstyle[39m=[32m"color: rgb(255, 0, 0);"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"24"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829z"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m2.5 21.5 1.4-1.4"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m20.1 3.9 1.4-1.4"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829z"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m9.6 14.4 4.8-4.8"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"font-size: 1.5rem; font-weight: 700;"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mstyle[39m=[32m"color: rgb(255, 0, 0);"[39m
+            [36m>[39m
+              [0mPower[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mstyle[39m=[32m"color: rgb(255, 255, 255); margin: 0px 0.2rem;"[39m
+            [36m>[39m
+              [0mHouse[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mstyle[39m=[32m"color: rgb(0, 0, 0); background-color: rgb(255, 255, 255); padding: 0.2rem 0.5rem; border-radius: 5px;"[39m
+            [36m>[39m
+              [0mATX[0m
+            [36m</span>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<nav[39m
+          [33mclass[39m=[32m"flex"[39m
+          [33mstyle[39m=[32m"gap: 1rem; list-style: none; margin: 0px; padding: 0px;"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33maria-current[39m=[32m"page"[39m
+            [33mclass[39m=[32m"active"[39m
+            [33mdata-discover[39m=[32m"true"[39m
+            [33mhref[39m=[32m"/"[39m
+            [33mstyle[39m=[32m"text-decoration: none;"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mstyle[39m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(0, 0, 0); font-size: 1.1rem; transition: all 0.3s ease; background-color: rgb(255, 0, 0); border-radius: 5px; display: block;"[39m
+            [36m>[39m
+              [0mDashboard[0m
+            [36m</span>[39m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m""[39m
+            [33mdata-discover[39m=[32m"true"[39m
+            [33mhref[39m=[32m"/assessment"[39m
+            [33mstyle[39m=[32m"text-decoration: none;"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mstyle[39m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(255, 255, 255); font-size: 1.1rem; transition: all 0.3s ease; background-color: transparent; border-radius: 5px; display: block;"[39m
+            [36m>[39m
+              [0mAssessment[0m
+            [36m</span>[39m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m""[39m
+            [33mdata-discover[39m=[32m"true"[39m
+            [33mhref[39m=[32m"/program"[39m
+            [33mstyle[39m=[32m"text-decoration: none;"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mstyle[39m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(255, 255, 255); font-size: 1.1rem; transition: all 0.3s ease; background-color: transparent; border-radius: 5px; display: block;"[39m
+            [36m>[39m
+              [0mProgram Design[0m
+            [36m</span>[39m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m""[39m
+            [33mdata-discover[39m=[32m"true"[39m
+            [33mhref[39m=[32m"/tracking"[39m
+            [33mstyle[39m=[32m"text-decoration: none;"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mstyle[39m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(255, 255, 255); font-size: 1.1rem; transition: all 0.3s ease; background-color: transparent; border-radius: 5px; display: block;"[39m
+            [36m>[39m
+              [0mTracking[0m
+            [36m</span>[39m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m""[39m
+            [33mdata-discover[39m=[32m"true"[39m
+            [33mhref[39m=[32m"/analytics"[39m
+            [33mstyle[39m=[32m"text-decoration: none;"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mstyle[39m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(255, 255, 255); font-size: 1.1rem; transition: all 0.3s ease; background-color: transparent; border-radius: 5px; display: block;"[39m
+            [36m>[39m
+              [0mAnalytics[0m
+            [36m</span>[39m
+          [36m</a>[39m
+        [36m</nav>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"padding: 0.5rem; border-radius: 5px; transition: all 0.3s ease; color: rgb(255, 255, 255);"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center "[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-user w-4 h-4 text-gray-300"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"[39m
+                [36m/>[39m
+                [36m<circle[39m
+                  [33mcx[39m=[32m"12"[39m
+                  [33mcy[39m=[32m"7"[39m
+                  [33mr[39m=[32m"4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6"[39m
+      [36m/>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError ../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m ../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m ../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m ../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/__tests__/AppShell.spec.jsx:[2m31:12[22m[39m
+    [90m 29| [39m    )[33m;[39m
+    [90m 30| [39m    
+    [90m 31| [39m    [34mexpect[39m([34mgetByText[39m([32m'PowerHouse Tracker'[39m))[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   | [39m           [31m^[39m
+    [90m 32| [39m  })[33m;[39m
+    [90m 33| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/AppShell.spec.jsx[2m > [22m<AppShell />[2m > [22mcontains navigation links
+[31m[1mTestingLibraryElementError[22m[39m: Unable to find an element with the text: Program. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"min-h-screen bg-black"[39m
+    [36m>[39m
+      [36m<header[39m
+        [33mclass[39m=[32m"sticky top-0 z-50 flex justify-between items-center"[39m
+        [33mstyle[39m=[32m"background-color: rgb(0, 0, 0); padding: 1.5rem 2rem; box-shadow: 0 2px 10px rgba(255, 0, 0, 0.3);"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-2"[39m
+        [36m>[39m
+          [36m<svg[39m
+            [33maria-hidden[39m=[32m"true"[39m
+            [33mclass[39m=[32m"lucide lucide-dumbbell w-6 h-6"[39m
+            [33mfill[39m=[32m"none"[39m
+            [33mheight[39m=[32m"24"[39m
+            [33mstroke[39m=[32m"currentColor"[39m
+            [33mstroke-linecap[39m=[32m"round"[39m
+            [33mstroke-linejoin[39m=[32m"round"[39m
+            [33mstroke-width[39m=[32m"2"[39m
+            [33mstyle[39m=[32m"color: rgb(255, 0, 0);"[39m
+            [33mviewBox[39m=[32m"0 0 24 24"[39m
+            [33mwidth[39m=[32m"24"[39m
+            [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+          [36m>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M17.596 12.768a2 2 0 1 0 2.829-2.829l-1.768-1.767a2 2 0 0 0 2.828-2.829l-2.828-2.828a2 2 0 0 0-2.829 2.828l-1.767-1.768a2 2 0 1 0-2.829 2.829z"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m2.5 21.5 1.4-1.4"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m20.1 3.9 1.4-1.4"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"M5.343 21.485a2 2 0 1 0 2.829-2.828l1.767 1.768a2 2 0 1 0 2.829-2.829l-6.364-6.364a2 2 0 1 0-2.829 2.829l1.768 1.767a2 2 0 0 0-2.828 2.829z"[39m
+            [36m/>[39m
+            [36m<path[39m
+              [33md[39m=[32m"m9.6 14.4 4.8-4.8"[39m
+            [36m/>[39m
+          [36m</svg>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"font-size: 1.5rem; font-weight: 700;"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mstyle[39m=[32m"color: rgb(255, 0, 0);"[39m
+            [36m>[39m
+              [0mPower[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mstyle[39m=[32m"color: rgb(255, 255, 255); margin: 0px 0.2rem;"[39m
+            [36m>[39m
+              [0mHouse[0m
+            [36m</span>[39m
+            [36m<span[39m
+              [33mstyle[39m=[32m"color: rgb(0, 0, 0); background-color: rgb(255, 255, 255); padding: 0.2rem 0.5rem; border-radius: 5px;"[39m
+            [36m>[39m
+              [0mATX[0m
+            [36m</span>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+        [36m<nav[39m
+          [33mclass[39m=[32m"flex"[39m
+          [33mstyle[39m=[32m"gap: 1rem; list-style: none; margin: 0px; padding: 0px;"[39m
+        [36m>[39m
+          [36m<a[39m
+            [33maria-current[39m=[32m"page"[39m
+            [33mclass[39m=[32m"active"[39m
+            [33mdata-discover[39m=[32m"true"[39m
+            [33mhref[39m=[32m"/"[39m
+            [33mstyle[39m=[32m"text-decoration: none;"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mstyle[39m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(0, 0, 0); font-size: 1.1rem; transition: all 0.3s ease; background-color: rgb(255, 0, 0); border-radius: 5px; display: block;"[39m
+            [36m>[39m
+              [0mDashboard[0m
+            [36m</span>[39m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m""[39m
+            [33mdata-discover[39m=[32m"true"[39m
+            [33mhref[39m=[32m"/assessment"[39m
+            [33mstyle[39m=[32m"text-decoration: none;"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mstyle[39m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(255, 255, 255); font-size: 1.1rem; transition: all 0.3s ease; background-color: transparent; border-radius: 5px; display: block;"[39m
+            [36m>[39m
+              [0mAssessment[0m
+            [36m</span>[39m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m""[39m
+            [33mdata-discover[39m=[32m"true"[39m
+            [33mhref[39m=[32m"/program"[39m
+            [33mstyle[39m=[32m"text-decoration: none;"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mstyle[39m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(255, 255, 255); font-size: 1.1rem; transition: all 0.3s ease; background-color: transparent; border-radius: 5px; display: block;"[39m
+            [36m>[39m
+              [0mProgram Design[0m
+            [36m</span>[39m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m""[39m
+            [33mdata-discover[39m=[32m"true"[39m
+            [33mhref[39m=[32m"/tracking"[39m
+            [33mstyle[39m=[32m"text-decoration: none;"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mstyle[39m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(255, 255, 255); font-size: 1.1rem; transition: all 0.3s ease; background-color: transparent; border-radius: 5px; display: block;"[39m
+            [36m>[39m
+              [0mTracking[0m
+            [36m</span>[39m
+          [36m</a>[39m
+          [36m<a[39m
+            [33mclass[39m=[32m""[39m
+            [33mdata-discover[39m=[32m"true"[39m
+            [33mhref[39m=[32m"/analytics"[39m
+            [33mstyle[39m=[32m"text-decoration: none;"[39m
+          [36m>[39m
+            [36m<span[39m
+              [33mstyle[39m=[32m"padding: 0.5rem 1rem; white-space: nowrap; color: rgb(255, 255, 255); font-size: 1.1rem; transition: all 0.3s ease; background-color: transparent; border-radius: 5px; display: block;"[39m
+            [36m>[39m
+              [0mAnalytics[0m
+            [36m</span>[39m
+          [36m</a>[39m
+        [36m</nav>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"flex items-center gap-4"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mstyle[39m=[32m"padding: 0.5rem; border-radius: 5px; transition: all 0.3s ease; color: rgb(255, 255, 255);"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center "[39m
+            [36m>[39m
+              [36m<svg[39m
+                [33maria-hidden[39m=[32m"true"[39m
+                [33mclass[39m=[32m"lucide lucide-user w-4 h-4 text-gray-300"[39m
+                [33mfill[39m=[32m"none"[39m
+                [33mheight[39m=[32m"24"[39m
+                [33mstroke[39m=[32m"currentColor"[39m
+                [33mstroke-linecap[39m=[32m"round"[39m
+                [33mstroke-linejoin[39m=[32m"round"[39m
+                [33mstroke-width[39m=[32m"2"[39m
+                [33mviewBox[39m=[32m"0 0 24 24"[39m
+                [33mwidth[39m=[32m"24"[39m
+                [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+              [36m>[39m
+                [36m<path[39m
+                  [33md[39m=[32m"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"[39m
+                [36m/>[39m
+                [36m<circle[39m
+                  [33mcx[39m=[32m"12"[39m
+                  [33mcy[39m=[32m"7"[39m
+                  [33mr[39m=[32m"4"[39m
+                [36m/>[39m
+              [36m</svg>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</header>[39m
+      [36m<main[39m
+        [33mclass[39m=[32m"w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6"[39m
+      [36m/>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError ../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m ../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m ../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m ../node_modules/.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/__tests__/AppShell.spec.jsx:[2m42:12[22m[39m
+    [90m 40| [39m    
+    [90m 41| [39m    [34mexpect[39m([34mgetByText[39m([32m'Dashboard'[39m))[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m 42| [39m    [34mexpect[39m([34mgetByText[39m([32m'Program'[39m))[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m   | [39m           [31m^[39m
+    [90m 43| [39m    [34mexpect[39m([34mgetByText[39m([32m'Tracking'[39m))[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+    [90m 44| [39m    [34mexpect[39m([34mgetByText[39m([32m'Analytics'[39m))[33m.[39m[34mtoBeInTheDocument[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/Dashboard.spec.jsx[2m > [22m<Dashboard />[2m > [22mrenders snapshot
+{
+  stack: 'AggregateError: \n' +
+    '    at aggregateErrors (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react@19.1.0\\node_modules\\react\\cjs\\react.development.js:527:11)\n' +
+    '    at process.env.NODE_ENV.exports.act (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react@19.1.0\\node_modules\\react\\cjs\\react.development.js:872:24)\n' +
+    '    at C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f\\node_modules\\@testing-library\\react\\dist\\act-compat.js:47:25\n' +
+    '    at renderRoot (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f\\node_modules\\@testing-library\\react\\dist\\pure.js:190:26)\n' +
+    '    at render (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f\\node_modules\\@testing-library\\react\\dist\\pure.js:292:10)\n' +
+    '    at C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\tracker-ui\\src\\__tests__\\Dashboard.spec.jsx:9:28\n' +
+    '    at file:///C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11\n' +
+    '    at file:///C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26\n' +
+    '    at file:///C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20\n' +
+    '    at new Promise (<anonymous>)',
+  errors: [
+    {
+      stack: 'ReferenceError: ResizeObserver is not defined\n' +
+        '    at C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\recharts@2.15.4_react-dom@19.1.0_react@19.1.0__react@19.1.0\\node_modules\\recharts\\lib\\component\\ResponsiveContainer.js:101:20\n' +
+        '    at Object.react-stack-bottom-frame (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:23949:20)\n' +
+        '    at runWithFiberInDEV (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:1522:13)\n' +
+        '    at commitHookEffectListMount (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:11905:29)\n' +
+        '    at commitHookPassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:12028:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13841:13)\n' +
+        '    at recursivelyTraversePassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13815:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13957:11)\n' +
+        '    at recursivelyTraversePassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13815:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13834:11)',
+      message: 'ResizeObserver is not defined',
+      constructor: 'Function<ReferenceError>',
+      name: 'ReferenceError',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'ReferenceError: ResizeObserver is not defined\n' +
+        '    at C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\recharts@2.15.4_react-dom@19.1.0_react@19.1.0__react@19.1.0\\node_modules\\recharts\\lib\\component\\ResponsiveContainer.js:101:20\n' +
+        '    at Object.react-stack-bottom-frame (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:23949:20)\n' +
+        '    at runWithFiberInDEV (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:1522:13)\n' +
+        '    at commitHookEffectListMount (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:11905:29)\n' +
+        '    at commitHookPassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:12028:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13841:13)\n' +
+        '    at recursivelyTraversePassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13815:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13957:11)\n' +
+        '    at recursivelyTraversePassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13815:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13834:11)',
+      message: 'ResizeObserver is not defined',
+      constructor: 'Function<ReferenceError>',
+      name: 'ReferenceError',
+      toString: 'Function<toString>'
+    }
+  ],
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'aggregateErrors',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/react@19.1.0/node_modules/react/cjs/react.development.js',
+      line: 527,
+      column: 11
+    },
+    {
+      method: 'process.env.NODE_ENV.exports.act',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/react@19.1.0/node_modules/react/cjs/react.development.js',
+      line: 872,
+      column: 24
+    },
+    {
+      method: '',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/act-compat.js',
+      line: 47,
+      column: 25
+    },
+    {
+      method: 'renderRoot',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/pure.js',
+      line: 190,
+      column: 26
+    },
+    {
+      method: 'render',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/pure.js',
+      line: 292,
+      column: 10
+    },
+    {
+      method: '',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/tracker-ui/src/__tests__/Dashboard.spec.jsx',
+      line: 9,
+      column: 28
+    }
+  ]
+}
+[90m [2m❯[22m aggregateErrors ../node_modules/.pnpm/react@19.1.0/node_modules/react/cjs/react.development.js:[2m527:11[22m[39m
+[90m [2m❯[22m process.env.NODE_ENV.exports.act ../node_modules/.pnpm/react@19.1.0/node_modules/react/cjs/react.development.js:[2m872:24[22m[39m
+[90m [2m❯[22m ../node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot ../node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m render ../node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/Dashboard.spec.jsx:[2m9:28[22m[39m
+    [90m  7| [39m[34mdescribe[39m([32m'<Dashboard />'[39m[33m,[39m () [33m=>[39m {
+    [90m  8| [39m  [34mit[39m([32m'renders snapshot'[39m[33m,[39m () [33m=>[39m {
+    [90m  9| [39m    [35mconst[39m { asFragment } [33m=[39m [34mrender[39m([33m<[39m[33mDashboard[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m                           [31m^[39m
+    [90m 10| [39m    [34mexpect[39m([34masFragment[39m())[33m.[39m[34mtoMatchSnapshot[39m()[33m;[39m
+    [90m 11| [39m  })[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/13]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/__tests__/Dashboard.spec.jsx[2m > [22m<Dashboard />[2m > [22mcalls refreshDashboard when Refresh is clicked
+{
+  stack: 'AggregateError: \n' +
+    '    at aggregateErrors (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react@19.1.0\\node_modules\\react\\cjs\\react.development.js:527:11)\n' +
+    '    at process.env.NODE_ENV.exports.act (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react@19.1.0\\node_modules\\react\\cjs\\react.development.js:872:24)\n' +
+    '    at C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f\\node_modules\\@testing-library\\react\\dist\\act-compat.js:47:25\n' +
+    '    at renderRoot (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f\\node_modules\\@testing-library\\react\\dist\\pure.js:190:26)\n' +
+    '    at render (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f\\node_modules\\@testing-library\\react\\dist\\pure.js:292:10)\n' +
+    '    at C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\tracker-ui\\src\\__tests__\\Dashboard.spec.jsx:25:5\n' +
+    '    at file:///C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11\n' +
+    '    at file:///C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26\n' +
+    '    at file:///C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@vitest+runner@3.2.4/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20\n' +
+    '    at new Promise (<anonymous>)',
+  errors: [
+    {
+      stack: 'ReferenceError: ResizeObserver is not defined\n' +
+        '    at C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\recharts@2.15.4_react-dom@19.1.0_react@19.1.0__react@19.1.0\\node_modules\\recharts\\lib\\component\\ResponsiveContainer.js:101:20\n' +
+        '    at Object.react-stack-bottom-frame (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:23949:20)\n' +
+        '    at runWithFiberInDEV (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:1522:13)\n' +
+        '    at commitHookEffectListMount (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:11905:29)\n' +
+        '    at commitHookPassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:12028:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13841:13)\n' +
+        '    at recursivelyTraversePassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13815:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13957:11)\n' +
+        '    at recursivelyTraversePassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13815:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13834:11)',
+      message: 'ResizeObserver is not defined',
+      constructor: 'Function<ReferenceError>',
+      name: 'ReferenceError',
+      toString: 'Function<toString>'
+    },
+    {
+      stack: 'ReferenceError: ResizeObserver is not defined\n' +
+        '    at C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\recharts@2.15.4_react-dom@19.1.0_react@19.1.0__react@19.1.0\\node_modules\\recharts\\lib\\component\\ResponsiveContainer.js:101:20\n' +
+        '    at Object.react-stack-bottom-frame (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:23949:20)\n' +
+        '    at runWithFiberInDEV (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:1522:13)\n' +
+        '    at commitHookEffectListMount (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:11905:29)\n' +
+        '    at commitHookPassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:12028:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13841:13)\n' +
+        '    at recursivelyTraversePassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13815:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13957:11)\n' +
+        '    at recursivelyTraversePassiveMountEffects (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13815:11)\n' +
+        '    at commitPassiveMountOnFiber (C:\\Users\\treyt\\OneDrive\\Desktop\\Projects\\ProgramDesignWorkspace\\tracker-ui-good\\node_modules\\.pnpm\\react-dom@19.1.0_react@19.1.0\\node_modules\\react-dom\\cjs\\react-dom-client.development.js:13834:11)',
+      message: 'ResizeObserver is not defined',
+      constructor: 'Function<ReferenceError>',
+      name: 'ReferenceError',
+      toString: 'Function<toString>'
+    }
+  ],
+  message: '',
+  constructor: 'Function<AggregateError>',
+  name: 'AggregateError',
+  toString: 'Function<toString>',
+  stacks: [
+    {
+      method: 'aggregateErrors',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/react@19.1.0/node_modules/react/cjs/react.development.js',
+      line: 527,
+      column: 11
+    },
+    {
+      method: 'process.env.NODE_ENV.exports.act',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/react@19.1.0/node_modules/react/cjs/react.development.js',
+      line: 872,
+      column: 24
+    },
+    {
+      method: '',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/act-compat.js',
+      line: 47,
+      column: 25
+    },
+    {
+      method: 'renderRoot',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/pure.js',
+      line: 190,
+      column: 26
+    },
+    {
+      method: 'render',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/pure.js',
+      line: 292,
+      column: 10
+    },
+    {
+      method: '',
+      file: 'C:/Users/treyt/OneDrive/Desktop/Projects/ProgramDesignWorkspace/tracker-ui-good/tracker-ui/src/__tests__/Dashboard.spec.jsx',
+      line: 25,
+      column: 5
+    }
+  ]
+}
+[90m [2m❯[22m aggregateErrors ../node_modules/.pnpm/react@19.1.0/node_modules/react/cjs/react.development.js:[2m527:11[22m[39m
+[90m [2m❯[22m process.env.NODE_ENV.exports.act ../node_modules/.pnpm/react@19.1.0/node_modules/react/cjs/react.development.js:[2m872:24[22m[39m
+[90m [2m❯[22m ../node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/act-compat.js:[2m47:25[22m[39m
+[90m [2m❯[22m renderRoot ../node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/pure.js:[2m190:26[22m[39m
+[90m [2m❯[22m render ../node_modules/.pnpm/@testing-library+react@16.3_a7b711c25dfb1fc34b8999e00374067f/node_modules/@testing-library/react/dist/pure.js:[2m292:10[22m[39m
+[36m [2m❯[22m src/__tests__/Dashboard.spec.jsx:[2m25:5[22m[39m
+    [90m 23| [39m      refreshDashboard[33m:[39m spy[33m,[39m
+    [90m 24| [39m    })[33m;[39m
+    [90m 25| [39m    [34mrender[39m([33m<[39m[33mDashboard[39m [33m/[39m[33m>[39m)[33m;[39m
+    [90m   | [39m    [31m^[39m
+    [90m 26| [39m    fireEvent[33m.[39m[34mclick[39m(screen[33m.[39m[34mgetByText[39m([32m'Refresh'[39m))[33m;[39m
+    [90m 27| [39m    [34mexpect[39m(spy)[33m.[39m[34mtoHaveBeenCalled[39m()[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/13]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m10 failed[39m[22m[2m | [22m[1m[32m5 passed[39m[22m[90m (15)[39m
+[2m      Tests [22m [1m[31m7 failed[39m[22m[2m | [22m[1m[32m24 passed[39m[22m[90m (31)[39m
+[2m   Start at [22m 20:55:45
+[2m   Duration [22m 11.66s[2m (transform 603ms, setup 4.20s, collect 6.29s, tests 1.88s, environment 18.70s, prepare 5.14s)[22m
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+ ELIFECYCLE  Test failed. See above for more details.

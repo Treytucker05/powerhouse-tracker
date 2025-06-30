@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import Sessions from '../src/pages/Sessions';
+import Sessions from '../pages/Sessions';
 
 // Mock the hooks
 vi.mock('../src/lib/useWorkoutSessions', () => ({

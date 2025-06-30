@@ -46,7 +46,6 @@ export default function TopNav({ user, onSignOut }) {
                 style={{ 
                   padding: '0.5rem 1rem',
                   whiteSpace: 'nowrap',
-                  color: '#fff',
                   fontSize: '1.1rem',
                   transition: 'all 0.3s ease',
                   backgroundColor: isActive ? '#FF0000' : 'transparent',
