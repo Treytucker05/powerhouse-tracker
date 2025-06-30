@@ -1,9 +1,9 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import Sessions from '../src/pages/Sessions';
+import Sessions from '../pages/Sessions';
 
 // Mock the hooks
-vi.mock('../src/lib/useWorkoutSessions', () => ({
+vi.mock('../lib/useWorkoutSessions', () => ({
   default: () => [
     {
       id: 1,
@@ -14,7 +14,7 @@ vi.mock('../src/lib/useWorkoutSessions', () => ({
   ]
 }));
 
-vi.mock('../src/lib/useSessionSets', () => ({
+vi.mock('../lib/useSessionSets', () => ({
   default: (sessionId) => sessionId ? [
     {
       id: 1,

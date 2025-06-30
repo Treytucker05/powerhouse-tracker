@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import Logger from '../src/pages/Logger';
+import Logger from '../pages/Logger';
 
 // Mock the hooks
-vi.mock('../src/lib/useActiveSession', () => ({
+vi.mock('../lib/useActiveSession', () => ({
   default: () => ({
     activeSession: null,
     loading: false,
@@ -13,7 +13,7 @@ vi.mock('../src/lib/useActiveSession', () => ({
   })
 }));
 
-vi.mock('../src/lib/useSessionSets', () => ({
+vi.mock('../lib/useSessionSets', () => ({
   default: () => []
 }));
 
