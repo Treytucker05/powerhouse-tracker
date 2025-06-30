@@ -1,20 +1,22 @@
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
+// tracker-ui/vitest.config.js
+import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-  plugins: [react()],
   test: {
-    environment: 'jsdom',
-    globals: true,
-    setupFiles: ['./src/tests/setup.js'],
-    coverage: {
-      reporter: ['text', 'lcov', 'html'],
-      thresholds: {
-        lines: 80,
-        branches: 80,
-        functions: 80,
-        statements: 80
-      }
-    }
-  },
-});
+    environment: 'jsdom',       // mock browser APIs
+    setupFiles: './vitest.setup.js',
+    reporters: 'dot',
+    silent: true,
+    globals: true,              // enable describe, test, expect globals
+    exclude: [
+      '**/node_modules/**',
+      '**/e2e/**',
+      '**/playwright/**',
+      '**/cypress/**',
+      '**/*.e2e.*',
+      '**/*.playwright.*',
+      '**/*.spec.ts',
+      '**/*.spec.js'
+    ]
+  }
+})

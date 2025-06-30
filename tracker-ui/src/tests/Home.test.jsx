@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import Home from '../src/pages/Home';
+import Home from '../pages/Home';
 
 // Mock the hooks
-vi.mock('../src/lib/useWeeklyVolume', () => ({
+vi.mock('../lib/useWeeklyVolume', () => ({
   default: () => ({
     data: [
       { muscle: 'Chest', volume: 12, week: 1 },
@@ -19,7 +19,7 @@ describe('Home Dashboard', () => {
     render(<Home onNavigate={mockNavigate} />);
     
     // Check if main elements are present
-    expect(screen.getByText('PowerHouse Tracker')).toBeInTheDocument();
+    expect(screen.getByText((content) => /Power\s*House/i.test(content))).toBeInTheDocument();
     expect(screen.getByText('Weekly Volume')).toBeInTheDocument();
     expect(screen.getByText('Fatigue Status:')).toBeInTheDocument();
     

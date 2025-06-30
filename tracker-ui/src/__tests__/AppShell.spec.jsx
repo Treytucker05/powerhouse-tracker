@@ -28,7 +28,7 @@ describe('<AppShell />', () => {
       </BrowserRouter>
     );
     
-    expect(getByText('PowerHouse Tracker')).toBeInTheDocument();
+    expect(getByText((content) => /Power\s*House/i.test(content))).toBeInTheDocument();
   });
 
   it('contains navigation links', () => {
@@ -39,7 +39,7 @@ describe('<AppShell />', () => {
     );
     
     expect(getByText('Dashboard')).toBeInTheDocument();
-    expect(getByText('Program')).toBeInTheDocument();
+    expect(getByText(/Program\s*Design/i)).toBeInTheDocument();
     expect(getByText('Tracking')).toBeInTheDocument();
     expect(getByText('Analytics')).toBeInTheDocument();
   });

@@ -1,39 +1,19 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./vitest.setup.js'],          // ← single, canonical entry
-    
-    // 🎯 Specify which test files to run
-    include: ["tests/**/*.{test,spec}.{js,jsx}", "__tests__/**/*.{test,spec}.{js,jsx}"],
-    
-    // 🚀 Windows performance tweaks
-    pool: "forks",
-    poolOptions: {
-      forks: {
-        singleFork: true
-      }
-    },
-
-    // ✅ keep tests fast – only cover source we own
-    coverage: {
-      enabled: false,                     // TEMP: disable to test if this is causing hangs
-      provider: "v8",                     // faster, no extra deps
-      reporter: ["text"],                 // simplified reporter
-      include: ["lib/**/*.js", "tracker-ui/src/**/*.{js,jsx}"],
-      exclude: [
-        "**/dist/**",
-        "**/docs/**",
-        "**/node_modules/**",
-        "tracker-ui/src/tests/**"
-      ],
-      // Remove strict thresholds that might cause hangs
-      // lines: 80,
-      // functions: 80,
-      // branches: 80,
-      // statements: 80
-    }
+    reporters: 'dot', // tiny one-line summary per run
+    silent: true,     // suppress passing-test output
+    globals: true,    // enable describe, test, expect globals
+    exclude: [
+      '**/node_modules/**',
+      '**/e2e/**',
+      '**/playwright/**',
+      '**/cypress/**',
+      '**/*.e2e.*',
+      '**/*.playwright.*',
+      '**/*.spec.ts',
+      '**/*.spec.js'
+    ]
   }
-});
+})
