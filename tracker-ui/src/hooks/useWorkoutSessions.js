@@ -318,3 +318,5 @@ export function useWorkoutSessions() {
     getWeeklyVolume
   };
 }
+
+export default useWorkoutSessions;
