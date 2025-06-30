@@ -82,10 +82,10 @@ const deloadAnalysis = calculateDeload(trainingData);
 ### Development Setup
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Start development server
-npm run dev
+pnpm run dev
 
 # Run tests
 npm test
@@ -100,8 +100,8 @@ npm run ci
 ### React/Vite Frontend
 ```bash
 cd tracker-ui
-npm install
-npm run dev  # Runs on http://localhost:5173
+pnpm install
+pnpm run dev  # Runs on http://localhost:5173
 ```
 
 ## 🎯 Core Features
@@ -202,7 +202,7 @@ targetRIR = 4.5 - (4.0 / (mesoLength - 1)) * (week - 1);
 
 1. **Install dependencies**
    ```
-   npm install
+   pnpm install
    ```
 2. **Create a `.env` file** from `.env.example` and add your Supabase credentials.
    ```
