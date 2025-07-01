@@ -21,7 +21,7 @@
  */
 
 import CardWrapper from "../components/ui/CardWrapper";
-import { TrainingStateProvider } from "../context/trainingStateContext";
+import { TrainingStateProvider } from "../context/TrainingStateContext";
 import ErrorBoundary from "../components/ErrorBoundary";
 import Breadcrumb from "../components/navigation/Breadcrumb";
 import SectionDivider from "../components/ui/SectionDivider";
@@ -1019,7 +1019,7 @@ export default function Macrocycle7125() {
                   <span>Back to Program Design</span>
                 </button>
                 <div className="text-center">
-                  <div className="text-sm text-gray-400">Program Design > Builder > Macrocycle</div>
+                  <div className="text-sm text-gray-400">Program Design {'>'}  Builder {'>'} Macrocycle</div>
                   <h2 className="text-2xl font-bold text-white">Macrocycle Builder</h2>
                 </div>
               </div>
