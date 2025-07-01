@@ -1,0 +1,81 @@
+{
+  "name": "powerhouse-rp-toolkit",
+  "type": "module",
+  "version": "0.9.0-beta.4",
+  "description": "Renaissance Periodization Training Toolkit for PowerHouseATX",
+  "main": "main.js",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "require": "./index.js"
+    },
+    "./node-bootstrap": {
+      "import": "./node-bootstrap.js",
+      "require": "./node-bootstrap.js"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:e2e": "cross-env-shell \"NODE_OPTIONS=-r %cd%/playwright-preload.cjs\" rimraf test-results && pnpm exec playwright test",
+    "lint:ci": "npx eslint \"{lib,tests,tracker-ui/src}/**/*.{js,jsx}\" --max-warnings 0",
+    "verify": "pnpm run build && pnpm run test:unit && pnpm run lint:ci",
+    "analyze": "node scripts/analyze-repo.js",
+    "deps": "node scripts/deps-check.js",
+    "gameplan": "python scripts/gameplan_generator.py",
+    "update-progress": "node scripts/update-progress.js"
+  },
+  "keywords": [
+    "fitness",
+    "renaissance periodization",
+    "training",
+    "workout"
+  ],
+  "author": "PowerHouseATX",
+  "license": "MIT",
+  "devDependencies": {
+    "@parcel/packager-raw-url": "^2.15.2",
+    "@parcel/transformer-webmanifest": "^2.15.2",
+    "@playwright/test": "^1.53.1",
+    "@testing-library/react": "^16.3.0",
+    "@vitest/browser": "^3.2.4",
+    "@vitest/coverage-istanbul": "3.2.4",
+    "@vitest/coverage-v8": "^3.2.4",
+    "buffer": "^6.0.3",
+    "cross-env": "^7.0.3",
+    "eslint": "^9.29.0",
+    "eslint-config-prettier": "^10.1.5",
+    "fake-indexeddb": "^4.0.2",
+    "jest": "^30.0.0",
+    "jest-environment-jsdom": "^30.0.0",
+    "jsdom": "^22.1.0",
+    "npm-run-all": "^4.1.5",
+    "parcel": "^2.15.2",
+    "playwright": "^1.53.1",
+    "prettier": "^3.5.3",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "rimraf": "^5.0.5",
+    "vite": "6.3.5",
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "@heroicons/react": "^2.2.0",
+    "@supabase/supabase-js": "^2.50.0",
+    "@tanstack/react-query": "^5.81.2",
+    "chart.js": "^4.5.0",
+    "clipboardy": "^4.0.0",
+    "powerhouse-rp-toolkit": "0.9.0-beta.2",
+    "zustand": "^4.5.2"
+  },
+  "targets": {
+    "default": {
+      "sourceMap": true,
+      "engines": {
+        "browsers": "> 0.5%, not dead"
+      }
+    }
+  }
+}
