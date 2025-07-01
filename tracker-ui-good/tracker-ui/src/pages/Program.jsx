@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
-import { 
-  BASE_VOLUME_LANDMARKS, 
-  RIR_SCHEMES, 
-  MACROCYCLE_TEMPLATES, 
+import {
+  BASE_VOLUME_LANDMARKS,
+  RIR_SCHEMES,
+  MACROCYCLE_TEMPLATES,
   HIGH_SFR_EXERCISES,
   GOAL_TYPES,
   PHASE_FOCUS_MAPPING,
@@ -43,6 +43,9 @@ const ProgramForm = memo(({ programData, setProgramData, selectedLevel, error, s
     setProgramData(prev => ({ ...prev, trainingDays: parseInt(e.target.value) }));
   }, [setProgramData]);
 
+  // Consistent input/select styling
+  const inputSelectClassName = "w-full bg-white border border-gray-600 text-black px-4 py-3 rounded-lg focus:border-red-500 focus:outline-none appearance-none";
+
   return (
     <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
       <div className="flex items-center justify-between mb-4">
@@ -61,7 +64,7 @@ const ProgramForm = memo(({ programData, setProgramData, selectedLevel, error, s
           <ProgramNameInput
             value={programData.name}
             onChange={handleNameChange}
-            className="w-full bg-white border border-gray-600 text-black px-4 py-3 rounded-lg focus:border-red-500 focus:outline-none"
+            className={inputSelectClassName}
             placeholder="Enter program name..."
           />
         </div>
@@ -72,7 +75,7 @@ const ProgramForm = memo(({ programData, setProgramData, selectedLevel, error, s
           <select
             value={programData.goal}
             onChange={handleGoalChange}
-            className="w-full bg-white border border-gray-600 text-black px-4 py-3 rounded-lg focus:border-red-500 focus:outline-none"
+            className={inputSelectClassName}
           >
             {GOAL_TYPES.map(goal => (
               <option key={goal.value} value={goal.value}>{goal.label}</option>
@@ -88,7 +91,7 @@ const ProgramForm = memo(({ programData, setProgramData, selectedLevel, error, s
             type="number"
             value={programData.duration}
             onChange={handleDurationChange}
-            className="w-full bg-white border border-gray-600 text-black px-4 py-3 rounded-lg focus:border-red-500 focus:outline-none"
+            className={inputSelectClassName}
             min="4"
             max="52"
           />
@@ -101,7 +104,7 @@ const ProgramForm = memo(({ programData, setProgramData, selectedLevel, error, s
             key="program-training-days-field"
             value={programData.trainingDays}
             onChange={handleTrainingDaysChange}
-            className="w-full bg-white border border-gray-600 text-black px-4 py-3 rounded-lg focus:border-red-500 focus:outline-none"
+            className={inputSelectClassName}
           >
             <option value="3">3 Days</option>
             <option value="4">4 Days</option>
@@ -159,9 +162,9 @@ const ProgramForm = memo(({ programData, setProgramData, selectedLevel, error, s
 ProgramForm.displayName = 'ProgramForm';
 
 // Move ProgramBuilder outside Program component to prevent re-creation
-const ProgramBuilder = memo(({ 
-  programData, setProgramData, selectedLevel, error, setError, isLoading, 
-  saveProgram, setActiveTab, handleSetProgramData 
+const ProgramBuilder = memo(({
+  programData, setProgramData, selectedLevel, error, setError, isLoading,
+  saveProgram, setActiveTab, handleSetProgramData
 }) => {
   return (
     <div className="space-y-6">
@@ -175,7 +178,7 @@ const ProgramBuilder = memo(({
         <h2 className="text-2xl font-semibold text-white">Program Builder</h2>
       </div>
 
-      <ProgramForm 
+      <ProgramForm
         programData={programData}
         setProgramData={setProgramData}
         selectedLevel={selectedLevel}
@@ -230,7 +233,7 @@ const Program = memo(() => {
           .select('*')
           .order('created_at', { ascending: false })
           .limit(5);
-        
+
         if (error) throw error;
         setRecentPrograms(data || []);
       } catch (error) {
@@ -250,7 +253,7 @@ const Program = memo(() => {
     try {
       // Check if user is authenticated
       const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
+
       if (authError || !user) {
         throw new Error('You must be logged in to create a program');
       }
@@ -270,7 +273,7 @@ const Program = memo(() => {
         .single();
 
       if (programError) throw programError;
-      
+
       // Step 2: Create program blocks if a template is selected
       if (programData.selectedTemplate && MACROCYCLE_TEMPLATES[programData.selectedTemplate]) {
         const template = MACROCYCLE_TEMPLATES[programData.selectedTemplate];
@@ -294,15 +297,15 @@ const Program = memo(() => {
           // Just log the error and continue
         }
       }
-      
+
       // Step 3: Navigate to the appropriate phase designer
       if (selectedLevel === 'macro') {
-        navigate('/macrocycle', { 
-          state: { 
-            programId: program.id, 
+        navigate('/macrocycle', {
+          state: {
+            programId: program.id,
             selectedTemplate: programData.selectedTemplate,
             programData: programData
-          } 
+          }
         });
       } else if (selectedLevel === 'meso') {
         navigate('/mesocycle', { state: { programId: program.id } });
@@ -321,8 +324,8 @@ const Program = memo(() => {
   const handleContinueProgram = useCallback(async (program) => {
     try {
       // Navigate based on program type or default to macrocycle
-      navigate('/macrocycle', { 
-        state: { 
+      navigate('/macrocycle', {
+        state: {
           programId: program.id,
           programData: {
             name: program.name,
@@ -330,7 +333,7 @@ const Program = memo(() => {
             duration: program.duration_weeks,
             trainingDays: program.training_days_per_week
           }
-        } 
+        }
       });
     } catch (error) {
       console.error('Error continuing program:', error);
@@ -342,7 +345,7 @@ const Program = memo(() => {
   const handleDuplicateProgram = useCallback(async (program) => {
     try {
       const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
+
       if (authError || !user) {
         throw new Error('You must be logged in to duplicate a program');
       }
@@ -391,7 +394,7 @@ const Program = memo(() => {
         .select('*')
         .order('created_at', { ascending: false })
         .limit(5);
-      
+
       if (!refreshError) {
         setRecentPrograms(updatedPrograms || []);
       }
@@ -413,7 +416,7 @@ const Program = memo(() => {
 
     try {
       const { data: { user }, error: authError } = await supabase.auth.getUser();
-      
+
       if (authError || !user) {
         throw new Error('You must be logged in to delete a program');
       }
@@ -439,7 +442,7 @@ const Program = memo(() => {
         .select('*')
         .order('created_at', { ascending: false })
         .limit(5);
-      
+
       if (!refreshError) {
         setRecentPrograms(updatedPrograms || []);
       }
@@ -470,7 +473,7 @@ const Program = memo(() => {
             },
             {
               id: 'meso',
-              title: 'MESOCYCLE', 
+              title: 'MESOCYCLE',
               subtitle: '4-6 weeks',
               description: 'Training blocks',
               icon: '📊',
@@ -487,11 +490,10 @@ const Program = memo(() => {
           ].map((level) => (
             <div
               key={level.id}
-              className={`bg-gray-800 rounded-lg p-6 border-2 cursor-pointer transition-all ${
-                selectedLevel === level.id 
-                  ? 'border-red-500 bg-gray-700' 
+              className={`bg-gray-800 rounded-lg p-6 border-2 cursor-pointer transition-all ${selectedLevel === level.id
+                  ? 'border-red-500 bg-gray-700'
                   : 'border-gray-600 hover:border-gray-500'
-              }`}
+                }`}
               onClick={() => setSelectedLevel(level.id)}
             >
               <div className="text-3xl mb-3">{level.icon}</div>
@@ -509,7 +511,7 @@ const Program = memo(() => {
                 >
                   START NEW
                 </button>
-                <button 
+                <button
                   onClick={(e) => {
                     e.stopPropagation();
                     setActiveTab('templates');
@@ -578,7 +580,7 @@ const Program = memo(() => {
                   </p>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <button 
+                  <button
                     onClick={() => handleContinueProgram(program)}
                     className="bg-green-600 text-black px-4 py-2 rounded hover:bg-green-700 transition-colors"
                     title="Continue working on this program"
@@ -634,7 +636,7 @@ const Program = memo(() => {
         {/* Interactive Calculator */}
         <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
           <h3 className="text-lg font-semibold text-white mb-4">Custom Volume Calculation</h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div>
               <label className="block text-gray-300 text-sm font-medium mb-2">Muscle Group</label>
@@ -648,7 +650,7 @@ const Program = memo(() => {
                 ))}
               </select>
             </div>
-            
+
             <div>
               <label className="block text-gray-300 text-sm font-medium mb-2">Training Age</label>
               <select
@@ -661,7 +663,7 @@ const Program = memo(() => {
                 <option value="advanced">Advanced (5+ years)</option>
               </select>
             </div>
-            
+
             <div>
               <label className="block text-gray-300 text-sm font-medium mb-2">Block Duration</label>
               <input
@@ -692,7 +694,7 @@ const Program = memo(() => {
                 <div className="text-blue-400 text-xl font-bold">{progression[progression.length - 1]}</div>
               </div>
             </div>
-            
+
             <div className="flex items-center justify-center space-x-2 text-sm">
               <span className="text-gray-400">Weekly progression:</span>
               <span className="text-white">{progression.join(' → ')}</span>
@@ -733,7 +735,7 @@ const Program = memo(() => {
             </table>
           </div>
         </div>
-        
+
         {/* Explanation Section */}
         <div className="bg-gray-700 rounded-lg p-4">
           <h4 className="text-white font-medium mb-3">Volume Landmarks Explained</h4>
@@ -800,7 +802,7 @@ const Program = memo(() => {
           <div key={key} className="bg-gray-800 rounded-lg p-6 border border-gray-700">
             <h3 className="text-lg font-semibold text-white mb-3">{template.name}</h3>
             <p className="text-gray-400 mb-4">{template.duration_weeks} weeks total</p>
-            
+
             <div className="space-y-2 mb-4">
               {template.blocks.map((block, index) => (
                 <div key={index} className="flex justify-between items-center p-2 bg-gray-700 rounded text-sm">
@@ -810,7 +812,7 @@ const Program = memo(() => {
                 </div>
               ))}
             </div>
-            
+
             <button
               onClick={() => {
                 setProgramData({
@@ -851,11 +853,10 @@ const Program = memo(() => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded transition-colors text-black ${
-                activeTab === tab.id
+              className={`flex items-center space-x-2 px-4 py-2 rounded transition-colors text-black ${activeTab === tab.id
                   ? 'bg-red-600'
                   : 'bg-gray-700 hover:bg-gray-600'
-              }`}
+                }`}
             >
               <span>{tab.icon}</span>
               <span>{tab.label}</span>
@@ -868,7 +869,7 @@ const Program = memo(() => {
           <ProgramOverview />
         </div>
         <div className={activeTab === 'builder' ? 'block' : 'hidden'}>
-          <ProgramBuilder 
+          <ProgramBuilder
             programData={programData}
             setProgramData={setProgramData}
             selectedLevel={selectedLevel}
