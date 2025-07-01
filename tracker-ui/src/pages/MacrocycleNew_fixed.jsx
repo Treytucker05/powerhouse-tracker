@@ -4,14 +4,16 @@ import ErrorBoundary from "../components/ErrorBoundary";
 import { useState } from "react";
 
 export default function Macrocycle() {
+  console.log('🟢 Fixed Macrocycle loaded');
+
   const [expandedPhase, setExpandedPhase] = useState(null);
-  
+
   const mesocycles = [
-    { 
-      id: 1, 
-      name: 'Foundation Phase', 
-      weeks: 6, 
-      status: 'completed', 
+    {
+      id: 1,
+      name: 'Foundation Phase',
+      weeks: 6,
+      status: 'completed',
       progress: 100,
       icon: '🏗️',
       gradient: 'from-blue-600 to-blue-800',
@@ -22,11 +24,11 @@ export default function Macrocycle() {
       objectives: ['Build training base', 'Improve movement quality', 'Establish routine'],
       keyMetrics: { volume: '+25%', technique: '95%', consistency: '90%' }
     },
-    { 
-      id: 2, 
-      name: 'Hypertrophy Phase', 
-      weeks: 8, 
-      status: 'current', 
+    {
+      id: 2,
+      name: 'Hypertrophy Phase',
+      weeks: 8,
+      status: 'current',
       progress: 65,
       icon: '💪',
       gradient: 'from-green-600 to-green-800',
@@ -37,11 +39,11 @@ export default function Macrocycle() {
       objectives: ['Maximize muscle growth', 'Volume progression', '6-12 rep focus'],
       keyMetrics: { volume: '+15%', weight: '+2.3 lbs', strength: '+8%' }
     },
-    { 
-      id: 3, 
-      name: 'Strength Phase', 
-      weeks: 6, 
-      status: 'planned', 
+    {
+      id: 3,
+      name: 'Strength Phase',
+      weeks: 6,
+      status: 'planned',
       progress: 0,
       icon: '🔥',
       gradient: 'from-orange-600 to-red-700',
@@ -52,11 +54,11 @@ export default function Macrocycle() {
       objectives: ['Build maximal strength', 'Lower rep ranges', 'Heavy compound focus'],
       keyMetrics: { '1RM': 'TBD', 'Intensity': 'TBD', 'Power': 'TBD' }
     },
-    { 
-      id: 4, 
-      name: 'Peak Phase', 
-      weeks: 4, 
-      status: 'planned', 
+    {
+      id: 4,
+      name: 'Peak Phase',
+      weeks: 4,
+      status: 'planned',
       progress: 0,
       icon: '⚡',
       gradient: 'from-purple-600 to-purple-800',
@@ -125,24 +127,22 @@ export default function Macrocycle() {
   const TimelineCard = ({ mesocycle }) => {
     const isExpanded = expandedPhase === mesocycle.id;
     const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    
+
     return (
-      <div 
-        className={`relative p-6 rounded-2xl border-2 transition-all duration-700 ease-out cursor-pointer group ${
-          mesocycle.status === 'completed' 
-            ? `bg-gradient-to-br ${mesocycle.gradient}/20 ${mesocycle.borderColor} shadow-lg` 
+      <div
+        className={`relative p-6 rounded-2xl border-2 transition-all duration-700 ease-out cursor-pointer group ${mesocycle.status === 'completed'
+            ? `bg-gradient-to-br ${mesocycle.gradient}/20 ${mesocycle.borderColor} shadow-lg`
             : mesocycle.status === 'current'
-            ? `bg-gradient-to-br ${mesocycle.gradient}/30 ${mesocycle.borderColor} shadow-xl animate-pulse`
-            : `bg-gradient-to-br from-gray-800/40 to-gray-700/30 border-gray-600/40 shadow-md`
-        } backdrop-blur-sm hover:scale-[1.02] hover:shadow-2xl ${
-          isExpanded ? 'scale-[1.02] shadow-2xl' : ''
-        }`}
+              ? `bg-gradient-to-br ${mesocycle.gradient}/30 ${mesocycle.borderColor} shadow-xl animate-pulse`
+              : `bg-gradient-to-br from-gray-800/40 to-gray-700/30 border-gray-600/40 shadow-md`
+          } backdrop-blur-sm hover:scale-[1.02] hover:shadow-2xl ${isExpanded ? 'scale-[1.02] shadow-2xl' : ''
+          }`}
         style={{
-          boxShadow: mesocycle.status === 'current' 
+          boxShadow: mesocycle.status === 'current'
             ? `0 15px 40px rgba(16, 185, 129, 0.25), 0 6px 20px rgba(0, 0, 0, 0.3)`
             : mesocycle.status === 'completed'
-            ? `0 10px 30px rgba(59, 130, 246, 0.2), 0 4px 15px rgba(0, 0, 0, 0.3)`
-            : '0 8px 25px rgba(0, 0, 0, 0.3)'
+              ? `0 10px 30px rgba(59, 130, 246, 0.2), 0 4px 15px rgba(0, 0, 0, 0.3)`
+              : '0 8px 25px rgba(0, 0, 0, 0.3)'
         }}
         onClick={() => setExpandedPhase(isExpanded ? null : mesocycle.id)}
       >
@@ -152,10 +152,10 @@ export default function Macrocycle() {
             <div className="text-4xl">{mesocycle.icon}</div>
             <div>
               <h3 className="text-xl font-bold text-white mb-1"
-                  style={{
-                    textShadow: '0 2px 4px rgba(0,0,0,0.8)',
-                    letterSpacing: '0.3px'
-                  }}>
+                style={{
+                  textShadow: '0 2px 4px rgba(0,0,0,0.8)',
+                  letterSpacing: '0.3px'
+                }}>
                 {mesocycle.name}
               </h3>
               <p className="text-sm text-gray-300">
@@ -163,25 +163,24 @@ export default function Macrocycle() {
               </p>
             </div>
           </div>
-          
+
           {/* Circular Progress Indicator */}
           <div className="flex flex-col items-center space-y-2">
-            <CircularProgress 
-              percentage={mesocycle.progress} 
+            <CircularProgress
+              percentage={mesocycle.progress}
               color={mesocycle.glowColor}
               size={70}
             />
-            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-              mesocycle.status === 'completed' 
-                ? 'bg-gradient-to-r from-blue-500/30 to-blue-400/20 text-blue-300 border border-blue-400/30' 
+            <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${mesocycle.status === 'completed'
+                ? 'bg-gradient-to-r from-blue-500/30 to-blue-400/20 text-blue-300 border border-blue-400/30'
                 : mesocycle.status === 'current'
-                ? 'bg-gradient-to-r from-green-500/30 to-green-400/20 text-green-300 border border-green-400/30'
-                : 'bg-gradient-to-r from-gray-600/30 to-gray-500/20 text-gray-300 border border-gray-500/30'
-            }`}
-                 style={{
-                   textShadow: '0 1px 2px rgba(0,0,0,0.8)',
-                   backdropFilter: 'blur(8px)'
-                 }}>
+                  ? 'bg-gradient-to-r from-green-500/30 to-green-400/20 text-green-300 border border-green-400/30'
+                  : 'bg-gradient-to-r from-gray-600/30 to-gray-500/20 text-gray-300 border border-gray-500/30'
+              }`}
+              style={{
+                textShadow: '0 1px 2px rgba(0,0,0,0.8)',
+                backdropFilter: 'blur(8px)'
+              }}>
               {mesocycle.status}
             </span>
           </div>
@@ -189,13 +188,13 @@ export default function Macrocycle() {
 
         {/* Progress Visualization */}
         <div className="relative w-full bg-gray-700/50 rounded-full h-4 mb-4 overflow-hidden"
-             style={{ 
-               boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.6)',
-               backdropFilter: 'blur(4px)'
-             }}>
-          <div 
+          style={{
+            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.6)',
+            backdropFilter: 'blur(4px)'
+          }}>
+          <div
             className={`h-4 rounded-full transition-all duration-1000 ease-out relative overflow-hidden bg-gradient-to-r ${mesocycle.gradient}`}
-            style={{ 
+            style={{
               width: `${mesocycle.progress}%`,
               boxShadow: `0 0 15px rgba(16, 185, 129, 0.6), inset 0 1px 2px rgba(255,255,255,0.2)`
             }}
@@ -205,9 +204,8 @@ export default function Macrocycle() {
         </div>
 
         {/* Expanded Details */}
-        <div className={`transition-all duration-500 ease-out overflow-hidden ${
-          isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-        }`}>
+        <div className={`transition-all duration-500 ease-out overflow-hidden ${isExpanded ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+          }`}>
           <div className="pt-4 border-t border-gray-600/30 space-y-4">
             <div>
               <h4 className="text-white font-semibold mb-2 flex items-center">
@@ -223,7 +221,7 @@ export default function Macrocycle() {
                 ))}
               </ul>
             </div>
-            
+
             <div>
               <h4 className="text-white font-semibold mb-2 flex items-center">
                 <span className="w-2 h-2 bg-gradient-to-r from-blue-400 to-green-500 rounded-full mr-2"></span>
@@ -243,9 +241,8 @@ export default function Macrocycle() {
 
         {/* Expand/Collapse Indicator */}
         <div className="absolute bottom-4 right-4">
-          <div className={`w-6 h-6 rounded-full bg-gray-700/50 backdrop-blur-sm flex items-center justify-center transition-transform duration-300 ${
-            isExpanded ? 'rotate-180' : ''
-          }`}>
+          <div className={`w-6 h-6 rounded-full bg-gray-700/50 backdrop-blur-sm flex items-center justify-center transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''
+            }`}>
             <svg className="w-3 h-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
@@ -258,25 +255,28 @@ export default function Macrocycle() {
   return (
     <ErrorBoundary>
       <TrainingStateProvider>
+        <div className="bg-green-500 text-white p-2 text-center font-bold">
+          🟢 FIXED MACROCYCLE COMPONENT
+        </div>
         <div className="space-y-8">
           {/* Page Header */}
           <div className="mb-12 text-center">
             <h1 className="text-5xl font-black text-white mb-4 transition-all duration-500"
-                style={{
-                  background: 'linear-gradient(135deg, #ffffff 0%, #dc2626 50%, #ffffff 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  textShadow: '0 4px 8px rgba(220, 38, 38, 0.3)',
-                  letterSpacing: '1px'
-                }}>
+              style={{
+                background: 'linear-gradient(135deg, #ffffff 0%, #dc2626 50%, #ffffff 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                textShadow: '0 4px 8px rgba(220, 38, 38, 0.3)',
+                letterSpacing: '1px'
+              }}>
               🎯 Macrocycle Overview
             </h1>
             <p className="text-gray-300 text-xl max-w-3xl mx-auto leading-relaxed"
-               style={{
-                 textShadow: '0 2px 4px rgba(0,0,0,0.8)',
-                 letterSpacing: '0.3px'
-               }}>
+              style={{
+                textShadow: '0 2px 4px rgba(0,0,0,0.8)',
+                letterSpacing: '0.3px'
+              }}>
               Long-term training periodization and phase planning (3-12 months)
             </p>
           </div>
@@ -290,7 +290,7 @@ export default function Macrocycle() {
                   {index < mesocycles.length - 1 && (
                     <div className="absolute left-1/2 transform -translate-x-1/2 top-full w-1 h-8 bg-gradient-to-b from-gray-600 to-transparent z-0"></div>
                   )}
-                  
+
                   <TimelineCard mesocycle={mesocycle} index={index} />
                 </div>
               ))}
@@ -299,24 +299,24 @@ export default function Macrocycle() {
 
           {/* Current Phase Hero Card */}
           <div className="relative">
-            <CardWrapper 
+            <CardWrapper
               title={
                 <div className="flex items-center space-x-4">
                   <div className="text-3xl">💪</div>
                   <div>
                     <h2 className="text-2xl font-black text-white mb-1"
-                        style={{
-                          background: 'linear-gradient(135deg, #10b981 0%, #34d399 50%, #6ee7b7 100%)',
-                          WebkitBackgroundClip: 'text',
-                          WebkitTextFillColor: 'transparent',
-                          backgroundClip: 'text',
-                          textShadow: '0 4px 8px rgba(16, 185, 129, 0.3)',
-                          letterSpacing: '0.5px'
-                        }}>
+                      style={{
+                        background: 'linear-gradient(135deg, #10b981 0%, #34d399 50%, #6ee7b7 100%)',
+                        WebkitBackgroundClip: 'text',
+                        WebkitTextFillColor: 'transparent',
+                        backgroundClip: 'text',
+                        textShadow: '0 4px 8px rgba(16, 185, 129, 0.3)',
+                        letterSpacing: '0.5px'
+                      }}>
                       Current Phase: Hypertrophy
                     </h2>
                     <p className="text-green-300 text-lg font-semibold"
-                       style={{ textShadow: '0 2px 4px rgba(0,0,0,0.6)' }}>
+                      style={{ textShadow: '0 2px 4px rgba(0,0,0,0.6)' }}>
                       Week 5 of 8 • 65% Complete
                     </p>
                   </div>
@@ -432,9 +432,9 @@ export default function Macrocycle() {
                       <span className="text-sm text-green-300 font-semibold">5 of 8 weeks</span>
                     </div>
                     <div className="relative w-full bg-gray-700/50 rounded-full h-3 mb-4 overflow-hidden">
-                      <div 
+                      <div
                         className="h-3 rounded-full bg-gradient-to-r from-green-600 to-green-400 transition-all duration-1000 ease-out relative overflow-hidden"
-                        style={{ 
+                        style={{
                           width: '62.5%',
                           boxShadow: '0 0 15px rgba(16, 185, 129, 0.6), inset 0 1px 2px rgba(255,255,255,0.2)'
                         }}
@@ -464,7 +464,7 @@ export default function Macrocycle() {
                   </h4>
                   <p className="text-gray-300 text-sm">Progressive overload with phase-specific adaptations</p>
                 </div>
-                
+
                 <div className="space-y-3">
                   <h4 className="text-white font-semibold">Training Philosophy:</h4>
                   <ul className="text-gray-300 text-sm space-y-2">
