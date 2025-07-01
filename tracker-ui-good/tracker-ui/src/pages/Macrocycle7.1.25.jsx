@@ -1,3 +1,25 @@
+/**
+ * Macrocycle Designer - RP Research Integrated Version
+ * Created: July 1, 2025
+ * 
+ * This version includes:
+ * - Full Renaissance Periodization (RP) research integration (2024-25)
+ * - Dynamic mesocycle generation with calculatePhaseDuration, calculateVolumeProgression, calculateRIRProgression
+ * - Real MEV/MRV volume landmarks and progressions
+ * - Research-validated deload recommendations using shouldDeload algorithm
+ * - Program Design navigation with tabs and breadcrumb navigation
+ * - Comprehensive debug logging and RP compliance validation
+ * - Template-based macrocycle creation with research-based modifications
+ * - Current phase analysis with live RP volume and RIR data
+ * 
+ * Key Features:
+ * - Evidence-based periodization using latest RP research
+ * - Dynamic phase calculations (not static data)
+ * - Real-time compliance checking against RP guidelines
+ * - Full navigation integration with Program Design workflow
+ * - Comprehensive testing and debugging capabilities
+ */
+
 import CardWrapper from "../components/ui/CardWrapper";
 import { TrainingStateProvider } from "../context/trainingStateContext";
 import ErrorBoundary from "../components/ErrorBoundary";
@@ -86,7 +108,7 @@ const validateRPCompliance = (mesocycles, programData) => {
   return compliance;
 };
 
-export default function Macrocycle() {
+export default function Macrocycle7125() {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -94,7 +116,8 @@ export default function Macrocycle() {
   debugLog('Component Mount', {
     entryPoint: location.state ? 'Program Design Navigation' : 'Direct Navigation',
     locationState: location.state,
-    pathname: location.pathname
+    pathname: location.pathname,
+    componentVersion: 'Macrocycle7.1.25 - RP Research Integrated'
   }, 'info');
 
   // State management
@@ -966,8 +989,8 @@ export default function Macrocycle() {
                     }
                   }}
                   className={`flex items-center space-x-2 px-4 py-2 rounded transition-colors ${tab.id === 'builder'
-                      ? 'bg-red-600 text-white'
-                      : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                    ? 'bg-red-600 text-white'
+                    : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
                     }`}
                 >
                   <span>{tab.icon}</span>
