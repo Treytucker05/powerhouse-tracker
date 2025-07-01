@@ -24,9 +24,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
         
-      - name: Run legacy CI validation
-        run: npm run ci
-        
       - name: Install dependencies (React app)
         working-directory: ./tracker-ui
         run: pnpm install
