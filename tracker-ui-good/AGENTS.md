@@ -1,14 +1,16 @@
-# AGENTS- Install dependencies with `pnpm install`
-- Run `pnpm test` to execute Jest test suiteInstall dependencies with `pnpm install`Guidelines
+# AGENTS Guidelines
 
 ## Project Structure
 - `js/` contains ES modules for UI, algorithms, and core state
 - `js/ui/globals.js` exposes browser globals for legacy code
-- Entry point is `main.js`, bundler is Parcel
+- Entry point is `main.js` (legacy) and `index.js` (Node.js exports), bundler is Vite
+- React UI components in `tracker-ui/` subdirectory
 
 ## Running Tests
-- Install dependencies with `npm install`
-- Run `npm test` to execute Jest test suite
+- Install dependencies with `pnpm install`
+- Run `pnpm run test:unit` to execute Vitest test suite with coverage
+- Run `pnpm run test:e2e` to execute Playwright end-to-end tests
+- Run `pnpm run verify` to build, test, and lint in one command
 
 ## Button Handler Mapping
 Handlers live in `js/ui/globals.js` and `js/ui/additionalHandlers.js`. Buttons follow the `btnActionName` naming convention. Event delegation in `js/app.js` maps button IDs to these handlers.
