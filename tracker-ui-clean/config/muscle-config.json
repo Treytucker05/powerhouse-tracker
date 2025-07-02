@@ -1,0 +1,11 @@
+{
+  "mrvMultipliers": {
+    "chest": 2.0, "back": 2.5, "shoulders": 2.8, "arms": 3.0,
+    "quads": 2.2, "hamstrings": 2.0, "glutes": 2.5, "calves": 3.5
+  },
+  "baselineVolumes": {
+    "chest": 8, "back": 10, "shoulders": 8, "arms": 6,
+    "quads": 8, "hamstrings": 6, "glutes": 4, "calves": 8
+  },
+  "individualMultipliers": { "beginner": 0.8, "intermediate": 1.0, "advanced": 1.2 }
+}
