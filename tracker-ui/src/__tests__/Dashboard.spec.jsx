@@ -1,12 +1,12 @@
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import Dashboard from '../pages/Dashboard';
 import * as state from '../lib/state/trainingState';
 
 describe('<Dashboard />', () => {
   it('renders snapshot', () => {
-    const { asFragment } = render(<Dashboard />);
+    const { asFragment } = renderWithProviders(<Dashboard />);
     expect(asFragment()).toMatchSnapshot();
   });
 
@@ -22,7 +22,7 @@ describe('<Dashboard />', () => {
       },
       refreshDashboard: spy,
     });
-    render(<Dashboard />);
+    renderWithProviders(<Dashboard />);
     fireEvent.click(screen.getByText('Refresh'));
     expect(spy).toHaveBeenCalled();
   });

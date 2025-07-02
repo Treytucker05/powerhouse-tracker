@@ -1,41 +1,18 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { screen, waitFor } from '@testing-library/react';
 import Dashboard from '../pages/Dashboard';
 
 describe('Dashboard', () => {
-  const createTestQueryClient = () => new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
-  });
 
   it('renders without crashing', () => {
-    const queryClient = createTestQueryClient();
-    
-    render(
-      <QueryClientProvider client={queryClient}>
-        <MemoryRouter>
-          <Dashboard />
-        </MemoryRouter>
-      </QueryClientProvider>
-    );
+    renderWithProviders(<Dashboard />);
     
     expect(screen.getByText('PowerHouse Tracker')).toBeInTheDocument();
     expect(screen.getAllByText('Dashboard')).toHaveLength(2); // Header and nav
-  });  it('renders all dashboard components', async () => {
-    const queryClient = createTestQueryClient();
-    
-    render(
-      <QueryClientProvider client={queryClient}>
-        <MemoryRouter>
-          <Dashboard />
-        </MemoryRouter>
-      </QueryClientProvider>
-    );
+  });
+
+  it('renders all dashboard components', async () => {
+    renderWithProviders(<Dashboard />);
     
     // Wait for async content to load - the new hooks may show loading states initially
     await waitFor(() => {

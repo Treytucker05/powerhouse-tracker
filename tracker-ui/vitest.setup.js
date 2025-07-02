@@ -1,6 +1,9 @@
-import '@testing-library/jest-dom';
-import { vi } from 'vitest';
-import React from 'react';
+import "@testing-library/jest-dom";
+import { vi, afterEach } from "vitest";
+import React from "react";
+import { cleanup, render } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter } from "react-router-dom";
 
 /* ----- extra browser shims for legacy suites ----- */
 if (!global.window) {
@@ -47,3 +50,23 @@ for (const k of supaKeys)
 import { expect } from 'vitest';
 import * as matchers from '@testing-library/jest-dom/matchers';
 expect.extend(matchers);
+
+// clean the jsdom between tests
+afterEach(() => cleanup());
+
+// helper: use in tests: renderWithProviders(<MyComp />)
+const queryClient = new QueryClient();
+global.renderWithProviders = function (ui, options) {
+  return render(
+    React.createElement(
+      BrowserRouter,
+      null,
+      React.createElement(
+        QueryClientProvider,
+        { client: queryClient },
+        ui
+      )
+    ),
+    options
+  );
+};

@@ -1,10 +1,10 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import PowerHouseVolumeChart from '../components/dashboard/PowerHouseVolumeChart';
 
 describe('PowerHouseVolumeChart', () => {
   it('renders the chart with PowerHouse branding', () => {
-    render(<PowerHouseVolumeChart />);
+    renderWithProviders(<PowerHouseVolumeChart />);
     
     // Check if the chart title is displayed
     expect(screen.getByText('📊 Weekly Volume by Muscle Group')).toBeInTheDocument();

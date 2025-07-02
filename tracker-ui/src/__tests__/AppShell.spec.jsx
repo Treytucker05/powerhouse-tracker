@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+
 import AppShell from '../layout/AppShell';
 
 // Mock Supabase client
@@ -33,21 +32,13 @@ vi.mock('../lib/supabaseClient', () => {
 
 describe('<AppShell />', () => {
   it('contains header with PowerHouse Tracker branding', () => {
-    const { getByText } = render(
-      <BrowserRouter>
-        <AppShell />
-      </BrowserRouter>
-    );
+    const { getByText } = renderWithProviders(<AppShell />);
     
     expect(getByText((content) => /Power\s*House/i.test(content))).toBeInTheDocument();
   });
 
   it('contains navigation links', () => {
-    const { getByText } = render(
-      <BrowserRouter>
-        <AppShell />
-      </BrowserRouter>
-    );
+    const { getByText } = renderWithProviders(<AppShell />);
     
     expect(getByText('Dashboard')).toBeInTheDocument();
     expect(getByText(/Program\s*Design/i)).toBeInTheDocument();
@@ -56,11 +47,7 @@ describe('<AppShell />', () => {
   });
 
   it('renders with dark theme background', () => {
-    const { container } = render(
-      <BrowserRouter>
-        <AppShell />
-      </BrowserRouter>
-    );
+    const { container } = renderWithProviders(<AppShell />);
     
     const mainContainer = container.querySelector('div');
     expect(mainContainer).toHaveClass('bg-black');

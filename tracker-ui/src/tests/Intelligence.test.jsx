@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import Intelligence from '../pages/Intelligence';
 
@@ -20,7 +20,7 @@ vi.mock('../lib/useAdaptiveRIR', () => ({
 
 describe('Intelligence Page', () => {
   it('should display adaptive RIR recommendations', () => {
-    render(<Intelligence />);
+    renderWithProviders(<Intelligence />);
     
     // Check if the page title is displayed
     expect(screen.getByText('Adaptive RIR Recommendations')).toBeInTheDocument();
@@ -43,11 +43,11 @@ describe('Intelligence Page', () => {
       default: () => []
     }));
     
-    const { unmount } = render(<Intelligence />);
+    const { unmount } = renderWithProviders(<Intelligence />);
     unmount();
     
     // Re-render with new mock
-    render(<Intelligence />);
+    renderWithProviders(<Intelligence />);
     
     expect(screen.getByText('No recommendations found.')).toBeInTheDocument();
   });

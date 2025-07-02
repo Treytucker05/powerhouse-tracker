@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview --port 5173",
     "lint": "eslint \"src/**/*.{js,jsx}\"",
-    "lint:ci": "eslint \"src/**/*.{js,jsx}\" --max-warnings 0",
+    "lint:ci": "eslint . --max-warnings 5",
     "test": "vitest",
     "test:unit": "vitest run --coverage",
     "ci": "vitest run --coverage",

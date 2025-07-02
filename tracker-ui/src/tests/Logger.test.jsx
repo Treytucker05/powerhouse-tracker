@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import Logger from '../pages/Logger';
 
@@ -19,7 +19,7 @@ vi.mock('../lib/useSessionSets', () => ({
 
 describe('Logger Page', () => {
   it('should display start session form when no active session', () => {
-    render(<Logger />);
+    renderWithProviders(<Logger />);
     
     expect(screen.getByText('Workout Logger')).toBeInTheDocument();
     expect(screen.getByText('Start New Session')).toBeInTheDocument();

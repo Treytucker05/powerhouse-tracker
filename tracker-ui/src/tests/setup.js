@@ -3,7 +3,7 @@ import { vi, afterEach, beforeAll } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 
 // Make vi globally available
-global.vi = vi;
+globalThis.vi = vi;
 
 // Stub console.error to prevent noise in test output
 beforeAll(() => {
@@ -32,7 +32,7 @@ const localStorageMock = {
   removeItem: vi.fn(),
   clear: vi.fn(),
 };
-global.localStorage = localStorageMock;
+globalThis.localStorage = localStorageMock;
 
 // Mock sessionStorage
 const sessionStorageMock = {
@@ -41,7 +41,7 @@ const sessionStorageMock = {
   removeItem: vi.fn(),
   clear: vi.fn(),
 };
-global.sessionStorage = sessionStorageMock;
+globalThis.sessionStorage = sessionStorageMock;
 
 // Reset mocks after each test
 afterEach(() => {

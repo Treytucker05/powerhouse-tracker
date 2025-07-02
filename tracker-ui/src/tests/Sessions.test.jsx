@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import Sessions from '../pages/Sessions';
 
@@ -29,7 +29,7 @@ vi.mock('../lib/useSessionSets', () => ({
 
 describe('Sessions with Drawer', () => {
   it('should open drawer when session row is clicked', () => {
-    render(<Sessions />);
+    renderWithProviders(<Sessions />);
     
     // Find and click on the session row
     const sessionRow = screen.getByText('Great workout').closest('tr');
@@ -42,7 +42,7 @@ describe('Sessions with Drawer', () => {
   });
   
   it('should close drawer when close button is clicked', () => {
-    render(<Sessions />);
+    renderWithProviders(<Sessions />);
     
     // Open drawer
     const sessionRow = screen.getByText('Great workout').closest('tr');
