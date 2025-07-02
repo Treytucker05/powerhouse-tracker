@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Dumbbell } from 'lucide-react';
 
-export default function TopNav({ user, onSignOut }) {
+export default function TopNav() {
   return (
     <nav className="sticky top-0 z-50 flex items-center justify-between
                     bg-surface/80 backdrop-blur-md border-b border-white/10

@@ -764,6 +764,7 @@ export default function Macrocycle() {
 
             </div> {/* End content container */}
           </div> {/* End max-width container */}
+        </div>
       </TrainingStateProvider>
     </ErrorBoundary>
   );
