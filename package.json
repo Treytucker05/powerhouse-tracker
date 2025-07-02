@@ -25,7 +25,8 @@
     "analyze": "node scripts/analyze-repo.js",
     "deps": "node scripts/deps-check.js",
     "gameplan": "python scripts/gameplan_generator.py",
-    "update-progress": "node scripts/update-progress.js"
+    "update-progress": "node scripts/update-progress.js",
+    "ci": "pnpm run build && pnpm run test:unit && pnpm run lint:ci"
   },
   "keywords": [
     "fitness",

@@ -49,7 +49,7 @@ import {
 import {
   generateMesocycles,
   calculateCurrentWeek
-} from "@/utils/mesoGenerators";
+} from "../utils/mesoGenerators";
 // import { RIRProgression } from "../../../lib/rirProgression";
 // TODO: Fix import path when rirProgression.js is available
 
