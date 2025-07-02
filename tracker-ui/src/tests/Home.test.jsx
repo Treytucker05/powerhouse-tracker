@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import Home from '../pages/Home';
 
@@ -16,7 +16,7 @@ vi.mock('../lib/useWeeklyVolume', () => ({
 describe('Home Dashboard', () => {
   it('should display weekly volume chart and fatigue status', () => {
     const mockNavigate = vi.fn();
-    render(<Home onNavigate={mockNavigate} />);
+    renderWithProviders(<Home onNavigate={mockNavigate} />);
     
     // Check if main elements are present
     expect(screen.getByText((content) => /Power\s*House/i.test(content))).toBeInTheDocument();

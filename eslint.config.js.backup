@@ -1,0 +1,36 @@
+import js from '@eslint/js';
+
+export default [
+  js.configs.recommended,
+  {
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: {
+        Chart: 'readonly',
+        showSystemMessage: 'readonly',
+        createSystemOutput: 'readonly',
+        updateAllDisplays: 'readonly',
+        browser: true,
+        es2021: true,
+        jest: true
+      }
+    },
+    rules: {
+      'no-unused-vars': 'warn'
+    }
+  },
+  {
+    files: ['**/__tests__/**', 'tests/**/*.js'],
+    languageOptions: {
+      globals: {
+        node: true,
+        jest: true
+      }
+    },
+    rules: {
+      'no-unused-vars': 'off',
+      'no-undef': 'off'
+    }
+  }
+];
