@@ -4,7 +4,7 @@ export default function UpcomingSessionsPreview({ sessions = [] }) {
     <div className="premium-card h-full flex flex-col p-6">
       <h3 className="text-xl font-semibold text-white mb-4 text-left">Next Workouts</h3>
       <ul className="space-y-3 flex-1">
-        {sessions.slice(0, 3).map((s, index) => (
+        {sessions.slice(0, 3).map((s) => (
           <li 
             key={s.id} 
             className={`
