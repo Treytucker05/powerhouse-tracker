@@ -3,7 +3,7 @@ import AppShell from './layout/AppShell.jsx';
 import TrackingEnhanced from "./pages/TrackingEnhanced.jsx";
 import MesocycleEnhanced from "./pages/MesocycleEnhanced.jsx";
 import Microcycle from "./pages/MicrocycleNew.jsx";
-import Macrocycle from "./pages/MacrocycleNew.jsx";
+import Macrocycle7125Fixed from "./pages/Macrocycle7.1.25.fixed.jsx";
 import Home from "./pages/Home.jsx";
 import Program from "./pages/Program.jsx";
 import Analytics from "./pages/Analytics.jsx";
@@ -21,7 +21,7 @@ function App() {
           <Route path="analytics" element={<Analytics />} />
           <Route path="mesocycle" element={<MesocycleEnhanced />} />
           <Route path="microcycle" element={<Microcycle />} />
-          <Route path="macrocycle" element={<Macrocycle />} />
+          <Route path="macrocycle" element={<Macrocycle7125Fixed />} />
         </Route>
       </Routes>
     </Router>
