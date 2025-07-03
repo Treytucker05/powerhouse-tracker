@@ -3,7 +3,7 @@ import { TRAINING_ACTIONS } from './trainingActions';
 import { initialState, trainingStateReducer } from './trainingStateReducer';
 
 // Create the context
-const TrainingStateContext = createContext();
+export const TrainingStateContext = createContext();
 
 // Provider component
 export function TrainingStateProvider({ children }) {

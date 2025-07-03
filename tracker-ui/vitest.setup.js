@@ -50,10 +50,29 @@ expect.extend(matchers);
 
 // Add renderWithProviders helper function
 import { render } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React from 'react';
+
+// Create a test wrapper with QueryClient provider
+function TestWrapper({ children }) {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+
+  return React.createElement(
+    QueryClientProvider,
+    { client: queryClient },
+    children
+  );
+}
 
 global.renderWithProviders = function (ui, options = {}) {
   return render(ui, {
-    wrapper: ({ children }) => children,
+    wrapper: TestWrapper,
     ...options
   });
 };
