@@ -1,7 +1,9 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { useReducer, useEffect, useContext } from 'react';
-import { TrainingStateContext } from './TrainingStateContext';
+import React, { useReducer, useEffect, useContext, createContext } from 'react';
 import { TRAINING_ACTIONS } from './trainingActions';
+
+// Create the context here to avoid circular dependency
+export const TrainingStateContext = createContext();
 
 // Training state initial values
 const initialState = {
