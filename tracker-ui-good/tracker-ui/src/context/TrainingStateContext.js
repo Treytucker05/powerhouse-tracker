@@ -1,9 +1,6 @@
-import { createContext } from 'react';
-
-export const TrainingStateContext = createContext();
-
-// Barrel re-export so both filenames work
+// Barrel re-export from trainingStateContext.jsx
 export {
+  TrainingStateContext,
   TrainingStateProvider,
   useTrainingState,
 } from "./trainingStateContext.jsx";

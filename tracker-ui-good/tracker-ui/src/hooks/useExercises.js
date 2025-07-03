@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../lib/api/supabaseClient';
 
 export function useExercises() {
   const [exercises, setExercises] = useState([]);
@@ -12,14 +12,14 @@ export function useExercises() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const { data, error } = await supabase
         .from('exercises')
         .select('*')
         .order('name');
 
       if (error) throw error;
-      
+
       setExercises(data || []);
       return data;
     } catch (err) {
@@ -36,7 +36,7 @@ export function useExercises() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const { data, error } = await supabase
         .from('exercises')
         .insert([{
@@ -52,7 +52,7 @@ export function useExercises() {
         .single();
 
       if (error) throw error;
-      
+
       setExercises(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)));
       return data;
     } catch (err) {
@@ -69,7 +69,7 @@ export function useExercises() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const { data, error } = await supabase
         .from('exercises')
         .update(updates)
@@ -78,11 +78,11 @@ export function useExercises() {
         .single();
 
       if (error) throw error;
-      
-      setExercises(prev => prev.map(exercise => 
+
+      setExercises(prev => prev.map(exercise =>
         exercise.id === exerciseId ? { ...exercise, ...data } : exercise
       ));
-      
+
       return data;
     } catch (err) {
       setError(err.message);
@@ -98,7 +98,7 @@ export function useExercises() {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Check if exercise has been used in workouts
       const { data: usageCheck } = await supabase
         .from('workout_sets')
@@ -109,14 +109,14 @@ export function useExercises() {
       if (usageCheck && usageCheck.length > 0) {
         throw new Error('Cannot delete exercise that has been used in workouts. Archive it instead.');
       }
-      
+
       const { error } = await supabase
         .from('exercises')
         .delete()
         .eq('id', exerciseId);
 
       if (error) throw error;
-      
+
       setExercises(prev => prev.filter(exercise => exercise.id !== exerciseId));
       return true;
     } catch (err) {
@@ -133,7 +133,7 @@ export function useExercises() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const { data, error } = await supabase
         .from('exercises')
         .update({ archived })
@@ -142,11 +142,11 @@ export function useExercises() {
         .single();
 
       if (error) throw error;
-      
-      setExercises(prev => prev.map(exercise => 
+
+      setExercises(prev => prev.map(exercise =>
         exercise.id === exerciseId ? { ...exercise, archived } : exercise
       ));
-      
+
       return data;
     } catch (err) {
       setError(err.message);
@@ -162,7 +162,7 @@ export function useExercises() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const { data, error } = await supabase
         .from('workout_sets')
         .select(`
@@ -179,12 +179,12 @@ export function useExercises() {
         .limit(limit);
 
       if (error) throw error;
-      
+
       setExerciseHistory(prev => ({
         ...prev,
         [exerciseName]: data || []
       }));
-      
+
       return data;
     } catch (err) {
       setError(err.message);
@@ -199,11 +199,11 @@ export function useExercises() {
   const getExerciseStats = (exerciseName) => {
     const history = exerciseHistory[exerciseName];
     if (!history || history.length === 0) return null;
-    
+
     const weights = history.map(set => set.weight).filter(w => w > 0);
     const volumes = history.map(set => set.weight * set.reps);
     const rirs = history.map(set => set.rir).filter(r => r !== null);
-    
+
     return {
       totalSets: history.length,
       maxWeight: weights.length > 0 ? Math.max(...weights) : 0,
@@ -219,18 +219,18 @@ export function useExercises() {
   // Calculate exercise progress trend
   const calculateProgressTrend = (history) => {
     if (history.length < 2) return 'insufficient_data';
-    
+
     // Compare recent sessions vs older sessions
     const recentSessions = history.slice(0, Math.ceil(history.length / 3));
     const olderSessions = history.slice(-Math.ceil(history.length / 3));
-    
-    const recentAvgVolume = recentSessions.reduce((sum, set) => 
+
+    const recentAvgVolume = recentSessions.reduce((sum, set) =>
       sum + (set.weight * set.reps), 0) / recentSessions.length;
-    const olderAvgVolume = olderSessions.reduce((sum, set) => 
+    const olderAvgVolume = olderSessions.reduce((sum, set) =>
       sum + (set.weight * set.reps), 0) / olderSessions.length;
-    
+
     const volumeChange = (recentAvgVolume - olderAvgVolume) / olderAvgVolume;
-    
+
     if (volumeChange > 0.1) return 'improving';
     if (volumeChange < -0.1) return 'declining';
     return 'stable';
@@ -238,7 +238,7 @@ export function useExercises() {
 
   // Get exercises by muscle group
   const getExercisesByMuscle = (muscleGroup) => {
-    return exercises.filter(exercise => 
+    return exercises.filter(exercise =>
       exercise.muscle_group === muscleGroup && !exercise.archived
     );
   };
@@ -246,7 +246,7 @@ export function useExercises() {
   // Search exercises
   const searchExercises = (query) => {
     const lowercaseQuery = query.toLowerCase();
-    return exercises.filter(exercise => 
+    return exercises.filter(exercise =>
       exercise.name.toLowerCase().includes(lowercaseQuery) ||
       exercise.muscle_group.toLowerCase().includes(lowercaseQuery) ||
       exercise.category.toLowerCase().includes(lowercaseQuery)
@@ -257,21 +257,21 @@ export function useExercises() {
   const getRecommendedWeight = (exerciseName, targetRIR = 2) => {
     const history = exerciseHistory[exerciseName];
     if (!history || history.length === 0) return null;
-    
+
     // Find recent sets with similar RIR
     const recentSets = history
       .slice(0, 10) // Last 10 sets
       .filter(set => Math.abs(set.rir - targetRIR) <= 1);
-    
+
     if (recentSets.length === 0) {
       // Fallback to any recent sets
       const fallbackSets = history.slice(0, 5);
       if (fallbackSets.length === 0) return null;
-      
+
       const avgWeight = fallbackSets.reduce((sum, set) => sum + set.weight, 0) / fallbackSets.length;
       return Math.round(avgWeight * 0.95); // Conservative estimate
     }
-    
+
     const avgWeight = recentSets.reduce((sum, set) => sum + set.weight, 0) / recentSets.length;
     return Math.round(avgWeight);
   };

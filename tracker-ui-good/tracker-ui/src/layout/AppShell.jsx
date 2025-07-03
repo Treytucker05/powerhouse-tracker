@@ -1,19 +1,19 @@
 import { useEffect, useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../lib/api/supabaseClient';
 import TopNav from '../components/navigation/TopNav';
 
 export default function AppShell() {
   console.log('🟢 AppShell rendering - timestamp:', Date.now());
-  
+
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false); // Set to false by default for better UX
   const navigate = useNavigate();
   const location = useLocation();
 
-  console.log('🟢 AppShell state', { 
-    user: !!user, 
-    loading, 
+  console.log('🟢 AppShell state', {
+    user: !!user,
+    loading,
     pathname: location.pathname,
     timestamp: Date.now()
   });
@@ -30,7 +30,7 @@ export default function AppShell() {
       }
       setLoading(false);
     };
-    
+
     getSession();
 
     // Listen for auth changes
@@ -46,10 +46,10 @@ export default function AppShell() {
   useEffect(() => {
     if (!loading && !user) {
       const protectedRoutes = ['/tracking', '/mesocycle', '/microcycle', '/macrocycle'];
-      const isProtectedRoute = protectedRoutes.some(route => 
+      const isProtectedRoute = protectedRoutes.some(route =>
         location.pathname.startsWith(route)
       );
-      
+
       if (isProtectedRoute) {
         navigate('/auth');
       }

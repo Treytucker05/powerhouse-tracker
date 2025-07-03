@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../lib/api/supabaseClient';
 import {
   BASE_VOLUME_LANDMARKS,
   RIR_SCHEMES,
