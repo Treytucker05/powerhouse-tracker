@@ -52,7 +52,7 @@ node scripts/convert-inventory-to-md.js
 ## Complete Workflow
 
 ```bash
-npm run dev
+pnpm run dev
 node scripts/collect-ui-inventory.js
 node scripts/convert-inventory-to-md.js buttons.json
 node scripts/report-missing-handlers.js

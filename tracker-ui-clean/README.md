@@ -2,7 +2,9 @@
 
 ![Vitest](https://img.shields.io/badge/tests-passing-brightgreen)
 
-A comprehensive evidence-based training toolkit implementing Renaissance Periodization methodology with **automated volume progression**, **intelligent deload analysis**, and **data management**.
+A comprehensive evidence-based training toolkit implementing Renaissance Periodization methodology with **automated volume progression**, **intelligent- **Build fails**: Ensure `.env` variables `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set.
+- **Charts not loading**: Verify the Chart.js bundle exists inside the `dist/` folder after running `pnpm run build`.
+- **Tests failing**: Run `pnpm test -- --verbose` to see detailed errors.load analysis**, and **data management**.
 
 ## 🎯 Latest Features (v0.9.0-beta.4)
 
@@ -82,26 +84,26 @@ const deloadAnalysis = calculateDeload(trainingData);
 ### Development Setup
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Start development server
-npm run dev
+pnpm run dev
 
 # Run tests
-npm test
+pnpm test
 
 # Run handler audit
-npm run audit
+pnpm run audit
 
 # Full CI pipeline
-npm run ci
+pnpm run ci
 ```
 
 ### React/Vite Frontend
 ```bash
 cd tracker-ui
-npm install
-npm run dev  # Runs on http://localhost:5173
+pnpm install
+pnpm run dev  # Runs on http://localhost:5173
 ```
 
 ## 🎯 Core Features
@@ -202,7 +204,7 @@ targetRIR = 4.5 - (4.0 / (mesoLength - 1)) * (week - 1);
 
 1. **Install dependencies**
    ```
-   npm install
+   pnpm install
    ```
 2. **Create a `.env` file** from `.env.example` and add your Supabase credentials.
    ```
@@ -213,7 +215,7 @@ targetRIR = 4.5 - (4.0 / (mesoLength - 1)) * (week - 1);
    ```
 3. **Build the project** so Parcel injects your credentials.
    ```
-   npm run build
+   pnpm run build
    ```
 4. **Start the local server**
    ```
@@ -328,8 +330,8 @@ npm run audit  # Runs full button/handler audit pipeline
 ### Testing
 
 ```bash
-npm test                    # Run all Jest tests
-npm test handlers.test.js   # Test button handler exposure
+pnpm test                    # Run all Jest tests
+pnpm test handlers.test.js   # Test button handler exposure
 ```
 
 ---
