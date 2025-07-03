@@ -11,6 +11,9 @@
     "lint:ci": "eslint \"src/**/*.{js,jsx}\" --max-warnings 0",
     "test": "vitest",
     "test:unit": "vitest run --coverage",
+    "test:progressive": "node test-runner.mjs",
+    "test:debug": "vitest run --reporter=verbose --no-coverage --bail=1",
+    "test:quick": "node test-checker.mjs",
     "ci": "vitest run --coverage",
     "test:e2e": "playwright test"
   },

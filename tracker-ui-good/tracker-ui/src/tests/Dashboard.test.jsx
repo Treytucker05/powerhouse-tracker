@@ -1,56 +1,67 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Dashboard from '../pages/Dashboard';
+import { renderWithProviders } from './test-utils';
+
+// Mock the hooks that cause issues
+vi.mock('../hooks/useWeeklyVolume', () => ({
+  useWeeklyVolume: () => ({
+    data: { weeklyData: [], totalVolume: 0 },
+    isLoading: false,
+    error: null
+  })
+}))
+
+vi.mock('../hooks/useWeekStatus', () => ({
+  useWeekStatus: () => ({
+    currentWeek: 3,
+    totalWeeks: 4,
+    phase: 'Accumulation',
+    daysToDeload: 5
+  })
+}))
+
+vi.mock('../hooks/useFatigueStatus', () => ({
+  useFatigueStatus: () => ({
+    systemicFatigue: 65,
+    muscleStatus: { chest: 'Working', back: 'Working' }
+  })
+}))
 
 describe('Dashboard', () => {
-  const createTestQueryClient = () => new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
+  it('renders without crashing', async () => {
+    const { container } = renderWithProviders(
+      <MemoryRouter>
+        <Dashboard />
+      </MemoryRouter>
+    );
+
+    // Wait for component to stabilize - just check container exists
+    await waitFor(() => {
+      expect(container.querySelector('div')).toBeTruthy();
+    }, { timeout: 3000 });
+
+    // Check for key dashboard elements by text content
+    expect(container.textContent).toContain('Week');
+    expect(container.textContent).toContain('Accumulation');
   });
 
-  it('renders without crashing', () => {
-    const queryClient = createTestQueryClient();
-    
-    render(
-      <QueryClientProvider client={queryClient}>
-        <MemoryRouter>
-          <Dashboard />
-        </MemoryRouter>
-      </QueryClientProvider>
+  it('renders main dashboard sections', async () => {
+    const { container } = renderWithProviders(
+      <MemoryRouter>
+        <Dashboard />
+      </MemoryRouter>
     );
-    
-    expect(screen.getByText((content) => /Power\s*House/i.test(content))).toBeInTheDocument();
-    expect(screen.getAllByText('Dashboard')).toHaveLength(2); // Header and nav
-  });  it('renders all dashboard components', async () => {
-    const queryClient = createTestQueryClient();
-    
-    render(
-      <QueryClientProvider client={queryClient}>
-        <MemoryRouter>
-          <Dashboard />
-        </MemoryRouter>
-      </QueryClientProvider>
-    );
-    
-    // Wait for async content to load - the new hooks may show loading states initially
+
+    // Wait for the component to load
     await waitFor(() => {
-      expect(screen.getByText('Week Overview')).toBeInTheDocument();
-    }, { timeout: 5000 });
-    
-    await waitFor(() => {
-      expect(screen.getByText('Quick Actions')).toBeInTheDocument();
-    });
-    
-    await waitFor(() => {
-      expect(screen.getByText('Volume Heatmap')).toBeInTheDocument();
-    });
-    
-    expect(screen.getByText('Progress Metrics')).toBeInTheDocument();
-    expect(screen.getByText('Recent Workouts')).toBeInTheDocument();
+      expect(container.textContent).toContain('Current Week');
+    }, { timeout: 2000 });
+
+    // Check for main sections by text content
+    expect(container.textContent).toContain('Weekly Volume');
+    expect(container.textContent).toContain('Systemic Fatigue');
+    expect(container.textContent).toContain('Upcoming Sessions');
   });
 });

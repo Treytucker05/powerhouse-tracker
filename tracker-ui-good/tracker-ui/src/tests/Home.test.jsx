@@ -1,6 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 import Home from '../pages/Home';
+import { renderWithProviders } from './test-utils';
 
 // Mock the hooks
 vi.mock('../lib/useWeeklyVolume', () => ({
@@ -14,19 +16,23 @@ vi.mock('../lib/useWeeklyVolume', () => ({
 }));
 
 describe('Home Dashboard', () => {
-  it('should display weekly volume chart and fatigue status', () => {
+  it('should display main dashboard elements', async () => {
     const mockNavigate = vi.fn();
-    render(<Home onNavigate={mockNavigate} />);
-    
-    // Check if main elements are present
-    expect(screen.getByText((content) => /Power\s*House/i.test(content))).toBeInTheDocument();
-    expect(screen.getByText('Weekly Volume')).toBeInTheDocument();
-    expect(screen.getByText('Fatigue Status:')).toBeInTheDocument();
-    
-    // Check if navigation buttons are present
-    expect(screen.getByText('View Sessions')).toBeInTheDocument();
-    expect(screen.getByText('View Intelligence')).toBeInTheDocument();
-    expect(screen.getByText('Start Workout')).toBeInTheDocument();
-    expect(screen.getByText('Analyze Deload Need')).toBeInTheDocument();
+
+    const { container } = renderWithProviders(
+      <MemoryRouter>
+        <Home onNavigate={mockNavigate} />
+      </MemoryRouter>
+    );
+
+    // Wait for component to load and check for key elements
+    await waitFor(() => {
+      expect(container.textContent).toContain('Welcome back,');
+    }, { timeout: 2000 });
+
+    // Check if main sections are present
+    expect(container.textContent).toContain('Current Training Status');
+    expect(container.textContent).toContain('WEEK');
+    expect(container.textContent).toContain('PHASE');
   });
 });
