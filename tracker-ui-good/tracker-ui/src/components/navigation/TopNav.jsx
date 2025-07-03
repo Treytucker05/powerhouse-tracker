@@ -7,15 +7,16 @@ export default function TopNav({ user, onSignOut }) {
     { to: "/", label: "Dashboard" },
     { to: "/assessment", label: "Assessment" },
     { to: "/program", label: "Program Design" },
+    { to: "/macrocycle", label: "Macrocycle" },
     { to: "/tracking", label: "Tracking" },
     { to: "/analytics", label: "Analytics" },
   ];
 
   return (
-    <header 
+    <header
       className="sticky top-0 z-50 flex justify-between items-center"
-      style={{ 
-        backgroundColor: '#000', 
+      style={{
+        backgroundColor: '#000',
         padding: '1.5rem 2rem',
         boxShadow: '0 2px 10px rgba(255, 0, 0, 0.3)'
       }}
@@ -25,11 +26,11 @@ export default function TopNav({ user, onSignOut }) {
         <div style={{ fontSize: '1.5rem', fontWeight: '700' }}>
           <span style={{ color: '#FF0000' }}>Power</span>
           <span style={{ color: '#FFF', margin: '0 0.2rem' }}>House</span>
-          <span style={{ 
-            color: '#000', 
-            backgroundColor: '#FFF', 
-            padding: '0.2rem 0.5rem', 
-            borderRadius: '5px' 
+          <span style={{
+            color: '#000',
+            backgroundColor: '#FFF',
+            padding: '0.2rem 0.5rem',
+            borderRadius: '5px'
           }}>ATX</span>
         </div>
       </div>
@@ -42,8 +43,8 @@ export default function TopNav({ user, onSignOut }) {
             style={{ textDecoration: 'none' }}
           >
             {({ isActive }) => (
-              <span 
-                style={{ 
+              <span
+                style={{
                   padding: '0.5rem 1rem',
                   whiteSpace: 'nowrap',
                   fontSize: '1.1rem',
@@ -75,20 +76,20 @@ export default function TopNav({ user, onSignOut }) {
 
       <div className="flex items-center gap-4">
         {user && (
-          <span style={{ 
-            color: '#fff', 
-            fontSize: '0.9rem', 
-            padding: '0.3rem 0.8rem', 
-            backgroundColor: 'rgba(255, 255, 255, 0.1)', 
-            borderRadius: '5px' 
+          <span style={{
+            color: '#fff',
+            fontSize: '0.9rem',
+            padding: '0.3rem 0.8rem',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            borderRadius: '5px'
           }}>
             {user.email}
           </span>
         )}
-        <div 
-          style={{ 
-            padding: '0.5rem', 
-            borderRadius: '5px', 
+        <div
+          style={{
+            padding: '0.5rem',
+            borderRadius: '5px',
             transition: 'all 0.3s ease',
             color: '#fff'
           }}
@@ -106,11 +107,11 @@ export default function TopNav({ user, onSignOut }) {
         {user && onSignOut && (
           <button
             onClick={onSignOut}
-            style={{ 
-              padding: '0.5rem', 
+            style={{
+              padding: '0.5rem',
               backgroundColor: 'transparent',
               border: 'none',
-              borderRadius: '5px', 
+              borderRadius: '5px',
               transition: 'all 0.3s ease',
               color: '#fff',
               cursor: 'pointer'

@@ -21,7 +21,7 @@
  */
 
 import CardWrapper from "../components/ui/CardWrapper";
-import { TrainingStateProvider } from "../context/TrainingStateContext";
+import { TrainingStateProvider } from "../context/trainingStateContext";
 import ErrorBoundary from "../components/ErrorBoundary";
 import Breadcrumb from "../components/navigation/Breadcrumb";
 import SectionDivider from "../components/ui/SectionDivider";
@@ -30,7 +30,28 @@ import { PlanningActions } from "../components/ui/fabHelpers";
 import LoadingSkeleton from "../components/ui/LoadingSkeleton";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { CalendarIcon, ChartBarIcon, TrophyIcon, ClockIcon } from '@heroicons/react/24/outline';
+import { CalendarIcon, ChartBarIcon, TrophyIcon, ClockIcon, Bars3Icon } from '@heroicons/react/24/outline';
+import { supabase } from "../lib/supabaseClient";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 // Import RP Research & Algorithms (Updated 2024-25)
 import {
@@ -46,8 +67,7 @@ import {
   calculateIntensityFromRIR,
   shouldDeload
 } from "../constants/rpConstants";
-// import { RIRProgression } from "../../../lib/rirProgression";
-// TODO: Fix import path when rirProgression.js is available
+import { RIRProgression } from "../../../lib/rirProgression";
 
 // 🐛 DEBUG: Enhanced logging for testing and validation
 const DEBUG_MODE = process.env.NODE_ENV === 'development' || true; // Force enable for testing
@@ -128,6 +148,29 @@ export default function Macrocycle7125() {
   const [selectedTemplate, setSelectedTemplate] = useState('hypertrophy_12');
   const [currentWeek, setCurrentWeek] = useState(1);
   const [programStartDate, setProgramStartDate] = useState(new Date());
+  const [showQuickActions, setShowQuickActions] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [mesocycleOrder, setMesocycleOrder] = useState([]);
+
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Initialize RIR progression calculator
   const rirCalculator = new RIRProgression();
@@ -547,6 +590,7 @@ export default function Macrocycle7125() {
         };
 
         setMacrocycleData(macrocycleData);
+        setMesocycleOrder(mesocycles.map(m => m.id));
 
         // 🐛 DEBUG: Log successful data creation
         debugLog('Macrocycle Data Created', {
@@ -611,13 +655,23 @@ export default function Macrocycle7125() {
       });
 
       // TODO: Implement Supabase save with validation
-      // const { data, error } = await supabase
-      //   .from('macrocycles')
-      //   .upsert({
-      //     ...validatedData,
-      //     research_version: '2024-25',
-      //     last_modified: new Date().toISOString()
-      //   });
+      const { data, error } = await supabase
+        .from('macrocycles')
+        .upsert({
+          name: validatedData.name || programData.name,
+          goal_type: validatedData.goal_type || programData.goal,
+          duration_weeks: validatedData.duration_weeks || programData.duration,
+          template_id: selectedTemplate,
+          mesocycle_data: validatedData.mesocycles,
+          program_data: programData,
+          research_version: '2024-25',
+          last_modified: new Date().toISOString(),
+          created_at: new Date().toISOString()
+        });
+
+      if (error) {
+        throw error;
+      }
 
       console.log('Saving RP research-based macrocycle data:', validatedData);
       setMacrocycleData(validatedData);
@@ -697,6 +751,193 @@ export default function Macrocycle7125() {
     }, 'success');
   };
 
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Drag and drop handler
+  const onDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const items = Array.from(mesocycles);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    // Update IDs and recalculate dates
+    const updatedMesocycles = items.map((item, index) => ({
+      ...item,
+      id: index + 1
+    }));
+
+    const updatedData = { ...macrocycleData, mesocycles: updatedMesocycles };
+    saveMacrocycle(updatedData);
+
+    debugLog('Mesocycles Reordered', {
+      from: result.source.index,
+      to: result.destination.index,
+      newOrder: updatedMesocycles.map(m => m.name)
+    }, 'info');
+  };
+
+  // Drag and Drop Handler
+  function handleDragEnd(event) {
+    const { active, over } = event;
+
+    if (active.id !== over?.id) {
+      const oldIndex = mesocycles.findIndex(m => m.id === active.id);
+      const newIndex = mesocycles.findIndex(m => m.id === over.id);
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const reorderedMesocycles = arrayMove(mesocycles, oldIndex, newIndex);
+
+        // Update the data with the new order
+        const updatedData = { ...macrocycleData, mesocycles: reorderedMesocycles };
+        saveMacrocycle(updatedData);
+
+        debugLog('Mesocycle Reorder', {
+          from: oldIndex,
+          to: newIndex,
+          movedPhase: mesocycles[oldIndex].name
+        }, 'info');
+      }
+    }
+  }
+
+  // Quick Actions Functions
+  const logWorkout = () => {
+    debugLog('Quick Action', { action: 'Log Workout', currentWeek }, 'info');
+    alert(`Logging workout for Week ${currentWeek}. This would integrate with your workout tracking system.`);
+  };
+
+  const checkDeload = () => {
+    const currentPhase = mesocycles.find(m => m.status === 'current');
+    if (currentPhase?.deloadRecommendation) {
+      const rec = currentPhase.deloadRecommendation;
+      debugLog('Quick Action', { action: 'Check Deload', recommendation: rec }, 'info');
+
+      const message = `Deload Status: ${rec.recommendation}\n\n` +
+        `Current Assessment:\n` +
+        `- Volume Status: ${rec.volumeStatus || 'Normal'}\n` +
+        `- Fatigue Level: ${rec.fatigueLevel || 'Moderate'}\n` +
+        `- Weeks Since Last Deload: ${rec.weeksSinceDeload || 'Unknown'}\n\n` +
+        (rec.triggers?.length > 0 ? `Triggers:\n${rec.triggers.join('\n')}` : 'No triggers detected');
+
+      alert(message);
+    } else {
+      alert('No deload data available for current phase.');
+    }
+  };
+
+  const viewProgress = () => {
+    debugLog('Quick Action', { action: 'View Progress', currentWeek }, 'info');
+    const currentPhase = mesocycles.find(m => m.status === 'current');
+    const completedPhases = mesocycles.filter(m => m.status === 'completed');
+
+    const progressMessage = `Training Progress Summary:\n\n` +
+      `Current Phase: ${currentPhase?.name || 'None'}\n` +
+      `Week: ${currentWeek}\n` +
+      `Phase Progress: ${currentPhase?.progress || 0}%\n\n` +
+      `Completed Phases: ${completedPhases.length}\n` +
+      `Total Program Progress: ${Math.round((completedPhases.length / mesocycles.length) * 100)}%`;
+
+    alert(progressMessage);
+  };
+
+  const exportToPDF = async () => {
+    try {
+      debugLog('Export Action', { action: 'Export PDF', phases: mesocycles.length }, 'info');
+
+      const pdf = new jsPDF();
+
+      // Title
+      pdf.setFontSize(20);
+      pdf.text(`${programData.name || 'Macrocycle'} - Training Plan`, 20, 30);
+
+      // Program info
+      pdf.setFontSize(12);
+      let yPos = 50;
+      pdf.text(`Goal: ${programData.goal}`, 20, yPos);
+      pdf.text(`Duration: ${programData.duration} weeks`, 20, yPos + 10);
+      pdf.text(`Training Age: ${programData.trainingAge}`, 20, yPos + 20);
+      pdf.text(`Days/Week: ${programData.availableDays}`, 20, yPos + 30);
+
+      yPos += 50;
+
+      // Phases
+      pdf.setFontSize(16);
+      pdf.text('Training Phases:', 20, yPos);
+      yPos += 20;
+
+      pdf.setFontSize(12);
+      mesocycles.forEach((phase, index) => {
+        if (yPos > 250) {
+          pdf.addPage();
+          yPos = 30;
+        }
+
+        pdf.text(`${index + 1}. ${phase.name}`, 20, yPos);
+        pdf.text(`   Duration: ${phase.weeks} weeks`, 20, yPos + 10);
+        pdf.text(`   Status: ${phase.status}`, 20, yPos + 20);
+        pdf.text(`   Progress: ${phase.progress}%`, 20, yPos + 30);
+        yPos += 45;
+      });
+
+      pdf.save(`${programData.name || 'macrocycle'}-training-plan.pdf`);
+      alert('PDF exported successfully!');
+
+    } catch (error) {
+      console.error('PDF export error:', error);
+      alert('Error exporting PDF. Please try again.');
+    }
+  };
+
+  const exportToCalendar = () => {
+    try {
+      debugLog('Export Action', { action: 'Export Calendar', phases: mesocycles.length }, 'info');
+
+      let icsContent = 'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//PowerHouse ATX//Macrocycle Calendar//EN\n';
+
+      mesocycles.forEach((phase, index) => {
+        const startDate = new Date(phase.startDate);
+        const endDate = new Date(phase.endDate);
+
+        const formatDate = (date) => {
+          return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+        };
+
+        icsContent += `BEGIN:VEVENT\n`;
+        icsContent += `UID:phase-${phase.id}@powerhouseatx.com\n`;
+        icsContent += `DTSTART:${formatDate(startDate)}\n`;
+        icsContent += `DTEND:${formatDate(endDate)}\n`;
+        icsContent += `SUMMARY:${phase.name}\n`;
+        icsContent += `DESCRIPTION:Training Phase ${index + 1} - ${phase.weeks} weeks\\n`;
+        icsContent += `Status: ${phase.status}\\n`;
+        icsContent += `Objectives: ${phase.objectives?.join(', ') || 'N/A'}\n`;
+        icsContent += `END:VEVENT\n`;
+      });
+
+      icsContent += 'END:VCALENDAR';
+
+      const blob = new Blob([icsContent], { type: 'text/calendar' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${programData.name || 'macrocycle'}-calendar.ics`;
+      link.click();
+      URL.revokeObjectURL(url);
+
+      alert('Calendar file downloaded! Import it into your calendar app.');
+
+    } catch (error) {
+      console.error('Calendar export error:', error);
+      alert('Error exporting calendar. Please try again.');
+    }
+  };
+
   // Circular Progress Component
   const CircularProgress = ({ percentage, size = 60, strokeWidth = 4, color = 'red' }) => {
     const radius = (size - strokeWidth) / 2;
@@ -744,6 +985,48 @@ export default function Macrocycle7125() {
           <span className="text-sm font-bold text-white" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>
             {percentage}%
           </span>
+        </div>
+      </div>
+    );
+  };
+
+  // Sortable Timeline Card Component for Drag & Drop
+  const SortableTimelineCard = ({ mesocycle, index }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id: mesocycle.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      opacity: isDragging ? 0.5 : 1,
+    };
+
+    return (
+      <div ref={setNodeRef} style={style} className="relative">
+        {/* Connecting Line */}
+        {index < mesocycles.length - 1 && (
+          <div className="absolute left-1/2 transform -translate-x-1/2 top-full w-1 h-8 bg-gradient-to-b from-gray-600 to-transparent z-0"></div>
+        )}
+
+        <div
+          {...attributes}
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing"
+        >
+          {/* Drag Handle */}
+          <div className="absolute top-2 left-2 bg-gray-700/50 rounded p-1 text-gray-400 hover:text-white transition-colors z-10">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+            </svg>
+          </div>
+
+          <TimelineCard mesocycle={mesocycle} />
         </div>
       </div>
     );
@@ -948,20 +1231,130 @@ export default function Macrocycle7125() {
     );
   };
 
+  // Quick Actions Sidebar Component
+  const QuickActionsSidebar = () => (
+    <div className={`fixed right-0 top-0 h-full w-80 bg-gray-900/95 backdrop-blur-sm border-l border-gray-700 z-50 transform transition-transform duration-300 ${showQuickActions ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className="p-6 h-full flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-bold text-white">Quick Actions</h3>
+          <button
+            onClick={() => setShowQuickActions(false)}
+            className="text-gray-400 hover:text-white transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Current Week Info */}
+        <div className="bg-gradient-to-r from-blue-600/20 to-blue-500/10 rounded-lg p-4 mb-6 border border-blue-500/30">
+          <h4 className="text-blue-300 font-semibold mb-2">Current Status</h4>
+          <p className="text-white">Week {currentWeek}</p>
+          <p className="text-gray-300 text-sm">
+            {mesocycles.find(m => m.status === 'current')?.name || 'No active phase'}
+          </p>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="space-y-4 flex-1">
+          <button
+            onClick={logWorkout}
+            className="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white p-4 rounded-lg transition-all duration-200 flex items-center space-x-3 shadow-lg"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            <span className="font-semibold">Log Workout</span>
+          </button>
+
+          <button
+            onClick={checkDeload}
+            className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-700 hover:to-orange-600 text-white p-4 rounded-lg transition-all duration-200 flex items-center space-x-3 shadow-lg"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="font-semibold">Check Deload</span>
+          </button>
+
+          <button
+            onClick={viewProgress}
+            className="w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white p-4 rounded-lg transition-all duration-200 flex items-center space-x-3 shadow-lg"
+          >
+            <ChartBarIcon className="w-6 h-6" />
+            <span className="font-semibold">View Progress</span>
+          </button>
+
+          <div className="border-t border-gray-600 pt-4">
+            <h5 className="text-gray-300 font-semibold mb-3">Export Options</h5>
+
+            <button
+              onClick={exportToPDF}
+              className="w-full bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white p-3 rounded-lg transition-all duration-200 flex items-center space-x-3 mb-3"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>Export PDF</span>
+            </button>
+
+            <button
+              onClick={exportToCalendar}
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white p-3 rounded-lg transition-all duration-200 flex items-center space-x-3"
+            >
+              <CalendarIcon className="w-5 h-5" />
+              <span>Export Calendar</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="text-center text-gray-400 text-xs">
+          <p>PowerHouse ATX • RP Research</p>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <ErrorBoundary>
       <TrainingStateProvider>
         <div className="min-h-screen bg-black text-white">
-          <div className="max-w-7xl mx-auto px-4 py-8">
+          {/* Quick Actions Sidebar */}
+          <QuickActionsSidebar />
+
+          {/* Overlay for mobile */}
+          {showQuickActions && (
+            <div
+              className="fixed inset-0 bg-black/50 z-40"
+              onClick={() => setShowQuickActions(false)}
+            />
+          )}
+
+          <div className="max-w-7xl mx-auto px-6 py-8 relative">
 
             {/* Program Design Header */}
-            <div className="mb-8">
-              <h1 className="text-4xl font-bold text-white mb-2">Program Design</h1>
-              <p className="text-gray-400">Build evidence-based training programs using Renaissance Periodization methodology</p>
+            <div className="mb-10 flex justify-between items-start">
+              <div className="flex-1">
+                <h1 className="text-4xl font-bold text-white mb-3">Program Design</h1>
+                <p className="text-gray-400 text-lg">Build evidence-based training programs using Renaissance Periodization methodology</p>
+              </div>
+              {/* Quick Actions Toggle */}
+              <button
+                onClick={() => setShowQuickActions(true)}
+                className="bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white px-6 py-3 rounded-lg transition-all duration-200 flex items-center space-x-2 shadow-lg font-semibold"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <span className={isMobile ? 'hidden' : ''}>Quick Actions</span>
+              </button>
             </div>
 
-            {/* Program Design Navigation Tabs */}
-            <div className="flex space-x-1 mb-8 bg-gray-800 rounded-lg p-1">
+            {/* Program Design Navigation Tabs - Mobile Responsive */}
+            <div className={`flex ${isMobile ? 'flex-col space-y-3' : 'space-x-2'} mb-10 bg-gray-900/80 backdrop-blur-sm rounded-xl p-2 border border-gray-700/50`}>
               {[
                 { id: 'overview', label: 'Overview', icon: '🏠' },
                 { id: 'builder', label: 'Builder', icon: '🔧' },
@@ -987,15 +1380,16 @@ export default function Macrocycle7125() {
                     } else {
                       // Navigate to other sections when implemented
                       console.log(`Navigate to ${tab.id} tab`);
+                      alert(`${tab.label} section coming soon!`);
                     }
                   }}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded transition-colors ${tab.id === 'builder'
-                    ? 'bg-red-600 text-white'
-                    : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
-                    }`}
+                  className={`flex items-center ${isMobile ? 'justify-center' : ''} space-x-3 px-6 py-3 rounded-lg transition-all duration-200 font-medium ${tab.id === 'builder'
+                    ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg'
+                    : 'bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-600 hover:border-gray-500'
+                    } ${isMobile ? 'w-full' : ''}`}
                 >
-                  <span>{tab.icon}</span>
-                  <span>{tab.label}</span>
+                  <span className="text-lg">{tab.icon}</span>
+                  <span className={isMobile ? 'text-base' : 'text-sm'}>{tab.label}</span>
                 </button>
               ))}
             </div>
@@ -1038,7 +1432,7 @@ export default function Macrocycle7125() {
               )}
             </div>
 
-            <div className="space-y-8">
+            <div className="space-y-8" id="macrocycle-content">
               {/* Loading State */}
               {isLoading ? (
                 <LoadingSkeleton />
@@ -1173,20 +1567,28 @@ export default function Macrocycle7125() {
                     </div>
                   </div>
 
-                  {/* Enhanced Timeline Visualization */}
-                  <CardWrapper title="🎯 RP-Based Training Timeline" subtitle="Evidence-based phase progression with MEV/MRV calculations">
-                    <div className="space-y-8">
-                      {mesocycles.map((mesocycle, index) => (
-                        <div key={mesocycle.id} className="relative">
-                          {/* Connecting Line */}
-                          {index < mesocycles.length - 1 && (
-                            <div className="absolute left-1/2 transform -translate-x-1/2 top-full w-1 h-8 bg-gradient-to-b from-gray-600 to-transparent z-0"></div>
-                          )}
-
-                          <TimelineCard mesocycle={mesocycle} index={index} />
+                  {/* Enhanced Timeline Visualization with Drag & Drop */}
+                  <CardWrapper title="🎯 RP-Based Training Timeline" subtitle="Evidence-based phase progression with MEV/MRV calculations • Drag to reorder phases">
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <SortableContext
+                        items={mesocycles.map(m => m.id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        <div className="space-y-8">
+                          {mesocycles.map((mesocycle, index) => (
+                            <SortableTimelineCard
+                              key={mesocycle.id}
+                              mesocycle={mesocycle}
+                              index={index}
+                            />
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                      </SortableContext>
+                    </DndContext>
                   </CardWrapper>
 
                   {/* Current Phase Analysis */}
@@ -1316,36 +1718,49 @@ export default function Macrocycle7125() {
             </div> {/* End content container */}
 
             {/* Navigation and Actions */}
-            <div className="mt-8 px-4">
+            <div className="mt-12 px-4">
               <div className="flex items-center justify-between">
                 <button
-                  onClick={() => window.history.back()}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg transition-colors"
+                  onClick={() => navigate('/program')}
+                  className="flex items-center gap-2 px-6 py-3 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-all duration-200 border border-gray-600 hover:border-gray-500"
                 >
-                  <span>← Back</span>
+                  <span>← Back to Program Design</span>
                 </button>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   <button
                     onClick={() => {
-                      console.log('💾 Saving macrocycle configuration...');
-                      // TODO: Implement save functionality
-                      alert('Configuration saved successfully!');
+                      debugLog('Save Progress', { template: selectedTemplate, currentWeek });
+                      const updatedData = {
+                        template: selectedTemplate,
+                        mesocycles,
+                        currentWeek,
+                        lastSaved: new Date().toISOString()
+                      };
+                      saveMacrocycle(updatedData);
+                      alert('Macrocycle configuration saved successfully!');
                     }}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors"
+                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white rounded-lg transition-all duration-200 font-semibold shadow-lg"
                   >
-                    Save Progress
+                    💾 Save Progress
                   </button>
 
                   <button
                     onClick={() => {
-                      console.log('➡️ Proceeding to Mesocycle Builder...');
-                      // TODO: Navigate to mesocycle builder
-                      alert('Proceeding to Mesocycle Builder...');
+                      debugLog('Navigate to Mesocycle Builder', { fromMacrocycle: true });
+                      navigate('/mesocycle', {
+                        state: {
+                          fromMacrocycle: true,
+                          programData,
+                          selectedTemplate,
+                          currentWeek
+                        }
+                      });
                     }}
-                    className="flex items-center gap-2 px-6 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg transition-colors font-medium"
+                    className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 text-white rounded-lg transition-all duration-200 font-bold shadow-lg"
                   >
-                    <span>Continue to Mesocycle →</span>
+                    <span>Continue to Mesocycle Builder</span>
+                    <span>→</span>
                   </button>
                 </div>
               </div>

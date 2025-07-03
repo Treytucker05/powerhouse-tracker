@@ -85,6 +85,45 @@ export const MACROCYCLE_TEMPLATES = {
       { block_type: 'deload', duration_weeks: 1, focus: 'deload' },
       { block_type: 'maintenance', duration_weeks: 1, focus: 'maintenance' }
     ]
+  },
+  endurance_16: {
+    name: '16-Week Endurance Base',
+    duration_weeks: 16,
+    goal_type: 'endurance',
+    description: 'Build aerobic base and muscular endurance',
+    blocks: [
+      { block_type: 'accumulation', duration_weeks: 6, focus: 'accumulation' },
+      { block_type: 'deload', duration_weeks: 1, focus: 'deload' },
+      { block_type: 'accumulation', duration_weeks: 6, focus: 'accumulation' },
+      { block_type: 'deload', duration_weeks: 1, focus: 'deload' },
+      { block_type: 'maintenance', duration_weeks: 2, focus: 'maintenance' }
+    ]
+  },
+  powerbuilding_12: {
+    name: '12-Week Powerbuilding',
+    duration_weeks: 12,
+    goal_type: 'powerbuilding',
+    description: 'Balanced strength and hypertrophy development',
+    blocks: [
+      { block_type: 'accumulation', duration_weeks: 4, focus: 'accumulation' },
+      { block_type: 'deload', duration_weeks: 1, focus: 'deload' },
+      { block_type: 'intensification', duration_weeks: 3, focus: 'intensification' },
+      { block_type: 'realization', duration_weeks: 2, focus: 'realization' },
+      { block_type: 'deload', duration_weeks: 1, focus: 'deload' },
+      { block_type: 'maintenance', duration_weeks: 1, focus: 'maintenance' }
+    ]
+  },
+  strength_8: {
+    name: '8-Week Strength Peak',
+    duration_weeks: 8,
+    goal_type: 'strength',
+    description: 'Short peaking cycle for competition',
+    blocks: [
+      { block_type: 'accumulation', duration_weeks: 3, focus: 'accumulation' },
+      { block_type: 'intensification', duration_weeks: 3, focus: 'intensification' },
+      { block_type: 'realization', duration_weeks: 1, focus: 'realization' },
+      { block_type: 'deload', duration_weeks: 1, focus: 'deload' }
+    ]
   }
 };
 
