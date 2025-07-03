@@ -7,19 +7,19 @@ import VolumeTonnageCard from '../components/dashboard/VolumeTonnageCard';
 import DashboardCard from '../components/ui/DashboardCard';
 import HeroHeader from '../components/ui/HeroHeader';
 import AIInsightBar from '../components/ui/AIInsightBar';
-import { useAI } from '../context/trainingStateContext';
+import { useAI } from '../context/trainingStateHooks';
 import { seedDemo } from '../lib/devSeed';
 
 export default function Home() {
   const aiInsight = useAI();
-  
+
   // Auto-seed demo data in development
   useEffect(() => {
     if (import.meta.env.DEV) {
       seedDemo();
     }
   }, []);
-  
+
   // Sample data for the volume chart
   const sampleVolumeData = {
     'Chest': 12,
@@ -72,7 +72,7 @@ export default function Home() {
       background: 'linear-gradient(135deg, #1C1C1C 0%, #0A0A0A 100%)'
     }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        
+
         {/* 1 · Hero header (transparent wrapper) */}
         <DashboardCard className="border-none bg-transparent p-0">
           <HeroHeader />
@@ -101,7 +101,7 @@ export default function Home() {
           />
         </div>
       </div>
-      
+
       {/* Sticky AI insight footer */}
       <AIInsightBar insight={aiInsight} />
     </div>

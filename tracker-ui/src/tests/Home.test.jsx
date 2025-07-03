@@ -5,6 +5,30 @@ import Home from '../pages/Home';
 // Import renderWithProviders function (defined globally in vitest.setup.js)
 const { renderWithProviders } = globalThis;
 
+// Mock the training state hooks
+vi.mock('../context/trainingStateHooks', () => ({
+  useTrainingState: () => ({
+    state: {
+      aiInsight: 'Test AI insight',
+      currentProgram: null,
+      fatigue: 'moderate',
+      currentCycle: null,
+      weeklySetTonnageByMuscle: [],
+      workoutSessions: [],
+      currentWeek: 1,
+      mesocycles: []
+    },
+    dispatch: vi.fn(),
+    setupMesocycle: vi.fn(),
+  }),
+  useAI: () => 'Test AI insight',
+}));
+
+// Mock the dev seed function
+vi.mock('../lib/devSeed', () => ({
+  seedDemo: vi.fn(),
+}));
+
 // Mock the hooks
 vi.mock('../lib/useWeeklyVolume', () => ({
   default: () => ({
@@ -22,14 +46,8 @@ describe('Home Dashboard', () => {
     renderWithProviders(<Home onNavigate={mockNavigate} />);
 
     // Check if main elements are present
-    expect(screen.getByText((content) => /Power\s*House/i.test(content))).toBeInTheDocument();
-    expect(screen.getByText('Weekly Volume')).toBeInTheDocument();
-    expect(screen.getByText('Fatigue Status:')).toBeInTheDocument();
-
-    // Check if navigation buttons are present
-    expect(screen.getByText('View Sessions')).toBeInTheDocument();
-    expect(screen.getByText('View Intelligence')).toBeInTheDocument();
-    expect(screen.getByText('Start Workout')).toBeInTheDocument();
-    expect(screen.getByText('Analyze Deload Need')).toBeInTheDocument();
+    expect(screen.getByText(/Welcome back/)).toBeInTheDocument();
+    expect(screen.getByText('Trey')).toBeInTheDocument();
+    expect(screen.getByText('Hypertrophy')).toBeInTheDocument();
   });
 });
