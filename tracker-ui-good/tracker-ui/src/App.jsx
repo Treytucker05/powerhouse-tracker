@@ -1,4 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import AppShell from './layout/AppShell.jsx';
 import TrackingEnhanced from "./pages/TrackingEnhanced.jsx";
 import MesocycleEnhanced from "./pages/MesocycleEnhanced.jsx";
@@ -22,8 +24,26 @@ function App() {
           <Route path="mesocycle" element={<MesocycleEnhanced />} />
           <Route path="microcycle" element={<Microcycle />} />
           <Route path="macrocycle" element={<Macrocycle />} />
+          <Route path="macrocycle/:id" element={<Macrocycle />} />
         </Route>
       </Routes>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        toastStyle={{
+          background: '#111827',
+          color: '#ffffff',
+          border: '1px solid #374151'
+        }}
+      />
     </Router>
   );
 }

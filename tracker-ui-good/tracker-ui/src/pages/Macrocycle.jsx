@@ -9,7 +9,9 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { toast } from 'react-toastify';
+import { saveMacrocycle, loadMacrocycle } from '../lib/storage';
 import {
     DndContext,
     closestCenter,
@@ -58,12 +60,15 @@ const TEXT_STYLES = {
 export default function Macrocycle() {
     const location = useLocation();
     const navigate = useNavigate();
+    const { id: macrocycleParamId } = useParams();
 
     // State management  
     const [selectedTemplate, setSelectedTemplate] = useState('hypertrophy_12');
     const [currentWeek] = useState(1);
     const [isMobile, setIsMobile] = useState(false);
     const [activeTab, setActiveTab] = useState('builder');
+    const [macrocycleId, setMacrocycleId] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     // MacrocycleBuilder state structure
     const [selectedBlockId, setSelectedBlockId] = useState(1);
@@ -366,7 +371,7 @@ export default function Macrocycle() {
     // Delete a block and revalidate
     const deleteBlock = (blockId) => {
         if (blocks.length <= 1) {
-            alert('Cannot delete the last remaining block. A program must have at least one block.');
+            toast.warning('Cannot delete the last remaining block. A program must have at least one block.');
             return;
         }
 
@@ -801,6 +806,78 @@ export default function Macrocycle() {
         });
     }, [validateProgram]);
 
+    // Load macrocycle from storage if ID is provided
+    useEffect(() => {
+        if (macrocycleParamId && macrocycleParamId !== 'new') {
+            setIsLoading(true);
+            loadMacrocycle(macrocycleParamId)
+                .then(data => {
+                    if (data) {
+                        setBlocks(prevBlocks => data.blocks || prevBlocks);
+                        setSelectedTemplate(prevTemplate => data.selectedTemplate || prevTemplate);
+                        setMacrocycleId(data.id);
+                        toast.success('Macrocycle loaded successfully!');
+                    } else {
+                        toast.error('Macrocycle not found');
+                        navigate('/macrocycle');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading macrocycle:', error);
+                    toast.error('Failed to load macrocycle');
+                })
+                .finally(() => {
+                    setIsLoading(false);
+                });
+        }
+    }, [macrocycleParamId, navigate]);
+
+    // Save macrocycle function
+    const handleSave = async () => {
+        setIsLoading(true);
+        try {
+            const macrocycleData = {
+                id: macrocycleId,
+                blocks,
+                selectedTemplate,
+                programData,
+                name: programData.name || 'Custom Macrocycle',
+                createdAt: macrocycleId ? undefined : Date.now(), // Only set createdAt for new macrocycles
+            };
+
+            const savedId = await saveMacrocycle(macrocycleData);
+            setMacrocycleId(savedId);
+
+            toast.success('Macrocycle saved successfully!');
+
+            // Update URL if it was a new macrocycle
+            if (!macrocycleId) {
+                navigate(`/macrocycle/${savedId}`, { replace: true });
+            }
+        } catch (error) {
+            console.error('Error saving macrocycle:', error);
+            toast.error('Failed to save macrocycle');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Navigate to mesocycle builder
+    const handleProceedToMesocycle = () => {
+        if (!macrocycleId) {
+            toast.warning('Please save your macrocycle first');
+            return;
+        }
+        toast.info('Proceeding to Mesocycle Builder...');
+        navigate('/mesocycle', {
+            state: {
+                macrocycleId,
+                blocks,
+                programData
+            }
+        });
+    };
+
     // Drag and Drop Handler
     function handleDragEnd(event) {
         const { active, over } = event;
@@ -995,11 +1072,11 @@ export default function Macrocycle() {
                                     } else if (tab.id === 'overview') {
                                         navigate('/program');
                                     } else if (tab.id === 'calculator') {
-                                        alert('Volume Calculator - Coming Soon!\nWill include MEV/MRV calculations based on RP research.');
+                                        toast.info('Volume Calculator - Coming Soon!\nWill include MEV/MRV calculations based on RP research.');
                                     } else if (tab.id === 'exercises') {
-                                        alert('Exercise Database - Coming Soon!\nWill include exercise selection based on muscle groups and training phases.');
+                                        toast.info('Exercise Database - Coming Soon!\nWill include exercise selection based on muscle groups and training phases.');
                                     } else if (tab.id === 'templates') {
-                                        alert('Program Templates - Coming Soon!\nWill include pre-built programs for different goals and experience levels.');
+                                        toast.info('Program Templates - Coming Soon!\nWill include pre-built programs for different goals and experience levels.');
                                     }
                                 }}
                                 className={`group relative flex items-center ${isMobile ? 'justify-center' : ''} space-x-3 px-6 py-4 rounded-lg transition-all duration-300 transform ${isMobile ? 'w-full' : 'min-w-[140px]'}`}
@@ -1552,7 +1629,7 @@ export default function Macrocycle() {
                                     border: '2px solid #f87171',
                                     boxShadow: '0 4px 14px 0 rgba(220, 38, 38, 0.3)'
                                 }}
-                                onClick={() => alert('Running full RP compliance analysis...')}
+                                onClick={() => toast.info('Running full RP compliance analysis...')}
                             >
                                 Run Full Analysis
                             </button>
@@ -1579,8 +1656,9 @@ export default function Macrocycle() {
 
                         <div className="flex items-center gap-4">
                             <button
-                                onClick={() => alert('Configuration saved successfully!')}
-                                className="px-6 py-3 rounded-lg transition-all duration-200 font-bold shadow-lg"
+                                onClick={handleSave}
+                                disabled={isLoading}
+                                className="px-6 py-3 rounded-lg transition-all duration-200 font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                                 style={{
                                     background: 'linear-gradient(135deg, #dc2626, #b91c1c)',
                                     color: 'white',
@@ -1588,11 +1666,11 @@ export default function Macrocycle() {
                                     boxShadow: '0 4px 14px 0 rgba(220, 38, 38, 0.3)'
                                 }}
                             >
-                                Save Progress
+                                {isLoading ? 'Saving...' : 'Save Progress'}
                             </button>
 
                             <button
-                                onClick={() => alert('Proceeding to Mesocycle Builder...')}
+                                onClick={handleProceedToMesocycle}
                                 className="flex items-center gap-2 px-8 py-3 rounded-lg transition-all duration-200 font-bold shadow-lg"
                                 style={{
                                     background: 'linear-gradient(135deg, #dc2626, #b91c1c)',
