@@ -36,7 +36,7 @@ To test the E2E setup locally:
 
 2. **Start preview server** (in separate terminal):
    ```bash
-   npx vite preview --port 5173
+   pnpm vite preview --port 5173
    ```
 
 3. **Run E2E tests**:

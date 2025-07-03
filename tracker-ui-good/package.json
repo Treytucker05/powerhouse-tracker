@@ -20,7 +20,7 @@
     "test": "vitest run",
     "test:unit": "vitest run",
     "test:e2e": "cross-env-shell \"NODE_OPTIONS=-r %cd%/playwright-preload.cjs\" rimraf test-results && pnpm exec playwright test",
-    "lint:ci": "npx eslint \"{lib,tests,tracker-ui/src}/**/*.{js,jsx}\" --max-warnings 0",
+    "lint:ci": "pnpm exec eslint \"{lib,tests,tracker-ui/src}/**/*.{js,jsx}\" --max-warnings 0",
     "verify": "pnpm run build && pnpm run test:unit && pnpm run lint:ci",
     "analyze": "node scripts/analyze-repo.js",
     "deps": "node scripts/deps-check.js",
