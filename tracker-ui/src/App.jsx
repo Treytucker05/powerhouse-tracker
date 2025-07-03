@@ -3,7 +3,7 @@ import AppShell from './layout/AppShell.jsx';
 import TrackingEnhanced from "./pages/TrackingEnhanced.jsx";
 import MesocycleEnhanced from "./pages/MesocycleEnhanced.jsx";
 import Microcycle from "./pages/MicrocycleNew.jsx";
-import Macrocycle from "./pages/MacrocycleNew.jsx";
+import Macrocycle from "./pages/Mesocycle.jsx";
 import Home from "./pages/Home.jsx";
 import Program from "./pages/Program.jsx";
 import Analytics from "./pages/Analytics.jsx";

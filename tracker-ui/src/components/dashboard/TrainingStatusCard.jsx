@@ -1,4 +1,4 @@
-import { useTrainingState } from "../../context/trainingStateContext";
+import { useTrainingState } from "../../context/trainingStateHooks";
 import {
   getCurrentCycle,
   getWeeklySetTonnageByMuscle,
@@ -35,7 +35,7 @@ export default function TrainingStatusCard() {
     Object.values(vol.sets).some(
       (sets, i) => sets >= state.mrvTable[Object.keys(vol.sets)[i]] * 0.9
     );
-  
+
   const daysToDeload = getDaysToDeload(state);
   const monthlyAgg = getMonthlyAggregates(state);
   const programAgg = getProgramAggregates(state);
@@ -96,27 +96,26 @@ export default function TrainingStatusCard() {
                 </th>
               </tr>
             </thead>
-              <tbody>
-                {Object.keys(vol.sets)
-                  .sort((a, b) => vol.tonnage[b] - vol.tonnage[a])
-                  .map((muscle, index) => (
-                    <tr 
-                      key={muscle} 
-                      className={`border-b border-gray-700/40 hover:bg-gray-800/30 transition-colors duration-200 ${
-                        index % 2 === 0 ? 'bg-gray-800/10' : 'bg-transparent'
+            <tbody>
+              {Object.keys(vol.sets)
+                .sort((a, b) => vol.tonnage[b] - vol.tonnage[a])
+                .map((muscle, index) => (
+                  <tr
+                    key={muscle}
+                    className={`border-b border-gray-700/40 hover:bg-gray-800/30 transition-colors duration-200 ${index % 2 === 0 ? 'bg-gray-800/10' : 'bg-transparent'
                       }`}
-                    >
-                      <td className="padding-responsive-sm text-white font-medium responsive-text-lg capitalize">
-                        {muscle}
-                      </td>
-                      <td className="padding-responsive-sm text-gray-300 font-semibold responsive-text-lg text-right tabular-nums">
-                        {vol.sets[muscle]}
-                      </td>
-                      <td className="padding-responsive-sm text-gray-300 font-semibold responsive-text-lg text-right tabular-nums">
-                        {formatNumber(vol.tonnage[muscle])}
-                      </td>
-                    </tr>
-                  ))}
+                  >
+                    <td className="padding-responsive-sm text-white font-medium responsive-text-lg capitalize">
+                      {muscle}
+                    </td>
+                    <td className="padding-responsive-sm text-gray-300 font-semibold responsive-text-lg text-right tabular-nums">
+                      {vol.sets[muscle]}
+                    </td>
+                    <td className="padding-responsive-sm text-gray-300 font-semibold responsive-text-lg text-right tabular-nums">
+                      {formatNumber(vol.tonnage[muscle])}
+                    </td>
+                  </tr>
+                ))}
             </tbody>
             <tfoot>
               <tr className="bg-gray-800/40 border-t-2 border-gray-600">
@@ -185,8 +184,8 @@ export default function TrainingStatusCard() {
         {/* Fatigue Card */}
         <div className="padding-responsive-md bg-gray-800/30 rounded-lg border border-primary-red/20 flex items-center justify-center min-w-0">
           <div className="gauge-container">
-            <VintageFatigueGauge 
-              value={state?.fatigueScore || 45} 
+            <VintageFatigueGauge
+              value={state?.fatigueScore || 45}
               label="Fatigue Level"
             />
           </div>
@@ -201,7 +200,7 @@ export default function TrainingStatusCard() {
               <span className="responsive-text-lg font-bold text-accent-red">{compliance.percentage}%</span>
             </div>
             <div className="w-full bg-gray-700 rounded-full h-2">
-              <div 
+              <div
                 className="bg-gradient-to-r from-accent-red to-primary-red h-2 rounded-full transition-all duration-300"
                 style={{ width: `${compliance.percentage}%` }}
               ></div>

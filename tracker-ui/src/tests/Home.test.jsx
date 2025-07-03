@@ -2,6 +2,9 @@ import { screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import Home from '../pages/Home';
 
+// Import renderWithProviders function (defined globally in vitest.setup.js)
+const { renderWithProviders } = globalThis;
+
 // Mock the hooks
 vi.mock('../lib/useWeeklyVolume', () => ({
   default: () => ({
@@ -17,12 +20,12 @@ describe('Home Dashboard', () => {
   it('should display weekly volume chart and fatigue status', () => {
     const mockNavigate = vi.fn();
     renderWithProviders(<Home onNavigate={mockNavigate} />);
-    
+
     // Check if main elements are present
     expect(screen.getByText((content) => /Power\s*House/i.test(content))).toBeInTheDocument();
     expect(screen.getByText('Weekly Volume')).toBeInTheDocument();
     expect(screen.getByText('Fatigue Status:')).toBeInTheDocument();
-    
+
     // Check if navigation buttons are present
     expect(screen.getByText('View Sessions')).toBeInTheDocument();
     expect(screen.getByText('View Intelligence')).toBeInTheDocument();

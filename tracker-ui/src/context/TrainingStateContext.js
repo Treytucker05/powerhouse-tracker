@@ -20,6 +20,10 @@ export const useAI = () => useTracker(s => s.aiInsight ?? '');
 // Barrel re-export so both filenames work
 export {
   TrainingStateProvider,
-  useTrainingState,
 } from "./trainingStateContext.jsx";
 export { default } from "./trainingStateContext.jsx";
+
+// Export hooks from the separate hooks file
+export {
+  useTrainingState,
+} from "./trainingStateHooks.js";

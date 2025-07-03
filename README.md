@@ -96,7 +96,7 @@ pnpm test
 pnpm run audit
 
 # Full CI pipeline
-npm run ci
+pnpm run verify
 ```
 
 ### React/Vite Frontend

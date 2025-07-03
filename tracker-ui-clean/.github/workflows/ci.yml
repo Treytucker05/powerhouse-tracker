@@ -22,17 +22,18 @@ jobs:
           cache: 'pnpm'
           
       - name: Install dependencies (root)
-        run: npm ci
+        run: pnpm install
         
       - name: Run legacy CI validation
-        run: npm run ci
+        run: pnpm run verify
         
       - name: Install dependencies (React app)
         working-directory: ./tracker-ui
         run: pnpm install
-          - name: Install Playwright browsers
+        
+      - name: Install Playwright browsers
         working-directory: ./tracker-ui
-        run: npx playwright install --with-deps
+        run: pnpm exec playwright install --with-deps
         
       - name: Strict lint React app (fail on warnings)
         working-directory: ./tracker-ui
