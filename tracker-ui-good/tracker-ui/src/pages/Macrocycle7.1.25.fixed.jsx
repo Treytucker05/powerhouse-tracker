@@ -243,10 +243,10 @@ export default function Macrocycle7125Fixed() {
 
                 <div
                     className={`relative p-6 rounded-2xl border-2 transition-all duration-700 ease-out cursor-pointer group ${mesocycle.status === 'completed'
-                            ? `bg-gradient-to-br ${mesocycle.gradient}/20 ${mesocycle.borderColor} shadow-lg`
-                            : mesocycle.status === 'current'
-                                ? `bg-gradient-to-br ${mesocycle.gradient}/30 ${mesocycle.borderColor} shadow-xl animate-pulse`
-                                : `bg-gradient-to-br from-gray-800/40 to-gray-700/30 border-gray-600/40 shadow-md`
+                        ? `bg-gradient-to-br ${mesocycle.gradient}/20 ${mesocycle.borderColor} shadow-lg`
+                        : mesocycle.status === 'current'
+                            ? `bg-gradient-to-br ${mesocycle.gradient}/30 ${mesocycle.borderColor} shadow-xl animate-pulse`
+                            : `bg-gradient-to-br from-gray-800/40 to-gray-700/30 border-gray-600/40 shadow-md`
                         } backdrop-blur-sm hover:scale-[1.02] hover:shadow-2xl ${isExpanded ? 'scale-[1.02] shadow-2xl' : ''}`}
                     onClick={() => setExpandedPhase(isExpanded ? null : mesocycle.id)}
                 >
@@ -288,10 +288,10 @@ export default function Macrocycle7125Fixed() {
                                 size={70}
                             />
                             <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${mesocycle.status === 'completed'
-                                    ? 'bg-gradient-to-r from-blue-500/30 to-blue-400/20 text-blue-300 border border-blue-400/30'
-                                    : mesocycle.status === 'current'
-                                        ? 'bg-gradient-to-r from-green-500/30 to-green-400/20 text-green-300 border border-green-400/30'
-                                        : 'bg-gradient-to-r from-gray-600/30 to-gray-500/20 text-gray-300 border border-gray-500/30'
+                                ? 'bg-gradient-to-r from-blue-500/30 to-blue-400/20 text-blue-300 border border-blue-400/30'
+                                : mesocycle.status === 'current'
+                                    ? 'bg-gradient-to-r from-green-500/30 to-green-400/20 text-green-300 border border-green-400/30'
+                                    : 'bg-gradient-to-r from-gray-600/30 to-gray-500/20 text-gray-300 border border-gray-500/30'
                                 }`}>
                                 {mesocycle.status}
                             </span>
@@ -389,7 +389,7 @@ export default function Macrocycle7125Fixed() {
                                 onClick={() => {
                                     debugLog('Navigation Tab Click', { clickedTab: tab.id, previousTab: activeTab });
                                     setActiveTab(tab.id);
-                                    
+
                                     // Handle navigation based on tab
                                     if (tab.id === 'builder') {
                                         window.scrollTo(0, 0);
@@ -403,37 +403,54 @@ export default function Macrocycle7125Fixed() {
                                         alert('Program Templates - Coming Soon!\nWill include pre-built programs for different goals and experience levels.');
                                     }
                                 }}
-                                className={`group relative flex items-center ${isMobile ? 'justify-center' : ''} space-x-3 px-6 py-4 rounded-lg transition-all duration-300 transform ${
-                                    isActive 
-                                        ? 'bg-gradient-to-r from-red-600 to-red-700 text-black shadow-lg shadow-red-500/30 scale-105 border-2 border-red-400' 
-                                        : 'bg-gradient-to-r from-gray-800 to-gray-700 hover:from-red-800 hover:to-red-700 text-gray-300 hover:text-white hover:scale-102 border border-gray-600/30 hover:border-red-500/50'
-                                } ${isMobile ? 'w-full' : 'min-w-[140px]'}`}
+                                className={`group relative flex items-center ${isMobile ? 'justify-center' : ''} space-x-3 px-6 py-4 rounded-lg transition-all duration-300 transform ${isMobile ? 'w-full' : 'min-w-[140px]'}`}
+                                style={isActive ? {
+                                    background: 'linear-gradient(135deg, #dc2626, #b91c1c)',
+                                    color: 'black',
+                                    border: '2px solid #f87171',
+                                    boxShadow: '0 4px 14px 0 rgba(220, 38, 38, 0.3)',
+                                    transform: 'scale(1.05)'
+                                } : {
+                                    background: 'linear-gradient(135deg, #374151, #1f2937)',
+                                    color: 'white',
+                                    border: '1px solid #4b5563'
+                                }}
                             >
                                 {/* Active Tab Indicator */}
                                 {isActive && (
                                     <div className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-red-400 rounded-full shadow-lg shadow-red-400/50"></div>
                                 )}
-                                
+
                                 {/* Tab Icon */}
                                 <span className={`text-xl transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-105'}`}>
                                     {tab.icon}
                                 </span>
-                                
+
                                 {/* Tab Content */}
                                 <div className={`flex flex-col ${isMobile ? 'items-center' : 'items-start'}`}>
-                                    <span className={`font-bold transition-all duration-300 ${
-                                        isActive 
-                                            ? 'text-black text-lg font-black' 
-                                            : 'text-gray-300 group-hover:text-white font-semibold'
-                                    } ${isMobile ? 'text-sm' : ''}`}>
+                                    <span
+                                        className={`font-bold transition-all duration-300 ${isMobile ? 'text-sm' : ''}`}
+                                        style={isActive ? {
+                                            color: 'black',
+                                            fontSize: isMobile ? '0.875rem' : '1.125rem',
+                                            fontWeight: '900'
+                                        } : {
+                                            color: 'white',
+                                            fontWeight: '600'
+                                        }}
+                                    >
                                         {tab.label}
                                     </span>
                                     {!isMobile && (
-                                        <span className={`text-xs transition-all duration-300 ${
-                                            isActive 
-                                                ? 'text-gray-800 font-semibold' 
-                                                : 'text-gray-500 group-hover:text-gray-400'
-                                        }`}>
+                                        <span
+                                            className="text-xs transition-all duration-300"
+                                            style={isActive ? {
+                                                color: '#1f2937',
+                                                fontWeight: '600'
+                                            } : {
+                                                color: '#d1d5db'
+                                            }}
+                                        >
                                             {tab.description}
                                         </span>
                                     )}
@@ -443,7 +460,7 @@ export default function Macrocycle7125Fixed() {
                                 {isActive && (
                                     <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 to-red-600/10 rounded-lg pointer-events-none"></div>
                                 )}
-                                
+
                                 {/* Hover Effect */}
                                 <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg pointer-events-none"></div>
                             </button>
@@ -456,7 +473,13 @@ export default function Macrocycle7125Fixed() {
                     <div className="flex items-center justify-between">
                         <button
                             onClick={() => navigate('/program')}
-                            className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-black font-bold px-4 py-2 rounded-lg transition-all duration-200 border border-red-400 shadow-lg shadow-red-500/30 flex items-center space-x-2"
+                            className="px-4 py-2 rounded-lg transition-all duration-200 font-bold shadow-lg flex items-center space-x-2"
+                            style={{
+                                background: 'linear-gradient(135deg, #dc2626, #b91c1c)',
+                                color: 'white',
+                                border: '1px solid #f87171',
+                                boxShadow: '0 4px 14px 0 rgba(220, 38, 38, 0.3)'
+                            }}
                         >
                             <span>←</span>
                             <span>Back to Program Design</span>
@@ -633,7 +656,13 @@ export default function Macrocycle7125Fixed() {
                     <div className="flex items-center justify-between">
                         <button
                             onClick={() => window.history.back()}
-                            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold rounded-lg transition-all duration-200 border-2 border-red-400 shadow-lg shadow-red-500/30"
+                            className="flex items-center gap-2 px-6 py-3 rounded-lg transition-all duration-200 font-bold shadow-lg"
+                            style={{
+                                background: 'linear-gradient(135deg, #dc2626, #b91c1c)',
+                                color: 'white',
+                                border: '2px solid #f87171',
+                                boxShadow: '0 4px 14px 0 rgba(220, 38, 38, 0.3)'
+                            }}
                         >
                             <span>← Back</span>
                         </button>
@@ -641,14 +670,26 @@ export default function Macrocycle7125Fixed() {
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={() => alert('Configuration saved successfully!')}
-                                className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold rounded-lg transition-all duration-200 border-2 border-red-400 shadow-lg shadow-red-500/30"
+                                className="px-6 py-3 rounded-lg transition-all duration-200 font-bold shadow-lg"
+                                style={{
+                                    background: 'linear-gradient(135deg, #dc2626, #b91c1c)',
+                                    color: 'white',
+                                    border: '2px solid #f87171',
+                                    boxShadow: '0 4px 14px 0 rgba(220, 38, 38, 0.3)'
+                                }}
                             >
                                 Save Progress
                             </button>
 
                             <button
                                 onClick={() => alert('Proceeding to Mesocycle Builder...')}
-                                className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold rounded-lg transition-all duration-200 border-2 border-red-400 shadow-lg shadow-red-500/30"
+                                className="flex items-center gap-2 px-8 py-3 rounded-lg transition-all duration-200 font-bold shadow-lg"
+                                style={{
+                                    background: 'linear-gradient(135deg, #dc2626, #b91c1c)',
+                                    color: 'white',
+                                    border: '2px solid #f87171',
+                                    boxShadow: '0 4px 14px 0 rgba(220, 38, 38, 0.3)'
+                                }}
                             >
                                 <span>Continue to Mesocycle →</span>
                             </button>
