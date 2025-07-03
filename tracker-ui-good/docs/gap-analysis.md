@@ -14,7 +14,7 @@ _Last updated: 2025-06-25_
 
 ### Technical-Debt Hotspots
 * Legacy Parcel code under `/js` → migrate or delete.  
-* ESLint warnings (run `npm run lint`).  
+* ESLint warnings (run `pnpm run lint`).  
 * Maintain ≥ 80 % Vitest coverage gate.
 
 ### Data-Model TODO

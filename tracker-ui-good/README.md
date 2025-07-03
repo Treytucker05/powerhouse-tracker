@@ -2,7 +2,9 @@
 
 ![Vitest](https://img.shields.io/badge/tests-passing-brightgreen)
 
-A comprehensive evidence-based training toolkit implementing Renaissance Periodization methodology with **automated volume progression**, **intelligent deload analysis**, and **data management**.
+A comprehensive evidence-based training toolkit implementing Renaissance Periodization methodology with **automated volume progression**, **intelligent- **Build fails**: Ensure `.env` variables `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set.
+- **Charts not loading**: Verify the Chart.js bundle exists inside the `dist/` folder after running `pnpm run build`.
+- **Tests failing**: Run `pnpm test -- --verbose` to see detailed errors.load analysis**, and **data management**.
 
 ## 🎯 Latest Features (v0.9.0-beta.4)
 
@@ -88,13 +90,13 @@ pnpm install
 pnpm run dev
 
 # Run tests
-npm test
+pnpm test
 
 # Run handler audit
-npm run audit
+pnpm run audit
 
 # Full CI pipeline
-npm run ci
+pnpm run ci
 ```
 
 ### React/Vite Frontend
@@ -328,8 +330,8 @@ npm run audit  # Runs full button/handler audit pipeline
 ### Testing
 
 ```bash
-npm test                    # Run all Jest tests
-npm test handlers.test.js   # Test button handler exposure
+pnpm test                    # Run all Jest tests
+pnpm test handlers.test.js   # Test button handler exposure
 ```
 
 ---

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 echo "📦 Dependency status"
-npm outdated || true
+pnpm outdated || true
 echo
 echo "🔒 Security audit"
-npm audit --production || true
+pnpm audit --production || true
