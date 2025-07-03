@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { supabase } from '../lib/api/supabaseClient';
+import { loadAllMacrocycles, deleteMacrocycle } from '../lib/storage';
 import {
   BASE_VOLUME_LANDMARKS,
   RIR_SCHEMES,
@@ -199,8 +201,10 @@ const Program = memo(() => {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [recentPrograms, setRecentPrograms] = useState([]);
+  const [recentMacrocycles, setRecentMacrocycles] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingPrograms, setIsLoadingPrograms] = useState(true);
+  const [isLoadingMacrocycles, setIsLoadingMacrocycles] = useState(true);
   const [error, setError] = useState(null);
   const [programData, setProgramData] = useState({
     name: '',
@@ -239,6 +243,27 @@ const Program = memo(() => {
     };
 
     loadRecentPrograms();
+  }, []);
+
+  // Load recent macrocycles
+  useEffect(() => {
+    const loadRecentMacrocyclesData = async () => {
+      setIsLoadingMacrocycles(true);
+      try {
+        const macrocycles = await loadAllMacrocycles();
+        const sortedMacrocycles = macrocycles
+          .sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0))
+          .slice(0, 5); // Show only the 5 most recent
+        setRecentMacrocycles(sortedMacrocycles);
+      } catch (error) {
+        console.error('Error loading macrocycles:', error);
+        toast.error('Failed to load recent macrocycles');
+      } finally {
+        setIsLoadingMacrocycles(false);
+      }
+    };
+
+    loadRecentMacrocyclesData();
   }, []);
 
   // Save program to Supabase - memoize this function!
@@ -451,6 +476,35 @@ const Program = memo(() => {
     }
   }, []);
 
+  // Macrocycle handlers
+  const handleContinueMacrocycle = useCallback((macrocycle) => {
+    navigate(`/macrocycle/${macrocycle.id}`, {
+      state: { macrocycleData: macrocycle }
+    });
+  }, [navigate]);
+
+  const handleDeleteMacrocycle = useCallback(async (macrocycle) => {
+    if (!window.confirm(`Are you sure you want to delete "${macrocycle.name}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      await deleteMacrocycle(macrocycle.id);
+
+      // Refresh the macrocycles list
+      const updatedMacrocycles = await loadAllMacrocycles();
+      const sortedMacrocycles = updatedMacrocycles
+        .sort((a, b) => (b.updatedAt || b.createdAt || 0) - (a.updatedAt || a.createdAt || 0))
+        .slice(0, 5);
+      setRecentMacrocycles(sortedMacrocycles);
+
+      toast.success('Macrocycle deleted successfully');
+    } catch (error) {
+      console.error('Error deleting macrocycle:', error);
+      toast.error('Failed to delete macrocycle');
+    }
+  }, []);
+
   const ProgramOverview = () => (
     <div className="space-y-8">
       {/* Planning Level Selection */}
@@ -603,6 +657,58 @@ const Program = memo(() => {
         ) : (
           <div className="text-gray-400 text-center py-8">
             No recent programs. Create your first program above!
+          </div>
+        )}
+      </div>
+
+      {/* Recent Macrocycles */}
+      <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+        <h3 className="text-lg font-semibold text-white mb-4">Recent Macrocycles</h3>
+        {isLoadingMacrocycles ? (
+          <div className="text-gray-400 text-center py-8">Loading macrocycles...</div>
+        ) : recentMacrocycles.length > 0 ? (
+          <div className="space-y-3">
+            {recentMacrocycles.map((macrocycle) => (
+              <div
+                key={macrocycle.id}
+                className="flex items-center justify-between p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+              >
+                <div>
+                  <h4 className="text-white font-medium">{macrocycle.name}</h4>
+                  <p className="text-gray-400 text-sm">
+                    {macrocycle.blocks?.length || 0} blocks • {macrocycle.selectedTemplate || 'Custom'}
+                  </p>
+                  <p className="text-gray-500 text-xs mt-1">
+                    {macrocycle.updatedAt
+                      ? `Updated: ${new Date(macrocycle.updatedAt).toLocaleDateString()}`
+                      : macrocycle.createdAt
+                        ? `Created: ${new Date(macrocycle.createdAt).toLocaleDateString()}`
+                        : 'No date'
+                    }
+                  </p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => handleContinueMacrocycle(macrocycle)}
+                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
+                    title="Continue working on this macrocycle"
+                  >
+                    Continue
+                  </button>
+                  <button
+                    onClick={() => handleDeleteMacrocycle(macrocycle)}
+                    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
+                    title="Delete this macrocycle permanently"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-gray-400 text-center py-8">
+            No saved macrocycles. Create your first macrocycle above!
           </div>
         )}
       </div>
