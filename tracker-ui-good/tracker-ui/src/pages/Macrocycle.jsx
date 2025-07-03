@@ -8,7 +8,7 @@
  * - Export to PDF/Calendar functionality
  */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
     DndContext,
@@ -19,7 +19,6 @@ import {
     useSensors,
 } from '@dnd-kit/core';
 import {
-    arrayMove,
     SortableContext,
     sortableKeyboardCoordinates,
     horizontalListSortingStrategy,
@@ -32,7 +31,7 @@ import { CSS } from '@dnd-kit/utilities';
 // Simplified imports for core functionality
 const DEBUG_MODE = true;
 
-const debugLog = (category, data, level = 'info') => {
+const debugLog = (category, data) => {
     if (!DEBUG_MODE) return;
     console.log(`🔍 [${category}]`, data);
 };
@@ -60,11 +59,9 @@ export default function Macrocycle() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // State management
-    const [expandedPhase, setExpandedPhase] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
+    // State management  
     const [selectedTemplate, setSelectedTemplate] = useState('hypertrophy_12');
-    const [currentWeek, setCurrentWeek] = useState(1);
+    const [currentWeek] = useState(1);
     const [isMobile, setIsMobile] = useState(false);
     const [activeTab, setActiveTab] = useState('builder');
 
@@ -253,7 +250,6 @@ export default function Macrocycle() {
     // Add a new block with proper defaults and RIR progression
     const addBlock = () => {
         const newBlockId = Math.max(...blocks.map(b => b.id)) + 1;
-        const blockIndex = blocks.length + 1;
 
         const newBlock = {
             id: newBlockId,
@@ -440,8 +436,10 @@ export default function Macrocycle() {
     // Update the existing updateBlock to use the new handler
     const updateBlock = (blockId, updates) => {
         updateBlockHandler(blockId, updates);
-    };    // RP Compliance validation function
-    const validateProgram = (blocksToValidate = blocks) => {
+    };
+
+    // RP Compliance validation function
+    const validateProgram = useCallback((blocksToValidate = blocks) => {
         const results = {
             blockSequence: { status: 'pass', message: 'Phase potentiation follows' },
             deloadTiming: { status: 'pass', message: 'Scheduled within 6 weeks' },
@@ -482,7 +480,7 @@ export default function Macrocycle() {
 
         setValidationResults(results);
         debugLog('Program Validation', results);
-    };
+    }, [blocks]);
 
     // Calculate block volume based on RP methodology
     const calculateBlockVolume = (block, muscle, userMEV = 12, userMRV = 20) => {
@@ -510,12 +508,13 @@ export default function Macrocycle() {
                 }
                 break;
 
-            case 'maintained': // Conservative approach (MEV + 20%)
+            case 'maintained': { // Conservative approach (MEV + 20%)
                 const conservativeVolume = Math.round(adjustedMEV * 1.2);
                 weeklyVolumes = Array(weeks).fill(conservativeVolume);
                 break;
+            }
 
-            case 'tapering': // Aggressive approach (MRV - 10%)
+            case 'tapering': { // Aggressive approach (MRV - 10%)
                 const aggressiveVolume = Math.round(adjustedMRV * 0.9);
                 for (let week = 1; week <= weeks; week++) {
                     const taperProgress = (week - 1) / (weeks - 1);
@@ -523,13 +522,16 @@ export default function Macrocycle() {
                     weeklyVolumes.push(Math.round(volume));
                 }
                 break;
+            }
 
-            default: // Standard progression
+            default: {// Standard progression
                 for (let week = 1; week <= weeks; week++) {
                     const progress = (week - 1) / (weeks - 1);
                     const volume = adjustedMEV + (progress * (adjustedMRV - adjustedMEV));
                     weeklyVolumes.push(Math.round(volume));
                 }
+                break;
+            }
         }
 
         debugLog('Volume Calculation', {
@@ -756,54 +758,7 @@ export default function Macrocycle() {
         return weeklyRIR;
     };
 
-    // Auto-update RIR progression when block properties change
-    const updateBlockWithRIRProgression = (blockId, updates) => {
-        setBlocks(prevBlocks => {
-            const updatedBlocks = prevBlocks.map(block => {
-                if (block.id === blockId) {
-                    const updatedBlock = { ...block, ...updates };
 
-                    // Check if we need to regenerate RIR progression
-                    const needsRIRUpdate =
-                        updates.type !== undefined ||
-                        updates.weeks !== undefined ||
-                        updates.duration !== undefined ||
-                        (updates.intensityStrategy && updates.intensityStrategy.progression !== undefined);
-
-                    if (needsRIRUpdate) {
-                        const newRIRProgression = getRIRProgression(
-                            updatedBlock.type,
-                            updatedBlock.weeks || updatedBlock.duration,
-                            updatedBlock.intensityStrategy?.progression || 'gradual'
-                        );
-
-                        updatedBlock.rirProgression = newRIRProgression;
-
-                        debugLog('Auto-Updated RIR Progression', {
-                            blockId,
-                            blockName: updatedBlock.name,
-                            newRIRProgression
-                        });
-                    }
-
-                    return updatedBlock;
-                }
-                return block;
-            });
-
-            // Trigger validation after block update
-            validateProgram(updatedBlocks);
-
-            // Run detailed sequence validation
-            const sequenceValidation = validateBlockSequence(updatedBlocks);
-            if (!sequenceValidation.isValid) {
-                debugLog('Validation Errors', sequenceValidation.errors);
-            }
-
-            debugLog('Block Updated with RIR Auto-Update', { blockId, updates, updatedBlocks });
-            return updatedBlocks;
-        });
-    };
 
     // Run initial validation and RIR progression setup
     useEffect(() => {
@@ -844,7 +799,7 @@ export default function Macrocycle() {
 
             return updatedBlocks;
         });
-    }, []);
+    }, [validateProgram]);
 
     // Drag and Drop Handler
     function handleDragEnd(event) {

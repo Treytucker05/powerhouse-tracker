@@ -1,4 +1,4 @@
-export default function DashboardCard({ children, className = "", variant = "default" }) {
+export default function DashboardCard({ children, className = "" }) {
   const baseClasses = [
     'bg-surface border border-white/10 hover:border-brand',
     'rounded-[1rem] p-6 shadow-insetCard hover:shadow-cardHover',

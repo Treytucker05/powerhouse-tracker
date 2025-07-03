@@ -285,7 +285,7 @@ export const calculatePhaseDuration = (phase, trainingAge = 'intermediate', goal
 };
 
 // Updated RIR Progression with Compound/Isolation Modifiers (2024-25 Research)
-export const calculateRIRProgression = (weeks, exerciseType = 'compound', baseRIR = 4) => {
+export const calculateRIRProgression = (weeks, exerciseType = 'compound') => {
   const scheme = RIR_SCHEMES[Math.min(weeks, 6)] || RIR_SCHEMES[4];
 
   // Compound exercises get +0.5 RIR modifier for safety

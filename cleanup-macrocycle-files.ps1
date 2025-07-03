@@ -28,7 +28,7 @@ Write-Host "📁 Created archive directory: $ARCHIVE_DIR" -ForegroundColor Green
 Write-Host ""
 
 # Function to safely archive a file
-function Archive-File {
+function Move-FileToArchive {
     param($FilePath)
     
     if (Test-Path $FilePath) {
@@ -48,7 +48,7 @@ Write-Host "🗂️  Archiving legacy macrocycle files..." -ForegroundColor Cyan
 Write-Host "----------------------------------------" -ForegroundColor Cyan
 
 foreach ($file in $LEGACY_FILES) {
-    Archive-File -FilePath $file
+    Move-FileToArchive -FilePath $file
 }
 
 Write-Host ""
