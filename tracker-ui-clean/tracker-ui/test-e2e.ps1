@@ -5,13 +5,13 @@ Write-Host "Building application..." -ForegroundColor Green
 pnpm run build
 
 Write-Host "Starting preview server..." -ForegroundColor Green
-$previewJob = Start-Job -ScriptBlock { npx vite preview --port 5173 }
+$previewJob = Start-Job -ScriptBlock { pnpm vite preview --port 5173 }
 
 Write-Host "Waiting for server to start..." -ForegroundColor Yellow
 Start-Sleep 8
 
 Write-Host "Running Playwright tests..." -ForegroundColor Green
-npx playwright test
+pnpm playwright test
 
 Write-Host "Stopping preview server..." -ForegroundColor Yellow
 Stop-Job $previewJob
