@@ -10,6 +10,8 @@
     "test": "vitest",
     "test:unit": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "test:progressive": "node test-runner.mjs",
+    "test:quick": "node test-checker.mjs",
     "lint": "eslint \"src/**/*.{js,jsx}\"",
     "lint:ci": "eslint \"src/**/*.{js,jsx}\" --max-warnings 0"
   },

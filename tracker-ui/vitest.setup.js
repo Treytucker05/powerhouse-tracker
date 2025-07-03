@@ -2,12 +2,16 @@ import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 import React from 'react';
 
+console.log('🧪 Vitest setup starting...');
+
 /* ----- extra browser shims for legacy suites ----- */
 if (!global.window) {
+  console.log('🌐 Setting up JSDOM environment...');
   const { JSDOM } = await import('jsdom')
   const { window } = new JSDOM('', { url: 'http://localhost/' })
   global.window = window
   global.document = window.document
+  console.log('✅ JSDOM environment ready');
 }
 
 global.document ||= global.window?.document
@@ -22,6 +26,8 @@ globalThis.document = globalThis.document || {
 };
 globalThis.navigator = globalThis.navigator || { userAgent: 'test' };
 globalThis.React = React;
+
+console.log('🎭 Setting up test polyfills...');
 
 // ResizeObserver polyfill for Recharts
 class ResizeObserver {
@@ -53,13 +59,22 @@ import { render } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 
+console.log('⚛️ Setting up React Testing Library...');
+
 // Create a test wrapper with QueryClient provider
 function TestWrapper({ children }) {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
         retry: false,
+        staleTime: 0,
+        gcTime: 0,
       },
+    },
+    logger: {
+      log: () => { },
+      warn: () => { },
+      error: () => { },
     },
   });
 
@@ -71,8 +86,11 @@ function TestWrapper({ children }) {
 }
 
 global.renderWithProviders = function (ui, options = {}) {
+  console.log('🎨 Rendering component with providers...');
   return render(ui, {
     wrapper: TestWrapper,
     ...options
   });
 };
+
+console.log('✅ Vitest setup complete!');
