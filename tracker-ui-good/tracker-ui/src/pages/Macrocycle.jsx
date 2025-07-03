@@ -37,6 +37,25 @@ const debugLog = (category, data, level = 'info') => {
     console.log(`🔍 [${category}]`, data);
 };
 
+// UI Style Constants - Use these for consistent theming
+const BUTTON_STYLES = {
+    primary: "bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 font-medium",
+    secondary: "bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded transition-colors duration-200",
+    danger: "bg-red-700 hover:bg-red-800 text-white px-4 py-2 rounded-lg transition-colors duration-200 font-medium",
+};
+
+const CONTAINER_STYLES = {
+    formField: "bg-red-600 rounded p-3",
+    card: "bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-8 shadow-2xl",
+    input: "w-full bg-white text-black px-2 py-1 rounded text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500",
+};
+
+const TEXT_STYLES = {
+    label: "block text-xs text-white mb-1",
+    title: "text-3xl font-bold text-white mb-2",
+    subtitle: "text-gray-400",
+};
+
 export default function Macrocycle() {
     const location = useLocation();
     const navigate = useNavigate();
@@ -934,7 +953,7 @@ export default function Macrocycle() {
                     <div
                         {...attributes}
                         {...listeners}
-                        className="absolute top-2 right-2 bg-gray-700/50 rounded p-1 text-gray-400 hover:text-white transition-colors z-10 cursor-grab active:cursor-grabbing"
+                        className="absolute top-2 right-2 bg-red-600 rounded p-1 text-white hover:text-gray-200 transition-colors z-10 cursor-grab active:cursor-grabbing"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1202,7 +1221,7 @@ export default function Macrocycle() {
                             <div className="flex gap-3">
                                 <button
                                     onClick={addBlock}
-                                    className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 font-medium"
+                                    className={`flex items-center gap-2 ${BUTTON_STYLES.primary}`}
                                 >
                                     <span className="text-lg">+</span>
                                     Add Block
@@ -1210,7 +1229,7 @@ export default function Macrocycle() {
                                 {blocks.length > 1 && (
                                     <button
                                         onClick={() => deleteBlock(selectedBlockId)}
-                                        className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors duration-200 font-medium"
+                                        className={`flex items-center gap-2 ${BUTTON_STYLES.danger}`}
                                     >
                                         <span className="text-lg">×</span>
                                         Delete Selected
@@ -1268,8 +1287,8 @@ export default function Macrocycle() {
                                         <div className="mb-6">
                                             <h4 className="text-lg font-semibold text-white mb-3">Block Configuration</h4>
                                             <div className="grid grid-cols-2 gap-3">
-                                                <div className="bg-gray-700/50 rounded p-3">
-                                                    <label className="block text-xs text-gray-400 mb-1">Block Type</label>
+                                                <div className="bg-red-600 rounded p-3">
+                                                    <label className="block text-xs text-white mb-1">Block Type</label>
                                                     <select
                                                         value={selectedBlock.type}
                                                         onChange={(e) => updateBlock(selectedBlock.id, {
@@ -1283,8 +1302,8 @@ export default function Macrocycle() {
                                                         <option value="deload">Deload</option>
                                                     </select>
                                                 </div>
-                                                <div className="bg-gray-700/50 rounded p-3">
-                                                    <label className="block text-xs text-gray-400 mb-1">Duration (weeks)</label>
+                                                <div className="bg-red-600 rounded p-3">
+                                                    <label className="block text-xs text-white mb-1">Duration (weeks)</label>
                                                     <input
                                                         type="number"
                                                         min="1"
@@ -1304,8 +1323,8 @@ export default function Macrocycle() {
                                         <div className="mb-6">
                                             <h4 className="text-lg font-semibold text-white mb-3">Volume Strategy</h4>
                                             <div className="grid grid-cols-2 gap-3">
-                                                <div className="bg-gray-700/50 rounded p-3">
-                                                    <label className="block text-xs text-gray-400 mb-1">Starting Sets</label>
+                                                <div className="bg-red-600 rounded p-3">
+                                                    <label className="block text-xs text-white mb-1">Starting Sets</label>
                                                     <input
                                                         type="number"
                                                         value={selectedBlock.volumeStrategy.startingSets}
@@ -1318,8 +1337,8 @@ export default function Macrocycle() {
                                                         className="w-full bg-white text-black px-2 py-1 rounded text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-500"
                                                     />
                                                 </div>
-                                                <div className="bg-gray-700/50 rounded p-3">
-                                                    <label className="block text-xs text-gray-400 mb-1">Peak Sets</label>
+                                                <div className="bg-red-600 rounded p-3">
+                                                    <label className="block text-xs text-white mb-1">Peak Sets</label>
                                                     <input
                                                         type="number"
                                                         value={selectedBlock.volumeStrategy.peakSets}
@@ -1339,8 +1358,8 @@ export default function Macrocycle() {
                                         <div className="mb-6">
                                             <h4 className="text-lg font-semibold text-white mb-3">Intensity Strategy</h4>
                                             <div className="grid grid-cols-3 gap-3">
-                                                <div className="bg-gray-700/50 rounded p-3 col-span-3">
-                                                    <label className="block text-xs text-gray-400 mb-1">Progression Strategy</label>
+                                                <div className="bg-red-600 rounded p-3 col-span-3">
+                                                    <label className="block text-xs text-white mb-1">Progression Strategy</label>
                                                     <select
                                                         value={selectedBlock.intensityStrategy.progression}
                                                         onChange={(e) => updateBlock(selectedBlock.id, {
@@ -1358,8 +1377,8 @@ export default function Macrocycle() {
                                                         <option value="peak">Peak</option>
                                                     </select>
                                                 </div>
-                                                <div className="bg-gray-700/50 rounded p-3">
-                                                    <label className="block text-xs text-gray-400 mb-1">RPE Range</label>
+                                                <div className="bg-red-600 rounded p-3">
+                                                    <label className="block text-xs text-white mb-1">RPE Range</label>
                                                     <div className="flex space-x-2">
                                                         <input
                                                             type="number"
@@ -1390,8 +1409,8 @@ export default function Macrocycle() {
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="bg-gray-700/50 rounded p-3">
-                                                    <label className="block text-xs text-gray-400 mb-1">Load Range (%)</label>
+                                                <div className="bg-red-600 rounded p-3">
+                                                    <label className="block text-xs text-white mb-1">Load Range (%)</label>
                                                     <div className="flex space-x-2">
                                                         <input
                                                             type="number"
@@ -1451,8 +1470,8 @@ export default function Macrocycle() {
                                             </div>
                                             <div className="grid grid-cols-4 gap-2">
                                                 {Object.entries(selectedBlock.rirProgression).map(([week, rir]) => (
-                                                    <div key={week} className="bg-gray-700/50 rounded p-2 text-center">
-                                                        <label className="block text-xs text-gray-400 mb-1 capitalize">{week}</label>
+                                                    <div key={week} className="bg-red-600 rounded p-2 text-center">
+                                                        <label className="block text-xs text-white mb-1 capitalize">{week}</label>
                                                         <input
                                                             type="number"
                                                             min="0"
