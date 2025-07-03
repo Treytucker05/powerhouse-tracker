@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import supabase from '../lib/supabaseClient';
-import { useTrainingState } from '../context/trainingStateContext';
+import { useTrainingState } from '../context/trainingStateHooks';
 
 export function useWorkoutSessions() {
   const [sessions, setSessions] = useState([]);
@@ -13,7 +13,7 @@ export function useWorkoutSessions() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const { data, error } = await supabase
         .from('workout_sessions')
         .select(`
@@ -33,7 +33,7 @@ export function useWorkoutSessions() {
         .order('started_at', { ascending: false });
 
       if (error) throw error;
-      
+
       setSessions(data || []);
       return data;
     } catch (err) {
@@ -50,7 +50,7 @@ export function useWorkoutSessions() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const { data, error } = await supabase
         .from('workout_sessions')
         .insert([{
@@ -65,7 +65,7 @@ export function useWorkoutSessions() {
         .single();
 
       if (error) throw error;
-      
+
       setSessions(prev => [data, ...prev]);
       return data;
     } catch (err) {
@@ -82,7 +82,7 @@ export function useWorkoutSessions() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const { data, error } = await supabase
         .from('workout_sessions')
         .update(updates)
@@ -91,11 +91,11 @@ export function useWorkoutSessions() {
         .single();
 
       if (error) throw error;
-      
-      setSessions(prev => prev.map(session => 
+
+      setSessions(prev => prev.map(session =>
         session.id === sessionId ? { ...session, ...data } : session
       ));
-      
+
       return data;
     } catch (err) {
       setError(err.message);
@@ -111,7 +111,7 @@ export function useWorkoutSessions() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const { data, error } = await supabase
         .from('workout_sessions')
         .update({
@@ -127,11 +127,11 @@ export function useWorkoutSessions() {
         .single();
 
       if (error) throw error;
-      
-      setSessions(prev => prev.map(session => 
+
+      setSessions(prev => prev.map(session =>
         session.id === sessionId ? { ...session, ...data } : session
       ));
-      
+
       return data;
     } catch (err) {
       setError(err.message);
@@ -147,13 +147,13 @@ export function useWorkoutSessions() {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Delete associated sets first
       await supabase
         .from('workout_sets')
         .delete()
         .eq('session_id', sessionId);
-      
+
       // Delete the session
       const { error } = await supabase
         .from('workout_sessions')
@@ -161,7 +161,7 @@ export function useWorkoutSessions() {
         .eq('id', sessionId);
 
       if (error) throw error;
-      
+
       setSessions(prev => prev.filter(session => session.id !== sessionId));
       return true;
     } catch (err) {
@@ -178,7 +178,7 @@ export function useWorkoutSessions() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const { data, error } = await supabase
         .from('workout_sets')
         .insert([{
@@ -196,7 +196,7 @@ export function useWorkoutSessions() {
         .single();
 
       if (error) throw error;
-      
+
       // Update the session with the new set
       setSessions(prev => prev.map(session => {
         if (session.id === sessionId) {
@@ -207,7 +207,7 @@ export function useWorkoutSessions() {
         }
         return session;
       }));
-      
+
       return data;
     } catch (err) {
       setError(err.message);
@@ -223,7 +223,7 @@ export function useWorkoutSessions() {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Find the most recent set for this session
       const { data: lastSet, error: fetchError } = await supabase
         .from('workout_sets')
@@ -234,7 +234,7 @@ export function useWorkoutSessions() {
         .single();
 
       if (fetchError) throw fetchError;
-      
+
       // Delete the last set
       const { error: deleteError } = await supabase
         .from('workout_sets')
@@ -242,7 +242,7 @@ export function useWorkoutSessions() {
         .eq('id', lastSet.id);
 
       if (deleteError) throw deleteError;
-      
+
       // Update local state
       setSessions(prev => prev.map(session => {
         if (session.id === sessionId) {
@@ -253,7 +253,7 @@ export function useWorkoutSessions() {
         }
         return session;
       }));
-      
+
       return true;
     } catch (err) {
       setError(err.message);
@@ -268,13 +268,13 @@ export function useWorkoutSessions() {
   const getSessionStats = (sessionId) => {
     const session = sessions.find(s => s.id === sessionId);
     if (!session || !session.workout_sets) return null;
-    
+
     const sets = session.workout_sets;
     const totalVolume = sets.reduce((sum, set) => sum + (set.weight * set.reps), 0);
     const totalSets = sets.length;
     const exerciseCount = new Set(sets.map(set => set.exercise_name)).size;
     const avgRIR = sets.length > 0 ? sets.reduce((sum, set) => sum + set.rir, 0) / sets.length : 0;
-    
+
     return {
       totalVolume,
       totalSets,
@@ -286,12 +286,12 @@ export function useWorkoutSessions() {
 
   // Get weekly volume by muscle group
   const getWeeklyVolume = (weekNumber) => {
-    const weekSessions = sessions.filter(session => 
+    const weekSessions = sessions.filter(session =>
       session.mesocycle_week === weekNumber && session.status === 'completed'
     );
-    
+
     const volumeByMuscle = {};
-    
+
     weekSessions.forEach(session => {
       session.workout_sets?.forEach(set => {
         const muscle = set.muscle_group;
@@ -299,7 +299,7 @@ export function useWorkoutSessions() {
         volumeByMuscle[muscle] = (volumeByMuscle[muscle] || 0) + volume;
       });
     });
-    
+
     return volumeByMuscle;
   };
 

@@ -6,28 +6,28 @@ import React from 'react';
 if (!global.window) {
   const { JSDOM } = await import('jsdom')
   const { window } = new JSDOM('', { url: 'http://localhost/' })
-  global.window   = window
+  global.window = window
   global.document = window.document
 }
 
 global.document ||= global.window?.document
-global.React    ||= (await import('react')).default
+global.React ||= (await import('react')).default
 
 // Global stubs for DOM APIs and React
 globalThis.window = globalThis.window || global;
 globalThis.document = globalThis.document || {
   getElementById: () => null,
-  createElement: () => ({ appendChild: () => {}, style: {} }),
-  body: { appendChild: () => {} }
+  createElement: () => ({ appendChild: () => { }, style: {} }),
+  body: { appendChild: () => { } }
 };
 globalThis.navigator = globalThis.navigator || { userAgent: 'test' };
 globalThis.React = React;
 
 // ResizeObserver polyfill for Recharts
 class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+  observe() { }
+  unobserve() { }
+  disconnect() { }
 }
 global.ResizeObserver = ResizeObserver
 
@@ -47,3 +47,13 @@ for (const k of supaKeys)
 import { expect } from 'vitest';
 import * as matchers from '@testing-library/jest-dom/matchers';
 expect.extend(matchers);
+
+// Add renderWithProviders helper function
+import { render } from '@testing-library/react';
+
+global.renderWithProviders = function (ui, options = {}) {
+  return render(ui, {
+    wrapper: ({ children }) => children,
+    ...options
+  });
+};
