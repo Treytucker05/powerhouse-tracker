@@ -1,5 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
 import { renderWithProviders, createTestQueryClient } from './test-utils';
 
 // Simple smoke test that should run in under 1 second

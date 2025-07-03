@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
 import {
@@ -164,7 +164,7 @@ ProgramForm.displayName = 'ProgramForm';
 // Move ProgramBuilder outside Program component to prevent re-creation
 const ProgramBuilder = memo(({
   programData, setProgramData, selectedLevel, error, setError, isLoading,
-  saveProgram, setActiveTab, handleSetProgramData
+  saveProgram, setActiveTab
 }) => {
   return (
     <div className="space-y-6">
@@ -209,11 +209,6 @@ const Program = memo(() => {
     trainingDays: 4,
     selectedTemplate: null
   });
-
-  // Stable functions to prevent re-renders
-  const handleSetProgramData = useCallback((newData) => {
-    setProgramData(prev => ({ ...prev, ...newData }));
-  }, []); // Remove programData from dependencies!
 
   const handleSetError = useCallback((error) => {
     setError(error);
@@ -491,8 +486,8 @@ const Program = memo(() => {
             <div
               key={level.id}
               className={`bg-gray-800 rounded-lg p-6 border-2 cursor-pointer transition-all ${selectedLevel === level.id
-                  ? 'border-red-500 bg-gray-700'
-                  : 'border-gray-600 hover:border-gray-500'
+                ? 'border-red-500 bg-gray-700'
+                : 'border-gray-600 hover:border-gray-500'
                 }`}
               onClick={() => setSelectedLevel(level.id)}
             >
@@ -854,8 +849,8 @@ const Program = memo(() => {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center space-x-2 px-4 py-2 rounded transition-colors text-black ${activeTab === tab.id
-                  ? 'bg-red-600'
-                  : 'bg-gray-700 hover:bg-gray-600'
+                ? 'bg-red-600'
+                : 'bg-gray-700 hover:bg-gray-600'
                 }`}
             >
               <span>{tab.icon}</span>
@@ -878,7 +873,6 @@ const Program = memo(() => {
             isLoading={isLoading}
             saveProgram={saveProgram}
             setActiveTab={handleSetActiveTab}
-            handleSetProgramData={handleSetProgramData}
           />
         </div>
         <div className={activeTab === 'calculator' ? 'block' : 'hidden'}>

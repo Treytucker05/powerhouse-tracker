@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { useReducer, useEffect, useContext } from 'react';
 import { TrainingStateContext } from './TrainingStateContext';
 import { TRAINING_ACTIONS } from './trainingActions';
@@ -10,7 +11,7 @@ const initialState = {
   programDays: null,
   programSplit: null,
   sessionTime: null,
-  
+
   // Volume Landmarks
   volumeLandmarks: {
     chest: { mv: 0, mev: 0, mav: 0, mrv: 0 },
@@ -20,7 +21,7 @@ const initialState = {
     legs: { mv: 0, mev: 0, mav: 0, mrv: 0 },
     abs: { mv: 0, mev: 0, mav: 0, mrv: 0 }
   },
-  
+
   // Mesocycle Planning
   currentMesocycle: {
     length: null,
@@ -30,7 +31,7 @@ const initialState = {
     phase: 'accumulation',
     trainingGoal: null
   },
-  
+
   // Weekly Programming
   weeklyProgram: {
     sessions: [],
@@ -39,7 +40,7 @@ const initialState = {
     actualVolume: {},
     weeklyProgress: {}
   },
-  
+
   // Daily Execution
   currentWorkout: {
     sessionId: null,
@@ -49,7 +50,7 @@ const initialState = {
     isActive: false,
     completedSets: []
   },
-  
+
   // Deload Analysis
   deloadData: {
     lastAnalysis: null,
@@ -57,7 +58,7 @@ const initialState = {
     recommendedAction: null,
     nextDeloadWeek: null
   },
-  
+
   // Intelligence Layer
   intelligence: {
     isInitialized: false,
@@ -66,7 +67,7 @@ const initialState = {
     performanceMetrics: {},
     lastOptimization: null
   },
-  
+
   // Data Export/Import
   dataManagement: {
     lastExport: null,
@@ -74,7 +75,7 @@ const initialState = {
     autoBackupEnabled: false,
     exportHistory: []
   },
-  
+
   // UI State
   ui: {
     activePhase: 1,
@@ -93,13 +94,13 @@ function trainingStateReducer(state, action) {
         currentPreset: action.payload.preset,
         volumeLandmarks: action.payload.landmarks || state.volumeLandmarks
       };
-      
+
     case TRAINING_ACTIONS.UPDATE_PROFILE:
       return {
         ...state,
         ...action.payload
       };
-      
+
     case TRAINING_ACTIONS.UPDATE_VOLUME_LANDMARKS:
       return {
         ...state,
@@ -108,7 +109,7 @@ function trainingStateReducer(state, action) {
           ...action.payload
         }
       };
-      
+
     case TRAINING_ACTIONS.SAVE_VOLUME_LANDMARKS:
       return {
         ...state,
@@ -121,7 +122,7 @@ function trainingStateReducer(state, action) {
           ]
         }
       };
-      
+
     case TRAINING_ACTIONS.SETUP_MESOCYCLE:
       return {
         ...state,
@@ -132,7 +133,7 @@ function trainingStateReducer(state, action) {
           endDate: new Date(Date.now() + (action.payload.length * 7 * 24 * 60 * 60 * 1000)).toISOString()
         }
       };
-      
+
     case TRAINING_ACTIONS.START_WORKOUT:
       return {
         ...state,
@@ -144,14 +145,14 @@ function trainingStateReducer(state, action) {
           exercises: action.payload.exercises || []
         }
       };
-        case TRAINING_ACTIONS.LOG_SET:
+    case TRAINING_ACTIONS.LOG_SET:
       // Emit volume:updated event for other components to listen
       setTimeout(() => {
-        window.dispatchEvent(new CustomEvent('volume:updated', { 
-          detail: { setData: action.payload } 
+        window.dispatchEvent(new CustomEvent('volume:updated', {
+          detail: { setData: action.payload }
         }))
       }, 0)
-      
+
       return {
         ...state,
         currentWorkout: {
@@ -162,7 +163,7 @@ function trainingStateReducer(state, action) {
           ]
         }
       };
-      
+
     case TRAINING_ACTIONS.UNDO_SET:
       return {
         ...state,
@@ -171,7 +172,7 @@ function trainingStateReducer(state, action) {
           completedSets: state.currentWorkout.completedSets.slice(0, -1)
         }
       };
-      
+
     case TRAINING_ACTIONS.FINISH_WORKOUT:
       return {
         ...state,
@@ -189,7 +190,7 @@ function trainingStateReducer(state, action) {
           }
         }
       };
-      
+
     case TRAINING_ACTIONS.ANALYZE_DELOAD:
       return {
         ...state,
@@ -199,7 +200,7 @@ function trainingStateReducer(state, action) {
           ...action.payload
         }
       };
-      
+
     case TRAINING_ACTIONS.INITIALIZE_INTELLIGENCE:
       return {
         ...state,
@@ -209,7 +210,7 @@ function trainingStateReducer(state, action) {
           ...action.payload
         }
       };
-      
+
     case TRAINING_ACTIONS.SET_ACTIVE_PHASE:
       return {
         ...state,
@@ -218,7 +219,7 @@ function trainingStateReducer(state, action) {
           activePhase: action.payload
         }
       };
-      
+
     case TRAINING_ACTIONS.ADD_NOTIFICATION:
       return {
         ...state,
@@ -230,7 +231,7 @@ function trainingStateReducer(state, action) {
           ]
         }
       };
-      
+
     case TRAINING_ACTIONS.REMOVE_NOTIFICATION:
       return {
         ...state,
@@ -239,16 +240,16 @@ function trainingStateReducer(state, action) {
           notifications: state.ui.notifications.filter(n => n.id !== action.payload)
         }
       };
-      
+
     case TRAINING_ACTIONS.UPDATE_STATE:
       return {
         ...state,
         ...action.payload
       };
-      
+
     case TRAINING_ACTIONS.RESET_STATE:
       return initialState;
-      
+
     default:
       return state;
   }
@@ -257,7 +258,7 @@ function trainingStateReducer(state, action) {
 // Provider component
 export function TrainingStateProvider({ children }) {
   const [state, dispatch] = useReducer(trainingStateReducer, initialState);
-  
+
   // Sync with localStorage
   useEffect(() => {
     const savedState = localStorage.getItem('powerhouse-training-state');
@@ -270,94 +271,94 @@ export function TrainingStateProvider({ children }) {
       }
     }
   }, []);
-  
+
   // Save to localStorage on state changes
   useEffect(() => {
     localStorage.setItem('powerhouse-training-state', JSON.stringify(state));
   }, [state]);
-  
+
   // Sync with legacy global state for backward compatibility
   useEffect(() => {
     if (typeof window !== 'undefined') {
       window.trainingState = state;
     }
   }, [state]);
-  
+
   const value = {
     state,
     dispatch,
-    
+
     // Convenience action creators
     setPreset: (preset, landmarks) => dispatch({
       type: TRAINING_ACTIONS.SET_PRESET,
       payload: { preset, landmarks }
     }),
-    
+
     updateProfile: (profile) => dispatch({
       type: TRAINING_ACTIONS.UPDATE_PROFILE,
       payload: profile
     }),
-    
+
     updateVolumeLandmarks: (landmarks) => dispatch({
       type: TRAINING_ACTIONS.UPDATE_VOLUME_LANDMARKS,
       payload: landmarks
     }),
-    
+
     saveVolumeLandmarks: (landmarks) => dispatch({
       type: TRAINING_ACTIONS.SAVE_VOLUME_LANDMARKS,
       payload: landmarks
     }),
-    
+
     setupMesocycle: (config) => dispatch({
       type: TRAINING_ACTIONS.SETUP_MESOCYCLE,
       payload: config
     }),
-    
+
     startWorkout: (sessionId, exercises) => dispatch({
       type: TRAINING_ACTIONS.START_WORKOUT,
       payload: { sessionId, exercises }
     }),
-    
+
     logSet: (setData) => dispatch({
       type: TRAINING_ACTIONS.LOG_SET,
       payload: setData
     }),
-    
+
     undoSet: () => dispatch({
       type: TRAINING_ACTIONS.UNDO_SET
     }),
-    
+
     finishWorkout: (completedVolume) => dispatch({
       type: TRAINING_ACTIONS.FINISH_WORKOUT,
       payload: { completedVolume }
     }),
-    
+
     analyzeDeload: (analysis) => dispatch({
       type: TRAINING_ACTIONS.ANALYZE_DELOAD,
       payload: analysis
     }),
-    
+
     initializeIntelligence: (config) => dispatch({
       type: TRAINING_ACTIONS.INITIALIZE_INTELLIGENCE,
       payload: config
     }),
-    
+
     setActivePhase: (phase) => dispatch({
       type: TRAINING_ACTIONS.SET_ACTIVE_PHASE,
       payload: phase
     }),
-    
+
     addNotification: (notification) => dispatch({
       type: TRAINING_ACTIONS.ADD_NOTIFICATION,
       payload: notification
     }),
-    
+
     removeNotification: (id) => dispatch({
       type: TRAINING_ACTIONS.REMOVE_NOTIFICATION,
       payload: id
     })
   };
-  
+
   return (
     <TrainingStateContext.Provider value={value}>
       {children}
