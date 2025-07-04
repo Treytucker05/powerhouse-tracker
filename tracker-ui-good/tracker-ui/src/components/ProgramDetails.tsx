@@ -18,8 +18,14 @@ const ProgramDetails: React.FC = () => {
     // Handle next button click
     const handleNext = () => {
         if (canProceedToNextStep()) {
+            console.log('🔄 Proceeding to template selection...');
             dispatch({ type: 'SET_STEP', payload: 2 });
-            navigate('/program-design/template');
+
+            // Use setTimeout to ensure navigation happens after state updates
+            setTimeout(() => {
+                console.log('🔄 Navigating to template...');
+                navigate('/program-design/template');
+            }, 0);
         }
     };
 
@@ -59,8 +65,8 @@ const ProgramDetails: React.FC = () => {
                                     onChange={(e) => updateField('name', e.target.value)}
                                     placeholder="e.g., Summer Hypertrophy Program"
                                     className={`w-full px-4 py-3 bg-gray-800 border rounded-lg text-white focus:outline-none focus:ring-2 transition-colors ${nameError
-                                            ? 'border-red-500 focus:ring-red-500'
-                                            : 'border-gray-600 focus:ring-red-500 focus:border-transparent'
+                                        ? 'border-red-500 focus:ring-red-500'
+                                        : 'border-gray-600 focus:ring-red-500 focus:border-transparent'
                                         }`}
                                 />
                                 {nameError && (
@@ -233,8 +239,8 @@ const ProgramDetails: React.FC = () => {
                                 onClick={handleNext}
                                 disabled={!isFormValid}
                                 className={`px-8 py-3 rounded-lg font-semibold transition-all duration-200 ${isFormValid
-                                        ? 'bg-red-600 text-white hover:bg-red-700 transform hover:scale-105'
-                                        : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                    ? 'bg-red-600 text-white hover:bg-red-700 transform hover:scale-105'
+                                    : 'bg-gray-600 text-gray-400 cursor-not-allowed'
                                     }`}
                             >
                                 Next: Template Selection →
@@ -245,7 +251,7 @@ const ProgramDetails: React.FC = () => {
             </div>
 
             {/* Custom Slider Styles */}
-            <style jsx>{`
+            <style>{`
         .slider::-webkit-slider-thumb {
           appearance: none;
           height: 20px;

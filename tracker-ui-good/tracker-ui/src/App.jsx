@@ -16,6 +16,7 @@ const Program = lazy(() => import("./pages/Program.jsx"));
 const Analytics = lazy(() => import("./pages/Analytics.jsx"));
 const AuthPage = lazy(() => import("./pages/AuthPage.jsx"));
 const ProgramDetails = lazy(() => import('./components/ProgramDetails.tsx'));
+const TemplateSelection = lazy(() => import('./components/builder/TemplateSelection.tsx'));
 
 // Loading component
 const LoadingSpinner = () => (
@@ -46,8 +47,8 @@ function App() {
                 <Suspense fallback={<LoadingSpinner />}>
                   <Routes>
                     <Route index element={<ProgramDetails />} />
-                    <Route path="template" element={<div className="p-8 text-white">Template Selection - Coming Soon</div>} />
-                    <Route path="blocks" element={<div className="p-8 text-white">Block Configuration - Coming Soon</div>} />
+                    <Route path="template" element={<TemplateSelection />} />
+                    <Route path="timeline" element={<div className="p-8 text-white">Timeline & Blocks - Coming Soon</div>} />
                     <Route path="review" element={<div className="p-8 text-white">Review & Generate - Coming Soon</div>} />
                   </Routes>
                 </Suspense>
