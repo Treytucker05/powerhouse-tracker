@@ -1,13 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./index.html", "./src/**/*.{js,jsx}"],
-  darkMode: 'class',  theme: { 
+  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
+  darkMode: 'class',
+  theme: {
     extend: {
       colors: {
         primary: '#ff1a1a',     // bright red – filled buttons, highlights
-        accent:  '#c50505',     // deeper red – borders, hovers, nav underline
-        offwhite:'#f2f2f2',
-        black:   '#000000',
+        accent: '#c50505',     // deeper red – borders, hovers, nav underline
+        offwhite: '#f2f2f2',
+        black: '#000000',
         // Define full red color palette for Tailwind v4 compatibility
         red: {
           50: '#fef2f2',
@@ -86,7 +87,7 @@ module.exports = {
   safelist: [
     // Heatmap colors for volume visualization
     'bg-green-100',
-    'bg-green-200', 
+    'bg-green-200',
     'bg-green-300',
     'bg-green-400',
     'bg-green-500',
@@ -97,7 +98,7 @@ module.exports = {
     // Dark mode heatmap colors
     'dark:bg-green-100',
     'dark:bg-green-200',
-    'dark:bg-green-300', 
+    'dark:bg-green-300',
     'dark:bg-green-400',
     'dark:bg-green-500',
     'dark:bg-green-600',
@@ -134,7 +135,7 @@ module.exports = {
     'bg-yellow-800',
     'bg-yellow-900',
     'dark:bg-yellow-100',
-    'dark:bg-yellow-200', 
+    'dark:bg-yellow-200',
     'dark:bg-yellow-300',
     'dark:bg-yellow-400',
     'dark:bg-yellow-500',

@@ -1148,7 +1148,12 @@ export default function Macrocycle() {
                 <div className="mb-8">
                     <div className="flex items-center justify-between">
                         <button
-                            onClick={() => navigate('/program')}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                console.log('🔄 Back to Program Design clicked');
+                                navigate('/program');
+                            }}
                             className="px-4 py-2 rounded-lg transition-all duration-200 font-bold shadow-lg flex items-center space-x-2"
                             style={{
                                 background: 'linear-gradient(135deg, #dc2626, #b91c1c)',
