@@ -1,32 +1,61 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Suspense, lazy } from 'react';
 import AppShell from './layout/AppShell.jsx';
-import TrackingEnhanced from "./pages/TrackingEnhanced.jsx";
-import MesocycleEnhanced from "./pages/MesocycleEnhanced.jsx";
-import Microcycle from "./pages/MicrocycleNew.jsx";
-import Macrocycle from "./pages/Macrocycle.jsx";
-import Home from "./pages/Home.jsx";
-import Program from "./pages/Program.jsx";
-import Analytics from "./pages/Analytics.jsx";
-import AuthPage from "./pages/AuthPage.jsx";
+import { MacrocycleBuilderProvider } from './contexts/MacrocycleBuilderContext.tsx';
 import './App.css';
+
+// Lazy load page components for better code splitting
+const TrackingEnhanced = lazy(() => import("./pages/TrackingEnhanced.jsx"));
+const MesocycleEnhanced = lazy(() => import("./pages/MesocycleEnhanced.jsx"));
+const Microcycle = lazy(() => import("./pages/MicrocycleNew.jsx"));
+const Macrocycle = lazy(() => import("./pages/Macrocycle.jsx"));
+const Home = lazy(() => import("./pages/Home.jsx"));
+const Program = lazy(() => import("./pages/Program.jsx"));
+const Analytics = lazy(() => import("./pages/Analytics.jsx"));
+const AuthPage = lazy(() => import("./pages/AuthPage.jsx"));
+const ProgramDetails = lazy(() => import('./components/ProgramDetails.tsx'));
+
+// Loading component
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
+  </div>
+);
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/auth" element={<AuthPage />} />        <Route path="/" element={<AppShell />}>
-          <Route index element={<Home />} />
-          <Route path="program" element={<Program />} />
-          <Route path="tracking" element={<TrackingEnhanced />} />
-          <Route path="analytics" element={<Analytics />} />
-          <Route path="mesocycle" element={<MesocycleEnhanced />} />
-          <Route path="microcycle" element={<Microcycle />} />
-          <Route path="macrocycle" element={<Macrocycle />} />
-          <Route path="macrocycle/:id" element={<Macrocycle />} />
-        </Route>
-      </Routes>
+      <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/" element={<AppShell />}>
+            <Route index element={<Home />} />
+            <Route path="program" element={<Program />} />
+            <Route path="tracking" element={<TrackingEnhanced />} />
+            <Route path="analytics" element={<Analytics />} />
+            <Route path="mesocycle" element={<MesocycleEnhanced />} />
+            <Route path="microcycle" element={<Microcycle />} />
+            <Route path="macrocycle" element={<Macrocycle />} />
+            <Route path="macrocycle/:id" element={<Macrocycle />} />
+
+            {/* Program Design Builder Routes */}
+            <Route path="program-design/*" element={
+              <MacrocycleBuilderProvider>
+                <Suspense fallback={<LoadingSpinner />}>
+                  <Routes>
+                    <Route index element={<ProgramDetails />} />
+                    <Route path="template" element={<div className="p-8 text-white">Template Selection - Coming Soon</div>} />
+                    <Route path="blocks" element={<div className="p-8 text-white">Block Configuration - Coming Soon</div>} />
+                    <Route path="review" element={<div className="p-8 text-white">Review & Generate - Coming Soon</div>} />
+                  </Routes>
+                </Suspense>
+              </MacrocycleBuilderProvider>
+            } />
+          </Route>
+        </Routes>
+      </Suspense>
       <ToastContainer
         position="top-right"
         autoClose={3000}

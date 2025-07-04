@@ -37,28 +37,88 @@ All 35 button handlers are now implemented across 7 training phases:
 
 ## 🚀 Quick Start
 
+### Prerequisites
+This project uses **pnpm** as the package manager for better performance and workspace management. 
+
+#### First-time Setup (Required)
 ```bash
-# Install dependencies  
-pnpm install
+# Install latest Corepack and enable pnpm (one-time setup)
+npm install --global corepack@latest
+corepack enable pnpm
+corepack prepare pnpm@latest-10 --activate
+```
+
+### Installation & Development
+```bash
+# Clone the repository
+git clone <repository-url>
+cd tracker-ui-good
+
+# Install dependencies (uses pnpm workspaces)
+pnpm install --frozen-lockfile
+
+# Navigate to the React app
+cd tracker-ui
+
+# Start development server
+pnpm run dev
+
+# Run tests
+pnpm run test
+
+# Build for production
+pnpm run build
+
+# Lint code
+pnpm run lint
+```
+
+### Troubleshooting pnpm
+- **Command not found**: Run the prerequisites setup above
+- **Permission errors**: Use `corepack prepare pnpm@latest --activate` 
+- **Cache issues**: Run `pnpm store prune` to clean the store
+
+# Install React app dependencies
+pnpm install --frozen-lockfile
 
 # Verify everything works (build + tests + linting)
 pnpm run verify
 
-# Development server (opens on http://localhost:5173)
+# Start development server (opens on http://localhost:5173)
 pnpm run dev
 ```
 
 ### Development Commands
 ```bash
-# Run tests only
+# Available in tracker-ui/ directory
+
+# Run tests only  
 pnpm run test:unit
+
+# Run tests with coverage
+pnpm run test:unit --coverage
 
 # Build for production
 pnpm run build
 
-# Lint check
+# Lint check (fails on warnings)
 pnpm run lint:ci
+
+# Run E2E tests
+pnpm run test:e2e
+
+# Start dev server
+pnpm run dev
+
+# Preview production build
+pnpm run preview
 ```
+
+### Package Manager Notes
+- **pnpm workspaces** are configured for monorepo structure
+- Use `pnpm install --frozen-lockfile` for deterministic installs
+- The project is locked to `pnpm@9.15.0` via `packageManager` field
+- CI/CD uses Corepack for consistent pnpm setup
 
 ## 🟢 Node.js Usage
 
@@ -298,41 +358,92 @@ This implementation follows the Renaissance Periodization methodology as outline
 - **Charts not loading**: Verify the Chart.js bundle exists inside the `dist/` folder after running `npm run build`.
 - **Tests failing**: Run `npm test -- --verbose` to see detailed errors.
 
-## 🛠 Development Workflow
+## 🔧 Troubleshooting
 
-### Button Handler Management
+### pnpm Issues
 
-**Architecture:** Button handlers are defined in `js/ui/buttonHandlers.js` and exposed globally for both ES6 imports and legacy inline `onclick` handlers.
-
-**Key Files:**
-- `js/ui/buttonHandlers.js` - New handler implementations
-- `js/ui/globals.js` - Legacy handler mappings and imports
-- `js/ui/additionalHandlers.js` - Additional system handlers
-- `main.js` - Entry point with side-effect imports
-
-**Audit System:**
+#### pnpm command not found
 ```bash
-npm run audit  # Runs full button/handler audit pipeline
+# Solution: Install and enable via Corepack
+npm install --global corepack@latest
+corepack enable pnpm
+corepack prepare pnpm@latest-10 --activate
+
+# Verify installation
+pnpm --version
 ```
 
-**Handler Requirements:**
-1. Must be exposed on `window` object as `window.btnButtonId`
-2. Function source must not contain "TODO" or "stub" text
-3. Must have descriptive function name for debugging
-
-**Troubleshooting Missing Handlers:**
-1. Ensure function is exported from `buttonHandlers.js`
-2. Add to imports in `globals.js` 
-3. Verify no conflicting stubs in `additionalHandlers.js`
-4. Run `node scripts/debug-handlers.js` to inspect browser state
-5. Check order of imports in `main.js` (buttonHandlers should load early)
-
-### Testing
-
+#### Permission/Access Issues
 ```bash
-pnpm test                    # Run all Jest tests
-pnpm test handlers.test.js   # Test button handler exposure
+# Windows: Run as Administrator
+# macOS/Linux: Use proper Node.js permissions
+sudo corepack enable pnpm
+
+# Alternative: Use Node Version Manager (nvm)
+nvm use 20
+corepack enable pnpm
 ```
+
+#### Cache/Install Issues
+```bash
+# Clear pnpm cache
+pnpm store prune
+
+# Force clean install
+rm -rf node_modules pnpm-lock.yaml
+pnpm install --frozen-lockfile
+
+# Check pnpm store path
+pnpm store path
+```
+
+### Development Issues
+
+#### Build Fails
+- **Environment Variables**: Ensure `.env` has `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
+- **Dependencies**: Run `pnpm install --frozen-lockfile` to sync dependencies
+- **Node Version**: Use Node.js 20+ (`node --version`)
+
+#### Charts Not Loading
+- **Build Step**: Run `pnpm run build` to generate Chart.js bundle
+- **Import Path**: Verify chart components import from correct paths
+- **Browser Console**: Check for JavaScript errors in DevTools
+
+#### Tests Failing
+```bash
+# Run with verbose output
+pnpm test -- --verbose
+
+# Run specific test file
+pnpm test -- MacrocycleBuilder.test.jsx
+
+# Check test coverage
+pnpm run test:unit --coverage
+```
+
+#### TypeScript Errors
+```bash
+# Check TypeScript compilation
+pnpm run build
+
+# Lint TypeScript files
+pnpm run lint
+
+# Fix auto-fixable issues
+pnpm run lint --fix
+```
+
+### CI/CD Issues
+
+#### GitHub Actions Failing
+- **Workflow**: Uses Corepack setup for consistent pnpm version
+- **Cache**: pnpm store is cached using `pnpm-lock.yaml` hash
+- **Node Version**: Locked to Node.js 20 in workflow
+
+#### Package Manager Conflicts
+- **Only use pnpm**: Don't mix with npm or yarn
+- **Lock File**: Always commit `pnpm-lock.yaml`
+- **Version**: Project uses `pnpm@9.15.0` (see `packageManager` in package.json)
 
 ---
 
