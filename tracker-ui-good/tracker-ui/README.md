@@ -16,9 +16,34 @@ A modern React-based interface for the PowerHouse Training Tracker with Supabase
 
 ## Quick Start
 
+### Prerequisites
+This project uses **pnpm** for package management. Ensure you have it set up:
+
+```bash
+# One-time system setup (if not already done)
+npm install --global corepack@latest
+corepack enable pnpm
+corepack prepare pnpm@latest-10 --activate
+```
+
+### Development Setup
 ```bash
 # Install dependencies
-pnpm install
+pnpm install --frozen-lockfile
+
+# Start development server
+pnpm run dev
+
+# Run tests
+pnpm run test
+
+# Build for production
+pnpm run build
+
+# Lint and fix code
+pnpm run lint
+# Install dependencies (from tracker-ui directory)
+pnpm install --frozen-lockfile
 
 # Start development server
 pnpm run dev
@@ -28,6 +53,18 @@ pnpm run build
 
 # Preview production build
 pnpm run preview
+
+# Run tests
+pnpm run test
+
+# Run tests with coverage
+pnpm run test:unit
+
+# Run E2E tests
+pnpm run test:e2e
+
+# Lint code
+pnpm run lint
 ```
 
 ## Environment Setup
@@ -107,3 +144,22 @@ pnpm run lint        # Code linting
 ```
 
 See `E2E_TESTING.md` for detailed E2E testing information.
+
+## Troubleshooting
+
+### pnpm Issues
+- **Command not found**: Run `corepack enable pnpm` to activate pnpm
+- **Wrong version**: This project uses pnpm@9.15.0 (locked via `packageManager` field)
+- **Permission errors**: Make sure Corepack is properly installed: `npm install --global corepack@latest`
+- **Cache issues**: Clear pnpm cache with `pnpm store prune`
+
+### Build Issues
+- **Build fails**: Ensure `.env` variables `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set
+- **Charts not loading**: Verify the Chart.js bundle exists inside the `dist/` folder after running `pnpm run build`
+- **Tests failing**: Run `pnpm test -- --verbose` to see detailed errors
+- **Large bundle warning**: This is normal; we've optimized with code splitting in `vite.config.js`
+
+### Development
+- **Hot reload not working**: Try `pnpm run dev --force` to bypass cache
+- **TypeScript errors**: Run `pnpm run build` to see all type errors
+- **Linting failures**: Run `pnpm run lint` to see style issues

@@ -553,8 +553,12 @@ const Program = memo(() => {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    setSelectedLevel(level.id);
-                    setActiveTab('builder');
+                    if (level.id === 'macro') {
+                      navigate('/program-design');
+                    } else {
+                      setSelectedLevel(level.id);
+                      setActiveTab('builder');
+                    }
                   }}
                   className="w-full bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
                 >
