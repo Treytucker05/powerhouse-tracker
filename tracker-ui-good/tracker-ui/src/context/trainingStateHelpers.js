@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { TrainingStateContext } from './TrainingStateContext';
+import { TrainingStateContext } from './TrainingStateContext.jsx';
 
 // Custom hook
 export function useTrainingState() {

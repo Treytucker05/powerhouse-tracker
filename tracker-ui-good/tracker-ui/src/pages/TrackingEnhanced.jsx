@@ -4,7 +4,7 @@ import Drawer from "../components/Drawer";
 import SimpleVolumeChart from "../components/dashboard/SimpleVolumeChart";
 import TrainingStatusCard from "../components/dashboard/TrainingStatusCard";
 import MuscleCard from "../components/dashboard/MuscleCard";
-import { TrainingStateProvider } from "../context/trainingStateContext";
+import { TrainingStateProvider } from "../context/TrainingStateContext.jsx";
 import ErrorBoundary from "../components/ErrorBoundary";
 import Breadcrumb from "../components/navigation/Breadcrumb";
 import SectionDivider from "../components/ui/SectionDivider";
@@ -96,7 +96,7 @@ export default function Tracking() {
                   <TrainingStatusCard />
                 </div>
 
-                <SectionDivider 
+                <SectionDivider
                   title="Weekly Volume"
                   icon={ChartBarIcon}
                   gradient={true}
@@ -107,7 +107,7 @@ export default function Tracking() {
                   <SimpleVolumeChart data={volumeChartData} />
                 </div>
 
-                <SectionDivider 
+                <SectionDivider
                   title="Muscle Groups"
                   subtitle="Track volume across all 13 muscle groups with MEV, MAV, and MRV landmarks"
                   gradient={true}
@@ -134,7 +134,7 @@ export default function Tracking() {
           </div>
 
           {/* Floating Action Button */}
-          <FloatingActionButton 
+          <FloatingActionButton
             actions={[
               {
                 icon: PlayIcon,
