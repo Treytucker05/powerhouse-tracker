@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useTrainingState } from '../../context/trainingStateContext';
+import { useTrainingState } from '../../context/TrainingStateContext.jsx';
 
 export default function MesocycleBuilder() {
   const { state, setupMesocycle } = useTrainingState();
@@ -157,8 +157,8 @@ export default function MesocycleBuilder() {
           </label>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {focusOptions.map(option => (
-              <label 
-                key={option.value} 
+              <label
+                key={option.value}
                 style={{
                   display: 'flex',
                   alignItems: 'flex-start',
@@ -221,8 +221,8 @@ export default function MesocycleBuilder() {
           </label>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {phaseOptions.map(option => (
-              <label 
-                key={option.value} 
+              <label
+                key={option.value}
                 style={{
                   display: 'flex',
                   alignItems: 'flex-start',

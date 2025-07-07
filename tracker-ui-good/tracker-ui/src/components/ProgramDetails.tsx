@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBuilder } from '../contexts/MacrocycleBuilderContext';
+import { calculateMEV, calculateMRV } from '../lib/algorithms/rpAlgorithms';
+import { MEV_RANGES, MRV_RANGES } from '../constants/rpConstants';
 
 const ProgramDetails: React.FC = () => {
     const navigate = useNavigate();
@@ -32,6 +34,28 @@ const ProgramDetails: React.FC = () => {
     // Form validation
     const isFormValid = validateCurrentStep();
     const nameError = programDetails.name.length > 0 && (programDetails.name.length < 3 || programDetails.name.length > 50);
+
+    // RP Algorithm Integration
+    const [rpRecommendations, setRpRecommendations] = useState<Array<{ muscle: string, mev: any, mrv: any }> | null>(null);
+
+    // Calculate MEV/MRV when trainingExperience or dietPhase changes
+    useEffect(() => {
+        if (programDetails.trainingExperience && programDetails.dietPhase) {
+            const muscleGroups = ['chest', 'back', 'shoulders', 'arms', 'legs'];
+            const recommendations = muscleGroups.map(muscle => {
+                const mev = calculateMEV(muscle, programDetails.trainingExperience);
+                const mrv = calculateMRV(muscle, programDetails.trainingExperience);
+                return {
+                    muscle,
+                    mev,
+                    mrv
+                };
+            });
+            setRpRecommendations(recommendations);
+        } else {
+            setRpRecommendations(null);
+        }
+    }, [programDetails.trainingExperience, programDetails.dietPhase]);
 
     return (
         <div className="min-h-screen bg-black text-white py-8">
@@ -132,6 +156,36 @@ const ProgramDetails: React.FC = () => {
                                     ))}
                                 </div>
                             </div>
+
+                            {/* RP Volume Targets - Conditional Display */}
+                            {rpRecommendations && (
+                                <div className="bg-blue-900/20 border border-blue-600/30 rounded-lg p-6 mt-6">
+                                    <h3 className="text-xl font-semibold text-blue-300 mb-4 flex items-center">
+                                        <span className="w-2 h-2 bg-blue-400 rounded-full mr-3"></span>
+                                        Your RP Volume Targets
+                                    </h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        {rpRecommendations.map((rec) => (
+                                            <div key={rec.muscle} className="bg-blue-800/20 rounded-lg p-4">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-blue-200 font-medium capitalize">
+                                                        {rec.muscle}
+                                                    </span>
+                                                    <span className="text-blue-100 font-bold">
+                                                        {rec.mev}-{rec.mrv} sets/week
+                                                    </span>
+                                                </div>
+                                                <div className="text-xs text-blue-300/70 mt-1">
+                                                    MEV-MRV Range
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="mt-4 text-xs text-blue-300/60">
+                                        Based on your {programDetails.trainingExperience} experience level and {programDetails.dietPhase} diet phase
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Right Column */}

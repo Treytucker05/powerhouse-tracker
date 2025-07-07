@@ -1,12 +1,12 @@
 import CardWrapper from "../components/ui/CardWrapper";
 import MesocycleBuilder from "../components/dashboard/MesocycleBuilder";
-import { TrainingStateProvider } from "../context/trainingStateContext";
+import { TrainingStateProvider } from "../context/TrainingStateContext.jsx";
 import ErrorBoundary from "../components/ErrorBoundary";
 import "../components/dashboard/DashboardLayout.css";
 
 export default function Mesocycle() {
   const muscleGroups = ['Chest', 'Back', 'Shoulders', 'Arms', 'Legs', 'Core'];
-  
+
   const volumeLandmarks = {
     'Chest': { mev: 8, mav: 18, mrv: 22 },
     'Back': { mev: 10, mav: 20, mrv: 25 },
@@ -22,10 +22,10 @@ export default function Mesocycle() {
         <span className="text-gray-400 text-sm">Current: {landmarks.mav} sets</span>
       </div>
       <div className="relative">
-        <input 
-          type="range" 
-          min={landmarks.mev} 
-          max={landmarks.mrv} 
+        <input
+          type="range"
+          min={landmarks.mev}
+          max={landmarks.mrv}
           defaultValue={landmarks.mav}
           className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
         />
@@ -55,17 +55,17 @@ export default function Mesocycle() {
           <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
             <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
               {/* Volume Landmarks Configuration */}
-              <CardWrapper 
-                title="Volume Landmarks" 
+              <CardWrapper
+                title="Volume Landmarks"
                 subtitle="Configure MEV, MAV, and MRV for each muscle group"
                 className="lg:col-span-2"
               >
                 <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                   {muscleGroups.map(muscle => (
-                    <VolumeSlider 
-                      key={muscle} 
-                      muscle={muscle} 
-                      landmarks={volumeLandmarks[muscle]} 
+                    <VolumeSlider
+                      key={muscle}
+                      muscle={muscle}
+                      landmarks={volumeLandmarks[muscle]}
                     />
                   ))}
                 </div>
@@ -105,7 +105,7 @@ export default function Mesocycle() {
                         <h4 className="text-white font-medium">{muscle}</h4>
                         <div className="text-xs text-gray-500 dark:text-gray-400">sets/week</div>
                       </div>
-                      
+
                       <div className="grid grid-cols-3 gap-3">
                         <div>
                           <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">MEV</label>
@@ -146,7 +146,7 @@ export default function Mesocycle() {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                   Weekly Volume Progression
                 </h3>
-                
+
                 <div className="grid grid-cols-6 gap-4">
                   {Array.from({ length: 6 }, (_, weekIndex) => (
                     <div key={weekIndex} className="text-center">
@@ -180,7 +180,7 @@ export default function Mesocycle() {
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                   Deload Planning
                 </h3>
-                
+
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

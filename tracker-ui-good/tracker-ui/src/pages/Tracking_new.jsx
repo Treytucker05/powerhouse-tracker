@@ -12,7 +12,7 @@ import DeloadIndicator from "../components/dashboard/DeloadIndicator";
 import RecentWorkouts from "../components/dashboard/RecentWorkouts";
 import Header from "../components/dashboard/Header";
 import NavBar from "../components/dashboard/NavBar";
-import { TrainingStateProvider } from "../context/trainingStateContext";
+import { TrainingStateProvider } from "../context/TrainingStateContext.jsx";
 import ErrorBoundary from "../components/ErrorBoundary";
 import "../components/dashboard/DashboardLayout.css";
 
@@ -75,13 +75,13 @@ export default function Tracking() {
                   </thead>
                   <tbody>
                     {sessions.map(s => {
-                      const duration = s.end_time 
+                      const duration = s.end_time
                         ? Math.round((new Date(s.end_time) - new Date(s.start_time)) / (1000 * 60))
                         : null;
-                      
+
                       return (
                         <tr key={s.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors"
-                            onClick={() => setSelected(s)}>
+                          onClick={() => setSelected(s)}>
                           <td className="p-3 text-sm text-gray-900 dark:text-gray-100">
                             {new Date(s.start_time).toLocaleDateString()}
                           </td>
@@ -117,7 +117,7 @@ export default function Tracking() {
                   </div>
                 </div>
               )}
-              
+
               {sets.length === 0 && <p>No sets recorded for this session.</p>}
               {sets.length > 0 && (
                 <table className="min-w-full border">

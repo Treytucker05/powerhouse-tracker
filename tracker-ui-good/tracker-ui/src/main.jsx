@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import './index.css'
 import App from './App.jsx'
-import { TrainingStateProvider } from './context/trainingStateContext.jsx'
+import { TrainingStateProvider } from './context/TrainingStateContext.jsx'
 
 // Ensure dark mode is always enabled
 document.documentElement.classList.add('dark');

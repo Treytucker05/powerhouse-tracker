@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import CardWrapper from "../components/ui/CardWrapper";
 import MesocycleBuilder from "../components/dashboard/MesocycleBuilder";
-import { TrainingStateProvider } from "../context/trainingStateContext";
+import { TrainingStateProvider } from "../context/TrainingStateContext.jsx";
 import ErrorBoundary from "../components/ErrorBoundary";
 import Breadcrumb from "../components/navigation/Breadcrumb";
 import SectionDivider from "../components/ui/SectionDivider";
@@ -22,7 +22,7 @@ export default function Mesocycle() {
 
   // All muscles from the volume chart
   const muscleGroups = ['Chest', 'Back', 'Quads', 'Glutes', 'Hamstrings', 'Shoulders', 'Biceps', 'Triceps', 'Calves', 'Abs', 'Forearms', 'Neck', 'Traps'];
-  
+
   const volumeLandmarks = {
     'Chest': { mev: 8, mav: 18, mrv: 22 },
     'Back': { mev: 10, mav: 20, mrv: 25 },
@@ -37,9 +37,9 @@ export default function Mesocycle() {
     'Forearms': { mev: 4, mav: 4, mrv: 12 },
     'Neck': { mev: 2, mav: 3, mrv: 8 },
     'Traps': { mev: 4, mav: 4, mrv: 12 }
-  };  const VolumeSlider = ({ muscle, landmarks }) => {
+  }; const VolumeSlider = ({ muscle, landmarks }) => {
     const [currentValue, setCurrentValue] = useState(landmarks.mav);
-    
+
     const getSliderColor = (value) => {
       if (value < landmarks.mev) return '#dc2626'; // Red - below MEV
       if (value > landmarks.mrv) return '#dc2626'; // Red - above MRV
@@ -52,7 +52,7 @@ export default function Mesocycle() {
       const maxRange = Math.max(landmarks.mrv * 1.5, 30); // Allow 50% beyond MRV or minimum 30
       const mevPercent = (landmarks.mev / maxRange) * 100;
       const mrvPercent = (landmarks.mrv / maxRange) * 100;
-      
+
       return `linear-gradient(to right, 
         #dc2626 0%, 
         #dc2626 ${mevPercent}%, 
@@ -94,24 +94,24 @@ export default function Mesocycle() {
             textShadow: `0 0 8px ${sliderColor}`
           }}>Current: {currentValue} sets</span>
         </div>
-        <div style={{ position: 'relative' }}>          <input 
-            type="range" 
-            min={0} 
-            max={maxRange} 
-            value={currentValue}
-            style={{
-              width: '100%',
-              height: '12px',
-              background: getSliderBackground(currentValue),
-              borderRadius: '6px',
-              appearance: 'none',
-              cursor: 'pointer',
-              outline: 'none'
-            }}
-            onChange={(e) => {
-              setCurrentValue(parseInt(e.target.value));
-            }}
-          />
+        <div style={{ position: 'relative' }}>          <input
+          type="range"
+          min={0}
+          max={maxRange}
+          value={currentValue}
+          style={{
+            width: '100%',
+            height: '12px',
+            background: getSliderBackground(currentValue),
+            borderRadius: '6px',
+            appearance: 'none',
+            cursor: 'pointer',
+            outline: 'none'
+          }}
+          onChange={(e) => {
+            setCurrentValue(parseInt(e.target.value));
+          }}
+        />
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -119,21 +119,21 @@ export default function Mesocycle() {
             marginTop: '0.75rem',
             fontWeight: '600'
           }}>
-            <span style={{ 
-              color: '#eab308', 
+            <span style={{
+              color: '#eab308',
               fontWeight: 'bold',
               textShadow: '0 0 4px #eab308'
             }}>MEV: {landmarks.mev}</span>
-            <span style={{ 
-              color: currentValue >= landmarks.mev && currentValue <= landmarks.mrv ? '#22c55e' : '#dc2626', 
+            <span style={{
+              color: currentValue >= landmarks.mev && currentValue <= landmarks.mrv ? '#22c55e' : '#dc2626',
               fontWeight: 'bold',
               textTransform: 'uppercase',
               textShadow: `0 0 4px ${currentValue >= landmarks.mev && currentValue <= landmarks.mrv ? '#22c55e' : '#dc2626'}`
             }}>
               {currentValue >= landmarks.mev && currentValue <= landmarks.mrv ? 'OPTIMAL RANGE' : 'OUT OF RANGE'}
             </span>
-            <span style={{ 
-              color: '#dc2626', 
+            <span style={{
+              color: '#dc2626',
               fontWeight: 'bold',
               textShadow: '0 0 4px #dc2626'
             }}>MRV: {landmarks.mrv}</span>
@@ -229,10 +229,10 @@ export default function Mesocycle() {
                 gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))'
               }}>
                 {muscleGroups.map(muscle => (
-                  <VolumeSlider 
-                    key={muscle} 
-                    muscle={muscle} 
-                    landmarks={volumeLandmarks[muscle]} 
+                  <VolumeSlider
+                    key={muscle}
+                    muscle={muscle}
+                    landmarks={volumeLandmarks[muscle]}
                   />
                 ))}
               </div>
@@ -296,7 +296,7 @@ export default function Mesocycle() {
                     Weeks 1-3: Volume progression and work capacity building
                   </p>
                 </div>
-                
+
                 <div style={{
                   backgroundColor: 'rgba(234, 179, 8, 0.1)',
                   padding: '1.5rem',
@@ -321,7 +321,7 @@ export default function Mesocycle() {
                     Week 4: High intensity training with reduced volume
                   </p>
                 </div>
-                
+
                 <div style={{
                   backgroundColor: 'rgba(220, 38, 38, 0.1)',
                   padding: '1.5rem',

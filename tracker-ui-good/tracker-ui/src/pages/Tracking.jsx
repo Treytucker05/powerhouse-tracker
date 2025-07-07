@@ -4,7 +4,7 @@ import Drawer from "../components/Drawer";
 import SimpleVolumeChart from "../components/dashboard/SimpleVolumeChart";
 import TrainingStatusCard from "../components/dashboard/TrainingStatusCard";
 import MuscleCard from "../components/dashboard/MuscleCard";
-import { TrainingStateProvider } from "../context/trainingStateContext";
+import { TrainingStateProvider } from "../context/TrainingStateContext.jsx";
 import ErrorBoundary from "../components/ErrorBoundary";
 import Breadcrumb from "../components/navigation/Breadcrumb";
 import SectionDivider from "../components/ui/SectionDivider";
@@ -68,29 +68,29 @@ export default function Tracking() {
   return (
     <ErrorBoundary>
       <TrainingStateProvider>        <div className="space-y-8 max-w-7xl">
-          {/* Training Status Card */}
-          <TrainingStatusCard />
+        {/* Training Status Card */}
+        <TrainingStatusCard />
 
-          {/* Weekly Volume Tracker Chart */}
-          <SimpleVolumeChart data={volumeChartData} />
+        {/* Weekly Volume Tracker Chart */}
+        <SimpleVolumeChart data={volumeChartData} />
 
-          {/* Muscle Volume Cards Grid */}
-          <div className="card-powerhouse">
-            <h2 className="text-2xl font-bold text-red-600 mb-4">💪 Muscle Volume Tracking</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {muscleData.map((muscle, index) => (
-                <MuscleCard
-                  key={index}
-                  muscle={muscle.muscle}
-                  sets={muscle.sets}
-                  MEV={muscle.MEV}
-                  MAV={muscle.MAV}
-                  MRV={muscle.MRV}
-                />
-              ))}
-            </div>
+        {/* Muscle Volume Cards Grid */}
+        <div className="card-powerhouse">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">💪 Muscle Volume Tracking</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {muscleData.map((muscle, index) => (
+              <MuscleCard
+                key={index}
+                muscle={muscle.muscle}
+                sets={muscle.sets}
+                MEV={muscle.MEV}
+                MAV={muscle.MAV}
+                MRV={muscle.MRV}
+              />
+            ))}
           </div>
         </div>
+      </div>
       </TrainingStateProvider>
     </ErrorBoundary>
   );
