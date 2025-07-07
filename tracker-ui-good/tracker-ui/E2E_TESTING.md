@@ -31,17 +31,17 @@ To test the E2E setup locally:
 1. **Build the app**:
    ```bash
    cd tracker-ui
-   pnpm run build
+   npm run build
    ```
 
 2. **Start preview server** (in separate terminal):
    ```bash
-   pnpm vite preview --port 5173
+   npm run preview -- --port 5173
    ```
 
 3. **Run E2E tests**:
    ```bash
-   pnpm run test:e2e
+   npm run test:e2e
    ```
 
 4. **Alternative**: Use the provided scripts:

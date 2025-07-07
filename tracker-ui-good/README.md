@@ -38,15 +38,7 @@ All 35 button handlers are now implemented across 7 training phases:
 ## 🚀 Quick Start
 
 ### Prerequisites
-This project uses **pnpm** as the package manager for better performance and workspace management. 
-
-#### First-time Setup (Required)
-```bash
-# Install latest Corepack and enable pnpm (one-time setup)
-npm install --global corepack@latest
-corepack enable pnpm
-corepack prepare pnpm@latest-10 --activate
-```
+This project uses **npm** as the package manager. 
 
 ### Installation & Development
 ```bash
@@ -54,38 +46,34 @@ corepack prepare pnpm@latest-10 --activate
 git clone <repository-url>
 cd tracker-ui-good
 
-# Install dependencies (uses pnpm workspaces)
-pnpm install --frozen-lockfile
-
 # Navigate to the React app
 cd tracker-ui
 
+# Install dependencies
+npm install --legacy-peer-deps
+
 # Start development server
-pnpm run dev
+npm run dev
 
 # Run tests
-pnpm run test
+npm run test
 
 # Build for production
-pnpm run build
+npm run build
 
 # Lint code
-pnpm run lint
+npm run lint
 ```
 
-### Troubleshooting pnpm
-- **Command not found**: Run the prerequisites setup above
-- **Permission errors**: Use `corepack prepare pnpm@latest --activate` 
-- **Cache issues**: Run `pnpm store prune` to clean the store
+### Troubleshooting npm
+- **Permission errors**: Try clearing npm cache: `npm cache clean --force` 
+- **Dependency conflicts**: Use `npm install --legacy-peer-deps`
 
 # Install React app dependencies
-pnpm install --frozen-lockfile
+npm install --legacy-peer-deps
 
-# Verify everything works (build + tests + linting)
-pnpm run verify
-
-# Start development server (opens on http://localhost:5173)
-pnpm run dev
+# Start development server (opens on http://localhost:5174)
+npm run dev
 ```
 
 ### Development Commands
@@ -93,10 +81,10 @@ pnpm run dev
 # Available in tracker-ui/ directory
 
 # Run tests only  
-pnpm run test:unit
+npm run test
 
 # Run tests with coverage
-pnpm run test:unit --coverage
+npm test -- --coverage
 
 # Build for production
 pnpm run build

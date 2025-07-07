@@ -2,17 +2,17 @@
 # Run this to test the application end-to-end
 
 echo "Building application..."
-pnpm run build
+npm run build
 
 echo "Starting preview server..."
-pnpm vite preview --port 5173 &
+npm run preview -- --port 5173 &
 PREVIEW_PID=$!
 
 echo "Waiting for server to start..."
 sleep 5
 
 echo "Running Playwright tests..."
-pnpm playwright test
+npm run test:e2e
 
 echo "Stopping preview server..."
 kill $PREVIEW_PID
