@@ -50,7 +50,7 @@ function runSingleTest(testFile, timeout = 30000) {
         console.log(`\n${colors.yellow}📋 Running: ${colors.bright}${relative(process.cwd(), testFile)}${colors.reset}`);
 
         const startTime = Date.now();
-        const child = spawn('pnpm', ['exec', 'vitest', 'run', testFile, '--reporter=verbose'], {
+        const child = spawn('npm', ['run', 'test', '--', testFile, '--reporter=verbose'], {
             stdio: 'pipe',
             shell: true
         });

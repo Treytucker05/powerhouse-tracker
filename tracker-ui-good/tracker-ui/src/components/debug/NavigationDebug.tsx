@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-const NavigationDebug: React.FC = () => {
+const NavigationDebug = () => {
     const navigate = useNavigate();
     const location = useLocation();
 

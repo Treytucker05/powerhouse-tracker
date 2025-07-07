@@ -17,54 +17,47 @@ A modern React-based interface for the PowerHouse Training Tracker with Supabase
 ## Quick Start
 
 ### Prerequisites
-This project uses **pnpm** for package management. Ensure you have it set up:
-
-```bash
-# One-time system setup (if not already done)
-npm install --global corepack@latest
-corepack enable pnpm
-corepack prepare pnpm@latest-10 --activate
-```
+This project uses **npm** for package management. 
 
 ### Development Setup
+
+**Important**: All commands must be run from the `tracker-ui-good/tracker-ui/` directory.
+
 ```bash
+# Navigate to the correct directory first!
+cd tracker-ui-good/tracker-ui/
+
 # Install dependencies
-pnpm install --frozen-lockfile
+npm install --legacy-peer-deps
 
 # Start development server
-pnpm run dev
+npm run dev
 
-# Run tests
-pnpm run test
+# Automated setup (optional)
+# Run either setup script from tracker-ui directory:
+./setup.sh    # Linux/Mac
+setup.bat     # Windows
+```
 
-# Build for production
-pnpm run build
+**All subsequent commands assume you're in the `tracker-ui-good/tracker-ui/` directory:**
 
-# Lint and fix code
-pnpm run lint
-# Install dependencies (from tracker-ui directory)
-pnpm install --frozen-lockfile
-
-# Start development server
-pnpm run dev
-
-# Build for production
-pnpm run build
-
-# Preview production build
-pnpm run preview
-
-# Run tests
-pnpm run test
+```bash
+npm run test
 
 # Run tests with coverage
-pnpm run test:unit
+npm test -- --coverage
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
 
 # Run E2E tests
-pnpm run test:e2e
+npm run test:e2e
 
-# Lint code
-pnpm run lint
+# Lint and fix code
+npm run lint
 ```
 
 ## Environment Setup
@@ -137,29 +130,27 @@ The application includes comprehensive testing:
 
 Run tests locally:
 ```bash
-pnpm run test        # Unit tests (watch mode)
-pnpm run ci          # Unit tests (CI mode)  
-pnpm run test:e2e    # E2E tests with Playwright
-pnpm run lint        # Code linting
+npm run test        # Unit tests (watch mode)
+npm run test        # Unit tests (CI mode)  
+npm run test:e2e    # E2E tests with Playwright
+npm run lint        # Code linting
 ```
 
 See `E2E_TESTING.md` for detailed E2E testing information.
 
 ## Troubleshooting
 
-### pnpm Issues
-- **Command not found**: Run `corepack enable pnpm` to activate pnpm
-- **Wrong version**: This project uses pnpm@9.15.0 (locked via `packageManager` field)
-- **Permission errors**: Make sure Corepack is properly installed: `npm install --global corepack@latest`
-- **Cache issues**: Clear pnpm cache with `pnpm store prune`
+### npm Issues
+- **Dependency conflicts**: Use `npm install --legacy-peer-deps`
+- **Cache issues**: Clear npm cache with `npm cache clean --force`
 
 ### Build Issues
 - **Build fails**: Ensure `.env` variables `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set
-- **Charts not loading**: Verify the Chart.js bundle exists inside the `dist/` folder after running `pnpm run build`
-- **Tests failing**: Run `pnpm test -- --verbose` to see detailed errors
+- **Charts not loading**: Verify the Chart.js bundle exists inside the `dist/` folder after running `npm run build`
+- **Tests failing**: Run `npm test -- --verbose` to see detailed errors
 - **Large bundle warning**: This is normal; we've optimized with code splitting in `vite.config.js`
 
 ### Development
-- **Hot reload not working**: Try `pnpm run dev --force` to bypass cache
-- **TypeScript errors**: Run `pnpm run build` to see all type errors
-- **Linting failures**: Run `pnpm run lint` to see style issues
+- **Hot reload not working**: Try `npm run dev -- --force` to bypass cache
+- **TypeScript errors**: Run `npm run build` to see all type errors
+- **Linting failures**: Run `npm run lint` to see style issues
