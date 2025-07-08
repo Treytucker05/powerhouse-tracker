@@ -141,6 +141,39 @@ export const BASE_VOLUME_LANDMARKS = {
   abs: { mv: 4, mev: 6, mrv: 16, mav: 12 }
 };
 
+// MEV and MRV ranges for UI display
+export const MEV_RANGES = {
+  chest: { beginner: 4, intermediate: 6, advanced: 8 },
+  back: { beginner: 7, intermediate: 10, advanced: 13 },
+  shoulders: { beginner: 6, intermediate: 8, advanced: 10 },
+  biceps: { beginner: 6, intermediate: 8, advanced: 10 },
+  triceps: { beginner: 4, intermediate: 6, advanced: 8 },
+  quads: { beginner: 6, intermediate: 8, advanced: 10 },
+  hamstrings: { beginner: 6, intermediate: 8, advanced: 10 },
+  glutes: { beginner: 4, intermediate: 6, advanced: 8 },
+  calves: { beginner: 6, intermediate: 8, advanced: 10 },
+  abs: { beginner: 4, intermediate: 6, advanced: 8 },
+  // Common muscle group aliases
+  arms: { beginner: 5, intermediate: 7, advanced: 9 }, // Average of biceps/triceps
+  legs: { beginner: 5, intermediate: 7, advanced: 9 }  // Average of quads/hamstrings/glutes
+};
+
+export const MRV_RANGES = {
+  chest: { beginner: 19, intermediate: 24, advanced: 26 },
+  back: { beginner: 20, intermediate: 25, advanced: 28 },
+  shoulders: { beginner: 19, intermediate: 24, advanced: 26 },
+  biceps: { beginner: 16, intermediate: 20, advanced: 22 },
+  triceps: { beginner: 14, intermediate: 18, advanced: 20 },
+  quads: { beginner: 16, intermediate: 20, advanced: 22 },
+  hamstrings: { beginner: 16, intermediate: 20, advanced: 22 },
+  glutes: { beginner: 13, intermediate: 16, advanced: 18 },
+  calves: { beginner: 16, intermediate: 20, advanced: 22 },
+  abs: { beginner: 13, intermediate: 16, advanced: 18 },
+  // Common muscle group aliases
+  arms: { beginner: 15, intermediate: 19, advanced: 21 }, // Average of biceps/triceps
+  legs: { beginner: 15, intermediate: 19, advanced: 21 }  // Average of quads/hamstrings/glutes
+};
+
 // RIR (Reps in Reserve) Schemes (Updated 2024-25 Research - Start at 4 RIR)
 export const RIR_SCHEMES = {
   4: [4, 3, 2, 1],
@@ -412,6 +445,8 @@ export default {
   PHASE_FOCUS_MAPPING,
   MACROCYCLE_TEMPLATES,
   BASE_VOLUME_LANDMARKS,
+  MEV_RANGES,
+  MRV_RANGES,
   RIR_SCHEMES,
   PHASE_DURATION_BASE,
   PHASE_DURATION_MODIFIERS,
