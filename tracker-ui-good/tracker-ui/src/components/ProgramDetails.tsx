@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilder } from '../contexts/MacrocycleBuilderContext';
 import { calculateMEV, calculateMRV } from '../lib/algorithms/rpAlgorithms';
 import { MEV_RANGES, MRV_RANGES } from '../constants/rpConstants';
+import { StepProgress } from '../lib/designSystem.jsx';
 
 const ProgramDetails: React.FC = () => {
     const navigate = useNavigate();
@@ -41,7 +42,13 @@ const ProgramDetails: React.FC = () => {
     // Calculate MEV/MRV when trainingExperience or dietPhase changes
     useEffect(() => {
         if (programDetails.trainingExperience && programDetails.dietPhase) {
-            const muscleGroups = ['chest', 'back', 'shoulders', 'arms', 'legs'];
+            const muscleGroups = [
+                'chest', 'back', 'shoulders',
+                'biceps', 'triceps',
+                'quads', 'hamstrings', 'glutes',
+                'calves', 'abs', 'traps', 'forearms'
+            ];
+
             const recommendations = muscleGroups.map(muscle => {
                 const mev = calculateMEV(muscle, programDetails.trainingExperience);
                 const mrv = calculateMRV(muscle, programDetails.trainingExperience);
@@ -65,8 +72,17 @@ const ProgramDetails: React.FC = () => {
                     <h1 className="text-4xl font-bold text-white mb-2">Program Details</h1>
                     <p className="text-gray-400">Step 1 of 4 - Define your training parameters</p>
 
-                    {/* Progress Bar */}
-                    <div className="w-full bg-gray-800 rounded-full h-2 mt-6">
+                    {/* Progress Steps - Desktop */}
+                    <div className="hidden md:block mt-6">
+                        <StepProgress
+                            currentStep={1}
+                            totalSteps={4}
+                            steps={['Details', 'Template', 'Timeline', 'Review']}
+                        />
+                    </div>
+
+                    {/* Mobile Progress Bar */}
+                    <div className="w-full bg-gray-800 rounded-full h-2 mt-4 md:hidden">
                         <div className="bg-red-600 h-2 rounded-full transition-all duration-300" style={{ width: '25%' }}></div>
                     </div>
                 </div>
@@ -157,32 +173,44 @@ const ProgramDetails: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* RP Volume Targets - Conditional Display */}
+                            {/* RP Volume Targets - Enhanced Design */}
                             {rpRecommendations && (
-                                <div className="bg-blue-900/20 border border-blue-600/30 rounded-lg p-6 mt-6">
+                                <div className="bg-blue-900/10 border border-blue-600/20 rounded-lg p-6 mt-6">
                                     <h3 className="text-xl font-semibold text-blue-300 mb-4 flex items-center">
                                         <span className="w-2 h-2 bg-blue-400 rounded-full mr-3"></span>
-                                        Your RP Volume Targets
+                                        💡 Volume Recommendations (Per Week)
                                     </h3>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <p className="text-blue-300/70 text-sm mb-4">
+                                        Based on: {programDetails.trainingExperience}, {programDetails.dietPhase}, {programDetails.trainingDaysPerWeek} days
+                                    </p>
+
+                                    <div className="space-y-3">
                                         {rpRecommendations.map((rec) => (
-                                            <div key={rec.muscle} className="bg-blue-800/20 rounded-lg p-4">
-                                                <div className="flex justify-between items-center">
+                                            <div key={rec.muscle} className="bg-blue-800/10 rounded-lg p-4 border border-blue-600/20">
+                                                <div className="flex justify-between items-center mb-2">
                                                     <span className="text-blue-200 font-medium capitalize">
                                                         {rec.muscle}
                                                     </span>
                                                     <span className="text-blue-100 font-bold">
-                                                        {rec.mev}-{rec.mrv} sets/week
+                                                        {rec.mev}-{rec.mrv} sets
                                                     </span>
                                                 </div>
-                                                <div className="text-xs text-blue-300/70 mt-1">
-                                                    MEV-MRV Range
+
+                                                {/* Volume Progress Bar */}
+                                                <div className="relative">
+                                                    <div className="w-full bg-gray-700 rounded-full h-2">
+                                                        <div
+                                                            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                                                            style={{ width: `${(rec.mev / rec.mrv) * 100}%` }}
+                                                        ></div>
+                                                    </div>
+                                                    <div className="flex justify-between text-xs text-blue-300/60 mt-1">
+                                                        <span>MEV ↑</span>
+                                                        <span>↑ MRV</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         ))}
-                                    </div>
-                                    <div className="mt-4 text-xs text-blue-300/60">
-                                        Based on your {programDetails.trainingExperience} experience level and {programDetails.dietPhase} diet phase
                                     </div>
                                 </div>
                             )}
@@ -196,30 +224,74 @@ const ProgramDetails: React.FC = () => {
                                 <label className="block text-sm font-medium text-gray-300 mb-2">
                                     Duration (weeks) <span className="text-red-500">*</span>
                                 </label>
-                                <input
-                                    type="number"
-                                    min="8"
-                                    max="24"
-                                    value={programDetails.duration}
-                                    onChange={(e) => updateField('duration', parseInt(e.target.value) || 8)}
-                                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                                />
-                                <p className="text-gray-500 text-xs mt-1">Range: 8-24 weeks</p>
+                                <div className="bg-gray-800 border border-gray-600 rounded-lg p-4">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-white font-semibold">{programDetails.duration} weeks</span>
+                                        <div className="flex space-x-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => updateField('duration', Math.max(8, programDetails.duration - 1))}
+                                                className="w-8 h-8 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center text-white transition-colors"
+                                            >
+                                                −
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => updateField('duration', Math.min(24, programDetails.duration + 1))}
+                                                className="w-8 h-8 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center text-white transition-colors"
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <input
+                                        type="range"
+                                        min="8"
+                                        max="24"
+                                        value={programDetails.duration}
+                                        onChange={(e) => updateField('duration', parseInt(e.target.value))}
+                                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                                    />
+                                    <div className="flex justify-between text-xs text-gray-500 mt-2">
+                                        <span>8 weeks</span>
+                                        <span>16 weeks</span>
+                                        <span>24 weeks</span>
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Training Days Per Week */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-3">
-                                    Training Days Per Week: <span className="text-red-400 font-semibold">{programDetails.trainingDaysPerWeek}</span>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                    Training Days Per Week
                                 </label>
-                                <div className="px-3">
+                                <div className="bg-gray-800 border border-gray-600 rounded-lg p-4">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="text-white font-semibold">{programDetails.trainingDaysPerWeek} days</span>
+                                        <div className="flex space-x-2">
+                                            <button
+                                                type="button"
+                                                onClick={() => updateField('trainingDaysPerWeek', Math.max(3, programDetails.trainingDaysPerWeek - 1))}
+                                                className="w-8 h-8 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center text-white transition-colors"
+                                            >
+                                                −
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => updateField('trainingDaysPerWeek', Math.min(6, programDetails.trainingDaysPerWeek + 1))}
+                                                className="w-8 h-8 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center text-white transition-colors"
+                                            >
+                                                +
+                                            </button>
+                                        </div>
+                                    </div>
                                     <input
                                         type="range"
                                         min="3"
                                         max="6"
                                         value={programDetails.trainingDaysPerWeek}
                                         onChange={(e) => updateField('trainingDaysPerWeek', parseInt(e.target.value))}
-                                        className="w-full h-3 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
+                                        className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
                                     />
                                     <div className="flex justify-between text-xs text-gray-500 mt-2">
                                         <span>3 days</span>
@@ -227,8 +299,8 @@ const ProgramDetails: React.FC = () => {
                                         <span>5 days</span>
                                         <span>6 days</span>
                                     </div>
+                                    <p className="text-gray-400 text-xs mt-2">💡 Recommended: 4-5 days for optimal recovery</p>
                                 </div>
-                                <p className="text-gray-500 text-xs mt-2">Recommended: 4-5 days for optimal recovery</p>
                             </div>
 
                             {/* Start Date */}
@@ -304,27 +376,70 @@ const ProgramDetails: React.FC = () => {
                 </div>
             </div>
 
-            {/* Custom Slider Styles */}
+            {/* Enhanced Slider Styles */}
             <style>{`
-        .slider::-webkit-slider-thumb {
+        /* Slider Track */
+        .slider {
+          -webkit-appearance: none;
           appearance: none;
-          height: 20px;
-          width: 20px;
-          border-radius: 50%;
-          background: #dc2626;
-          cursor: pointer;
-          border: 2px solid #ffffff;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+          height: 8px;
+          border-radius: 4px;
+          background: #374151;
+          outline: none;
+          transition: background 0.3s ease;
         }
         
-        .slider::-moz-range-thumb {
-          height: 20px;
+        .slider:hover {
+          background: #4B5563;
+        }
+        
+        /* Webkit Slider Thumb */
+        .slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
           width: 20px;
+          height: 20px;
           border-radius: 50%;
-          background: #dc2626;
+          background: #FF0000;
           cursor: pointer;
-          border: 2px solid #ffffff;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+          border: 2px solid #FFFFFF;
+          box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
+          transition: all 0.2s ease;
+        }
+        
+        .slider::-webkit-slider-thumb:hover {
+          transform: scale(1.1);
+          box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4);
+        }
+        
+        /* Firefox Slider Thumb */
+        .slider::-moz-range-thumb {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: #FF0000;
+          cursor: pointer;
+          border: 2px solid #FFFFFF;
+          box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
+          transition: all 0.2s ease;
+        }
+        
+        .slider::-moz-range-thumb:hover {
+          transform: scale(1.1);
+          box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4);
+        }
+        
+        /* Mobile Touch Optimization */
+        @media (max-width: 640px) {
+          .slider::-webkit-slider-thumb {
+            width: 24px;
+            height: 24px;
+          }
+          
+          .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+          }
         }
       `}</style>
         </div>

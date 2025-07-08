@@ -24,6 +24,7 @@ export interface MacrocycleBuilderState {
     programDetails: ProgramDetails;
     blocks: Block[];
     selectedTemplate: string;
+    specialization: string;
     isValid: boolean;
 }
 
@@ -35,6 +36,8 @@ export type MacrocycleBuilderAction =
     | { type: 'UPDATE_BLOCK'; payload: { id: string; updates: Partial<Block> } }
     | { type: 'REMOVE_BLOCK'; payload: string }
     | { type: 'SET_TEMPLATE'; payload: string }
+    | { type: 'SET_BLOCKS'; payload: Block[] }
+    | { type: 'SET_SPECIALIZATION'; payload: string }
     | { type: 'RESET_BUILDER' }
     | { type: 'HYDRATE_STATE'; payload: MacrocycleBuilderState };
 
@@ -51,6 +54,7 @@ const initialState: MacrocycleBuilderState = {
     },
     blocks: [],
     selectedTemplate: '',
+    specialization: 'None',
     isValid: false,
 };
 
@@ -137,6 +141,20 @@ const macrocycleBuilderReducer = (
             newState = {
                 ...state,
                 selectedTemplate: action.payload,
+            };
+            break;
+
+        case 'SET_BLOCKS':
+            newState = {
+                ...state,
+                blocks: action.payload,
+            };
+            break;
+
+        case 'SET_SPECIALIZATION':
+            newState = {
+                ...state,
+                specialization: action.payload,
             };
             break;
 
