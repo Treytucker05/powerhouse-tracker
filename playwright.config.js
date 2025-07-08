@@ -28,7 +28,7 @@ export default defineConfig({
   
   // ✅ Launch the React Vite dev server from tracker-ui
   webServer: {
-    command: "pnpm --filter tracker-ui dev",
+    command: "npm run dev",
     cwd: "./tracker-ui",
     url: "http://localhost:5173",
     reuseExistingServer: !process.env.CI,
