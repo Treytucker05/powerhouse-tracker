@@ -17,6 +17,9 @@ const Analytics = lazy(() => import("./pages/Analytics.jsx"));
 const AuthPage = lazy(() => import("./pages/AuthPage.jsx"));
 const ProgramDetails = lazy(() => import('./components/ProgramDetails.tsx'));
 const TemplateSelection = lazy(() => import('./components/builder/TemplateSelection.tsx'));
+const TimelineBlocks = lazy(() => import('./components/builder/TimelineBlocks.tsx'));
+const VolumeDistribution = lazy(() => import('./components/builder/VolumeDistribution.tsx'));
+const ReviewGenerate = lazy(() => import('./components/builder/ReviewGenerate.tsx'));
 
 // Loading component
 const LoadingSpinner = () => (
@@ -48,8 +51,9 @@ function App() {
                   <Routes>
                     <Route index element={<ProgramDetails />} />
                     <Route path="template" element={<TemplateSelection />} />
-                    <Route path="timeline" element={<div className="p-8 text-white">Timeline & Blocks - Coming Soon</div>} />
-                    <Route path="review" element={<div className="p-8 text-white">Review & Generate - Coming Soon</div>} />
+                    <Route path="timeline" element={<TimelineBlocks />} />
+                    <Route path="volume-distribution" element={<VolumeDistribution />} />
+                    <Route path="review" element={<ReviewGenerate />} />
                   </Routes>
                 </Suspense>
               </MacrocycleBuilderProvider>

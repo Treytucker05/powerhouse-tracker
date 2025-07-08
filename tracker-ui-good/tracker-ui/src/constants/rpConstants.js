@@ -1,5 +1,46 @@
-// Renaissance Periodization Constants
+// Renaissance Periodization Constants - Updated with Complete RP Volume Landmark Data
 // Shared across all Program Design components with correct database field names
+
+// Experience Level Multipliers
+export const EXPERIENCE_MULTIPLIERS = {
+  beginner: {
+    mev: 0.7,    // 70% of intermediate
+    mrv: 0.7,
+    mesocycleDuration: "8-12 weeks",
+    rirStart: 4
+  },
+  intermediate: {
+    mev: 1.0,    // Baseline
+    mrv: 1.0,
+    mesocycleDuration: "4-6 weeks",
+    rirStart: 3
+  },
+  advanced: {
+    mev: 1.0,    // Same as intermediate but faster fatigue
+    mrv: 1.0,
+    mesocycleDuration: "3-4 weeks",
+    rirStart: 2
+  }
+};
+
+// Diet Phase Adjustments
+export const DIET_PHASE_MULTIPLIERS = {
+  bulk: {
+    volumeMultiplier: 1.2,    // +20% volume capacity
+    recoveryBonus: 1.15,      // +15% recovery
+    description: "Hypercaloric +300-500 calories"
+  },
+  maintenance: {
+    volumeMultiplier: 1.0,    // Baseline
+    recoveryBonus: 1.0,
+    description: "Isocaloric ±100 calories"
+  },
+  cut: {
+    volumeMultiplier: 0.75,   // -25% volume capacity
+    recoveryBonus: 0.7,       // -30% recovery
+    description: "Hypocaloric -300-500 calories"
+  }
+};
 
 // Valid goal types matching database constraint
 export const GOAL_TYPES = [
@@ -127,18 +168,20 @@ export const MACROCYCLE_TEMPLATES = {
   }
 };
 
-// Base Volume Landmarks for MEV/MRV calculations (Updated 2024-25 Research)
+// Base Volume Landmarks for MEV/MRV calculations (Complete RP Volume Landmark Data)
 export const BASE_VOLUME_LANDMARKS = {
-  chest: { mv: 4, mev: 6, mrv: 24, mav: 16 },
-  back: { mv: 8, mev: 10, mrv: 25, mav: 18 },
-  shoulders: { mv: 2, mev: 8, mrv: 24, mav: 16 },
-  biceps: { mv: 4, mev: 8, mrv: 20, mav: 14 },
-  triceps: { mv: 4, mev: 6, mrv: 18, mav: 12 },
-  quads: { mv: 6, mev: 8, mrv: 20, mav: 18 },
-  hamstrings: { mv: 4, mev: 8, mrv: 20, mav: 14 },
-  glutes: { mv: 4, mev: 6, mrv: 16, mav: 12 },
-  calves: { mv: 6, mev: 8, mrv: 20, mav: 14 },
-  abs: { mv: 4, mev: 6, mrv: 16, mav: 12 }
+  chest: { mv: 4, mev: 10, mrv: 22, mav: 16, frequency: '2-3x/week', maintenance: 4 },
+  back: { mv: 6, mev: 10, mrv: 25, mav: 18, frequency: '2-4x/week', maintenance: 6 },
+  shoulders: { mv: 6, mev: 8, mrv: 26, mav: 16, frequency: '2-6x/week', maintenance: 6 },
+  biceps: { mv: 4, mev: 8, mrv: 30, mav: 14, frequency: '2-6x/week', maintenance: 4 }, // Using mid-range of 26-35
+  triceps: { mv: 4, mev: 6, mrv: 19, mav: 12, frequency: '2-4x/week', maintenance: 4 }, // Using mid-range of 18-20
+  quads: { mv: 6, mev: 8, mrv: 20, mav: 18, frequency: '1.5-3x/week', maintenance: 6 },
+  hamstrings: { mv: 3, mev: 6, mrv: 20, mav: 14, frequency: '2-3x/week', maintenance: 3 },
+  glutes: { mv: 0, mev: 2, mrv: 16, mav: 12, frequency: '2-3x/week', maintenance: 0 }, // Using mid-range of 0-4
+  calves: { mv: 0, mev: 8, mrv: 20, mav: 14, frequency: '2-4x/week', maintenance: 0 },
+  abs: { mv: 0, mev: 2, mrv: 16, mav: 12, frequency: '3-5x/week', maintenance: 0 }, // Using mid-range of 0-4 MEV, 12-20 MRV
+  traps: { mv: 0, mev: 2, mrv: 16, mav: 12, frequency: '2-6x/week', maintenance: 0 }, // Using mid-range of 0-4 MEV, 12-20 MRV
+  forearms: { mv: 0, mev: 4, mrv: 27, mav: 16, frequency: '2-6x/week', maintenance: 0 } // Using mid-range of 0-8 MEV, 24-30 MRV
 };
 
 // MEV and MRV ranges for UI display
