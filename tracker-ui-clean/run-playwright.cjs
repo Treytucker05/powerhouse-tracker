@@ -19,7 +19,7 @@ if (env.NODE_PATH) {
 
 // Run playwright directly - Windows compatible
 const isWindows = process.platform === 'win32';
-const command = isWindows ? 'pnpm.cmd' : 'pnpm';
+const command = isWindows ? 'npx.cmd' : 'npx';
 
 const playwright = spawn(command, ['playwright', 'test', ...process.argv.slice(2)], {
   stdio: 'inherit',
