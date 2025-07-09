@@ -1,9 +1,4 @@
 // Renaissance Periodization Algorithms
-// Functions for calculating MEV, MRV, and other RP metrics
-
-import { BASE_VOLUME_LANDMARKS } from '../../constants/rpConstants';
-
-// Renaissance Periodization Algorithms
 // Functions for calculating MEV, MRV, and other RP metrics using precise formulas
 
 import { BASE_VOLUME_LANDMARKS, EXPERIENCE_MULTIPLIERS, DIET_PHASE_MULTIPLIERS } from '../../constants/rpConstants';

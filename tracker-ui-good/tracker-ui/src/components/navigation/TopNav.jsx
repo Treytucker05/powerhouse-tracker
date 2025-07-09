@@ -7,7 +7,6 @@ export default function TopNav({ user, onSignOut }) {
     { to: "/", label: "Dashboard" },
     { to: "/assessment", label: "Assessment" },
     { to: "/program", label: "Program Design" },
-    { to: "/macrocycle", label: "Macrocycle" },
     { to: "/tracking", label: "Tracking" },
     { to: "/analytics", label: "Analytics" },
   ];

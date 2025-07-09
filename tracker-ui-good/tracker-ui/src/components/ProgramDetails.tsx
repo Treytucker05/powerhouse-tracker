@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBuilder } from '../contexts/MacrocycleBuilderContext';
-import { calculateMEV, calculateMRV } from '../lib/algorithms/rpAlgorithms';
+import { calculateMEV, calculateMRV, calculatePersonalizedVolume } from '../lib/algorithms/rpAlgorithms';
 import { MEV_RANGES, MRV_RANGES } from '../constants/rpConstants';
 import { StepProgress } from '../lib/designSystem.jsx';
 
 const ProgramDetails: React.FC = () => {
+    console.log('🟢 ProgramDetails component rendering...');
+
     const navigate = useNavigate();
     const { state, dispatch, validateCurrentStep, canProceedToNextStep } = useBuilder();
     const { programDetails } = state;
@@ -50,12 +52,16 @@ const ProgramDetails: React.FC = () => {
             ];
 
             const recommendations = muscleGroups.map(muscle => {
-                const mev = calculateMEV(muscle, programDetails.trainingExperience);
-                const mrv = calculateMRV(muscle, programDetails.trainingExperience);
+                const personalizedVolume = calculatePersonalizedVolume(
+                    muscle,
+                    programDetails.trainingExperience,
+                    programDetails.dietPhase,
+                    false // specialization flag - will be handled in later steps
+                );
                 return {
                     muscle,
-                    mev,
-                    mrv
+                    mev: personalizedVolume.mev,
+                    mrv: personalizedVolume.mrv
                 };
             });
             setRpRecommendations(recommendations);
@@ -151,9 +157,27 @@ const ProgramDetails: React.FC = () => {
                                 </label>
                                 <div className="space-y-3">
                                     {[
-                                        { value: 'bulk', label: 'Bulk', desc: 'Caloric surplus, muscle gain focus' },
-                                        { value: 'maintenance', label: 'Maintenance', desc: 'Caloric balance, strength focus' },
-                                        { value: 'cut', label: 'Cut', desc: 'Caloric deficit, fat loss focus' },
+                                        {
+                                            value: 'bulk',
+                                            label: 'Bulk',
+                                            desc: 'Caloric surplus, muscle gain focus',
+                                            impact: '+20% volume capacity',
+                                            color: 'text-green-400'
+                                        },
+                                        {
+                                            value: 'maintenance',
+                                            label: 'Maintenance',
+                                            desc: 'Caloric balance, strength focus',
+                                            impact: 'Baseline capacity',
+                                            color: 'text-blue-400'
+                                        },
+                                        {
+                                            value: 'cut',
+                                            label: 'Cut',
+                                            desc: 'Caloric deficit, fat loss focus',
+                                            impact: '-25% volume capacity',
+                                            color: 'text-yellow-400'
+                                        },
                                     ].map((option) => (
                                         <label key={option.value} className="flex items-start cursor-pointer group">
                                             <input
@@ -167,6 +191,7 @@ const ProgramDetails: React.FC = () => {
                                             <div className="ml-3">
                                                 <div className="text-white group-hover:text-red-400 transition-colors">{option.label}</div>
                                                 <div className="text-gray-500 text-sm">{option.desc}</div>
+                                                <div className={`text-xs ${option.color} font-medium`}>RP Impact: {option.impact}</div>
                                             </div>
                                         </label>
                                     ))}
@@ -181,7 +206,11 @@ const ProgramDetails: React.FC = () => {
                                         💡 Volume Recommendations (Per Week)
                                     </h3>
                                     <p className="text-blue-300/70 text-sm mb-4">
-                                        Based on: {programDetails.trainingExperience}, {programDetails.dietPhase}, {programDetails.trainingDaysPerWeek} days
+                                        Based on: {programDetails.trainingExperience}, {programDetails.dietPhase}
+                                        {programDetails.dietPhase === 'bulk' && ' (+20% volume capacity)'}
+                                        {programDetails.dietPhase === 'cut' && ' (-25% volume capacity)'}
+                                        {programDetails.dietPhase === 'maintenance' && ' (baseline capacity)'}
+                                        , {programDetails.trainingDaysPerWeek} days/week
                                     </p>
 
                                     <div className="space-y-3">

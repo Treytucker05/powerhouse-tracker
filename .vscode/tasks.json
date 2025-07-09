@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Test Unified Program Design",
+			"type": "shell",
+			"command": "npm start",
+			"isBackground": true,
+			"group": "test"
+		}
+	]
+}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBuilder } from '../../contexts/MacrocycleBuilderContext';
 import { templates, checkCompatibility, Template } from '../../data/templates';
@@ -7,6 +7,25 @@ const TemplateSelection: React.FC = () => {
     const navigate = useNavigate();
     const { state, dispatch } = useBuilder();
     const { programDetails } = state;
+    const [showAllTemplates, setShowAllTemplates] = useState(false);
+
+    // Filter templates based on compatibility
+    const getFilteredTemplates = () => {
+        if (showAllTemplates) {
+            return templates;
+        }
+
+        return templates.filter(template => {
+            const compatibility = checkCompatibility(template, programDetails);
+            return compatibility.isCompatible;
+        });
+    };
+
+    const filteredTemplates = getFilteredTemplates();
+    const allTemplatesCount = templates.length;
+    const compatibleTemplatesCount = templates.filter(template =>
+        checkCompatibility(template, programDetails).isCompatible
+    ).length;
 
     // Handle template selection
     const handleSelectTemplate = (template: Template) => {
@@ -89,9 +108,49 @@ const TemplateSelection: React.FC = () => {
                     </div>
                 </div>
 
+                {/* Filter Toggle */}
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center space-x-4">
+                        <h2 className="text-2xl font-semibold">Templates</h2>
+                        <div className="text-sm text-gray-400">
+                            {showAllTemplates
+                                ? `Showing all ${allTemplatesCount} templates`
+                                : `Showing ${compatibleTemplatesCount} compatible templates`
+                            }
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => setShowAllTemplates(!showAllTemplates)}
+                        className="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded text-sm transition-colors"
+                    >
+                        {showAllTemplates ? 'Show Compatible Only' : 'Show All Templates'}
+                    </button>
+                </div>
+
+                {/* No Compatible Templates Message */}
+                {!showAllTemplates && compatibleTemplatesCount === 0 && (
+                    <div className="bg-yellow-900 border border-yellow-600 rounded-lg p-6 mb-8">
+                        <h3 className="text-yellow-200 font-semibold mb-2">No Compatible Templates Found</h3>
+                        <p className="text-yellow-300 text-sm mb-4">
+                            Based on your program details, no pre-built templates match your requirements exactly.
+                            You can either:
+                        </p>
+                        <ul className="text-yellow-300 text-sm space-y-1 mb-4">
+                            <li>• View all templates and use one with adjustments</li>
+                            <li>• Build a custom program from scratch</li>
+                        </ul>
+                        <button
+                            onClick={() => setShowAllTemplates(true)}
+                            className="bg-yellow-600 hover:bg-yellow-700 text-white py-2 px-4 rounded text-sm transition-colors"
+                        >
+                            Show All Templates
+                        </button>
+                    </div>
+                )}
+
                 {/* Templates Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                    {templates.map((template) => {
+                    {filteredTemplates.map((template) => {
                         const compatibility = checkCompatibility(template, programDetails);
 
                         return (
