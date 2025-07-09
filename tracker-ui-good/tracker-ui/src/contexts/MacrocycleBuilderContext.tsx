@@ -194,7 +194,11 @@ interface MacrocycleBuilderProviderProps {
 }
 
 export const MacrocycleBuilderProvider: React.FC<MacrocycleBuilderProviderProps> = ({ children }) => {
+    console.log('🟢 MacrocycleBuilderProvider rendering...');
+
     const [state, dispatch] = useReducer(macrocycleBuilderReducer, initialState);
+
+    console.log('🟢 MacrocycleBuilderProvider state:', state);
 
     // Load state from localStorage on mount
     useEffect(() => {
@@ -253,10 +257,15 @@ export const MacrocycleBuilderProvider: React.FC<MacrocycleBuilderProviderProps>
 
 // Custom hook to use the context
 export const useBuilder = (): MacrocycleBuilderContextType => {
+    console.log('🟢 useBuilder hook called...');
+
     const context = useContext(MacrocycleBuilderContext);
     if (context === undefined) {
+        console.error('🚨 useBuilder: Context is undefined! Must be used within a MacrocycleBuilderProvider');
         throw new Error('useBuilder must be used within a MacrocycleBuilderProvider');
     }
+
+    console.log('🟢 useBuilder context:', context);
     return context;
 };
 

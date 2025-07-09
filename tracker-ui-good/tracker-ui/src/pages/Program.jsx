@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { supabase } from '../lib/api/supabaseClient';
 import { loadAllMacrocycles, deleteMacrocycle } from '../lib/storage';
+import ContextAwareBuilder from '../components/builder/ContextAwareBuilder.jsx';
 import {
   BASE_VOLUME_LANDMARKS,
   RIR_SCHEMES,
@@ -169,28 +170,17 @@ const ProgramBuilder = memo(({
   saveProgram, setActiveTab
 }) => {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center space-x-4">
-        <button
-          onClick={() => setActiveTab('overview')}
-          className="text-gray-400 hover:text-white"
-        >
-          ← Back to Overview
-        </button>
-        <h2 className="text-2xl font-semibold text-white">Program Builder</h2>
-      </div>
-
-      <ProgramForm
-        programData={programData}
-        setProgramData={setProgramData}
-        selectedLevel={selectedLevel}
-        error={error}
-        setError={setError}
-        isLoading={isLoading}
-        saveProgram={saveProgram}
-        setActiveTab={setActiveTab}
-      />
-    </div>
+    <ContextAwareBuilder
+      context={selectedLevel}
+      onBack={() => setActiveTab('overview')}
+      programData={programData}
+      setProgramData={setProgramData}
+      selectedLevel={selectedLevel}
+      error={error}
+      setError={setError}
+      isLoading={isLoading}
+      saveProgram={saveProgram}
+    />
   );
 });
 
@@ -214,13 +204,62 @@ const Program = memo(() => {
     selectedTemplate: null
   });
 
+  // State persistence for tab switching
+  const [savedBuilderState, setSavedBuilderState] = useState({
+    macro: null,
+    meso: null,
+    micro: null
+  });
+
   const handleSetError = useCallback((error) => {
     setError(error);
   }, []);
 
   const handleSetActiveTab = useCallback((tab) => {
+    // Save current builder state before switching tabs
+    if (activeTab === 'builder' && selectedLevel) {
+      setSavedBuilderState(prev => ({
+        ...prev,
+        [selectedLevel]: {
+          programData,
+          selectedLevel,
+          timestamp: Date.now()
+        }
+      }));
+    }
     setActiveTab(tab);
-  }, []);
+  }, [activeTab, selectedLevel, programData]);
+
+  // Context handlers for different program types
+  const handleStartMacrocycle = useCallback(() => {
+    // Restore saved state if available
+    const savedState = savedBuilderState.macro;
+    if (savedState && Date.now() - savedState.timestamp < 24 * 60 * 60 * 1000) { // 24 hours
+      setProgramData(savedState.programData);
+    }
+    setSelectedLevel('macro');
+    setActiveTab('builder');
+  }, [savedBuilderState]);
+
+  const handleStartMesocycle = useCallback(() => {
+    // Restore saved state if available
+    const savedState = savedBuilderState.meso;
+    if (savedState && Date.now() - savedState.timestamp < 24 * 60 * 60 * 1000) { // 24 hours
+      setProgramData(savedState.programData);
+    }
+    setSelectedLevel('meso');
+    setActiveTab('builder');
+  }, [savedBuilderState]);
+
+  const handleStartMicrocycle = useCallback(() => {
+    // Restore saved state if available
+    const savedState = savedBuilderState.micro;
+    if (savedState && Date.now() - savedState.timestamp < 24 * 60 * 60 * 1000) { // 24 hours
+      setProgramData(savedState.programData);
+    }
+    setSelectedLevel('micro');
+    setActiveTab('builder');
+  }, [savedBuilderState]);
 
   // Load recent programs
   useEffect(() => {
@@ -505,7 +544,7 @@ const Program = memo(() => {
     }
   }, []);
 
-  const ProgramOverview = () => (
+  const ProgramOverview = ({ onStartMacrocycle, onStartMesocycle, onStartMicrocycle }) => (
     <div className="space-y-8">
       {/* Planning Level Selection */}
       <div>
@@ -516,25 +555,25 @@ const Program = memo(() => {
               id: 'macro',
               title: 'MACROCYCLE',
               subtitle: '3-12 months',
-              description: 'Long-term periodization',
+              description: 'Long-term periodization with Renaissance Periodization',
               icon: '📅',
-              route: '/macrocycle'
+              handler: onStartMacrocycle
             },
             {
               id: 'meso',
               title: 'MESOCYCLE',
               subtitle: '4-6 weeks',
-              description: 'Training blocks',
+              description: 'Training blocks and phases',
               icon: '📊',
-              route: '/mesocycle'
+              handler: onStartMesocycle
             },
             {
               id: 'micro',
               title: 'MICROCYCLE',
               subtitle: '1 week',
-              description: 'Daily workouts',
+              description: 'Daily workout planning',
               icon: '📋',
-              route: '/microcycle'
+              handler: onStartMicrocycle
             }
           ].map((level) => (
             <div
@@ -553,12 +592,8 @@ const Program = memo(() => {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (level.id === 'macro') {
-                      navigate('/program-design');
-                    } else {
-                      setSelectedLevel(level.id);
-                      setActiveTab('builder');
-                    }
+                    setSelectedLevel(level.id);
+                    level.handler();
                   }}
                   className="w-full bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
                 >
@@ -958,20 +993,27 @@ const Program = memo(() => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-2 px-4 py-2 rounded transition-colors text-black ${activeTab === tab.id
+              className={`flex items-center space-x-2 px-4 py-2 rounded transition-colors text-white ${activeTab === tab.id
                 ? 'bg-red-600'
                 : 'bg-gray-700 hover:bg-gray-600'
                 }`}
             >
               <span>{tab.icon}</span>
               <span>{tab.label}</span>
+              {tab.id === 'builder' && selectedLevel === 'macro' && (
+                <span className="text-xs bg-blue-500 px-1 rounded">Advanced</span>
+              )}
             </button>
           ))}
         </div>
 
         {/* Tab Content */}
         <div className={activeTab === 'overview' ? 'block' : 'hidden'}>
-          <ProgramOverview />
+          <ProgramOverview
+            onStartMacrocycle={handleStartMacrocycle}
+            onStartMesocycle={handleStartMesocycle}
+            onStartMicrocycle={handleStartMicrocycle}
+          />
         </div>
         <div className={activeTab === 'builder' ? 'block' : 'hidden'}>
           <ProgramBuilder

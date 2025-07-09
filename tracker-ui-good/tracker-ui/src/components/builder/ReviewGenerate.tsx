@@ -1,135 +1,249 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBuilder } from '../../contexts/MacrocycleBuilderContext';
-import { calculateMEV, calculateMRV, calculatePersonalizedVolume } from '../../lib/algorithms/rpAlgorithms';
-import { StepProgress, PhaseCard, VolumeProgressBar } from '../../lib/designSystem.jsx';
+import { calculateMacrocycleVolumeProgression } from '../../lib/algorithms/volumeProgression';
+import { calculatePersonalizedVolume } from '../../lib/algorithms/rpAlgorithms';
 
-interface VolumeRecommendation {
-    muscle: string;
-    mev: number;
-    mrv: number;
-    specialization: boolean;
+interface ValidationResult {
+    type: 'error' | 'warning' | 'info';
+    title: string;
+    message: string;
+    severity: 'high' | 'medium' | 'low';
+}
+
+interface ExportFormat {
+    format: 'json' | 'csv' | 'pdf' | 'mesocycle';
+    name: string;
+    description: string;
 }
 
 const ReviewGenerate: React.FC = () => {
     const navigate = useNavigate();
     const { state, dispatch } = useBuilder();
-    const { programDetails, blocks, selectedTemplate, specialization } = state;
-    const [isGenerating, setIsGenerating] = useState(false);
-    const [showSuccess, setShowSuccess] = useState(false);
-    const [volumeRecommendations, setVolumeRecommendations] = useState<VolumeRecommendation[]>([]);
+    const { programDetails, blocks, specialization } = state;
 
-    // Calculate volume recommendations
-    useEffect(() => {
-        if (programDetails.trainingExperience && programDetails.dietPhase) {
-            const muscleGroups = [
-                'chest', 'back', 'shoulders',
-                'biceps', 'triceps',
-                'quads', 'hamstrings', 'glutes',
-                'calves', 'abs', 'traps', 'forearms'
-            ];
+    const [validationResults, setValidationResults] = useState<ValidationResult[]>([]);
+    const [volumeProgression, setVolumeProgression] = useState<any>(null);
+    const [selectedExportFormat, setSelectedExportFormat] = useState<string>('mesocycle');
+    const [isExporting, setIsExporting] = useState(false);
+    const [exportSuccess, setExportSuccess] = useState(false);
 
-            const recommendations = muscleGroups.map(muscle => {
-                const isSpecialized = specialization !== 'None' &&
-                    ((specialization === 'Chest' && muscle === 'chest') ||
-                        (specialization === 'Back' && muscle === 'back') ||
-                        (specialization === 'Shoulders' && muscle === 'shoulders') ||
-                        (specialization === 'Arms' && (muscle === 'biceps' || muscle === 'triceps')) ||
-                        (specialization === 'Legs' && (muscle === 'quads' || muscle === 'hamstrings' || muscle === 'glutes')));
-
-                const personalizedVolume = calculatePersonalizedVolume(
-                    muscle,
-                    programDetails.trainingExperience,
-                    programDetails.dietPhase,
-                    isSpecialized
-                );
-
-                return {
-                    muscle,
-                    mev: personalizedVolume.mev,
-                    mrv: personalizedVolume.mrv,
-                    specialization: isSpecialized
-                };
-            });
-
-            setVolumeRecommendations(recommendations);
+    // Export formats
+    const exportFormats: ExportFormat[] = [
+        {
+            format: 'mesocycle',
+            name: 'Mesocycle Builder',
+            description: 'Export to mesocycle builder for detailed week-by-week programming'
+        },
+        {
+            format: 'json',
+            name: 'JSON Data',
+            description: 'Raw program data for backup or external tools'
+        },
+        {
+            format: 'csv',
+            name: 'CSV Spreadsheet',
+            description: 'Import into Excel or Google Sheets'
+        },
+        {
+            format: 'pdf',
+            name: 'PDF Report',
+            description: 'Printable program overview and progression charts'
         }
-    }, [programDetails.trainingExperience, programDetails.dietPhase, specialization]);
+    ];
 
-    // Handle back navigation
+    // Calculate volume progression and validate program
+    useEffect(() => {
+        if (blocks.length > 0) {
+            const specializationMuscles = specialization && specialization !== 'None'
+                ? specialization.split(',').map(s => s.trim().toLowerCase())
+                : [];
+
+            const progression = calculateMacrocycleVolumeProgression(
+                programDetails,
+                blocks,
+                specializationMuscles
+            );
+
+            setVolumeProgression(progression);
+
+            // Validate the program
+            const validations = validateProgram(progression, programDetails, blocks);
+            setValidationResults(validations);
+        }
+    }, [programDetails, blocks, specialization]);
+
+    // Program validation logic
+    const validateProgram = (progression: any, details: any, blocks: any[]): ValidationResult[] => {
+        const validations: ValidationResult[] = [];
+
+        // Check program duration
+        const totalWeeks = blocks.reduce((sum, block) => sum + block.weeks, 0);
+        if (totalWeeks < 8) {
+            validations.push({
+                type: 'warning',
+                title: 'Short Program Duration',
+                message: `${totalWeeks} weeks may be insufficient for significant adaptations. Consider extending to 8-12 weeks.`,
+                severity: 'medium'
+            });
+        }
+
+        // Check deload frequency
+        const deloadBlocks = blocks.filter(block => block.type === 'deload');
+        if (totalWeeks > 8 && deloadBlocks.length === 0) {
+            validations.push({
+                type: 'error',
+                title: 'Missing Deload Phase',
+                message: 'Programs longer than 8 weeks should include at least one deload week to prevent overtraining.',
+                severity: 'high'
+            });
+        }
+
+        // Check systemic load
+        if (progression?.systemicLoad) {
+            const extremeWeeks = progression.systemicLoad.filter((week: any) => week.category === 'extreme');
+            if (extremeWeeks.length > 2) {
+                validations.push({
+                    type: 'warning',
+                    title: 'High Systemic Load',
+                    message: `${extremeWeeks.length} weeks show extreme training load. Consider volume reduction or additional deloads.`,
+                    severity: 'high'
+                });
+            }
+        }
+
+        // Check specialization balance
+        const specializationMuscles = specialization?.split(',').map(s => s.trim()) || [];
+        if (specializationMuscles.length > 3) {
+            validations.push({
+                type: 'warning',
+                title: 'Excessive Specialization',
+                message: 'More than 3 specialized muscle groups may exceed recovery capacity and limit results.',
+                severity: 'medium'
+            });
+        }
+
+        // Check training frequency vs experience
+        if (details.trainingExperience === 'beginner' && details.trainingDaysPerWeek > 4) {
+            validations.push({
+                type: 'info',
+                title: 'High Training Frequency',
+                message: 'Beginners typically respond well to 3-4 training days per week. Consider recovery capacity.',
+                severity: 'low'
+            });
+        }
+
+        // Check diet phase alignment
+        if (details.dietPhase === 'cut' && specializationMuscles.length > 1) {
+            validations.push({
+                type: 'warning',
+                title: 'Specialization During Cut',
+                message: 'Specializing multiple muscle groups during a cut may impair recovery and results.',
+                severity: 'medium'
+            });
+        }
+
+        return validations;
+    };
+
+    // Handle export
+    const handleExport = async () => {
+        setIsExporting(true);
+
+        try {
+            const exportData = {
+                programDetails,
+                blocks,
+                specialization,
+                volumeProgression,
+                createdAt: new Date().toISOString(),
+                format: selectedExportFormat
+            };
+
+            switch (selectedExportFormat) {
+                case 'mesocycle':
+                    // Navigate to mesocycle builder with data
+                    localStorage.setItem('macrocycle_export', JSON.stringify(exportData));
+                    navigate('/mesocycle-builder', { state: { importData: exportData } });
+                    break;
+
+                case 'json':
+                    downloadFile(JSON.stringify(exportData, null, 2), `${programDetails.name}_macrocycle.json`, 'application/json');
+                    break;
+
+                case 'csv':
+                    const csvData = convertToCSV(exportData);
+                    downloadFile(csvData, `${programDetails.name}_macrocycle.csv`, 'text/csv');
+                    break;
+
+                case 'pdf':
+                    // For now, just download JSON - PDF generation would require additional libraries
+                    downloadFile(JSON.stringify(exportData, null, 2), `${programDetails.name}_macrocycle.json`, 'application/json');
+                    break;
+            }
+
+            setExportSuccess(true);
+            setTimeout(() => setExportSuccess(false), 3000);
+        } catch (error) {
+            console.error('Export error:', error);
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
+    // Helper function to download file
+    const downloadFile = (content: string, filename: string, mimeType: string) => {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+    // Convert data to CSV format
+    const convertToCSV = (data: any): string => {
+        const lines: string[] = [];
+        lines.push('Week,Block Type,Muscle Group,Volume (Sets),RIR,Intensity %');
+
+        if (data.volumeProgression?.weeklyProgression) {
+            Object.entries(data.volumeProgression.weeklyProgression).forEach(([muscle, weeks]: [string, any]) => {
+                weeks.forEach((week: any) => {
+                    lines.push(`${week.week},${week.blockType},${muscle},${week.volume},${week.rir},${week.intensity}`);
+                });
+            });
+        }
+
+        return lines.join('\n');
+    };
+
+    // Handle navigation
     const handleBack = () => {
         dispatch({ type: 'SET_STEP', payload: 3.5 });
         navigate('/program-design/volume-distribution');
     };
 
-    // Handle program generation
-    const handleGenerateProgram = async () => {
-        setIsGenerating(true);
+    const handleStartOver = () => {
+        dispatch({ type: 'RESET_BUILDER' });
+        navigate('/program-design');
+    };
 
-        try {
-            // Simulate program generation
-            await new Promise(resolve => setTimeout(resolve, 2000));
-
-            // Here you would typically:
-            // 1. Generate detailed workout plans
-            // 2. Calculate progressive overload schedules
-            // 3. Create exercise selections
-            // 4. Save to database/local storage
-            // 5. Navigate to the program dashboard
-
-            setShowSuccess(true);
-
-            // Reset builder state after success
-            setTimeout(() => {
-                dispatch({ type: 'RESET_BUILDER' });
-                setShowSuccess(false);
-                navigate('/program');
-            }, 3000);
-
-        } catch (error) {
-            console.error('Failed to generate program:', error);
-            setIsGenerating(false);
+    // Get validation icon and color
+    const getValidationStyle = (type: string) => {
+        switch (type) {
+            case 'error':
+                return { color: 'text-red-400', bg: 'bg-red-900/20 border-red-700', icon: '⚠️' };
+            case 'warning':
+                return { color: 'text-yellow-400', bg: 'bg-yellow-900/20 border-yellow-700', icon: '⚠️' };
+            case 'info':
+                return { color: 'text-blue-400', bg: 'bg-blue-900/20 border-blue-700', icon: 'ℹ️' };
+            default:
+                return { color: 'text-gray-400', bg: 'bg-gray-900/20 border-gray-700', icon: '•' };
         }
     };
-
-    // Calculate phase breakdown
-    const getPhaseBreakdown = () => {
-        const phaseBreakdown = {
-            accumulation: 0,
-            intensification: 0,
-            realization: 0,
-            deload: 0
-        };
-
-        blocks.forEach(block => {
-            if (block.type in phaseBreakdown) {
-                phaseBreakdown[block.type] += block.weeks;
-            }
-        });
-
-        return phaseBreakdown;
-    };
-
-    const phaseBreakdown = getPhaseBreakdown();
-
-    if (showSuccess) {
-        return (
-            <div className="min-h-screen bg-black text-white flex items-center justify-center">
-                <div className="text-center">
-                    <div className="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                    </div>
-                    <h1 className="text-4xl font-bold mb-4">Program Generated Successfully!</h1>
-                    <p className="text-gray-400 mb-6">Your personalized training program is ready</p>
-                    <div className="animate-pulse">
-                        <p className="text-gray-500">Redirecting to your program dashboard...</p>
-                    </div>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className="min-h-screen bg-black text-white py-8">
@@ -137,19 +251,10 @@ const ReviewGenerate: React.FC = () => {
                 {/* Header */}
                 <div className="text-center mb-8">
                     <h1 className="text-4xl font-bold text-white mb-2">Review & Generate</h1>
-                    <p className="text-gray-400">Step 4 of 4 - Review your program and generate your plan</p>
+                    <p className="text-gray-400">Step 4 of 4 - Validate and export your macrocycle</p>
 
-                    {/* Progress Steps - Desktop */}
-                    <div className="hidden md:block mt-6">
-                        <StepProgress
-                            currentStep={4}
-                            totalSteps={4}
-                            steps={['Details', 'Template', 'Timeline', 'Review']}
-                        />
-                    </div>
-
-                    {/* Mobile Progress Bar */}
-                    <div className="w-full bg-gray-800 rounded-full h-2 mt-4 md:hidden">
+                    {/* Progress Bar */}
+                    <div className="w-full bg-gray-800 rounded-full h-2 mt-6">
                         <div className="bg-red-600 h-2 rounded-full transition-all duration-300" style={{ width: '100%' }}></div>
                     </div>
                 </div>
@@ -159,245 +264,161 @@ const ReviewGenerate: React.FC = () => {
                     <div className="bg-gray-900 rounded-lg p-6 border border-gray-700">
                         <h2 className="text-2xl font-bold text-gray-100 mb-6">Program Summary</h2>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                            {/* Left Column - Basic Details */}
-                            <div className="space-y-6">
-                                <div className="bg-gray-800 rounded-lg p-4">
-                                    <h3 className="text-lg font-semibold text-gray-100 mb-4">Program Details</h3>
-                                    <div className="space-y-3">
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-400">Name:</span>
-                                            <span className="text-white font-medium">{programDetails.name}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-400">Duration:</span>
-                                            <span className="text-white font-medium">{programDetails.duration} weeks</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-400">Training Days:</span>
-                                            <span className="text-white font-medium">{programDetails.trainingDaysPerWeek} days/week</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-400">Experience:</span>
-                                            <span className="text-white font-medium capitalize">{programDetails.trainingExperience}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-400">Diet Phase:</span>
-                                            <span className="text-white font-medium capitalize">{programDetails.dietPhase}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-400">Template:</span>
-                                            <span className="text-white font-medium capitalize">{selectedTemplate}</span>
-                                        </div>
-                                        {specialization && specialization !== 'None' && (
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-400">Specialization:</span>
-                                                <span className="text-red-400 font-medium">{specialization}</span>
-                                            </div>
-                                        )}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {/* Basic Details */}
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-semibold text-white mb-4">Program Details</h3>
+                                <div className="space-y-3">
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-400">Name:</span>
+                                        <span className="text-white font-medium">{programDetails.name}</span>
                                     </div>
-                                </div>
-
-                                <div className="bg-gray-800 rounded-lg p-4">
-                                    <h3 className="text-lg font-semibold text-gray-100 mb-4">Phase Breakdown</h3>
-                                    <div className="space-y-3">
-                                        {phaseBreakdown.accumulation > 0 && (
-                                            <div className="flex justify-between items-center">
-                                                <div className="flex items-center">
-                                                    <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
-                                                    <span className="text-gray-400">Accumulation:</span>
-                                                </div>
-                                                <span className="text-white font-medium">{phaseBreakdown.accumulation} weeks</span>
-                                            </div>
-                                        )}
-                                        {phaseBreakdown.intensification > 0 && (
-                                            <div className="flex justify-between items-center">
-                                                <div className="flex items-center">
-                                                    <div className="w-3 h-3 bg-yellow-500 rounded-full mr-3"></div>
-                                                    <span className="text-gray-400">Intensification:</span>
-                                                </div>
-                                                <span className="text-white font-medium">{phaseBreakdown.intensification} weeks</span>
-                                            </div>
-                                        )}
-                                        {phaseBreakdown.realization > 0 && (
-                                            <div className="flex justify-between items-center">
-                                                <div className="flex items-center">
-                                                    <div className="w-3 h-3 bg-red-500 rounded-full mr-3"></div>
-                                                    <span className="text-gray-400">Realization:</span>
-                                                </div>
-                                                <span className="text-white font-medium">{phaseBreakdown.realization} weeks</span>
-                                            </div>
-                                        )}
-                                        {phaseBreakdown.deload > 0 && (
-                                            <div className="flex justify-between items-center">
-                                                <div className="flex items-center">
-                                                    <div className="w-3 h-3 bg-gray-500 rounded-full mr-3"></div>
-                                                    <span className="text-gray-400">Deload/Recovery:</span>
-                                                </div>
-                                                <span className="text-white font-medium">{phaseBreakdown.deload} weeks</span>
-                                            </div>
-                                        )}
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-400">Duration:</span>
+                                        <span className="text-white font-medium">{programDetails.duration} weeks</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-400">Experience:</span>
+                                        <span className="text-white font-medium capitalize">{programDetails.trainingExperience}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-400">Diet Phase:</span>
+                                        <span className="text-white font-medium capitalize">{programDetails.dietPhase}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-400">Training Days:</span>
+                                        <span className="text-white font-medium">{programDetails.trainingDaysPerWeek}/week</span>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Right Column - Volume Recommendations */}
-                            <div className="space-y-6">
-                                <div className="bg-gray-800 rounded-lg p-4">
-                                    <h3 className="text-lg font-semibold text-gray-100 mb-4">Volume Targets</h3>
-                                    <p className="text-gray-400 text-sm mb-4">
-                                        Weekly volume recommendations based on your experience level and goals
-                                    </p>
-
-                                    <div className="space-y-4">
-                                        {volumeRecommendations.map((rec) => (
-                                            <div key={rec.muscle} className="bg-gray-700 rounded-lg p-3">
-                                                <div className="flex justify-between items-center mb-2">
-                                                    <div className="flex items-center">
-                                                        <span className="text-gray-200 font-medium capitalize">
-                                                            {rec.muscle}
-                                                        </span>
-                                                        {rec.specialization && (
-                                                            <span className="ml-2 text-xs bg-red-600 text-white px-2 py-1 rounded">
-                                                                +30%
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <span className="text-gray-100 font-bold">
-                                                        {rec.mev}-{rec.mrv} sets
-                                                    </span>
-                                                </div>
-
-                                                <div className="w-full bg-gray-600 rounded-full h-2">
-                                                    <div
-                                                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                                                        style={{ width: `${(rec.mev / rec.mrv) * 100}%` }}
-                                                    ></div>
-                                                </div>
-                                                <div className="flex justify-between text-xs text-gray-400 mt-1">
-                                                    <span>MEV</span>
-                                                    <span>MRV</span>
-                                                </div>
-                                            </div>
-                                        ))}
+                            {/* Volume Summary */}
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-semibold text-white mb-4">Volume Summary</h3>
+                                {volumeProgression && (
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-400">Total Sets:</span>
+                                            <span className="text-white font-medium">{volumeProgression.totalSets}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-400">Specialized Muscles:</span>
+                                            <span className="text-white font-medium">{volumeProgression.specializationMuscles.length}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-400">Total Weeks:</span>
+                                            <span className="text-white font-medium">{volumeProgression.totalWeeks}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-400">Avg Weekly Sets:</span>
+                                            <span className="text-white font-medium">
+                                                {Math.round(volumeProgression.totalSets / volumeProgression.totalWeeks)}
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
                         </div>
                     </div>
 
-                    {/* Phase Timeline */}
+                    {/* Block Structure */}
                     <div className="bg-gray-900 rounded-lg p-6 border border-gray-700">
-                        <h2 className="text-2xl font-bold text-gray-100 mb-6">Phase Timeline</h2>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {blocks.map((block, index) => {
-                                const startWeek = blocks.slice(0, index).reduce((acc, b) => acc + b.weeks, 0) + 1;
-                                const endWeek = blocks.slice(0, index + 1).reduce((acc, b) => acc + b.weeks, 0);
-
-                                return (
-                                    <PhaseCard
-                                        key={block.id}
-                                        phase={block.name}
-                                        weeks={`${startWeek}-${endWeek}`}
-                                        current={0}
-                                        total={block.weeks}
-                                        description={
-                                            block.type === 'accumulation' ? 'Build volume from MEV to MRV' :
-                                                block.type === 'intensification' ? 'Maintain volume, increase intensity' :
-                                                    block.type === 'realization' ? 'Taper volume, peak performance' :
-                                                        'Reduce volume for recovery'
-                                        }
-                                        color={
-                                            block.type === 'accumulation' ? 'blue' :
-                                                block.type === 'intensification' ? 'yellow' :
-                                                    block.type === 'realization' ? 'red' : 'gray'
-                                        }
-                                    />
-                                );
-                            })}
-                        </div>
-                    </div>
-
-                    {/* Key Features */}
-                    <div className="bg-gray-900 rounded-lg p-6 border border-gray-700">
-                        <h2 className="text-2xl font-bold text-gray-100 mb-6">Your Program Includes</h2>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-4">
-                                <div className="flex items-start space-x-3">
-                                    <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-white font-semibold">RP Volume Recommendations</h3>
-                                        <p className="text-gray-400 text-sm">Science-based volume targets for each muscle group</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start space-x-3">
-                                    <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-white font-semibold">Periodized Training Phases</h3>
-                                        <p className="text-gray-400 text-sm">Structured progression through accumulation, intensification, and realization</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start space-x-3">
-                                    <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-white font-semibold">Auto-Regulation</h3>
-                                        <p className="text-gray-400 text-sm">RIR-based intensity prescription for optimal recovery</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="space-y-4">
-                                <div className="flex items-start space-x-3">
-                                    <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-white font-semibold">Progressive Overload</h3>
-                                        <p className="text-gray-400 text-sm">Systematic increases in volume and intensity over time</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start space-x-3">
-                                    <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3 className="text-white font-semibold">Deload Weeks</h3>
-                                        <p className="text-gray-400 text-sm">Planned recovery periods for supercompensation</p>
-                                    </div>
-                                </div>
-
-                                {specialization && specialization !== 'None' && (
-                                    <div className="flex items-start space-x-3">
-                                        <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        </div>
+                        <h2 className="text-2xl font-bold text-gray-100 mb-4">Block Structure</h2>
+                        <div className="space-y-4">
+                            {blocks.map((block, index) => (
+                                <div key={index} className="bg-gray-800 rounded-lg p-4 flex items-center justify-between">
+                                    <div className="flex items-center space-x-4">
+                                        <div className={`w-4 h-4 rounded-full ${block.type === 'accumulation' ? 'bg-blue-500' :
+                                                block.type === 'intensification' ? 'bg-yellow-500' :
+                                                    block.type === 'realization' ? 'bg-red-500' :
+                                                        'bg-gray-500'
+                                            }`}></div>
                                         <div>
-                                            <h3 className="text-white font-semibold">{specialization} Specialization</h3>
-                                            <p className="text-gray-400 text-sm">Enhanced volume for targeted muscle group development</p>
+                                            <p className="text-white font-medium">{block.name}</p>
+                                            <p className="text-gray-400 text-sm capitalize">{block.type}</p>
                                         </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-white font-medium">{block.weeks} weeks</p>
+                                        <p className="text-gray-400 text-sm">
+                                            {block.rirRange[0]}-{block.rirRange[1]} RIR
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Validation Results */}
+                    <div className="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                        <h2 className="text-2xl font-bold text-gray-100 mb-4">Program Validation</h2>
+
+                        {validationResults.length === 0 ? (
+                            <div className="bg-green-900/20 border border-green-700 rounded-lg p-4">
+                                <div className="flex items-center space-x-2">
+                                    <span className="text-green-400">✅</span>
+                                    <span className="text-green-300 font-medium">Program validation passed!</span>
+                                </div>
+                                <p className="text-green-400 text-sm mt-2">
+                                    Your program meets all RP guidelines and is ready for implementation.
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {validationResults.map((result, index) => {
+                                    const style = getValidationStyle(result.type);
+                                    return (
+                                        <div key={index} className={`${style.bg} border rounded-lg p-4`}>
+                                            <div className="flex items-start space-x-3">
+                                                <span className="text-xl">{style.icon}</span>
+                                                <div>
+                                                    <h3 className={`font-medium ${style.color}`}>{result.title}</h3>
+                                                    <p className="text-gray-300 text-sm mt-1">{result.message}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Export Options */}
+                    <div className="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                        <h2 className="text-2xl font-bold text-gray-100 mb-4">Export Program</h2>
+
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {exportFormats.map((format) => (
+                                    <button
+                                        key={format.format}
+                                        onClick={() => setSelectedExportFormat(format.format)}
+                                        className={`text-left p-4 rounded-lg border-2 transition-all ${selectedExportFormat === format.format
+                                                ? 'border-red-500 bg-red-500/10'
+                                                : 'border-gray-600 bg-gray-800 hover:border-gray-500'
+                                            }`}
+                                    >
+                                        <h3 className="font-medium text-white mb-2">{format.name}</h3>
+                                        <p className="text-gray-400 text-sm">{format.description}</p>
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div className="pt-4 border-t border-gray-700">
+                                <button
+                                    onClick={handleExport}
+                                    disabled={isExporting}
+                                    className={`w-full py-3 px-6 rounded-lg font-medium transition-all ${isExporting
+                                            ? 'bg-gray-600 cursor-not-allowed'
+                                            : 'bg-red-600 hover:bg-red-700 transform hover:scale-105'
+                                        } text-white`}
+                                >
+                                    {isExporting ? 'Exporting...' : `Export as ${exportFormats.find(f => f.format === selectedExportFormat)?.name}`}
+                                </button>
+
+                                {exportSuccess && (
+                                    <div className="mt-4 bg-green-900/20 border border-green-700 rounded-lg p-3">
+                                        <p className="text-green-300 text-sm">✅ Export successful!</p>
                                     </div>
                                 )}
                             </div>
@@ -414,24 +435,10 @@ const ReviewGenerate: React.FC = () => {
                         </button>
 
                         <button
-                            onClick={handleGenerateProgram}
-                            disabled={isGenerating}
-                            className={`px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-200 ${isGenerating
-                                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                : 'bg-red-600 text-white hover:bg-red-700 transform hover:scale-105'
-                                }`}
+                            onClick={handleStartOver}
+                            className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-colors"
                         >
-                            {isGenerating ? (
-                                <div className="flex items-center space-x-2">
-                                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    <span>Generating Program...</span>
-                                </div>
-                            ) : (
-                                'Generate Program 🚀'
-                            )}
+                            Start New Program
                         </button>
                     </div>
                 </div>

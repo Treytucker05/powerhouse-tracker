@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBuilder } from '../../contexts/MacrocycleBuilderContext';
-import {
-    calculatePersonalizedVolume,
-    calculateWeeklyVolume,
-    calculateWeeklyRIR,
-    calculateVolumeDistribution
-} from '../../lib/algorithms/rpAlgorithms';
-import { StepProgress } from '../../lib/designSystem.jsx';
+import { calculatePersonalizedVolume } from '../../lib/algorithms/rpAlgorithms';
+import { calculateMacrocycleVolumeProgression } from '../../lib/algorithms/volumeProgression';
 
+// Types
 interface WeeklyVolume {
     week: number;
     volume: number;
@@ -16,12 +12,13 @@ interface WeeklyVolume {
     phase: string;
 }
 
-interface MuscleVolumeProgression {
+interface MuscleProgression {
     muscle: string;
     mev: number;
     mrv: number;
     mav: number;
-    frequency: string;
+    mv: number;
+    frequency: number;
     specialization: boolean;
     weeklyProgression: WeeklyVolume[];
 }
@@ -30,86 +27,92 @@ const VolumeDistribution: React.FC = () => {
     const navigate = useNavigate();
     const { state, dispatch, validateCurrentStep, canProceedToNextStep } = useBuilder();
     const { programDetails, blocks, specialization } = state;
-    const [volumeProgressions, setVolumeProgressions] = useState<MuscleVolumeProgression[]>([]);
     const [selectedMuscle, setSelectedMuscle] = useState<string>('chest');
+    const [volumeProgressions, setVolumeProgressions] = useState<MuscleProgression[]>([]);
 
-    // Calculate volume progressions for all muscles
-    useEffect(() => {
-        if (programDetails.trainingExperience && programDetails.dietPhase && blocks.length > 0) {
-            const muscleGroups = [
-                'chest', 'back', 'shoulders',
-                'biceps', 'triceps',
-                'quads', 'hamstrings', 'glutes',
-                'calves', 'abs', 'traps', 'forearms'
-            ];
+    // All muscle groups
+    const muscleGroups = [
+        'chest', 'back', 'shoulders', 'biceps', 'triceps', 'forearms',
+        'quads', 'hamstrings', 'glutes', 'calves', 'abs', 'traps'
+    ];
 
-            const progressions = muscleGroups.map(muscle => {
-                const isSpecialized = specialization !== 'None' &&
-                    ((specialization === 'Chest' && muscle === 'chest') ||
-                        (specialization === 'Back' && muscle === 'back') ||
-                        (specialization === 'Shoulders' && muscle === 'shoulders') ||
-                        (specialization === 'Arms' && (muscle === 'biceps' || muscle === 'triceps')) ||
-                        (specialization === 'Legs' && (muscle === 'quads' || muscle === 'hamstrings' || muscle === 'glutes')));
+    // Helper function to calculate weekly volume within a block
+    const calculateWeeklyVolume = (mev: number, mrv: number, weekInBlock: number, totalWeeks: number): number => {
+        const progressionFactor = (weekInBlock - 1) / Math.max(totalWeeks - 1, 1);
+        return Math.round(mev + (mrv - mev) * progressionFactor);
+    };
 
-                const personalizedVolume = calculatePersonalizedVolume(
-                    muscle,
-                    programDetails.trainingExperience,
-                    programDetails.dietPhase,
-                    isSpecialized
-                );
+    // Helper function to calculate weekly RIR
+    const calculateWeeklyRIR = (weekInBlock: number, totalWeeks: number, experience: string): number => {
+        const baseRIR = experience === 'beginner' ? 3 : experience === 'intermediate' ? 2 : 1;
+        const rirReduction = Math.floor((weekInBlock - 1) / Math.max(totalWeeks - 1, 1) * 2);
+        return Math.max(0, baseRIR - rirReduction);
+    };
 
-                // Calculate weekly progression for each block
-                const weeklyProgression: WeeklyVolume[] = [];
-                let currentWeek = 1;
+    // Helper function to calculate volume distribution per training day
+    const calculateVolumeDistribution = (weeklyVolume: number, trainingDays: number, frequency: number): number[] => {
+        const sessionsPerWeek = Math.min(frequency, trainingDays);
+        const baseVolume = Math.floor(weeklyVolume / sessionsPerWeek);
+        const remainder = weeklyVolume % sessionsPerWeek;
 
-                blocks.forEach(block => {
-                    for (let week = 1; week <= block.weeks; week++) {
-                        let weeklyVolume: number;
-                        let weeklyRIR: number;
+        const distribution = new Array(trainingDays).fill(0);
 
-                        if (block.type === 'accumulation') {
-                            weeklyVolume = calculateWeeklyVolume(
-                                personalizedVolume.mev,
-                                personalizedVolume.mrv,
-                                week,
-                                block.weeks
-                            );
-                            weeklyRIR = calculateWeeklyRIR(week, block.weeks, programDetails.trainingExperience);
-                        } else if (block.type === 'intensification') {
-                            weeklyVolume = Math.round(personalizedVolume.mav * 0.9); // Slightly below MAV
-                            weeklyRIR = Math.max(0, calculateWeeklyRIR(week, block.weeks, programDetails.trainingExperience) - 1);
-                        } else if (block.type === 'realization') {
-                            weeklyVolume = Math.round(personalizedVolume.mev * 0.7); // Taper volume
-                            weeklyRIR = Math.max(0, calculateWeeklyRIR(week, block.weeks, programDetails.trainingExperience) - 2);
-                        } else { // deload
-                            weeklyVolume = personalizedVolume.mv;
-                            weeklyRIR = 4; // Easy deload
-                        }
-
-                        weeklyProgression.push({
-                            week: currentWeek,
-                            volume: weeklyVolume,
-                            rir: weeklyRIR,
-                            phase: block.type
-                        });
-
-                        currentWeek++;
-                    }
-                });
-
-                return {
-                    muscle,
-                    mev: personalizedVolume.mev,
-                    mrv: personalizedVolume.mrv,
-                    mav: personalizedVolume.mav,
-                    frequency: personalizedVolume.frequency,
-                    specialization: isSpecialized,
-                    weeklyProgression
-                };
-            });
-
-            setVolumeProgressions(progressions);
+        // Distribute base volume
+        for (let i = 0; i < sessionsPerWeek; i++) {
+            distribution[i] = baseVolume;
         }
+
+        // Distribute remainder
+        for (let i = 0; i < remainder; i++) {
+            distribution[i]++;
+        }
+
+        return distribution;
+    };
+
+    // Calculate volume progressions for all muscle groups
+    useEffect(() => {
+        if (blocks.length === 0) return;
+
+        const specializationMuscles = specialization && specialization !== 'None'
+            ? specialization.split(',').map(s => s.trim().toLowerCase())
+            : [];
+
+        // Use the enhanced volume progression calculator
+        const progression = calculateMacrocycleVolumeProgression(
+            programDetails,
+            blocks,
+            specializationMuscles
+        );
+
+        // Convert the progression data to the format expected by the component
+        const progressions: MuscleProgression[] = muscleGroups.map(muscle => {
+            const muscleData = progression.weeklyProgression[muscle] || [];
+            const personalizedVolume = calculatePersonalizedVolume(
+                muscle,
+                programDetails.trainingExperience,
+                programDetails.dietPhase,
+                specializationMuscles.includes(muscle)
+            );
+
+            return {
+                muscle,
+                mev: personalizedVolume.mev,
+                mrv: personalizedVolume.mrv,
+                mav: personalizedVolume.mav,
+                mv: personalizedVolume.mv,
+                frequency: personalizedVolume.frequency || 2,
+                specialization: specializationMuscles.includes(muscle),
+                weeklyProgression: muscleData.map((week: any) => ({
+                    week: week.week,
+                    volume: week.volume,
+                    rir: week.rir,
+                    phase: week.blockType
+                }))
+            };
+        });
+
+        setVolumeProgressions(progressions);
     }, [programDetails.trainingExperience, programDetails.dietPhase, blocks, specialization]);
 
     // Handle navigation
@@ -146,17 +149,8 @@ const VolumeDistribution: React.FC = () => {
                     <h1 className="text-4xl font-bold text-white mb-2">Volume Distribution</h1>
                     <p className="text-gray-400">Step 3.5 of 4 - Review weekly volume progression</p>
 
-                    {/* Progress Steps - Desktop */}
-                    <div className="hidden md:block mt-6">
-                        <StepProgress
-                            currentStep={3}
-                            totalSteps={4}
-                            steps={['Details', 'Template', 'Timeline', 'Review']}
-                        />
-                    </div>
-
-                    {/* Mobile Progress Bar */}
-                    <div className="w-full bg-gray-800 rounded-full h-2 mt-4 md:hidden">
+                    {/* Progress Bar */}
+                    <div className="w-full bg-gray-800 rounded-full h-2 mt-6">
                         <div className="bg-red-600 h-2 rounded-full transition-all duration-300" style={{ width: '87.5%' }}></div>
                     </div>
                 </div>
@@ -193,21 +187,21 @@ const VolumeDistribution: React.FC = () => {
                                 </h2>
                                 <div className="text-right">
                                     <p className="text-gray-400 text-sm">MEV: {selectedProgression.mev} | MRV: {selectedProgression.mrv}</p>
-                                    <p className="text-gray-400 text-sm">Frequency: {selectedProgression.frequency}</p>
+                                    <p className="text-gray-400 text-sm">Frequency: {selectedProgression.frequency}x/week</p>
                                 </div>
                             </div>
 
                             {/* Weekly Volume Chart */}
                             <div className="bg-gray-800 rounded-lg p-4 mb-6">
-                                <div className="grid grid-cols-1 md:grid-cols-12 gap-2">
+                                <div className="flex justify-between items-end gap-2 overflow-x-auto">
                                     {selectedProgression.weeklyProgression.map((week, index) => (
-                                        <div key={index} className="text-center">
+                                        <div key={index} className="text-center min-w-[60px]">
                                             <div className="text-xs text-gray-400 mb-1">W{week.week}</div>
                                             <div
-                                                className={`${getPhaseColor(week.phase)} rounded-lg p-2 text-white font-bold text-sm`}
+                                                className={`${getPhaseColor(week.phase)} rounded-lg text-white font-bold text-sm flex items-center justify-center`}
                                                 style={{
-                                                    height: `${Math.max(30, (week.volume / selectedProgression.mrv) * 100)}px`,
-                                                    minHeight: '30px'
+                                                    height: `${Math.max(40, (week.volume / selectedProgression.mrv) * 120)}px`,
+                                                    minHeight: '40px'
                                                 }}
                                             >
                                                 {week.volume}

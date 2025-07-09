@@ -4,6 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Suspense, lazy } from 'react';
 import AppShell from './layout/AppShell.jsx';
 import { MacrocycleBuilderProvider } from './contexts/MacrocycleBuilderContext.tsx';
+import ErrorBoundary from './components/ErrorBoundary.jsx';
 import './App.css';
 
 // Lazy load page components for better code splitting
@@ -46,17 +47,19 @@ function App() {
 
             {/* Program Design Builder Routes */}
             <Route path="program-design/*" element={
-              <MacrocycleBuilderProvider>
-                <Suspense fallback={<LoadingSpinner />}>
-                  <Routes>
-                    <Route index element={<ProgramDetails />} />
-                    <Route path="template" element={<TemplateSelection />} />
-                    <Route path="timeline" element={<TimelineBlocks />} />
-                    <Route path="volume-distribution" element={<VolumeDistribution />} />
-                    <Route path="review" element={<ReviewGenerate />} />
-                  </Routes>
-                </Suspense>
-              </MacrocycleBuilderProvider>
+              <ErrorBoundary>
+                <MacrocycleBuilderProvider>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <Routes>
+                      <Route index element={<ProgramDetails />} />
+                      <Route path="template" element={<TemplateSelection />} />
+                      <Route path="timeline" element={<TimelineBlocks />} />
+                      <Route path="volume-distribution" element={<VolumeDistribution />} />
+                      <Route path="review" element={<ReviewGenerate />} />
+                    </Routes>
+                  </Suspense>
+                </MacrocycleBuilderProvider>
+              </ErrorBoundary>
             } />
           </Route>
         </Routes>

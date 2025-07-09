@@ -1,25 +1,105 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBuilder } from '../../contexts/MacrocycleBuilderContext';
 import { calculateMEV, calculateMRV } from '../../lib/algorithms/rpAlgorithms';
+
+// Block templates with enhanced parameters
+const blockTemplates = {
+    accumulation: {
+        name: 'Accumulation',
+        description: 'Volume accumulation phase (MEV → MRV)',
+        volumeProgression: 'linear' as const,
+        intensityRange: [65, 75] as [number, number],
+        rirRange: [1, 4] as [number, number],
+        primaryFocus: 'Volume & work capacity',
+        color: 'bg-blue-500',
+        icon: '📈'
+    },
+    intensification: {
+        name: 'Intensification',
+        description: 'Strength & density focus',
+        volumeProgression: 'undulating' as const,
+        intensityRange: [75, 85] as [number, number],
+        rirRange: [1, 3] as [number, number],
+        primaryFocus: 'Strength & power',
+        color: 'bg-yellow-500',
+        icon: '⚡'
+    },
+    realization: {
+        name: 'Realization',
+        description: 'Peak performance & taper',
+        volumeProgression: 'block' as const,
+        intensityRange: [85, 95] as [number, number],
+        rirRange: [0, 2] as [number, number],
+        primaryFocus: 'Peak strength & skill',
+        color: 'bg-red-500',
+        icon: '🎯'
+    },
+    deload: {
+        name: 'Deload',
+        description: 'Recovery & restoration',
+        volumeProgression: 'linear' as const,
+        intensityRange: [50, 65] as [number, number],
+        rirRange: [3, 4] as [number, number],
+        primaryFocus: 'Recovery & mobility',
+        color: 'bg-gray-500',
+        icon: '🔄'
+    }
+};
+
+// Import the Block type from context
+import type { Block } from '../../contexts/MacrocycleBuilderContext';
 
 const TimelineBlocks: React.FC = () => {
     const navigate = useNavigate();
     const { state, dispatch, validateCurrentStep, canProceedToNextStep } = useBuilder();
     const { programDetails } = state;
+    const [selectedSpecialization, setSelectedSpecialization] = useState<string[]>([]);
 
-    // Calculate number of blocks based on duration
-    const calculateBlocks = () => {
+    // Muscle groups for specialization selection
+    const muscleGroups = [
+        'chest', 'back', 'shoulders', 'biceps', 'triceps', 'forearms',
+        'quads', 'hamstrings', 'glutes', 'calves', 'abs', 'traps'
+    ];
+
+    // Enhanced block calculation with template integration
+    const calculateBlocks = (): Block[] => {
         const weeks = programDetails.duration;
-        const blocks = [];
+        const blocks: Block[] = [];
 
         if (weeks <= 8) {
-            blocks.push({ type: 'accumulation', weeks: weeks - 1, name: 'Accumulation' });
-            blocks.push({ type: 'deload', weeks: 1, name: 'Deload' });
+            blocks.push({
+                id: 'accumulation-1',
+                type: 'accumulation',
+                weeks: weeks - 1,
+                ...blockTemplates.accumulation
+            });
+            blocks.push({
+                id: 'deload-1',
+                type: 'deload',
+                weeks: 1,
+                ...blockTemplates.deload
+            });
         } else if (weeks <= 12) {
-            blocks.push({ type: 'accumulation', weeks: 6, name: 'Accumulation 1' });
-            blocks.push({ type: 'intensification', weeks: weeks - 7, name: 'Intensification' });
-            blocks.push({ type: 'deload', weeks: 1, name: 'Deload' });
+            blocks.push({
+                id: 'accumulation-1',
+                type: 'accumulation',
+                weeks: 6,
+                ...blockTemplates.accumulation,
+                name: 'Accumulation 1'
+            });
+            blocks.push({
+                id: 'intensification-1',
+                type: 'intensification',
+                weeks: weeks - 7,
+                ...blockTemplates.intensification
+            });
+            blocks.push({
+                id: 'deload-1',
+                type: 'deload',
+                weeks: 1,
+                ...blockTemplates.deload
+            });
         } else {
             // For longer programs, add realization phase
             const accumulationWeeks = Math.floor(weeks * 0.4);
@@ -27,10 +107,31 @@ const TimelineBlocks: React.FC = () => {
             const realizationWeeks = Math.floor(weeks * 0.2);
             const deloadWeeks = weeks - accumulationWeeks - intensificationWeeks - realizationWeeks;
 
-            blocks.push({ type: 'accumulation', weeks: accumulationWeeks, name: 'Accumulation' });
-            blocks.push({ type: 'intensification', weeks: intensificationWeeks, name: 'Intensification' });
-            blocks.push({ type: 'realization', weeks: realizationWeeks, name: 'Realization' });
-            blocks.push({ type: 'deload', weeks: deloadWeeks, name: 'Recovery' });
+            blocks.push({
+                id: 'accumulation-1',
+                type: 'accumulation',
+                weeks: accumulationWeeks,
+                ...blockTemplates.accumulation
+            });
+            blocks.push({
+                id: 'intensification-1',
+                type: 'intensification',
+                weeks: intensificationWeeks,
+                ...blockTemplates.intensification
+            });
+            blocks.push({
+                id: 'realization-1',
+                type: 'realization',
+                weeks: realizationWeeks,
+                ...blockTemplates.realization
+            });
+            blocks.push({
+                id: 'deload-1',
+                type: 'deload',
+                weeks: deloadWeeks,
+                ...blockTemplates.deload,
+                name: 'Recovery'
+            });
         }
 
         return blocks;
@@ -42,6 +143,20 @@ const TimelineBlocks: React.FC = () => {
     useEffect(() => {
         dispatch({ type: 'SET_BLOCKS', payload: blocks });
     }, [programDetails.duration, dispatch]);
+
+    // Handle specialization selection
+    const handleSpecializationChange = (muscle: string) => {
+        if (selectedSpecialization.includes(muscle)) {
+            setSelectedSpecialization(prev => prev.filter(m => m !== muscle));
+        } else if (selectedSpecialization.length < 2) {
+            setSelectedSpecialization(prev => [...prev, muscle]);
+        }
+    };
+
+    // Update specialization in state
+    useEffect(() => {
+        dispatch({ type: 'SET_SPECIALIZATION', payload: selectedSpecialization.join(', ') });
+    }, [selectedSpecialization, dispatch]);
 
     // Handle next button click
     const handleNext = () => {
@@ -150,45 +265,49 @@ const TimelineBlocks: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Block details */}
+                        {/* Enhanced Block details */}
                         <div className="space-y-4">
                             {blocks.map((block, index) => {
                                 const startWeek = blocks.slice(0, index).reduce((acc, b) => acc + b.weeks, 0) + 1;
                                 const endWeek = blocks.slice(0, index + 1).reduce((acc, b) => acc + b.weeks, 0);
+                                const template = blockTemplates[block.type];
 
                                 return (
-                                    <div key={index} className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                                        <div className="flex items-center justify-between">
+                                    <div key={index} className="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                                        <div className="flex items-center justify-between mb-4">
                                             <div className="flex items-center space-x-4">
-                                                <div
-                                                    className={`w-4 h-4 rounded-full ${block.type === 'accumulation' ? 'bg-blue-500' :
-                                                        block.type === 'intensification' ? 'bg-yellow-500' :
-                                                            block.type === 'realization' ? 'bg-red-500' :
-                                                                'bg-gray-500'
-                                                        }`}
-                                                />
+                                                <div className={`w-6 h-6 rounded-full ${template.color} flex items-center justify-center text-white text-sm font-bold`}>
+                                                    {template.icon}
+                                                </div>
                                                 <div>
-                                                    <h3 className="text-lg font-semibold text-gray-100">{block.name}</h3>
-                                                    <p className="text-sm text-gray-400">Weeks {startWeek} - {endWeek}</p>
+                                                    <h3 className="text-lg font-semibold text-white">{block.name}</h3>
+                                                    <p className="text-sm text-gray-400">{template.description}</p>
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <p className="text-sm text-gray-400">Volume Focus</p>
-                                                <p className="text-lg font-medium text-gray-200">
-                                                    {block.type === 'accumulation' ? 'MEV → MRV' :
-                                                        block.type === 'intensification' ? 'MAV → MEV' :
-                                                            block.type === 'realization' ? 'Taper' :
-                                                                'Recovery'}
-                                                </p>
+                                                <p className="text-white font-semibold">Weeks {startWeek}-{endWeek}</p>
+                                                <p className="text-sm text-gray-400">{block.weeks} weeks</p>
                                             </div>
                                         </div>
 
-                                        {/* Block description */}
-                                        <div className="mt-3 text-sm text-gray-400">
-                                            {block.type === 'accumulation' && 'Build volume progressively from MEV to MRV. Focus on hypertrophy adaptations.'}
-                                            {block.type === 'intensification' && 'Maintain volume around MAV while increasing intensity. Strength focus.'}
-                                            {block.type === 'realization' && 'Taper volume to realize strength gains. Peak performance phase.'}
-                                            {block.type === 'deload' && 'Reduce volume and intensity to promote recovery and supercompensation.'}
+                                        {/* Phase Details Grid */}
+                                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+                                            <div className="bg-gray-900 rounded-lg p-3">
+                                                <p className="text-xs text-gray-400 uppercase tracking-wide">Intensity Range</p>
+                                                <p className="text-white font-semibold">{template.intensityRange[0]}-{template.intensityRange[1]}%</p>
+                                            </div>
+                                            <div className="bg-gray-900 rounded-lg p-3">
+                                                <p className="text-xs text-gray-400 uppercase tracking-wide">RIR Range</p>
+                                                <p className="text-white font-semibold">{block.rirRange[0]}-{block.rirRange[1]} RIR</p>
+                                            </div>
+                                            <div className="bg-gray-900 rounded-lg p-3">
+                                                <p className="text-xs text-gray-400 uppercase tracking-wide">Volume Pattern</p>
+                                                <p className="text-white font-semibold capitalize">{block.volumeProgression}</p>
+                                            </div>
+                                            <div className="bg-gray-900 rounded-lg p-3">
+                                                <p className="text-xs text-gray-400 uppercase tracking-wide">Primary Focus</p>
+                                                <p className="text-white font-semibold">{template.primaryFocus}</p>
+                                            </div>
                                         </div>
                                     </div>
                                 );
@@ -196,37 +315,44 @@ const TimelineBlocks: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Specialization options */}
+                    {/* Specialization Selection */}
                     <div className="bg-gray-900 rounded-lg p-6 border border-gray-700">
-                        <h3 className="text-lg font-semibold text-gray-100 mb-4">
-                            Specialization Focus (Optional)
-                        </h3>
-                        <p className="text-gray-400 mb-4">
-                            Choose a muscle group to prioritize during accumulation phases. This will increase volume by 30% for the selected muscle while maintaining others.
-                        </p>
+                        <div className="mb-6">
+                            <h2 className="text-2xl font-bold text-gray-100 mb-2">Specialization Focus</h2>
+                            <p className="text-gray-400">
+                                Select up to 2 muscle groups to prioritize. These will receive 30% extra volume while others are reduced to maintain systemic MRV.
+                            </p>
+                        </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                            {['Chest', 'Back', 'Shoulders', 'Arms', 'Legs', 'None'].map((muscle) => (
+                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                            {muscleGroups.map((muscle) => (
                                 <button
                                     key={muscle}
-                                    onClick={() => dispatch({ type: 'SET_SPECIALIZATION', payload: muscle })}
-                                    className={`px-4 py-3 rounded-lg border transition-colors ${state.specialization === muscle
-                                        ? 'bg-red-500 border-red-500 text-white'
-                                        : 'bg-gray-700 border-gray-600 text-gray-300 hover:border-gray-500 hover:bg-gray-600'
+                                    onClick={() => handleSpecializationChange(muscle)}
+                                    disabled={!selectedSpecialization.includes(muscle) && selectedSpecialization.length >= 2}
+                                    className={`p-3 rounded-lg border-2 transition-all duration-200 ${selectedSpecialization.includes(muscle)
+                                            ? 'border-red-500 bg-red-500/20 text-red-300'
+                                            : 'border-gray-600 bg-gray-800 text-gray-300 hover:border-gray-500 hover:bg-gray-700'
+                                        } ${!selectedSpecialization.includes(muscle) && selectedSpecialization.length >= 2
+                                            ? 'opacity-50 cursor-not-allowed'
+                                            : 'cursor-pointer'
                                         }`}
                                 >
-                                    {muscle}
+                                    <div className="text-center">
+                                        <p className="text-sm font-medium capitalize">{muscle}</p>
+                                        {selectedSpecialization.includes(muscle) && (
+                                            <p className="text-xs text-red-400 mt-1">+30% volume</p>
+                                        )}
+                                    </div>
                                 </button>
                             ))}
                         </div>
 
-                        {state.specialization && state.specialization !== 'None' && (
-                            <div className="mt-4 p-4 bg-red-900/20 border border-red-600/30 rounded-lg">
-                                <p className="text-red-200 font-medium">
-                                    {state.specialization} Specialization Selected
-                                </p>
-                                <p className="text-red-300/70 text-sm mt-1">
-                                    {state.specialization} will receive +30% volume during accumulation phases while other muscle groups maintain standard volumes.
+                        {selectedSpecialization.length > 0 && (
+                            <div className="mt-4 p-4 bg-blue-900/20 border border-blue-700 rounded-lg">
+                                <p className="text-blue-300 text-sm">
+                                    <strong>Selected:</strong> {selectedSpecialization.join(', ')} will receive priority volume.
+                                    Other muscle groups will be reduced to maintain recovery capacity.
                                 </p>
                             </div>
                         )}
