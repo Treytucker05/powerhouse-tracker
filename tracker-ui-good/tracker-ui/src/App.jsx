@@ -14,6 +14,7 @@ const Microcycle = lazy(() => import("./pages/MicrocycleNew.jsx"));
 const Macrocycle = lazy(() => import("./pages/Macrocycle.jsx"));
 const Home = lazy(() => import("./pages/Home.jsx"));
 const Program = lazy(() => import("./pages/Program.jsx"));
+const Assessment = lazy(() => import("./pages/Assessment.jsx"));
 const Analytics = lazy(() => import("./pages/Analytics.jsx"));
 const AuthPage = lazy(() => import("./pages/AuthPage.jsx"));
 const ProgramDetails = lazy(() => import('./components/ProgramDetails.tsx'));
@@ -38,6 +39,7 @@ function App() {
           <Route path="/" element={<AppShell />}>
             <Route index element={<Home />} />
             <Route path="program" element={<Program />} />
+            <Route path="assessment" element={<Assessment />} />
             <Route path="tracking" element={<TrackingEnhanced />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="mesocycle" element={<MesocycleEnhanced />} />
