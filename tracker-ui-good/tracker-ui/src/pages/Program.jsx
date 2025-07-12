@@ -394,22 +394,82 @@ const Program = memo(() => {
     const loadRecentPrograms = async () => {
       setIsLoadingPrograms(true);
       try {
-        const { data, error } = await supabase
+        // First try to load from Supabase
+        const { data: supabaseData, error } = await supabase
           .from('programs')
           .select('*')
           .order('created_at', { ascending: false })
           .limit(5);
 
-        if (error) throw error;
-        setRecentPrograms(data || []);
+        // Also load from localStorage
+        const localPrograms = JSON.parse(localStorage.getItem('savedPrograms') || '[]');
+
+        // Combine and sort all programs
+        const allPrograms = [
+          ...(supabaseData || []),
+          ...localPrograms
+        ];
+
+        // Remove duplicates and sort by created date
+        const uniquePrograms = allPrograms
+          .filter((program, index, self) =>
+            index === self.findIndex(p => p.id === program.id)
+          )
+          .sort((a, b) => new Date(b.createdAt || b.created_at) - new Date(a.createdAt || a.created_at))
+          .slice(0, 5);
+
+        setRecentPrograms(uniquePrograms);
+
+        if (error) {
+          console.warn('Supabase load error, using localStorage only:', error);
+        }
       } catch (error) {
-        console.error('Error loading programs:', error);
+        console.error('Error loading programs, falling back to localStorage:', error);
+        // Fallback to localStorage only
+        const localPrograms = JSON.parse(localStorage.getItem('savedPrograms') || '[]');
+        setRecentPrograms(localPrograms.slice(0, 5));
       } finally {
         setIsLoadingPrograms(false);
       }
     };
 
     loadRecentPrograms();
+  }, []);
+
+  // Function to refresh recent programs (can be called after saving)
+  const refreshRecentPrograms = useCallback(async () => {
+    try {
+      // Load from Supabase
+      const { data: supabaseData } = await supabase
+        .from('programs')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      // Load from localStorage
+      const localPrograms = JSON.parse(localStorage.getItem('savedPrograms') || '[]');
+
+      // Combine and sort all programs
+      const allPrograms = [
+        ...(supabaseData || []),
+        ...localPrograms
+      ];
+
+      // Remove duplicates and sort by created date
+      const uniquePrograms = allPrograms
+        .filter((program, index, self) =>
+          index === self.findIndex(p => p.id === program.id)
+        )
+        .sort((a, b) => new Date(b.createdAt || b.created_at) - new Date(a.createdAt || a.created_at))
+        .slice(0, 5);
+
+      setRecentPrograms(uniquePrograms);
+    } catch (error) {
+      console.error('Error refreshing programs:', error);
+      // Fallback to localStorage only
+      const localPrograms = JSON.parse(localStorage.getItem('savedPrograms') || '[]');
+      setRecentPrograms(localPrograms.slice(0, 5));
+    }
   }, []);
 
   // Load recent macrocycles
@@ -943,8 +1003,6 @@ const Program = memo(() => {
     }
 
     try {
-      // Save to localStorage
-      const savedPrograms = JSON.parse(localStorage.getItem('savedPrograms') || '[]');
       const newProgram = {
         id: Date.now().toString(),
         ...generatedProgram,
@@ -952,18 +1010,52 @@ const Program = memo(() => {
         userId: assessmentData?.userId || 'anonymous'
       };
 
+      // Save to localStorage first (always works)
+      const savedPrograms = JSON.parse(localStorage.getItem('savedPrograms') || '[]');
       savedPrograms.push(newProgram);
       localStorage.setItem('savedPrograms', JSON.stringify(savedPrograms));
 
-      // TODO: Save to Supabase if needed
-      console.log('Program saved to localStorage:', newProgram);
+      // Try to save to Supabase as well
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
 
+        if (user) {
+          const { error: supabaseError } = await supabase
+            .from('programs')
+            .insert({
+              id: newProgram.id,
+              name: newProgram.overview.name,
+              goal: newProgram.overview.goal,
+              duration: newProgram.overview.duration,
+              training_model: newProgram.overview.trainingModel,
+              training_days: newProgram.overview.trainingDays,
+              phases: JSON.stringify(newProgram.phases),
+              weekly_outline: JSON.stringify(newProgram.weeklyOutline),
+              parameters: JSON.stringify(newProgram.parameters),
+              user_id: user.id,
+              created_at: newProgram.createdAt
+            });
+
+          if (supabaseError) {
+            console.warn('Failed to save to Supabase, but saved locally:', supabaseError);
+          } else {
+            console.log('Program saved to both localStorage and Supabase');
+          }
+        }
+      } catch (supabaseError) {
+        console.warn('Supabase save failed, but localStorage succeeded:', supabaseError);
+      }
+
+      // Refresh the recent programs list to show the new program
+      await refreshRecentPrograms();
+
+      console.log('Program saved successfully:', newProgram);
       toast.success('Program saved successfully!');
     } catch (error) {
       console.error('Error saving program:', error);
       toast.error('Failed to save program');
     }
-  }, [generatedProgram, assessmentData]);
+  }, [generatedProgram, assessmentData, refreshRecentPrograms]);
 
   // Handle export program
   const handleExportProgram = useCallback(() => {
