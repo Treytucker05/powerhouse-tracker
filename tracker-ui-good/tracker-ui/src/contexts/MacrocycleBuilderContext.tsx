@@ -80,6 +80,8 @@ const validateCurrentStep = (state: MacrocycleBuilderState): boolean => {
             return !!state.selectedTemplate;
         case 3:
             return state.blocks.length > 0;
+        case 3.5:
+            return state.blocks.length > 0; // Volume distribution requires blocks
         case 4:
             return true; // Review step
         default:

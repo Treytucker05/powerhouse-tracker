@@ -16,6 +16,9 @@ const Analytics = lazy(() => import("./pages/Analytics.jsx"));
 const AuthPage = lazy(() => import("./pages/AuthPage.jsx"));
 const MacrocycleRedirect = lazy(() => import("./pages/MacrocycleRedirect.jsx"));
 
+// Program Design Builder Components
+const ContextAwareBuilder = lazy(() => import("./components/builder/ContextAwareBuilder.jsx"));
+
 // Placeholder components for new routes
 const ExercisesPage = lazy(() => import('./pages/Exercises.jsx'));
 const ProfilePage = lazy(() => import('./pages/Profile.jsx'));
@@ -31,31 +34,41 @@ const LoadingSpinner = () => (
 function App() {
   return (
     <Router>
-      <Suspense fallback={<LoadingSpinner />}>
-        <Routes>
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="/" element={<AppShell />}>
-            <Route index element={<Home />} />
-            <Route path="program" element={<Program />} />
-            <Route path="assessment" element={<Assessment />} />
-            <Route path="tracking" element={<TrackingEnhanced />} />
-            <Route path="analytics" element={<Analytics />} />
-            <Route path="exercises" element={<ExercisesPage />} />
-            <Route path="profile" element={<ProfilePage />} />
-            <Route path="resources" element={<ResourcesPage />} />
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingSpinner />}>
+          <Routes>
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/" element={<AppShell />}>
+              <Route index element={<Home />} />
+              <Route path="program" element={
+                <ErrorBoundary>
+                  <Program />
+                </ErrorBoundary>
+              } />
+              <Route path="assessment" element={<Assessment />} />
+              <Route path="tracking" element={<TrackingEnhanced />} />
+              <Route path="analytics" element={<Analytics />} />
+              <Route path="exercises" element={<ExercisesPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="resources" element={<ResourcesPage />} />
 
-            {/* Unified Builder Routes - All redirect to /program with context */}
-            <Route path="mesocycle" element={<MacrocycleRedirect />} />
-            <Route path="microcycle" element={<MacrocycleRedirect />} />
-            <Route path="macrocycle" element={<MacrocycleRedirect />} />
-            <Route path="macrocycle/:id" element={<MacrocycleRedirect />} />
-            <Route path="builder" element={<MacrocycleRedirect />} />
+              {/* Unified Builder Routes - All redirect to /program with context */}
+              <Route path="mesocycle" element={<MacrocycleRedirect />} />
+              <Route path="microcycle" element={<MacrocycleRedirect />} />
+              <Route path="macrocycle" element={<MacrocycleRedirect />} />
+              <Route path="macrocycle/:id" element={<MacrocycleRedirect />} />
+              <Route path="builder" element={<MacrocycleRedirect />} />
 
-            {/* Legacy Program Design Routes - Redirect to unified /program */}
-            <Route path="program-design/*" element={<MacrocycleRedirect />} />
-          </Route>
-        </Routes>
-      </Suspense>
+              {/* Program Design Builder Routes */}
+              <Route path="program-design" element={
+                <MacrocycleBuilderProvider>
+                  <ContextAwareBuilder />
+                </MacrocycleBuilderProvider>
+              } />
+            </Route>
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
       <ToastContainer
         position="top-right"
         autoClose={3000}
