@@ -696,7 +696,7 @@ const TimelineStep = ({ selectedLevel = 'macro' }) => {
             },
             Isometric: {
                 load: '75-85%',
-                time: '4 weeks', 
+                time: '4 weeks',
                 methods: 'Isometric holds + Cluster sets',
                 color: 'green'
             },
@@ -764,7 +764,7 @@ const TimelineStep = ({ selectedLevel = 'macro' }) => {
     const handleBlockDrop = useCallback((block, dropInfo = {}) => {
         const startDate = dropInfo.start || new Date();
         const endDate = new Date(startDate);
-        
+
         // Default 4-week span for macrocycle blocks
         endDate.setDate(startDate.getDate() + 28);
 
@@ -788,8 +788,8 @@ const TimelineStep = ({ selectedLevel = 'macro' }) => {
 
     // Handle event resize/move on calendar
     const handleEventChange = useCallback(({ event, start, end }) => {
-        const updatedEvents = localEvents.map(evt => 
-            evt.id === event.id 
+        const updatedEvents = localEvents.map(evt =>
+            evt.id === event.id
                 ? { ...evt, start, end }
                 : evt
         );
@@ -928,7 +928,7 @@ const TimelineStep = ({ selectedLevel = 'macro' }) => {
                             <h3 className="text-xl font-semibold text-white">Macrocycle Timeline Planning</h3>
                             <div className="flex items-center gap-2 mt-2">
                                 <label className="text-gray-400 text-sm">Methodology:</label>
-                                <select 
+                                <select
                                     value={methodology}
                                     onChange={(e) => setMethodology(e.target.value)}
                                     className="bg-gray-700 text-white px-3 py-1 rounded border border-gray-600"
@@ -938,26 +938,24 @@ const TimelineStep = ({ selectedLevel = 'macro' }) => {
                                 </select>
                             </div>
                         </div>
-                        
+
                         <div className="flex items-center space-x-2">
                             <button
                                 onClick={() => setViewMode('calendar')}
-                                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                                    viewMode === 'calendar'
+                                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${viewMode === 'calendar'
                                         ? 'bg-blue-600 text-white'
                                         : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                                }`}
+                                    }`}
                             >
                                 <CalendarIcon className="w-4 h-4" />
                                 <span>Calendar</span>
                             </button>
                             <button
                                 onClick={() => setViewMode('table')}
-                                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
-                                    viewMode === 'table'
+                                className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${viewMode === 'table'
                                         ? 'bg-blue-600 text-white'
                                         : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                                }`}
+                                    }`}
                             >
                                 <Table className="w-4 h-4" />
                                 <span>Table</span>
