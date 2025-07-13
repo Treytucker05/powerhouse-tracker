@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useBuilder } from '../../contexts/MacrocycleBuilderContext';
 import { calculateMacrocycleVolumeProgression } from '../../lib/algorithms/volumeProgression';
 import { calculatePersonalizedVolume } from '../../lib/algorithms/rpAlgorithms';
@@ -18,7 +17,6 @@ interface ExportFormat {
 }
 
 const ReviewGenerate: React.FC = () => {
-    const navigate = useNavigate();
     const { state, dispatch } = useBuilder();
     const { programDetails, blocks, specialization } = state;
 
@@ -162,9 +160,10 @@ const ReviewGenerate: React.FC = () => {
 
             switch (selectedExportFormat) {
                 case 'mesocycle':
-                    // Navigate to mesocycle builder with data
+                    // Store export data for mesocycle builder
                     localStorage.setItem('macrocycle_export', JSON.stringify(exportData));
-                    navigate('/mesocycle-builder', { state: { importData: exportData } });
+                    // TODO: Implement navigation to mesocycle builder
+                    console.log('Mesocycle export ready:', exportData);
                     break;
 
                 case 'json':
@@ -223,12 +222,10 @@ const ReviewGenerate: React.FC = () => {
     // Handle navigation
     const handleBack = () => {
         dispatch({ type: 'SET_STEP', payload: 3.5 });
-        navigate('/program-design/volume-distribution');
     };
 
     const handleStartOver = () => {
         dispatch({ type: 'RESET_BUILDER' });
-        navigate('/program-design');
     };
 
     // Get validation icon and color
@@ -329,9 +326,9 @@ const ReviewGenerate: React.FC = () => {
                                 <div key={index} className="bg-gray-800 rounded-lg p-4 flex items-center justify-between">
                                     <div className="flex items-center space-x-4">
                                         <div className={`w-4 h-4 rounded-full ${block.type === 'accumulation' ? 'bg-blue-500' :
-                                                block.type === 'intensification' ? 'bg-yellow-500' :
-                                                    block.type === 'realization' ? 'bg-red-500' :
-                                                        'bg-gray-500'
+                                            block.type === 'intensification' ? 'bg-yellow-500' :
+                                                block.type === 'realization' ? 'bg-red-500' :
+                                                    'bg-gray-500'
                                             }`}></div>
                                         <div>
                                             <p className="text-white font-medium">{block.name}</p>
@@ -394,8 +391,8 @@ const ReviewGenerate: React.FC = () => {
                                         key={format.format}
                                         onClick={() => setSelectedExportFormat(format.format)}
                                         className={`text-left p-4 rounded-lg border-2 transition-all ${selectedExportFormat === format.format
-                                                ? 'border-red-500 bg-red-500/10'
-                                                : 'border-gray-600 bg-gray-800 hover:border-gray-500'
+                                            ? 'border-red-500 bg-red-500/10'
+                                            : 'border-gray-600 bg-gray-800 hover:border-gray-500'
                                             }`}
                                     >
                                         <h3 className="font-medium text-white mb-2">{format.name}</h3>
@@ -409,8 +406,8 @@ const ReviewGenerate: React.FC = () => {
                                     onClick={handleExport}
                                     disabled={isExporting}
                                     className={`w-full py-3 px-6 rounded-lg font-medium transition-all ${isExporting
-                                            ? 'bg-gray-600 cursor-not-allowed'
-                                            : 'bg-red-600 hover:bg-red-700 transform hover:scale-105'
+                                        ? 'bg-gray-600 cursor-not-allowed'
+                                        : 'bg-red-600 hover:bg-red-700 transform hover:scale-105'
                                         } text-white`}
                                 >
                                     {isExporting ? 'Exporting...' : `Export as ${exportFormats.find(f => f.format === selectedExportFormat)?.name}`}

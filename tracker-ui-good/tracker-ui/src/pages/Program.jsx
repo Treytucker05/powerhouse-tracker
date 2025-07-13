@@ -3,12 +3,17 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import { supabase } from '../lib/api/supabaseClient';
 import { loadAllMacrocycles, deleteMacrocycle } from '../lib/storage';
+import { programService } from '../services/api';
 import ContextAwareBuilder from '../components/builder/ContextAwareBuilder.jsx';
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical } from 'lucide-react';
+import { GripVertical, Calendar, List, Plus, Minus } from 'lucide-react';
+import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar';
+import moment from 'moment';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import '../styles/calendar.css';
 import {
   BASE_VOLUME_LANDMARKS,
   RIR_SCHEMES,
@@ -251,6 +256,213 @@ const SortableBlock = memo(({ id, name, description, index }) => {
 
 SortableBlock.displayName = 'SortableBlock';
 
+// Block Palette Component for dragging to calendar
+const BlockPalette = memo(({ blockSequence, blockTypeConfig, draggedBlock, setDraggedBlock, selectedTrainingModel }) => {
+  // Filter blocks based on training model
+  const getFilteredBlocks = () => {
+    if (selectedTrainingModel === 'Block') {
+      return blockSequence.filter(block => ['accumulation', 'intensification', 'realization', 'deload'].includes(block.id));
+    } else if (selectedTrainingModel === 'Hybrid') {
+      return blockSequence; // All blocks available
+    }
+    return blockSequence;
+  };
+
+  const filteredBlocks = getFilteredBlocks();
+
+  return (
+    <div className="bg-gray-700 p-4 rounded-lg border border-gray-600">
+      <h4 className="text-white font-medium mb-3 flex items-center">
+        <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
+        Training Block Palette
+      </h4>
+      <p className="text-gray-400 text-xs mb-3">
+        Click a block, then click on the calendar to place it
+      </p>
+      <div className="grid grid-cols-2 gap-2">
+        {filteredBlocks.map((block) => {
+          const config = blockTypeConfig[block.id] || { color: '#6B7280', textColor: '#FFFFFF' };
+          return (
+            <button
+              key={block.id}
+              onClick={() => setDraggedBlock(draggedBlock?.id === block.id ? null : block)}
+              className={`p-3 rounded-lg text-sm font-medium transition-all duration-200 transform hover:scale-105 ${draggedBlock?.id === block.id
+                ? 'ring-2 ring-white ring-opacity-50 scale-105'
+                : 'hover:shadow-lg'
+                }`}
+              style={{
+                backgroundColor: config.color,
+                color: config.textColor,
+                border: draggedBlock?.id === block.id ? '2px solid #FFFFFF' : 'none'
+              }}
+              title={`${block.name} - ${block.description}`}
+            >
+              <div className="font-semibold">{block.name}</div>
+              <div className="text-xs opacity-80 mt-1">{config.focus}</div>
+            </button>
+          );
+        })}
+      </div>
+      {draggedBlock && (
+        <div className="mt-3 p-2 bg-blue-900/30 border border-blue-600 rounded text-xs text-blue-300">
+          <strong>{draggedBlock.name}</strong> selected. Click on calendar to place.
+        </div>
+      )}
+    </div>
+  );
+});
+
+BlockPalette.displayName = 'BlockPalette';
+
+// Calendar Event Component
+const CalendarEvent = memo(({ event, blockTypeConfig, updateEventWeeks, addDeloadToEvent, handleDeleteEvent }) => {
+  const config = blockTypeConfig[event.resource.blockType] || { color: '#6B7280', textColor: '#FFFFFF' };
+
+  return (
+    <div
+      className="h-full w-full text-xs font-medium flex flex-col justify-center p-1"
+      style={{ backgroundColor: config.color, color: config.textColor }}
+    >
+      <div className="font-semibold truncate">{event.title}</div>
+      <div className="opacity-80">{event.resource.weeks}w • {event.resource.focus}</div>
+    </div>
+  );
+});
+
+CalendarEvent.displayName = 'CalendarEvent';
+
+// Event Detail Panel
+const EventDetailPanel = memo(({ selectedEvent, blockTypeConfig, updateEventWeeks, addDeloadToEvent, handleDeleteEvent, onClose }) => {
+  if (!selectedEvent) return null;
+
+  const config = blockTypeConfig[selectedEvent.resource.blockType] || { color: '#6B7280', textColor: '#FFFFFF' };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 border border-gray-600">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-semibold text-white">{selectedEvent.title}</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white text-xl"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-gray-300 text-sm font-medium mb-2">
+              Duration (weeks)
+            </label>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => updateEventWeeks(selectedEvent.id, Math.max(1, selectedEvent.resource.weeks - 1))}
+                className="bg-gray-600 hover:bg-gray-500 text-white p-2 rounded"
+                disabled={selectedEvent.resource.weeks <= 1}
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+              <span className="text-white font-medium px-4">{selectedEvent.resource.weeks} weeks</span>
+              <button
+                onClick={() => updateEventWeeks(selectedEvent.id, Math.min(12, selectedEvent.resource.weeks + 1))}
+                className="bg-gray-600 hover:bg-gray-500 text-white p-2 rounded"
+                disabled={selectedEvent.resource.weeks >= 12}
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-gray-300 text-sm font-medium mb-2">
+              Start Date
+            </label>
+            <p className="text-white">{moment(selectedEvent.start).format('MMMM Do, YYYY')}</p>
+          </div>
+
+          <div>
+            <label className="block text-gray-300 text-sm font-medium mb-2">
+              End Date
+            </label>
+            <p className="text-white">{moment(selectedEvent.end).format('MMMM Do, YYYY')}</p>
+          </div>
+
+          <div className="flex space-x-2">
+            <button
+              onClick={() => addDeloadToEvent(selectedEvent.id)}
+              className="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              + Add Deload Week
+            </button>
+            <button
+              onClick={() => {
+                handleDeleteEvent(selectedEvent.id);
+                onClose();
+              }}
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              Delete Block
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+EventDetailPanel.displayName = 'EventDetailPanel';
+
+// Error boundary component for Program
+class ProgramErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Program component error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-black text-white p-8">
+          <div className="max-w-2xl mx-auto">
+            <h1 className="text-2xl font-bold text-red-400 mb-4">Program Design Error</h1>
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+              <p className="text-gray-300 mb-4">
+                An error occurred while loading the program design interface.
+              </p>
+              <details className="mb-4">
+                <summary className="text-blue-400 cursor-pointer mb-2">Error Details</summary>
+                <pre className="text-gray-400 text-sm bg-gray-900 p-3 rounded overflow-auto">
+                  {this.state.error?.toString()}
+                </pre>
+              </details>
+              <button
+                onClick={() => {
+                  this.setState({ hasError: false, error: null });
+                  window.location.reload();
+                }}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+              >
+                Reload Page
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 const Program = memo(() => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -332,16 +544,108 @@ const Program = memo(() => {
     }
   ]);
 
-  // Loading parameters calculator state
-  const [oneRM, setOneRM] = useState('');
-  const [intensity, setIntensity] = useState(80);
-  const [targetRIR, setTargetRIR] = useState(2);
-  const [loadingResults, setLoadingResults] = useState(null);
+  // Calendar integration for block sequencing
+  // Setup moment and localizer
+  moment.locale('en');
+  const localizer = momentLocalizer(moment);
+  const [calendarView, setCalendarView] = useState(true); // true for calendar, false for list
+  const [localEvents, setLocalEvents] = useState([]);
+  const [draggedBlock, setDraggedBlock] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
 
-  // Movement parameters state
-  const [selectedExercise, setSelectedExercise] = useState('');
-  const [tempo, setTempo] = useState('');
-  const [rom, setRom] = useState('');
+  // Block type configurations with colors for TrainingPeaks-style visualization
+  const blockTypeConfig = {
+    accumulation: { color: '#3B82F6', textColor: '#FFFFFF', focus: 'Volume' }, // Blue
+    intensification: { color: '#F59E0B', textColor: '#000000', focus: 'Intensity' }, // Orange
+    realization: { color: '#10B981', textColor: '#FFFFFF', focus: 'Peaking' }, // Green
+    deload: { color: '#6B7280', textColor: '#FFFFFF', focus: 'Recovery' }, // Gray
+    specialization: { color: '#8B5CF6', textColor: '#FFFFFF', focus: 'Specialization' }, // Purple
+    competition: { color: '#EF4444', textColor: '#FFFFFF', focus: 'Competition' } // Red
+  };
+
+  // Per-block parameters state
+  const [blockParameters, setBlockParameters] = useState({});
+  const [activeBlockTab, setActiveBlockTab] = useState('accumulation');
+
+  // Computed values for current block parameters
+  const currentBlockParams = blockParameters[activeBlockTab] || {};
+  const selectedExercise = currentBlockParams.selectedExercise || '';
+  const tempo = currentBlockParams.tempo || '3010';
+  const rom = currentBlockParams.rom || 'Full';
+
+  // Get phase-specific defaults
+  const getPhaseDefaults = useCallback((blockType) => {
+    const defaults = {
+      accumulation: {
+        intensityRange: [55, 70],
+        defaultIntensity: 65,
+        defaultRIR: 3,
+        suggestedReps: '8-12',
+        focus: 'Volume progression, muscle hypertrophy'
+      },
+      intensification: {
+        intensityRange: [70, 85],
+        defaultIntensity: 80,
+        defaultRIR: 2,
+        suggestedReps: '4-8',
+        focus: 'Strength development, moderate volume'
+      },
+      realization: {
+        intensityRange: [85, 100],
+        defaultIntensity: 90,
+        defaultRIR: 1,
+        suggestedReps: '1-5',
+        focus: 'Peak strength, low volume'
+      },
+      deload: {
+        intensityRange: [40, 60],
+        defaultIntensity: 50,
+        defaultRIR: 4,
+        suggestedReps: '8-15',
+        focus: 'Recovery, technique refinement'
+      },
+      specialization: {
+        intensityRange: [60, 80],
+        defaultIntensity: 70,
+        defaultRIR: 2,
+        suggestedReps: '6-10',
+        focus: 'Specialized skill development'
+      },
+      competition: {
+        intensityRange: [90, 100],
+        defaultIntensity: 95,
+        defaultRIR: 0,
+        suggestedReps: '1-3',
+        focus: 'Competition performance'
+      }
+    };
+    return defaults[blockType] || defaults.accumulation;
+  }, []);
+
+  // Initialize block parameters when blockSequence changes
+  useEffect(() => {
+    setBlockParameters(prevParams => {
+      const newParams = { ...prevParams };
+      blockSequence.forEach(block => {
+        if (!newParams[block.id]) {
+          const defaults = getPhaseDefaults(block.id);
+          newParams[block.id] = {
+            // Loading parameters
+            oneRM: '',
+            intensity: defaults.defaultIntensity,
+            targetRIR: defaults.defaultRIR,
+            loadingResults: null,
+            // Movement parameters
+            exercises: [],
+            selectedExercise: '',
+            tempo: '3010',
+            rom: 'Full'
+          };
+        }
+      });
+      return newParams;
+    });
+  }, [blockSequence, getPhaseDefaults]);
 
   // Training methods state
   const [selectedTrainingMethod, setSelectedTrainingMethod] = useState('');
@@ -418,45 +722,22 @@ const Program = memo(() => {
     setActiveTab('builder');
   }, [savedBuilderState]);
 
-  // Load recent programs
+  // Load recent programs using ProgramService
   useEffect(() => {
     const loadRecentPrograms = async () => {
       setIsLoadingPrograms(true);
       try {
-        // First try to load from Supabase
-        const { data: supabaseData, error } = await supabase
-          .from('programs')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(5);
+        const programs = await programService.loadAllPrograms();
 
-        // Also load from localStorage
-        const localPrograms = JSON.parse(localStorage.getItem('savedPrograms') || '[]');
-
-        // Combine and sort all programs
-        const allPrograms = [
-          ...(supabaseData || []),
-          ...localPrograms
-        ];
-
-        // Remove duplicates and sort by created date
-        const uniquePrograms = allPrograms
-          .filter((program, index, self) =>
-            index === self.findIndex(p => p.id === program.id)
-          )
-          .sort((a, b) => new Date(b.createdAt || b.created_at) - new Date(a.createdAt || a.created_at))
+        // Sort by creation date and take only recent 5
+        const recentPrograms = programs
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
           .slice(0, 5);
 
-        setRecentPrograms(uniquePrograms);
-
-        if (error) {
-          console.warn('Supabase load error, using localStorage only:', error);
-        }
+        setRecentPrograms(recentPrograms);
       } catch (error) {
-        console.error('Error loading programs, falling back to localStorage:', error);
-        // Fallback to localStorage only
-        const localPrograms = JSON.parse(localStorage.getItem('savedPrograms') || '[]');
-        setRecentPrograms(localPrograms.slice(0, 5));
+        console.error('Error loading programs:', error);
+        // ProgramService already handles toast notifications
       } finally {
         setIsLoadingPrograms(false);
       }
@@ -465,39 +746,31 @@ const Program = memo(() => {
     loadRecentPrograms();
   }, []);
 
-  // Function to refresh recent programs (can be called after saving)
+  // Function to refresh recent programs using ProgramService
   const refreshRecentPrograms = useCallback(async () => {
     try {
-      // Load from Supabase
-      const { data: supabaseData } = await supabase
-        .from('programs')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(5);
+      const programs = await programService.loadAllPrograms();
 
-      // Load from localStorage
-      const localPrograms = JSON.parse(localStorage.getItem('savedPrograms') || '[]');
-
-      // Combine and sort all programs
-      const allPrograms = [
-        ...(supabaseData || []),
-        ...localPrograms
-      ];
-
-      // Remove duplicates and sort by created date
-      const uniquePrograms = allPrograms
-        .filter((program, index, self) =>
-          index === self.findIndex(p => p.id === program.id)
-        )
-        .sort((a, b) => new Date(b.createdAt || b.created_at) - new Date(a.createdAt || a.created_at))
+      // Sort by creation date and take only recent 5
+      const recentPrograms = programs
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .slice(0, 5);
 
-      setRecentPrograms(uniquePrograms);
+      setRecentPrograms(recentPrograms);
     } catch (error) {
       console.error('Error refreshing programs:', error);
-      // Fallback to localStorage only
-      const localPrograms = JSON.parse(localStorage.getItem('savedPrograms') || '[]');
-      setRecentPrograms(localPrograms.slice(0, 5));
+      // ProgramService already handles toast notifications
+    }
+  }, []);
+
+  // Load a specific program by ID using ProgramService
+  const loadSpecificProgram = useCallback(async (programId) => {
+    try {
+      const program = await programService.loadProgram(programId);
+      return program;
+    } catch (error) {
+      console.error('Error loading specific program:', error);
+      return null;
     }
   }, []);
 
@@ -648,17 +921,94 @@ const Program = memo(() => {
   const handleSaveSequence = useCallback(() => {
     console.log('Saving block sequence:', blockSequence.map(block => block.name));
     toast.success('Block sequence saved successfully!');
-    // Future: Save to Supabase or localStorage
+    // Update localEvents based on blockSequence changes
+    setLocalEvents(prevEvents => [...prevEvents]); // Trigger re-render
   }, [blockSequence]);
 
-  // Handle loading calculation
-  const handleCalculateLoading = useCallback(() => {
-    if (!oneRM || oneRM <= 0) {
-      toast.error('Please enter a valid 1RM weight');
+  // Calendar event handlers for block sequencing
+  const handleSelectSlot = useCallback((slotInfo) => {
+    if (draggedBlock) {
+      const newEvent = {
+        id: `${draggedBlock.id}-${Date.now()}`,
+        title: draggedBlock.name,
+        start: slotInfo.start,
+        end: moment(slotInfo.start).add(4, 'weeks').toDate(), // Default 4 weeks
+        resource: {
+          blockType: draggedBlock.id,
+          weeks: 4,
+          focus: blockTypeConfig[draggedBlock.id]?.focus || 'Training',
+          methods: ['Standard Sets'],
+          load: 'Moderate'
+        }
+      };
+
+      setLocalEvents(prev => [...prev, newEvent]);
+      setDraggedBlock(null);
+      toast.success(`${draggedBlock.name} block added to calendar`);
+    }
+  }, [draggedBlock, blockTypeConfig]);
+
+  const handleEventResize = useCallback(({ event, start, end }) => {
+    setLocalEvents(prev => prev.map(evt =>
+      evt.id === event.id
+        ? { ...evt, start, end, resource: { ...evt.resource, weeks: moment(end).diff(moment(start), 'weeks') } }
+        : evt
+    ));
+  }, []);
+
+  const handleEventDrop = useCallback(({ event, start, end }) => {
+    setLocalEvents(prev => prev.map(evt =>
+      evt.id === event.id
+        ? { ...evt, start, end }
+        : evt
+    ));
+  }, []);
+
+  const handleDeleteEvent = useCallback((eventId) => {
+    setLocalEvents(prev => prev.filter(evt => evt.id !== eventId));
+    toast.success('Training block removed from calendar');
+  }, []);
+
+  const updateEventWeeks = useCallback((eventId, weeks) => {
+    setLocalEvents(prev => prev.map(evt =>
+      evt.id === eventId
+        ? {
+          ...evt,
+          end: moment(evt.start).add(weeks, 'weeks').toDate(),
+          resource: { ...evt.resource, weeks }
+        }
+        : evt
+    ));
+  }, []);
+
+  const addDeloadToEvent = useCallback((eventId) => {
+    setLocalEvents(prev => prev.map(evt =>
+      evt.id === eventId
+        ? {
+          ...evt,
+          end: moment(evt.end).add(1, 'week').toDate(),
+          resource: {
+            ...evt.resource,
+            weeks: evt.resource.weeks + 1,
+            hasDeload: true
+          }
+        }
+        : evt
+    ));
+    toast.success('Deload week added');
+  }, []);
+
+  // Handle per-block loading calculation
+  const handleCalculateLoading = useCallback((blockId) => {
+    const blockParams = blockParameters[blockId];
+    if (!blockParams?.oneRM || blockParams.oneRM <= 0) {
+      toast.error('Please enter a valid 1RM weight for this block');
       return;
     }
 
-    const weight = parseFloat(oneRM);
+    const weight = parseFloat(blockParams.oneRM);
+    const intensity = blockParams.intensity;
+    const targetRIR = blockParams.targetRIR;
     const loadWeight = Math.round((weight * intensity) / 100);
 
     // Estimate reps based on intensity (%1RM)
@@ -690,6 +1040,7 @@ const Program = memo(() => {
 
     // Get volume landmarks for context (using chest as default)
     const landmarks = BASE_VOLUME_LANDMARKS.chest || { mev: 10, mrv: 20 };
+    const blockDefaults = getPhaseDefaults(blockId);
 
     const results = {
       loadWeight,
@@ -698,65 +1049,84 @@ const Program = memo(() => {
       totalVolume,
       landmarks,
       intensity,
-      targetRIR
+      targetRIR,
+      blockType: blockId,
+      focus: blockDefaults.focus
     };
 
-    setLoadingResults(results);
-
-    // Log calculations to console
-    console.log('Loading Parameters Calculation:', {
-      oneRM: weight,
-      intensity: intensity + '%',
-      targetRIR,
-      loadWeight: loadWeight + ' lbs',
-      estimatedReps,
-      recommendedSets,
-      totalVolume: totalVolume + ' lbs',
-      volumeLandmarks: `MEV: ${landmarks.mev} sets, MRV: ${landmarks.mrv} sets`
-    });
-  }, [oneRM, intensity, targetRIR]);
-
-  // Handle adding movement
-  const handleAddMovement = useCallback(() => {
-    if (!selectedExercise) {
-      toast.error('Please select an exercise');
-      return;
-    }
-    if (!tempo) {
-      toast.error('Please enter a tempo');
-      return;
-    }
-    if (!rom) {
-      toast.error('Please select a ROM');
-      return;
-    }
-
-    // Validate tempo format (should be 4 digits)
-    if (!/^\d{4}$/.test(tempo)) {
-      toast.error('Tempo must be 4 digits (e.g., 3010)');
-      return;
-    }
-
-    // Log movement parameters to console
-    console.log('Movement Parameters Added:', {
-      exercise: selectedExercise,
-      tempo: tempo,
-      rom: rom,
-      tempoBreakdown: {
-        eccentric: tempo[0] + 's',
-        pause1: tempo[1] + 's',
-        concentric: tempo[2] + 's',
-        pause2: tempo[3] + 's'
+    // Update block parameters with results
+    setBlockParameters(prev => ({
+      ...prev,
+      [blockId]: {
+        ...prev[blockId],
+        loadingResults: results
       }
-    });
+    }));
 
-    toast.success(`Added ${selectedExercise} with tempo ${tempo} and ${rom} ROM`);
+    const blockName = blockSequence.find(b => b.id === blockId)?.name || blockId;
+    toast.success(`Loading parameters calculated for ${blockName} block`);
+  }, [blockParameters, blockSequence, getPhaseDefaults]);
 
-    // Reset form
-    setSelectedExercise('');
-    setTempo('');
-    setRom('');
-  }, [selectedExercise, tempo, rom]);
+  // Handle adding exercise to block
+  const handleAddExercise = useCallback((blockId) => {
+    const blockParams = blockParameters[blockId];
+    if (!blockParams?.selectedExercise || !blockParams?.tempo || !blockParams?.rom) {
+      toast.error('Please complete all exercise fields');
+      return;
+    }
+
+    const newExercise = {
+      id: Date.now(),
+      name: blockParams.selectedExercise,
+      tempo: blockParams.tempo,
+      rom: blockParams.rom
+    };
+
+    setBlockParameters(prev => ({
+      ...prev,
+      [blockId]: {
+        ...prev[blockId],
+        exercises: [...(prev[blockId].exercises || []), newExercise],
+        selectedExercise: '',
+        tempo: '3010',
+        rom: 'Full'
+      }
+    }));
+
+    const blockName = blockSequence.find(b => b.id === blockId)?.name || blockId;
+    toast.success(`Exercise added to ${blockName} block`);
+  }, [blockParameters, blockSequence]);
+
+  // Update block parameter helper
+  const updateBlockParameter = useCallback((blockId, field, value) => {
+    setBlockParameters(prev => ({
+      ...prev,
+      [blockId]: {
+        ...prev[blockId],
+        [field]: value
+      }
+    }));
+  }, []);
+
+  // Handle adding movement (this is now handled by handleAddExercise above)
+  // Legacy function - kept for compatibility
+  const handleAddMovement = useCallback(() => {
+    // This functionality has been moved to per-block handleAddExercise
+    toast.info('Please use the block-specific exercise addition in the Loading & Movement Parameters section');
+  }, []);
+
+  // Remove exercise from block
+  const handleRemoveExercise = useCallback((blockId, exerciseId) => {
+    setBlockParameters(prev => ({
+      ...prev,
+      [blockId]: {
+        ...prev[blockId],
+        exercises: prev[blockId].exercises?.filter(ex => ex.id !== exerciseId) || []
+      }
+    }));
+
+    toast.success('Exercise removed from block');
+  }, []);
 
   // Get SFR rating based on training method
   const getSFRRating = useCallback((method) => {
@@ -998,7 +1368,7 @@ const Program = memo(() => {
       phases: phases,
       weeklyOutline: weeklyOutline.slice(0, duration),
       parameters: {
-        movement: { exercise: selectedExercise, tempo: tempo, rom: rom },
+        movement: { exercise: selectedExercise, tempo: rom },
         method: { type: selectedTrainingMethod, sfr: methodSFR },
         energySystem: { focus: selectedEnergySystem, note: energySystemNote },
         recovery: { strategy: selectedDeloadType, protocol: deloadProtocol },
@@ -1031,6 +1401,9 @@ const Program = memo(() => {
       return;
     }
 
+    // Log programData before save as requested
+    console.log('programData before save:', programData);
+
     try {
       const newProgram = {
         id: Date.now().toString(),
@@ -1039,52 +1412,68 @@ const Program = memo(() => {
         userId: assessmentData?.userId || 'anonymous'
       };
 
-      // Save to localStorage first (always works)
+      // Save to localStorage first (always works as fallback)
       const savedPrograms = JSON.parse(localStorage.getItem('savedPrograms') || '[]');
       savedPrograms.push(newProgram);
       localStorage.setItem('savedPrograms', JSON.stringify(savedPrograms));
 
-      // Try to save to Supabase as well
+      // Try to save to Supabase with improved error handling
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+        if (authError) {
+          console.warn('Authentication error, saving locally only:', authError);
+          toast.success('Saved locally—check internet for cloud sync');
+          return;
+        }
 
         if (user) {
+          // Ensure 'programs' table has required columns (id, user_id, name, model, blockSequence, etc.)
           const { error: supabaseError } = await supabase
             .from('programs')
             .insert({
               id: newProgram.id,
               name: newProgram.overview.name,
-              goal: newProgram.overview.goal,
-              duration: newProgram.overview.duration,
-              training_model: newProgram.overview.trainingModel,
-              training_days: newProgram.overview.trainingDays,
+              goal_type: newProgram.overview.goal,
+              duration_weeks: newProgram.overview.duration,
+              training_days_per_week: newProgram.overview.trainingDays,
+              user_id: user.id,
+              // Store model and blockSequence in JSON columns
+              model: newProgram.overview.trainingModel,
+              block_sequence: JSON.stringify(newProgram.phases || []),
               phases: JSON.stringify(newProgram.phases),
               weekly_outline: JSON.stringify(newProgram.weeklyOutline),
               parameters: JSON.stringify(newProgram.parameters),
-              user_id: user.id,
-              created_at: newProgram.createdAt
+              created_at: newProgram.createdAt,
+              is_active: true
             });
 
           if (supabaseError) {
-            console.warn('Failed to save to Supabase, but saved locally:', supabaseError);
+            console.warn('Supabase insert failed, using localStorage fallback:', supabaseError);
+            toast.success('Saved locally—check internet for cloud sync');
           } else {
             console.log('Program saved to both localStorage and Supabase');
+            toast.success('Program saved successfully!');
           }
+        } else {
+          // No user authentication, use localStorage only
+          console.log('No authenticated user, saved locally only');
+          toast.success('Saved locally—check internet for cloud sync');
         }
       } catch (supabaseError) {
         console.warn('Supabase save failed, but localStorage succeeded:', supabaseError);
+        toast.success('Saved locally—check internet for cloud sync');
       }
 
       // Refresh the recent programs list to show the new program
       await refreshRecentPrograms();
 
       console.log('Program saved successfully:', newProgram);
-      toast.success('Program saved successfully!');
     } catch (error) {
       console.error('Error saving program:', error);
       toast.error('Failed to save program');
     }
-  }, [generatedProgram, assessmentData, refreshRecentPrograms]);
+  }, [generatedProgram, assessmentData, refreshRecentPrograms, programData]);
 
   // Handle export program
   const handleExportProgram = useCallback(() => {
@@ -1117,6 +1506,9 @@ const Program = memo(() => {
 
   // Handle generate full program
   const handleGenerateFullProgram = useCallback(() => {
+    // Log programData before generation as requested
+    console.log('programData before generation:', programData);
+
     const program = generateProgramStructure();
 
     console.log('Generating macrocycle with all data:', {
@@ -1184,79 +1576,143 @@ const Program = memo(() => {
     programData
   ]);
 
-  // Save program to Supabase - memoize this function!
+  // Save program using ProgramService - enhanced with conflict handling
   const saveProgram = useCallback(async (programData) => {
     setIsLoading(true);
     setError(null);
-    try {
-      // Check if user is authenticated
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-      if (authError || !user) {
-        throw new Error('You must be logged in to create a program');
+    try {
+      // Log programData before save as requested
+      console.log('programData before saveProgram:', programData);
+
+      // Validate required fields
+      if (!programData.name?.trim()) {
+        throw new Error('Program name is required');
       }
 
-      // Step 1: Create the program record
-      const { data: program, error: programError } = await supabase
-        .from('programs')
-        .insert({
-          name: programData.name,
-          goal_type: programData.goal,
-          duration_weeks: programData.duration,
-          training_days_per_week: programData.trainingDays,
-          user_id: user.id,
-          is_active: true
-        })
-        .select()
-        .single();
+      // Prepare complete program data
+      const completeProgram = {
+        name: programData.name.trim(),
+        description: programData.description || '',
+        type: selectedLevel || 'macro',
+        goal: programData.goal,
+        duration: programData.duration,
+        trainingDaysPerWeek: programData.trainingDays,
+        selectedTemplate: programData.selectedTemplate,
+        assessmentId: assessmentData?.id,
+        totalDuration: programData.duration,
+        isActive: true,
+        blocks: []
+      };
 
-      if (programError) throw programError;
-
-      // Step 2: Create program blocks if a template is selected
+      // Add blocks if template is selected
       if (programData.selectedTemplate && MACROCYCLE_TEMPLATES[programData.selectedTemplate]) {
         const template = MACROCYCLE_TEMPLATES[programData.selectedTemplate];
-        const programBlocks = template.blocks.map((block, index) => ({
-          program_id: program.id,
+        completeProgram.blocks = template.blocks.map((block, index) => ({
+          id: `block_${Date.now()}_${index}`,
           name: `${block.block_type} ${index + 1}`,
-          block_type: block.block_type,
-          duration_weeks: block.duration_weeks,
+          type: block.block_type,
+          duration: block.duration_weeks,
           focus: PHASE_FOCUS_MAPPING[block.focus] || block.focus,
-          order_index: index,
-          is_active: index === 0 // First block is active
+          order: index,
+          isActive: index === 0
         }));
+      }
 
-        const { error: blocksError } = await supabase
-          .from('program_blocks')
-          .insert(programBlocks);
+      // Try ProgramService first, with enhanced error handling for Supabase fallback
+      let savedProgram;
+      try {
+        savedProgram = await programService.saveProgram(completeProgram);
+        console.log('Program saved via ProgramService:', savedProgram);
+      } catch (serviceError) {
+        console.warn('ProgramService failed, attempting direct Supabase save:', serviceError);
 
-        if (blocksError) {
-          console.error('Error creating program blocks:', blocksError);
-          // Don't throw here - program was created successfully
-          // Just log the error and continue
+        // Fallback: try direct Supabase save with auth handling
+        try {
+          const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+          if (authError || !user) {
+            // No auth, save to localStorage only
+            const localProgram = {
+              ...completeProgram,
+              id: Date.now().toString(),
+              createdAt: new Date().toISOString()
+            };
+            localStorage.setItem('currentProgram', JSON.stringify(localProgram));
+            toast.success('Saved locally—check internet for cloud sync');
+            savedProgram = localProgram;
+          } else {
+            // Try direct Supabase insert with proper column mapping
+            const { data: supabaseProgram, error: insertError } = await supabase
+              .from('programs')
+              .insert({
+                name: completeProgram.name,
+                goal_type: completeProgram.goal,
+                duration_weeks: completeProgram.duration,
+                training_days_per_week: completeProgram.trainingDaysPerWeek,
+                user_id: user.id,
+                is_active: completeProgram.isActive,
+                // Store additional data in JSON fields
+                model: selectedLevel || 'macro',
+                block_sequence: JSON.stringify(completeProgram.blocks)
+              })
+              .select()
+              .single();
+
+            if (insertError) {
+              // Supabase failed, use localStorage fallback
+              const localProgram = {
+                ...completeProgram,
+                id: Date.now().toString(),
+                createdAt: new Date().toISOString()
+              };
+              localStorage.setItem('currentProgram', JSON.stringify(localProgram));
+              toast.success('Saved locally—check internet for cloud sync');
+              savedProgram = localProgram;
+            } else {
+              savedProgram = supabaseProgram;
+              toast.success('Program saved successfully!');
+            }
+          }
+        } catch (fallbackError) {
+          // Final fallback to localStorage only
+          console.error('All save methods failed, using localStorage only:', fallbackError);
+          const localProgram = {
+            ...completeProgram,
+            id: Date.now().toString(),
+            createdAt: new Date().toISOString()
+          };
+          localStorage.setItem('currentProgram', JSON.stringify(localProgram));
+          toast.success('Saved locally—check internet for cloud sync');
+          savedProgram = localProgram;
         }
       }
 
-      // Step 3: Navigate to the appropriate phase designer
+      // Update local state
+      setRecentPrograms(prev => [savedProgram, ...prev.slice(0, 4)]);
+
+      // Navigate to appropriate phase designer
       if (selectedLevel === 'macro') {
         navigate('/macrocycle', {
           state: {
-            programId: program.id,
+            programId: savedProgram.id,
             selectedTemplate: programData.selectedTemplate,
-            programData: programData
+            programData: savedProgram
           }
         });
       } else if (selectedLevel === 'meso') {
-        navigate('/mesocycle', { state: { programId: program.id } });
-      } else {
-        navigate('/microcycle', { state: { programId: program.id } });
+        navigate('/mesocycle', { state: { programId: savedProgram.id } });
+      } else if (selectedLevel === 'micro') {
+        navigate('/microcycle', { state: { programId: savedProgram.id } });
       }
+
     } catch (error) {
       console.error('Error saving program:', error);
-      setError(`Failed to create program: ${error.message}`);
+      setError(error.message || 'Failed to save program');
     } finally {
       setIsLoading(false);
     }
-  }, [navigate, selectedLevel]); // Add dependencies
+  }, [selectedLevel, assessmentData, navigate, setRecentPrograms, programData]);
 
   // Continue with existing program
   const handleContinueProgram = useCallback(async (program) => {
@@ -1267,7 +1723,7 @@ const Program = memo(() => {
           programId: program.id,
           programData: {
             name: program.name,
-            goal: program.goal_type,
+            goal: program.goal,
             duration: program.duration_weeks,
             trainingDays: program.training_days_per_week
           }
@@ -1346,53 +1802,26 @@ const Program = memo(() => {
     }
   }, []);
 
-  // Delete existing program
+  // Delete program using ProgramService
   const handleDeleteProgram = useCallback(async (program) => {
     if (!window.confirm(`Are you sure you want to delete "${program.name}"? This action cannot be undone.`)) {
       return;
     }
 
     try {
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      // Use ProgramService for deletion with conflict handling
+      const success = await programService.deleteProgram(program.id);
 
-      if (authError || !user) {
-        throw new Error('You must be logged in to delete a program');
+      if (success) {
+        // Refresh the programs list
+        await refreshRecentPrograms();
+        setError(null);
       }
-
-      // Delete program blocks first (foreign key constraint)
-      await supabase
-        .from('program_blocks')
-        .delete()
-        .eq('program_id', program.id);
-
-      // Delete the program
-      const { error: deleteError } = await supabase
-        .from('programs')
-        .delete()
-        .eq('id', program.id)
-        .eq('user_id', user.id); // Ensure user can only delete their own programs
-
-      if (deleteError) throw deleteError;
-
-      // Refresh the programs list
-      const { data: updatedPrograms, error: refreshError } = await supabase
-        .from('programs')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      if (!refreshError) {
-        setRecentPrograms(updatedPrograms || []);
-      }
-
-      setError(null);
-      // Optionally show success message
-      console.log('Program deleted successfully');
     } catch (error) {
       console.error('Error deleting program:', error);
       setError(`Failed to delete program: ${error.message}`);
     }
-  }, []);
+  }, [refreshRecentPrograms]);
 
   // Macrocycle handlers
   const handleContinueMacrocycle = useCallback((macrocycle) => {
@@ -1433,1426 +1862,1337 @@ const Program = memo(() => {
     selectedTrainingModel,
     setSelectedTrainingModel,
     handleApplyModel
-  }) => (
-    <div className="space-y-6 md:space-y-8">
-      {/* Assessment Summary */}
-      <div>
-        <h2 className="text-2xl font-semibold text-white mb-6">Your Assessment</h2>
-        {isLoadingAssessment ? (
-          <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-            <div className="flex items-center justify-center space-x-2">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              <span className="text-gray-400">Loading assessment data...</span>
+  }) => {
+    // Accordion state management
+    const [openAccordion, setOpenAccordion] = useState('assessment'); // Always open assessment by default
+
+    const toggleAccordion = (value) => {
+      setOpenAccordion(openAccordion === value ? '' : value);
+    };
+
+    // Auto-expand next section when Apply button is clicked
+    const handleApplyWithNext = (currentSection, nextSection, applyFunction) => {
+      applyFunction();
+      if (nextSection) {
+        setTimeout(() => setOpenAccordion(nextSection), 300);
+      }
+    };
+
+    // Accordion Item Component with Shadcn styling
+    const AccordionItem = ({ value, title, children, stepNumber, isComplete, instructions }) => (
+      <div className="border border-gray-700 rounded-lg bg-gray-800/50">
+        <button
+          onClick={() => toggleAccordion(value)}
+          className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-700/50 transition-colors rounded-lg"
+        >
+          <div className="flex items-center space-x-3">
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${isComplete ? 'bg-green-600 text-white' : 'bg-gray-600 text-gray-300'
+              }`}>
+              {stepNumber}
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white">{title}</h3>
+              {instructions && (
+                <p className="text-gray-400 text-sm">{instructions}</p>
+              )}
             </div>
           </div>
-        ) : assessmentError ? (
-          <div className="bg-red-900/50 border border-red-500 p-6 rounded-lg">
-            <div className="text-center">
-              <div className="text-red-400 mb-2">⚠️ Error loading assessment</div>
-              <p className="text-red-200 mb-4">{assessmentError}</p>
-              <Link
-                to="/assessment"
-                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors inline-block"
-              >
-                Complete Assessment
-              </Link>
-            </div>
+          <div className={`transform transition-transform ${openAccordion === value ? 'rotate-180' : ''}`}>
+            <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
           </div>
-        ) : assessmentData ? (
-          <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-white">Assessment Complete ✅</h3>
-              <Link
-                to="/assessment"
-                className="text-blue-400 hover:text-blue-300 text-sm underline"
-              >
-                Update Assessment
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div>
-                <span className="text-gray-400 text-sm font-bold">Name:</span>
-                <p className="text-white">{assessmentData.name}</p>
-              </div>
-              <div>
-                <span className="text-gray-400 text-sm font-bold">Primary Goal:</span>
-                <p className="text-white">{assessmentData.primaryGoal}</p>
-              </div>
-              <div>
-                <span className="text-gray-400 text-sm font-bold">Training Age:</span>
-                <p className="text-white">{assessmentData.trainingAge} years</p>
-              </div>
-              <div>
-                <span className="text-gray-400 text-sm font-bold">Main Priority:</span>
-                <p className="text-white">{assessmentData.mainPriority}</p>
-              </div>
-              <div>
-                <span className="text-gray-400 text-sm font-bold">Energy Spent:</span>
-                <p className="text-white">{assessmentData.energyFocus}</p>
-              </div>
-              <div>
-                <span className="text-gray-400 text-sm font-bold">Most Organized:</span>
-                <p className="text-white">{assessmentData.organizedArea}</p>
-              </div>
-              <div>
-                <span className="text-gray-400 text-sm font-bold">Main Constraint:</span>
-                <p className="text-white">{assessmentData.trainingConstraint}</p>
-              </div>
-              <div>
-                <span className="text-gray-400 text-sm font-bold">Completed:</span>
-                <p className="text-white">
-                  {assessmentData.createdAt ? new Date(assessmentData.createdAt).toLocaleDateString() : 'Recently'}
-                </p>
-              </div>
-            </div>
-            <div className="mt-4 p-3 bg-green-900/30 border border-green-600 rounded-lg">
-              <p className="text-green-400 text-sm">
-                <span className="font-bold">Ready for personalized training!</span> Your assessment data will help create programs tailored to your goals and constraints.
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-            <div className="text-center">
-              <div className="text-4xl mb-4">📋</div>
-              <h3 className="text-lg font-semibold text-white mb-2">Complete your assessment to personalize your program</h3>
-              <p className="text-gray-400 mb-6">
-                Tell us about your training goals, experience, and lifestyle to get personalized program recommendations.
-              </p>
-              <Link
-                to="/assessment"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg transition-colors inline-block font-medium"
-              >
-                Start Assessment
-              </Link>
-            </div>
+        </button>
+
+        {openAccordion === value && (
+          <div className="px-4 pb-4 space-y-4">
+            {children}
           </div>
         )}
       </div>
+    );
 
-      {/* Training Model Selection - Only show if assessment is complete */}
-      {assessmentData && (
-        <div>
-          <h2 className="text-2xl font-semibold text-white mb-6">Training Model</h2>
-          <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-            <div className="flex flex-col space-y-4">
-              <div>
-                <label className="block text-gray-300 text-sm font-medium mb-2">
-                  Select your base training model
-                </label>
-                <p className="text-gray-400 text-xs mb-3">
-                  Recommended for {assessmentData.primaryGoal}: <span className="text-blue-400 font-medium">{getRecommendedModel(assessmentData.primaryGoal)}</span>
-                </p>
-                <select
-                  value={selectedTrainingModel}
-                  onChange={(e) => setSelectedTrainingModel(e.target.value)}
-                  className="w-full p-3 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none appearance-none"
-                >
-                  <option value="">Choose a training model...</option>
-                  <option value="Linear">Linear - Progressive overload with gradual increases</option>
-                  <option value="Undulating">Undulating - Varied intensity and volume patterns</option>
-                  <option value="Block">Block - Specialized training phases</option>
-                  <option value="Conjugate">Conjugate - Multiple training methods simultaneously</option>
-                  <option value="Hybrid">Hybrid - Combination of multiple approaches</option>
-                </select>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-400">
-                  {selectedTrainingModel && (
-                    <span>Selected: <span className="text-white font-medium">{selectedTrainingModel}</span></span>
-                  )}
-                </div>
-                <button
-                  onClick={handleApplyModel}
-                  disabled={!selectedTrainingModel}
-                  className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg transition-colors font-medium"
-                >
-                  Apply Model
-                </button>
+    return (
+      <div className="space-y-4 max-w-6xl mx-auto">
+        {/* Step 1: Assessment Summary (Always Open) */}
+        <AccordionItem
+          value="assessment"
+          stepNumber="1"
+          title="Assessment Summary"
+          instructions="Your training profile and personalized recommendations"
+          isComplete={!!assessmentData}
+        >
+          {isLoadingAssessment ? (
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+              <div className="flex items-center justify-center space-x-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                <span className="text-gray-400">Loading assessment data...</span>
               </div>
             </div>
-
-            {/* Model descriptions */}
-            {selectedTrainingModel && (
-              <div className="mt-4 p-3 bg-gray-700 rounded-lg">
-                <h4 className="text-white font-medium mb-2">{selectedTrainingModel} Training Model</h4>
-                <p className="text-gray-300 text-sm">
-                  {selectedTrainingModel === 'Linear' && 'Focuses on steady progression with gradual increases in weight, volume, or intensity over time. Best for beginners and strength-focused goals.'}
-                  {selectedTrainingModel === 'Undulating' && 'Varies training variables (intensity, volume, exercise selection) within short periods. Good for intermediate trainees and preventing plateaus.'}
-                  {selectedTrainingModel === 'Block' && 'Divides training into specific blocks focusing on different adaptations (hypertrophy, strength, power). Excellent for hypertrophy and advanced trainees.'}
-                  {selectedTrainingModel === 'Conjugate' && 'Trains multiple qualities simultaneously using different methods on different days. Popular for powerlifting and sport-specific training.'}
-                  {selectedTrainingModel === 'Hybrid' && 'Combines elements from multiple training models to address various goals simultaneously. Flexible approach for diverse objectives.'}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Block Sequencing - Only show if training model is selected and it's Block or Hybrid */}
-      {assessmentData && selectedTrainingModel && (selectedTrainingModel === 'Block' || selectedTrainingModel === 'Hybrid') && (
-        <div>
-          <h2 className="text-2xl font-semibold text-white mb-6">Block Sequencing</h2>
-          <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-            <div className="mb-4">
-              <p className="text-gray-300 mb-2">
-                Arrange your training blocks in the optimal sequence for your {selectedTrainingModel.toLowerCase()} training model.
-              </p>
-              <p className="text-gray-400 text-sm">
-                Drag and drop the blocks below to customize your training sequence.
-              </p>
-            </div>
-
-            <DndContext
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext
-                items={blockSequence.map(block => block.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <div className="space-y-3 mb-6">
-                  {blockSequence.map((block, index) => (
-                    <SortableBlock
-                      key={block.id}
-                      id={block.id}
-                      name={block.name}
-                      description={block.description}
-                      index={index}
-                    />
-                  ))}
-                </div>
-              </SortableContext>
-            </DndContext>
-
-            <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-600">
-              <div className="text-sm text-gray-400">
-                <span>Current sequence: </span>
-                <span className="text-white font-medium">
-                  {blockSequence.map(block => block.name).join(' → ')}
-                </span>
-              </div>
-              <button
-                onClick={handleSaveSequence}
-                className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors font-medium"
-              >
-                Save Sequence
-              </button>
-            </div>
-
-            <div className="mt-4 p-3 bg-blue-900/30 border border-blue-600 rounded-lg">
-              <p className="text-blue-400 text-sm">
-                <span className="font-bold">Tip:</span> For {selectedTrainingModel.toLowerCase()} training, consider starting with accumulation phases to build a foundation before progressing to higher intensities.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Loading Parameters Calculator - Only show if training model is selected */}
-      {assessmentData && selectedTrainingModel && (
-        <div>
-          <h2 className="text-2xl font-semibold text-white mb-6">Loading Parameters Calculator</h2>
-          <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-            <div className="mb-4">
-              <p className="text-gray-300 mb-2">
-                Calculate training loads based on your 1RM and desired intensity for your {selectedTrainingModel.toLowerCase()} training model.
-              </p>
-              <p className="text-gray-400 text-sm">
-                Enter your one-rep max and select your target intensity to get rep, set, and volume recommendations.
-              </p>
-            </div>
-
-            {/* Input Form */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div className="flex flex-col">
-                <label className="block text-gray-300 text-sm font-medium mb-2">
-                  Enter 1RM (lbs)
-                </label>
-                <input
-                  type="number"
-                  value={oneRM}
-                  onChange={(e) => setOneRM(e.target.value)}
-                  className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none"
-                  placeholder="e.g., 225"
-                  min="1"
-                />
-              </div>
-
-              <div className="flex flex-col">
-                <label className="block text-gray-300 text-sm font-medium mb-2">
-                  Intensity (%1RM)
-                </label>
-                <select
-                  value={intensity}
-                  onChange={(e) => setIntensity(parseInt(e.target.value))}
-                  className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none appearance-none"
-                >
-                  <option value={60}>60% - Light</option>
-                  <option value={70}>70% - Moderate</option>
-                  <option value={80}>80% - Heavy</option>
-                  <option value={90}>90% - Very Heavy</option>
-                  <option value={100}>100% - Maximum</option>
-                </select>
-              </div>
-
-              <div className="flex flex-col">
-                <label className="block text-gray-300 text-sm font-medium mb-2">
-                  Target RIR (0-5)
-                </label>
-                <input
-                  type="number"
-                  value={targetRIR}
-                  onChange={(e) => setTargetRIR(parseInt(e.target.value) || 0)}
-                  className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none"
-                  min="0"
-                  max="5"
-                />
-              </div>
-            </div>
-
-            {/* Calculate Button */}
-            <div className="mb-6">
-              <button
-                onClick={handleCalculateLoading}
-                disabled={!oneRM || oneRM <= 0}
-                className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg transition-colors font-medium"
-              >
-                Calculate Loading
-              </button>
-            </div>
-
-            {/* Results Display */}
-            {loadingResults && (
-              <div className="bg-gray-800 p-4 rounded-lg border border-gray-600">
-                <h4 className="text-white font-medium mb-4">Loading Recommendations</h4>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                  <div className="text-center p-3 bg-gray-700 rounded-lg">
-                    <div className="text-gray-400 text-sm mb-1">Working Weight</div>
-                    <div className="text-blue-400 text-xl font-bold">{loadingResults.loadWeight} lbs</div>
-                    <div className="text-gray-500 text-xs">{loadingResults.intensity}% of 1RM</div>
-                  </div>
-
-                  <div className="text-center p-3 bg-gray-700 rounded-lg">
-                    <div className="text-gray-400 text-sm mb-1">Estimated Reps</div>
-                    <div className="text-green-400 text-xl font-bold">{loadingResults.estimatedReps}</div>
-                    <div className="text-gray-500 text-xs">@ RIR {loadingResults.targetRIR}</div>
-                  </div>
-
-                  <div className="text-center p-3 bg-gray-700 rounded-lg">
-                    <div className="text-gray-400 text-sm mb-1">Recommended Sets</div>
-                    <div className="text-yellow-400 text-xl font-bold">{loadingResults.recommendedSets}</div>
-                    <div className="text-gray-500 text-xs">per exercise</div>
-                  </div>
-
-                  <div className="text-center p-3 bg-gray-700 rounded-lg">
-                    <div className="text-gray-400 text-sm mb-1">Total Volume</div>
-                    <div className="text-purple-400 text-xl font-bold">{loadingResults.totalVolume.toLocaleString()}</div>
-                    <div className="text-gray-500 text-xs">lbs (sets × reps × weight)</div>
-                  </div>
-                </div>
-
-                {/* Volume Landmarks Note */}
-                <div className="p-3 bg-gray-700 rounded-lg">
-                  <h5 className="text-white font-medium mb-2">Volume Landmarks Reference</h5>
-                  <p className="text-gray-300 text-sm">
-                    <span className="text-green-400 font-medium">MEV:</span> {loadingResults.landmarks.mev} sets per week •
-                    <span className="text-red-400 font-medium ml-2">MRV:</span> {loadingResults.landmarks.mrv} sets per week
-                  </p>
-                  <p className="text-gray-400 text-xs mt-1">
-                    These are general guidelines for chest. Adjust based on your specific muscle group and recovery capacity.
-                  </p>
-                </div>
-
-                {/* Training Tips */}
-                <div className="mt-4 p-3 bg-blue-900/30 border border-blue-600 rounded-lg">
-                  <p className="text-blue-400 text-sm">
-                    <span className="font-bold">Training Tip:</span>
-                    {loadingResults.intensity >= 85 && ' Focus on perfect form and adequate rest between sets (3-5 minutes).'}
-                    {loadingResults.intensity >= 70 && loadingResults.intensity < 85 && ' Great intensity for hypertrophy. Rest 2-3 minutes between sets.'}
-                    {loadingResults.intensity < 70 && ' Perfect for high volume work. Rest 1-2 minutes between sets.'}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Movement Parameters - Only show if training model is selected */}
-      {assessmentData && selectedTrainingModel && (
-        <div>
-          <h2 className="text-2xl font-semibold text-white mb-6">Movement Parameters</h2>
-          <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-            <div className="mb-4">
-              <p className="text-gray-300 mb-2">
-                Configure exercise-specific parameters for your {selectedTrainingModel.toLowerCase()} training model.
-              </p>
-              <p className="text-gray-400 text-sm">
-                Define tempo, range of motion, and other movement variables for precise exercise execution.
-              </p>
-            </div>
-
-            {/* Movement Form */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div className="flex flex-col">
-                <label className="block text-gray-300 text-sm font-medium mb-2">
-                  Exercise
-                </label>
-                <select
-                  value={selectedExercise}
-                  onChange={(e) => setSelectedExercise(e.target.value)}
-                  className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none appearance-none"
-                >
-                  <option value="">Select an exercise...</option>
-                  <option value="Bench Press">Bench Press</option>
-                  <option value="Squat">Squat</option>
-                  <option value="Deadlift">Deadlift</option>
-                  <option value="Overhead Press">Overhead Press</option>
-                </select>
-              </div>
-
-              <div className="flex flex-col">
-                <label className="block text-gray-300 text-sm font-medium mb-2">
-                  Tempo (4-digit: ecc/pause/con/pause)
-                </label>
-                <input
-                  type="text"
-                  value={tempo}
-                  onChange={(e) => setTempo(e.target.value)}
-                  className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none"
-                  placeholder="e.g., 3010"
-                  maxLength="4"
-                  pattern="[0-9]{4}"
-                />
-                <p className="text-gray-500 text-xs mt-1">
-                  Format: Eccentric-Pause-Concentric-Pause (seconds)
-                </p>
-              </div>
-
-              <div className="flex flex-col">
-                <label className="block text-gray-300 text-sm font-medium mb-2">
-                  ROM (Range of Motion)
-                </label>
-                <select
-                  value={rom}
-                  onChange={(e) => setRom(e.target.value)}
-                  className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none appearance-none"
-                >
-                  <option value="">Select ROM...</option>
-                  <option value="Full">Full - Complete range of motion</option>
-                  <option value="Partial">Partial - Limited range of motion</option>
-                  <option value="Stretch Emphasis">Stretch Emphasis - Emphasized stretch position</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Add Movement Button */}
-            <div className="mt-4">
-              <button
-                onClick={handleAddMovement}
-                disabled={!selectedExercise || !tempo || !rom}
-                className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg transition-colors font-medium"
-              >
-                Add Movement
-              </button>
-            </div>
-
-            {/* Movement Guide */}
-            <div className="mt-6 p-4 bg-gray-700 rounded-lg">
-              <h4 className="text-white font-medium mb-3">Movement Parameter Guide</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div>
-                  <h5 className="text-gray-300 font-medium mb-2">Tempo Examples:</h5>
-                  <ul className="text-gray-400 space-y-1">
-                    <li><span className="text-white">3010</span> - 3s down, 0s pause, 1s up, 0s pause</li>
-                    <li><span className="text-white">4020</span> - 4s down, 0s pause, 2s up, 0s pause</li>
-                    <li><span className="text-white">3110</span> - 3s down, 1s pause, 1s up, 0s pause</li>
-                    <li><span className="text-white">2210</span> - 2s down, 2s pause, 1s up, 0s pause</li>
-                  </ul>
-                </div>
-                <div>
-                  <h5 className="text-gray-300 font-medium mb-2">ROM Applications:</h5>
-                  <ul className="text-gray-400 space-y-1">
-                    <li><span className="text-white">Full:</span> Standard complete range</li>
-                    <li><span className="text-white">Partial:</span> Strength curves, sticking points</li>
-                    <li><span className="text-white">Stretch Emphasis:</span> Hypertrophy focus</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4 p-3 bg-orange-900/30 border border-orange-600 rounded-lg">
-              <p className="text-orange-400 text-sm">
-                <span className="font-bold">Pro Tip:</span> Slower tempos (3-4s eccentric) increase time under tension for hypertrophy, while faster tempos (1-2s) are better for power development.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Training Methods - Only show if training model is selected */}
-      {assessmentData && selectedTrainingModel && (
-        <div>
-          <h2 className="text-2xl font-semibold text-white mb-6">Training Methods</h2>
-          <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-            <div className="mb-4">
-              <p className="text-gray-300 mb-2">
-                Select a method for this block using your {selectedTrainingModel.toLowerCase()} training model.
-              </p>
-              <p className="text-gray-400 text-sm">
-                Each method has a different Stimulus-to-Fatigue Ratio (SFR) that affects recovery demands.
-              </p>
-            </div>
-
-            {/* Training Method Selection */}
-            <div className="flex flex-col md:flex-row gap-4 mb-6">
-              <div className="flex-1">
-                <label className="block text-gray-300 text-sm font-medium mb-2">
-                  Select a method for this block
-                </label>
-                <select
-                  value={selectedTrainingMethod}
-                  onChange={handleTrainingMethodChange}
-                  className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none appearance-none"
-                >
-                  <option value="">Choose a training method...</option>
-                  <option value="Straight Sets">Straight Sets</option>
-                  <option value="Supersets">Supersets</option>
-                  <option value="Cluster Sets">Cluster Sets</option>
-                  <option value="Drop Sets">Drop Sets</option>
-                  <option value="French Contrast">French Contrast</option>
-                  <option value="Myoreps">Myoreps</option>
-                </select>
-              </div>
-
-              <div className="flex-1">
-                <label className="block text-gray-300 text-sm font-medium mb-2">
-                  SFR Rating
-                </label>
-                <div className="w-full p-2 border border-gray-600 bg-gray-700 text-white rounded-lg flex items-center">
-                  {methodSFR ? (
-                    <span className="font-medium">SFR: {methodSFR}</span>
-                  ) : (
-                    <span className="text-gray-400">Select a method first</span>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Apply Method Button */}
-            <div className="mt-4">
-              <button
-                onClick={handleApplyMethod}
-                disabled={!selectedTrainingMethod}
-                className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg transition-colors font-medium"
-              >
-                Apply Method
-              </button>
-            </div>
-
-            {/* Method Description */}
-            {selectedTrainingMethod && (
-              <div className="mt-6 p-4 bg-gray-700 rounded-lg">
-                <h4 className="text-white font-medium mb-2">{selectedTrainingMethod} Method</h4>
-                <div className="text-gray-300 text-sm">
-                  {selectedTrainingMethod === 'Straight Sets' && (
-                    <p>Standard sets with complete rest between each set. High stimulus with manageable fatigue. Perfect for strength and hypertrophy.</p>
-                  )}
-                  {selectedTrainingMethod === 'Supersets' && (
-                    <p>Two exercises performed back-to-back with minimal rest. Very high fatigue but time-efficient. Great for hypertrophy and conditioning.</p>
-                  )}
-                  {selectedTrainingMethod === 'Cluster Sets' && (
-                    <p>Sets broken into smaller clusters with short rest periods. Medium fatigue with high quality reps. Excellent for strength and power.</p>
-                  )}
-                  {selectedTrainingMethod === 'Drop Sets' && (
-                    <p>Continue with reduced weight after reaching failure. High fatigue and metabolic stress. Best for hypertrophy and muscle endurance.</p>
-                  )}
-                  {selectedTrainingMethod === 'French Contrast' && (
-                    <p>Sequence of heavy, explosive, plyometric, and speed exercises. Very high fatigue but develops multiple qualities simultaneously.</p>
-                  )}
-                  {selectedTrainingMethod === 'Myoreps' && (
-                    <p>Activation set followed by short rest periods and mini-sets. Medium fatigue with high metabolic stress. Excellent for hypertrophy.</p>
-                  )}
-                </div>
-                <div className="mt-3 p-2 bg-gray-600 rounded">
-                  <span className="text-gray-300 text-xs font-medium">SFR Rating: </span>
-                  <span className={`text-xs font-bold ${methodSFR === 'Very High' ? 'text-red-400' :
-                    methodSFR === 'High' ? 'text-orange-400' :
-                      methodSFR === 'Medium' ? 'text-yellow-400' : 'text-gray-400'
-                    }`}>
-                    {methodSFR}
-                  </span>
-                  <span className="text-gray-400 text-xs ml-2">
-                    ({methodSFR === 'Very High' ? 'High recovery demands' :
-                      methodSFR === 'High' ? 'Moderate recovery demands' :
-                        methodSFR === 'Medium' ? 'Manageable recovery demands' : ''})
-                  </span>
-                </div>
-              </div>
-            )}
-
-            <div className="mt-4 p-3 bg-blue-900/30 border border-blue-600 rounded-lg">
-              <p className="text-blue-400 text-sm">
-                <span className="font-bold">Training Tip:</span> Consider your recovery capacity and training phase when selecting methods. Higher SFR methods require more recovery time between sessions.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Energy Systems Development - Only show if training model is selected */}
-      {assessmentData && selectedTrainingModel && (
-        <div>
-          <h2 className="text-2xl font-semibold text-white mb-6">Energy Systems Development</h2>
-          <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-            <div className="mb-4">
-              <p className="text-gray-300 mb-2">
-                Configure energy system emphasis for your {selectedTrainingModel.toLowerCase()} training model.
-              </p>
-              <p className="text-gray-400 text-sm">
-                Select your primary energy system focus to optimize work-to-rest ratios and training intensity.
-              </p>
-            </div>
-
-            {/* Energy System Selection */}
-            <div className="flex flex-col gap-4 mb-6">
-              <div>
-                <label className="block text-gray-300 text-sm font-medium mb-2">
-                  Select energy system emphasis
-                </label>
-                <select
-                  value={selectedEnergySystem}
-                  onChange={handleEnergySystemChange}
-                  className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none appearance-none"
-                >
-                  <option value="">Choose an energy system focus...</option>
-                  <option value="Aerobic Base">Aerobic Base</option>
-                  <option value="Anaerobic Capacity">Anaerobic Capacity</option>
-                  <option value="Hybrid/Concurrent">Hybrid/Concurrent</option>
-                  <option value="Minimize (Hypertrophy Focus)">Minimize (Hypertrophy Focus)</option>
-                </select>
-              </div>
-
-              {/* Energy System Note */}
-              {energySystemNote && (
-                <div className="p-3 bg-gray-700 rounded-lg">
-                  <p className="text-sm text-gray-400">
-                    <span className="font-medium text-gray-300">Recommendation: </span>
-                    {energySystemNote}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Apply Energy System Button */}
-            <div className="mt-4">
-              <button
-                onClick={handleApplyEnergySystem}
-                disabled={!selectedEnergySystem}
-                className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg transition-colors font-medium"
-              >
-                Apply Energy System
-              </button>
-            </div>
-
-            {/* Energy System Description */}
-            {selectedEnergySystem && (
-              <div className="mt-6 p-4 bg-gray-700 rounded-lg">
-                <h4 className="text-white font-medium mb-2">{selectedEnergySystem} Focus</h4>
-                <div className="text-gray-300 text-sm">
-                  {selectedEnergySystem === 'Aerobic Base' && (
-                    <p>Develops aerobic capacity and fat oxidation. Low-intensity, high-volume training that builds endurance foundation and enhances recovery between sessions.</p>
-                  )}
-                  {selectedEnergySystem === 'Anaerobic Capacity' && (
-                    <p>Targets anaerobic power and lactate tolerance. High-intensity intervals that improve performance in short, intense efforts. Requires significant recovery.</p>
-                  )}
-                  {selectedEnergySystem === 'Hybrid/Concurrent' && (
-                    <p>Combines aerobic and anaerobic training. Can lead to interference effects where strength gains may be compromised. Careful programming and timing essential.</p>
-                  )}
-                  {selectedEnergySystem === 'Minimize (Hypertrophy Focus)' && (
-                    <p>Prioritizes muscle growth by minimizing cardio interference. Limited to warm-up and light recovery work to preserve energy for strength training.</p>
-                  )}
-                </div>
-
-                {/* Special warning for Hybrid/Concurrent */}
-                {selectedEnergySystem === 'Hybrid/Concurrent' && (
-                  <div className="mt-3 p-2 bg-yellow-900/30 border border-yellow-600 rounded">
-                    <p className="text-yellow-400 text-xs font-medium">
-                      ⚠️ Interference Alert: Separate strength and endurance sessions by at least 6 hours to minimize negative adaptations.
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div className="mt-4 p-3 bg-purple-900/30 border border-purple-600 rounded-lg">
-              <p className="text-purple-400 text-sm">
-                <span className="font-bold">Energy Tip:</span> Your energy system focus should align with your primary training goals and the current phase of your program.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Recovery & Adaptation - Only show if training model is selected */}
-      {assessmentData && selectedTrainingModel && (
-        <div>
-          <h2 className="text-2xl font-semibold text-white mb-6">Recovery & Adaptation</h2>
-          <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-            <div className="mb-4">
-              <p className="text-gray-300 mb-2">
-                Configure deload strategy for your {selectedTrainingModel.toLowerCase()} training model.
-              </p>
-              <p className="text-gray-400 text-sm">
-                Select your deload approach to optimize recovery and prevent overreaching.
-              </p>
-            </div>
-
-            {/* Deload Type Selection */}
-            <div className="flex flex-col gap-4 mb-6">
-              <div>
-                <label className="block text-gray-300 text-sm font-medium mb-2">
-                  Select deload approach
-                </label>
-                <select
-                  value={selectedDeloadType}
-                  onChange={handleDeloadTypeChange}
-                  className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none appearance-none"
-                >
-                  <option value="">Choose a deload type...</option>
-                  <option value="Scheduled (RP Style)">Scheduled (RP Style)</option>
-                  <option value="Earned (OPEX Style)">Earned (OPEX Style)</option>
-                  <option value="Technical (Bryant Style)">Technical (Bryant Style)</option>
-                  <option value="None">None</option>
-                </select>
-              </div>
-
-              {/* Deload Protocol Note */}
-              {deloadProtocol && (
-                <div className="p-3 bg-gray-700 rounded-lg">
-                  <p className="text-sm text-gray-400">
-                    <span className="font-medium text-gray-300">Protocol: </span>
-                    {deloadProtocol}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Apply Deload Button */}
-            <div className="mt-4">
-              <button
-                onClick={handleApplyDeload}
-                disabled={!selectedDeloadType}
-                className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg transition-colors font-medium"
-              >
-                Apply Deload
-              </button>
-            </div>
-
-            {/* Deload Strategy Description */}
-            {selectedDeloadType && (
-              <div className="mt-6 p-4 bg-gray-700 rounded-lg">
-                <h4 className="text-white font-medium mb-2">{selectedDeloadType} Strategy</h4>
-                <div className="text-gray-300 text-sm">
-                  {selectedDeloadType === 'Scheduled (RP Style)' && (
-                    <p>Predetermined deloads based on Renaissance Periodization guidelines. MRV (Maximum Recoverable Volume) triggers a mandatory deload week at MV (Maintenance Volume) to restore recovery capacity.</p>
-                  )}
-                  {selectedDeloadType === 'Earned (OPEX Style)' && (
-                    <p>Individualized deloads based on readiness markers and subjective feedback. Only deload when biomarkers indicate accumulated fatigue, allowing for auto-regulation and optimal adaptation.</p>
-                  )}
-                  {selectedDeloadType === 'Technical (Bryant Style)' && (
-                    <p>Technique-focused deloads maintaining intensity while reducing volume. Emphasizes movement quality and skill refinement while allowing physiological recovery.</p>
-                  )}
-                  {selectedDeloadType === 'None' && (
-                    <p>No structured deload protocol. Relies on program completion or external factors to dictate recovery. Higher risk of overreaching but potentially faster adaptation in some individuals.</p>
-                  )}
-                </div>
-
-                {/* Special considerations for each type */}
-                {selectedDeloadType === 'Earned (OPEX Style)' && (
-                  <div className="mt-3 p-2 bg-green-900/30 border border-green-600 rounded">
-                    <p className="text-green-400 text-xs font-medium">
-                      💡 Requires consistent tracking: HRV, sleep quality, motivation, and performance metrics
-                    </p>
-                  </div>
-                )}
-
-                {selectedDeloadType === 'None' && (
-                  <div className="mt-3 p-2 bg-red-900/30 border border-red-600 rounded">
-                    <p className="text-red-400 text-xs font-medium">
-                      ⚠️ Warning: Monitor closely for signs of overreaching, poor recovery, or decreased performance
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div className="mt-4 p-3 bg-orange-900/30 border border-orange-600 rounded-lg">
-              <p className="text-orange-400 text-sm">
-                <span className="font-bold">Recovery Tip:</span> Your deload strategy should match your training experience, recovery capacity, and lifestyle factors.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Individual Considerations - Only show if training model is selected */}
-      {assessmentData && selectedTrainingModel && (
-        <div>
-          <h2 className="text-2xl font-semibold text-white mb-6">Individual Considerations</h2>
-          <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-            <div className="mb-4">
-              <p className="text-gray-300 mb-2">
-                Personalize your program based on individual factors and preferences.
-              </p>
-              <p className="text-gray-400 text-sm">
-                These considerations help optimize training timing and adaptation strategies.
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-4 mb-6">
-              {/* Training Age Input */}
-              <div>
-                <label className="block text-gray-300 text-sm font-medium mb-2">
-                  Training Age (years)
-                </label>
-                <input
-                  type="number"
-                  value={trainingAge}
-                  onChange={(e) => setTrainingAge(e.target.value)}
-                  className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none"
-                  placeholder="Enter years of training experience..."
-                  min="0"
-                  step="0.5"
-                />
-              </div>
-
-              {/* Chronotype Selection */}
-              <div>
-                <label className="block text-gray-300 text-sm font-medium mb-2">
-                  Chronotype
-                </label>
-                <select
-                  value={chronotype}
-                  onChange={handleChronotypeChange}
-                  className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none appearance-none"
-                >
-                  <option value="">Select your chronotype...</option>
-                  <option value="Lion (Early)">Lion (Early)</option>
-                  <option value="Bear (Middle)">Bear (Middle)</option>
-                  <option value="Wolf (Late)">Wolf (Late)</option>
-                </select>
-              </div>
-
-              {/* Chronotype Note */}
-              {chronotypeNote && (
-                <div className="p-3 bg-gray-700 rounded-lg">
-                  <p className="text-sm text-gray-400">
-                    <span className="font-medium text-gray-300">Timing Recommendation: </span>
-                    {chronotypeNote}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Save Considerations Button */}
-            <div className="mt-4">
-              <button
-                onClick={handleSaveConsiderations}
-                disabled={!trainingAge || !chronotype}
-                className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg transition-colors font-medium"
-              >
-                Save Considerations
-              </button>
-            </div>
-
-            <div className="mt-4 p-3 bg-blue-900/30 border border-blue-600 rounded-lg">
-              <p className="text-blue-400 text-sm">
-                <span className="font-bold">Personalization Tip:</span> Training age and chronotype influence program periodization and optimal training times.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Emerging Trends & Tech - Only show if training model is selected */}
-      {assessmentData && selectedTrainingModel && (
-        <div>
-          <h2 className="text-2xl font-semibold text-white mb-6">Emerging Trends & Tech</h2>
-          <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-            <div className="mb-4">
-              <p className="text-gray-300 mb-2">
-                Integrate cutting-edge technology to enhance training effectiveness and monitoring.
-              </p>
-              <p className="text-gray-400 text-sm">
-                Select advanced technologies to incorporate into your training program.
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-4 mb-6">
-              {/* Tech Integration Selection */}
-              <div>
-                <label className="block text-gray-300 text-sm font-medium mb-2">
-                  Select tech feature to add
-                </label>
-                <select
-                  value={selectedTechIntegration}
-                  onChange={handleTechIntegrationChange}
-                  className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none appearance-none"
-                >
-                  <option value="">Choose a tech integration...</option>
-                  <option value="VBT (Velocity Tracking)">VBT (Velocity Tracking)</option>
-                  <option value="AI Optimization">AI Optimization</option>
-                  <option value="Wearables (HRV/Sleep)">Wearables (HRV/Sleep)</option>
-                  <option value="Digital Twin">Digital Twin</option>
-                  <option value="None">None</option>
-                </select>
-              </div>
-
-              {/* Tech Note */}
-              {techNote && (
-                <div className="p-3 bg-gray-700 rounded-lg">
-                  <p className="text-sm text-gray-400">
-                    <span className="font-medium text-gray-300">Implementation: </span>
-                    {techNote}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Apply Tech Button */}
-            <div className="mt-4">
-              <button
-                onClick={handleApplyTech}
-                disabled={!selectedTechIntegration}
-                className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg transition-colors font-medium"
-              >
-                Apply Tech
-              </button>
-            </div>
-
-            <div className="mt-4 p-3 bg-purple-900/30 border border-purple-600 rounded-lg">
-              <p className="text-purple-400 text-sm">
-                <span className="font-bold">Innovation Tip:</span> Technology integration should enhance, not complicate, your training approach.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Program Preview Section - Only show if assessment and training model are selected */}
-      {assessmentData && selectedTrainingModel && (
-        <div>
-          <h2 className="text-2xl font-semibold text-white mb-6">Program Preview</h2>
-          <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
-            {!showPreview ? (
+          ) : assessmentError ? (
+            <div className="bg-red-900/50 border border-red-500 p-6 rounded-lg">
               <div className="text-center">
-                <div className="mb-4">
-                  <p className="text-gray-300 mb-2">
-                    Generate a preview of your complete training program based on all your selections.
+                <div className="text-red-400 mb-2">⚠️ Error loading assessment</div>
+                <p className="text-red-200 mb-4">{assessmentError}</p>
+                <Link
+                  to="/assessment"
+                  className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors inline-block"
+                >
+                  Complete Assessment
+                </Link>
+              </div>
+            </div>
+          ) : assessmentData ? (
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-lg font-semibold text-white flex items-center">
+                  <span className="text-green-400 mr-2">✅</span>
+                  Assessment Complete
+                </h4>
+                <Link
+                  to="/assessment"
+                  className="text-blue-400 hover:text-blue-300 text-sm underline"
+                  title="Update your assessment data"
+                >
+                  Update Assessment
+                </Link>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <span className="text-gray-400 text-sm font-bold">Name:</span>
+                  <p className="text-white">{assessmentData.name}</p>
+                </div>
+                <div>
+                  <span className="text-gray-400 text-sm font-bold">Primary Goal:</span>
+                  <p className="text-white">{assessmentData.primaryGoal}</p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+              <div className="text-center">
+                <div className="text-yellow-400 mb-2">📝 Assessment Required</div>
+                <p className="text-gray-300 mb-4">Complete your assessment to begin program design</p>
+                <Link
+                  to="/assessment"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors inline-block"
+                >
+                  Start Assessment
+                </Link>
+              </div>
+            </div>
+          )}
+        </AccordionItem>
+
+        {/* Step 2: Training Model */}
+        {assessmentData && (
+          <AccordionItem
+            value="training-model"
+            stepNumber="2"
+            title="Training Model"
+            instructions="Select your periodization approach"
+            isComplete={!!selectedTrainingModel}
+          >
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+              <div className="flex flex-col space-y-4">
+                <div>
+                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                   
+                    Select your base training model
+                    <span className="text-gray-400 ml-2" title="Your periodization strategy determines how training variables progress over time">ℹ️</span>
+                  </label>
+                  <p className="text-gray-400 text-xs mb-3">
+                    Recommended for {assessmentData.primaryGoal}: <span className="text-blue-400 font-medium">{getRecommendedModel(assessmentData.primaryGoal)}</span>
                   </p>
-                  <p className="text-gray-400 text-sm">
-                    This will create a structured program with phases, weekly breakdown, and all parameters.
+                  <select
+                    value={selectedTrainingModel}
+                    onChange={(e) => setSelectedTrainingModel(e.target.value)}
+                    className="w-full p-3 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none appearance-none"
+                  >
+                    <option value="">Choose a training model...</option>
+                    <option value="Linear">Linear - Progressive overload with gradual increases</option>
+                    <option value="Undulating">Undulating - Varied intensity and volume patterns</option>
+                    <option value="Block">Block - Specialized training phases</option>
+                    <option value="Conjugate">Conjugate - Multiple training methods simultaneously</option>
+                    <option value="Hybrid">Hybrid - Combination of multiple approaches</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-gray-400">
+                    {selectedTrainingModel && (
+                      <span>Selected: <span className="text-white font-medium">{selectedTrainingModel}</span></span>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleApplyWithNext('training-model', 'block-sequencing', handleApplyModel)}
+                    disabled={!selectedTrainingModel}
+                    className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg transition-colors font-medium"
+                    title="Apply this training model and continue to next step"
+                  >
+                    Apply Model
+                  </button>
+                </div>
+              </div>
+
+              {/* Model descriptions */}
+              {selectedTrainingModel && (
+                <div className="mt-4 p-3 bg-gray-700 rounded-lg">
+                  <h5 className="text-white font-medium mb-2">{selectedTrainingModel} Training Model</h5>
+                  <p className="text-gray-300 text-sm">
+                    {selectedTrainingModel === 'Linear' && 'Focuses on steady progression with gradual increases in weight, volume, or intensity over time. Best for beginners and strength-focused goals.'}
+                    {selectedTrainingModel === 'Undulating' && 'Varies training variables (intensity, volume, exercise selection) within short periods. Good for intermediate trainees and preventing plateaus.'}
+                    {selectedTrainingModel === 'Block' && 'Divides training into specific blocks focusing on different adaptations (hypertrophy, strength, power). Excellent for hypertrophy and advanced trainees.'}
+                    {selectedTrainingModel === 'Conjugate' && 'Trains multiple qualities simultaneously using different methods on different days. Popular for powerlifting and sport-specific training.'}
+                    {selectedTrainingModel === 'Hybrid' && 'Combines elements from multiple training models to address various goals simultaneously. Flexible approach for diverse objectives.'}
                   </p>
+                </div>
+              )}
+            </div>
+          </AccordionItem>
+        )}
+
+        {/* Step 3: Block Sequencing - Calendar Integration */}
+        {assessmentData && selectedTrainingModel && (selectedTrainingModel === 'Block' || selectedTrainingModel === 'Hybrid') && (
+          <AccordionItem
+            value="block-sequencing"
+            stepNumber="3"
+            title="Block Sequencing"
+            instructions="Drag blocks to calendar for visual sequencing—adjust weeks with controls"
+            isComplete={localEvents.length > 0}
+          >
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+              <div className="mb-4">
+                <p className="text-gray-300 mb-2">
+                  Design your training sequence using our TrainingPeaks-inspired calendar interface.
+                </p>
+                <p className="text-gray-400 text-sm">
+                  Select training blocks from the palette and place them on the calendar to create your periodization plan.
+                </p>
+              </div>
+
+              {/* View Toggle */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-4">
+                  <button
+                    onClick={() => setCalendarView(true)}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${calendarView
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      }`}
+                  >
+                    <Calendar className="w-4 h-4" />
+                    <span>Calendar View</span>
+                  </button>
+                  <button
+                    onClick={() => setCalendarView(false)}
+                    className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${!calendarView
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                      }`}
+                  >
+                    <List className="w-4 h-4" />
+                    <span>List View</span>
+                  </button>
+                </div>
+                <div className="text-sm text-gray-400">
+                  {localEvents.length} blocks scheduled
+                </div>
+              </div>
+
+              {calendarView ? (
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                  {/* Block Palette */}
+                  <div className="lg:col-span-1">
+                    <BlockPalette
+                      blockSequence={blockSequence}
+                      blockTypeConfig={blockTypeConfig}
+                      draggedBlock={draggedBlock}
+                      setDraggedBlock={setDraggedBlock}
+                      selectedTrainingModel={selectedTrainingModel}
+                    />
+                  </div>
+
+                  {/* Calendar */}
+                  <div className="lg:col-span-3">
+                    <div className="bg-white rounded-lg p-4" style={{ height: '500px' }}>
+                      <BigCalendar
+                        localizer={localizer}
+                        events={localEvents}
+                        startAccessor="start"
+                        endAccessor="end"
+                        views={['month']}
+                        defaultView="month"
+                        selectable={true}
+                        onSelectSlot={handleSelectSlot}
+                        onSelectEvent={(event) => setSelectedEvent(event)}
+                        onEventDrop={handleEventDrop}
+                        onEventResize={handleEventResize}
+                        resizable={true}
+                        dragFromOutsideItem={null}
+                        components={{
+                          event: (props) => (
+                            <CalendarEvent
+                              {...props}
+                              blockTypeConfig={blockTypeConfig}
+                              updateEventWeeks={updateEventWeeks}
+                              addDeloadToEvent={addDeloadToEvent}
+                              handleDeleteEvent={handleDeleteEvent}
+                            />
+                          )
+                        }}
+                        eventPropGetter={(event) => {
+                          const config = blockTypeConfig[event.resource.blockType] || { color: '#6B7280' };
+                          return {
+                            style: {
+                              backgroundColor: config.color,
+                              borderColor: config.color,
+                              border: 'none',
+                              borderRadius: '4px',
+                              color: config.textColor || '#FFFFFF'
+                            }
+                          };
+                        }}
+                        dayPropGetter={(date) => ({
+                          style: {
+                            backgroundColor: moment().isSame(date, 'day') ? '#FEF3C7' : '#FFFFFF'
+                          }
+                        })}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* List View */
+                <div className="space-y-4">
+                  <DndContext
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={blockSequence.map(block => block.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      <div className="space-y-3 mb-6">
+                        {blockSequence.map((block, index) => (
+                          <SortableBlock
+                            key={block.id}
+                            id={block.id}
+                            name={block.name}
+                            description={block.description}
+                            index={index}
+                          />
+                        ))}
+                      </div>
+                    </SortableContext>
+                  </DndContext>
+
+                  <div className="mt-4 p-3 bg-gray-700 rounded-lg">
+                    <h4 className="text-white font-medium mb-2">Scheduled Events</h4>
+                    {localEvents.length > 0 ? (
+                      <div className="space-y-2">
+                        {localEvents
+                          .sort((a, b) => new Date(a.start) - new Date(b.start))
+                          .map((event) => (
+                            <div key={event.id} className="flex items-center justify-between p-3 bg-gray-600 rounded">
+                              <div>
+                                <span className="text-white font-medium">{event.title}</span>
+                                <span className="text-gray-300 ml-2">
+                                  {moment(event.start).format('MMM DD')} - {moment(event.end).format('MMM DD, YYYY')}
+                                </span>
+                                <span className="text-gray-400 ml-2">({event.resource.weeks} weeks)</span>
+                              </div>
+                              <button
+                                onClick={() => setSelectedEvent(event)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
+                              >
+                                Edit
+                              </button>
+                            </div>
+                          ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-400 text-sm">No training blocks scheduled yet.</p>
+                    )
+                    }
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-600">
+                <div className="text-sm text-gray-400">
+                  <span>Training model: </span>
+                  <span className="text-white font-medium">{selectedTrainingModel}</span>
+                  {localEvents.length > 0 && (
+                    <span className="ml-4">
+                      Total duration: {localEvents.reduce((total, event) => total + event.resource.weeks, 0)} weeks
+                    </span>
+                  )}
                 </div>
                 <button
-                  onClick={handleGeneratePreview}
-                  className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg transition-colors font-medium"
+                  onClick={() => handleApplyWithNext('block-sequencing', 'loading-parameters', handleSaveSequence)}
+                  className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors font-medium"
+                  title="Save block sequence and continue to loading parameters"
                 >
-                  Generate Preview
+                  Save Sequence
                 </button>
               </div>
-            ) : generatedProgram && (
-              <div className="space-y-6">
-                {/* Program Overview */}
-                <div className="bg-gray-700 p-4 rounded-lg">
-                  <h3 className="text-xl font-semibold text-white mb-3">Program Overview</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-gray-400">Name:</span>
-                      <span className="text-white ml-2">{generatedProgram.overview.name}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Goal:</span>
-                      <span className="text-white ml-2">{generatedProgram.overview.goal}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Duration:</span>
-                      <span className="text-white ml-2">{generatedProgram.overview.duration} weeks</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Training Model:</span>
-                      <span className="text-white ml-2">{generatedProgram.overview.trainingModel}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Training Days:</span>
-                      <span className="text-white ml-2">{generatedProgram.overview.trainingDays} per week</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Chronotype:</span>
-                      <span className="text-white ml-2">{generatedProgram.overview.chronotype || 'Not specified'}</span>
-                    </div>
+
+              <div className="mt-4 p-3 bg-blue-900/30 border border-blue-600 rounded-lg">
+                <p className="text-blue-400 text-sm">
+                  <span className="font-bold">Pro Tip:</span> Use the calendar view to visualize your training progression and ensure proper periodization. Each block automatically fills with appropriate load, time, and methods.
+                </p>
+              </div>
+            </div>
+
+            {/* Event Detail Modal */}
+            {selectedEvent && (
+              <EventDetailPanel
+                selectedEvent={selectedEvent}
+                blockTypeConfig={blockTypeConfig}
+                updateEventWeeks={updateEventWeeks}
+                addDeloadToEvent={addDeloadToEvent}
+                handleDeleteEvent={handleDeleteEvent}
+                onClose={() => setSelectedEvent(null)}
+              />
+            )}
+          </AccordionItem>
+        )}
+
+        {/* Step 4: Loading & Movement Parameters (Per-Block) */}
+        {assessmentData && selectedTrainingModel && blockSequence.length > 0 && (
+          <AccordionItem
+            value="loading-parameters"
+            stepNumber="4"
+            title="Loading & Movement Parameters"
+            instructions="Configure training loads and exercises for each block - defaults based on block type"
+            isComplete={Object.keys(blockParameters).length > 0}
+          >
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+              <div className="mb-6">
+                <p className="text-gray-300 mb-2">
+                  Set parameters for each block in your {selectedTrainingModel.toLowerCase()} training model.
+                </p>
+                <p className="text-gray-400 text-sm">
+                  Each block has default intensity ranges based on its phase. Customize as needed for your specific goals.
+                </p>
+              </div>
+
+              {/* Active Block Tab Navigation */}
+              {blockSequence.length > 0 && (
+                <div className="mb-6">
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {blockSequence.map((block) => {
+                      const blockConfig = blockTypeConfig[block.id] || blockTypeConfig.accumulation;
+                      const blockParams = blockParameters[block.id] || {};
+                      const hasParams = blockParams.oneRM || blockParams.exercises?.length > 0;
+
+                      return (
+                        <button
+                          key={block.id}
+                          onClick={() => setActiveBlockTab(block.id)}
+                          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeBlockTab === block.id
+                            ? 'bg-blue-600 text-white'
+                            : hasParams
+                              ? 'bg-green-800 text-green-200 hover:bg-green-700'
+                              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                            }`}
+                          style={{
+                            backgroundColor: activeBlockTab === block.id
+                              ? undefined
+                              : hasParams
+                                ? undefined
+                                : blockConfig.color + '20',
+                            borderColor: blockConfig.color,
+                            borderWidth: '1px'
+                          }}
+                        >
+                          {block.name}
+                          {hasParams && <span className="ml-2 text-green-400">✓</span>}
+                        </button>
+                      );
+                    })}
                   </div>
+
+                  {/* Active Block Parameter Form */}
+                  {activeBlockTab && blockSequence.length > 0 && (
+                    <div className="border border-gray-600 rounded-lg p-6">
+                      {(() => {
+                        const activeBlock = blockSequence.find(b => b.id === activeBlockTab);
+                        const blockConfig = blockTypeConfig[activeBlockTab] || blockTypeConfig.accumulation;
+                        const blockParams = blockParameters[activeBlockTab] || {};
+                        const defaults = getPhaseDefaults(activeBlockTab);
+
+                        if (!activeBlock) {
+                          return <div className="text-gray-400">Block not found</div>;
+                        }
+
+                        return (
+                          <div>
+                            {/* Block Header */}
+                            <div className="mb-6 p-4 rounded-lg" style={{ backgroundColor: blockConfig.color + '15', borderColor: blockConfig.color, borderWidth: '1px' }}>
+                              <h4 className="text-white text-lg font-semibold mb-2">{activeBlock?.name || activeBlockTab}</h4>
+                              <p className="text-gray-300 text-sm mb-1">
+                                <span className="font-medium">Focus:</span> {defaults.focus}
+                              </p>
+                              <p className="text-gray-300 text-sm">
+                                <span className="font-medium">Default Intensity:</span> {defaults.intensityRange} •
+                                <span className="font-medium ml-2">Target RIR:</span> {defaults.targetRIR}
+                              </p>
+                            </div>
+
+                            {/* Loading Parameters Form */}
+                            <div className="mb-6">
+                              <h5 className="text-white font-medium mb-4">Loading Parameters</h5>
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div className="flex flex-col">
+                                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                                    1RM Weight (lbs)
+                                  </label>
+                                  <input
+                                    type="number"
+                                    value={blockParams.oneRM || ''}
+                                    onChange={(e) => updateBlockParameter(activeBlockTab, 'oneRM', e.target.value)}
+                                    className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none"
+                                    placeholder="e.g., 225"
+                                    min="1"
+                                  />
+                                </div>
+
+                                <div className="flex flex-col">
+                                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                                    Intensity (%1RM)
+                                  </label>
+                                  <input
+                                    type="number"
+                                    value={blockParams.intensity || defaults.defaultIntensity}
+                                    onChange={(e) => updateBlockParameter(activeBlockTab, 'intensity', parseInt(e.target.value))}
+                                    className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none"
+                                    min="50"
+                                    max="100"
+                                  />
+                                </div>
+
+                                <div className="flex flex-col">
+                                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                                    Target RIR
+                                  </label>
+                                  <input
+                                    type="number"
+                                    value={blockParams.targetRIR ?? defaults.targetRIR}
+                                    onChange={(e) => updateBlockParameter(activeBlockTab, 'targetRIR', parseInt(e.target.value))}
+                                    className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none"
+                                    min="0"
+                                    max="5"
+                                  />
+                                </div>
+                              </div>
+
+                              <button
+                                onClick={() => handleCalculateLoading(activeBlockTab)}
+                                disabled={!blockParams.oneRM || blockParams.oneRM <= 0}
+                                className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg transition-colors"
+                              >
+                                Calculate Loading for {activeBlock?.name}
+                              </button>
+
+                              {/* Loading Results */}
+                              {blockParams.loadingResults && (
+                                <div className="mt-4 p-4 bg-gray-700 rounded-lg">
+                                  <h6 className="text-white font-medium mb-3">Loading Recommendations</h6>
+                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    <div className="text-center p-2 bg-gray-800 rounded">
+                                      <div className="text-gray-400 text-xs mb-1">Working Weight</div>
+                                      <div className="text-blue-400 font-bold">{blockParams.loadingResults.loadWeight} lbs</div>
+                                    </div>
+                                    <div className="text-center p-2 bg-gray-800 rounded">
+                                      <div className="text-gray-400 text-xs mb-1">Reps</div>
+                                      <div className="text-green-400 font-bold">{blockParams.loadingResults.estimatedReps}</div>
+                                    </div>
+                                    <div className="text-center p-2 bg-gray-800 rounded">
+                                      <div className="text-gray-400 text-xs mb-1">Sets</div>
+                                      <div className="text-yellow-400 font-bold">{blockParams.loadingResults.recommendedSets}</div>
+                                    </div>
+                                    <div className="text-center p-2 bg-gray-800 rounded">
+                                      <div className="text-gray-400 text-xs mb-1">Volume</div>
+                                      <div className="text-purple-400 font-bold">{blockParams.loadingResults.totalVolume.toLocaleString()}</div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Movement Parameters Form */}
+                            <div>
+                              <h5 className="text-white font-medium mb-4">Movement Parameters</h5>
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div className="flex flex-col">
+                                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                                    Exercise
+                                  </label>
+                                  <select
+                                    value={blockParams.selectedExercise || ''}
+                                    onChange={(e) => updateBlockParameter(activeBlockTab, 'selectedExercise', e.target.value)}
+                                    className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none"
+                                  >
+                                    <option value="">Select exercise...</option>
+                                    <option value="Bench Press">Bench Press</option>
+                                    <option value="Squat">Squat</option>
+                                    <option value="Deadlift">Deadlift</option>
+                                    <option value="Overhead Press">Overhead Press</option>
+                                    <option value="Incline Press">Incline Press</option>
+                                    <option value="Romanian Deadlift">Romanian Deadlift</option>
+                                  </select>
+                                </div>
+
+                                <div className="flex flex-col">
+                                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                                    Tempo (e.g., 3010)
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={blockParams.tempo || '3010'}
+                                    onChange={(e) => updateBlockParameter(activeBlockTab, 'tempo', e.target.value)}
+                                    className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none"
+                                    placeholder="3010"
+                                    maxLength="4"
+                                  />
+                                </div>
+
+                                <div className="flex flex-col">
+                                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                                    Range of Motion
+                                  </label>
+                                  <select
+                                    value={blockParams.rom || 'Full'}
+                                    onChange={(e) => updateBlockParameter(activeBlockTab, 'rom', e.target.value)}
+                                    className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none"
+                                  >
+                                    <option value="Full">Full ROM</option>
+                                    <option value="Partial">Partial ROM</option>
+                                    <option value="1.5x">1.5x ROM</option>
+                                    <option value="Lengthened">Lengthened Partial</option>
+                                  </select>
+                                </div>
+                              </div>
+
+                              <button
+                                onClick={() => handleAddExercise(activeBlockTab)}
+                                disabled={!blockParams.selectedExercise || !blockParams.tempo || !blockParams.rom}
+                                className="bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-6 py-2 rounded-lg transition-colors"
+                              >
+                                Add Exercise to {activeBlock?.name}
+                              </button>
+
+                              {/* Exercise List */}
+                              {blockParams.exercises && blockParams.exercises.length > 0 && (
+                                <div className="mt-4">
+                                  <h6 className="text-white font-medium mb-2">Exercises in {activeBlock?.name}</h6>
+                                  <div className="space-y-2">
+                                    {blockParams.exercises.map((exercise) => (
+                                      <div key={exercise.id} className="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
+                                        <div>
+                                          <span className="text-white font-medium">{exercise.name}</span>
+                                          <span className="text-gray-400 ml-3">Tempo: {exercise.tempo}</span>
+                                          <span className="text-gray-400 ml-3">ROM: {exercise.rom}</span>
+                                        </div>
+                                        <button
+                                          onClick={() => handleRemoveExercise(activeBlockTab, exercise.id)}
+                                          className="text-red-400 hover:text-red-300 px-2 py-1 rounded"
+                                        >
+                                          Remove
+                                        </button>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </AccordionItem>
+        )}
+
+        {/* Step 5: Training Methods */}
+        {assessmentData && selectedTrainingModel && (
+          <AccordionItem
+            value="training-methods"
+            stepNumber="5"
+            title="Training Methods"
+            instructions="Select training methods with SFR ratings"
+            isComplete={!!selectedTrainingMethod}
+          >
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+              <div className="mb-4">
+                <p className="text-gray-300 mb-2">
+                  Select a method for this block using your {selectedTrainingModel.toLowerCase()} training model.
+                </p>
+                <p className="text-gray-400 text-sm">
+                  Each method has a different Stimulus-to-Fatigue Ratio (SFR) that affects recovery demands.
+                </p>
+              </div>
+
+              {/* Training Method Selection */}
+              <div className="flex flex-col md:flex-row gap-4 mb-6">
+                <div className="flex-1">
+                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                    Select a method for this block
+                    <span className="text-gray-400 ml-2" title="Training method determines stimulus and fatigue">ℹ️</span>
+                  </label>
+                  <select
+                    value={selectedTrainingMethod}
+                    onChange={handleTrainingMethodChange}
+                    className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none appearance-none"
+                  >
+                    <option value="">Choose a training method...</option>
+                    <option value="Straight Sets">Straight Sets</option>
+                    <option value="Supersets">Supersets</option>
+                    <option value="Cluster Sets">Cluster Sets</option>
+                    <option value="Drop Sets">Drop Sets</option>
+                    <option value="French Contrast">French Contrast</option>
+                    <option value="Myoreps">Myoreps</option>
+                  </select>
                 </div>
 
-                {/* Program Phases */}
-                <div className="bg-gray-700 p-4 rounded-lg">
-                  <h3 className="text-xl font-semibold text-white mb-3">Training Phases</h3>
-                  <div className="space-y-2">
-                    {generatedProgram.phases.map((phase, index) => (
-                      <div key={index} className="flex justify-between items-center bg-gray-600 p-3 rounded">
-                        <div>
-                          <span className="text-white font-medium">{phase.name}</span>
-                          <span className="text-gray-400 ml-2">- {phase.focus}</span>
-                        </div>
-                        <span className="text-blue-400">{phase.weeks} weeks</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Weekly Overview */}
-                <div className="bg-gray-700 p-4 rounded-lg">
-                  <h3 className="text-xl font-semibold text-white mb-3">Weekly Breakdown</h3>
-                  <div className="max-h-60 overflow-y-auto space-y-1">
-                    {generatedProgram.weeklyOutline.slice(0, 8).map((week) => (
-                      <div key={week.week} className="flex justify-between items-center bg-gray-600 p-2 rounded text-sm">
-                        <span className="text-white">Week {week.week}</span>
-                        <span className="text-gray-300">{week.phase}</span>
-                        <span className="text-gray-400">{week.focus}</span>
-                        {week.deloadWeek && <span className="text-yellow-400 text-xs">DELOAD</span>}
-                      </div>
-                    ))}
-                    {generatedProgram.weeklyOutline.length > 8 && (
-                      <div className="text-center text-gray-400 text-sm pt-2">
-                        ... and {generatedProgram.weeklyOutline.length - 8} more weeks
-                      </div>
+                <div className="flex-1">
+                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                    SFR Rating
+                    <span className="text-gray-400 ml-2" title="Stimulus-to-Fatigue Ratio">ℹ️</span>
+                  </label>
+                  <div className="w-full p-2 border border-gray-600 bg-gray-700 text-white rounded-lg flex items-center">
+                    {methodSFR ? (
+                      <span className="font-medium">SFR: {methodSFR}</span>
+                    ) : (
+                      <span className="text-gray-400">Select a method first</span>
                     )}
                   </div>
                 </div>
+              </div>
 
-                {/* Key Parameters */}
-                <div className="bg-gray-700 p-4 rounded-lg">
-                  <h3 className="text-xl font-semibold text-white mb-3">Key Parameters</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                    <div>
-                      <span className="text-gray-400">Exercise Focus:</span>
-                      <span className="text-white ml-2">{generatedProgram.parameters.movement.exercise || 'Various'}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Training Method:</span>
-                      <span className="text-white ml-2">{generatedProgram.parameters.method.type || 'Standard Sets'}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Energy System:</span>
-                      <span className="text-white ml-2">{generatedProgram.parameters.energySystem.focus || 'Mixed'}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Recovery Strategy:</span>
-                      <span className="text-white ml-2">{generatedProgram.parameters.recovery.strategy || 'Standard'}</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">Tech Integration:</span>
-                      <span className="text-white ml-2">{generatedProgram.parameters.tech.integration || 'None'}</span>
-                    </div>
+              {/* Apply Method Button */}
+              <div className="mt-4">
+                <button
+                  onClick={() => {
+                    handleApplyMethod();
+                    setTimeout(() => setOpenAccordion('energy-systems'), 500);
+                  }}
+                  disabled={!selectedTrainingMethod}
+                  className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg transition-colors font-medium"
+                  title="Apply training method and continue to energy systems"
+                >
+                  Apply Method
+                </button>
+              </div>
+
+              {/* Method Description */}
+              {selectedTrainingMethod && (
+                <div className="mt-6 p-4 bg-gray-700 rounded-lg">
+                  <h5 className="text-white font-medium mb-2">{selectedTrainingMethod} Method</h5>
+                  <div className="text-gray-300 text-sm">
+                    {selectedTrainingMethod === 'Straight Sets' && (
+                      <p>Standard sets with complete rest between each set. High stimulus with manageable fatigue. Perfect for strength and hypertrophy.</p>
+                    )}
+                    {selectedTrainingMethod === 'Supersets' && (
+                      <p>Two exercises performed back-to-back with minimal rest. Very high fatigue but time-efficient. Great for hypertrophy and conditioning.</p>
+                    )}
+                    {selectedTrainingMethod === 'Cluster Sets' && (
+                      <p>Sets broken into smaller clusters with short rest periods. Medium fatigue with high quality reps. Excellent for strength and power.</p>
+                    )}
+                    {selectedTrainingMethod === 'Drop Sets' && (
+                      <p>Continue with reduced weight after reaching failure. High fatigue and metabolic stress. Best for hypertrophy and muscle endurance.</p>
+                    )}
+                    {selectedTrainingMethod === 'French Contrast' && (
+                      <p>Sequence of heavy, explosive, plyometric, and speed exercises. Very high fatigue but develops multiple qualities simultaneously.</p>
+                    )}
+                    {selectedTrainingMethod === 'Myoreps' && (
+                      <p>Activation set followed by short rest periods and mini-sets. Medium fatigue with high metabolic stress. Excellent for hypertrophy.</p>
+                    )}
+                  </div>
+                  <div className="mt-3 p-2 bg-gray-600 rounded">
+                    <span className="text-gray-300 text-xs font-medium">SFR Rating: </span>
+                    <span className={`text-xs font-bold ${methodSFR === 'Very High' ? 'text-red-400' :
+                      methodSFR === 'High' ? 'text-orange-400' :
+                        methodSFR === 'Medium' ? 'text-yellow-400' : 'text-gray-400'
+                      }`}>
+                      {methodSFR}
+                    </span>
+                    <span className="text-gray-400 text-xs ml-2">
+                      ({methodSFR === 'Very High' ? 'High recovery demands' :
+                        methodSFR === 'High' ? 'Moderate recovery demands' :
+                          methodSFR === 'Medium' ? 'Manageable recovery demands' : ''})
+                    </span>
                   </div>
                 </div>
+              )}
 
-                {/* Action Buttons */}
-                <div className="flex flex-col md:flex-row gap-3 pt-4 border-t border-gray-600">
-                  <button
-                    onClick={handleSaveProgram}
-                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors font-medium flex-1"
+              <div className="mt-4 p-3 bg-blue-900/30 border border-blue-600 rounded-lg">
+                <p className="text-blue-400 text-sm">
+                  <span className="font-bold">Training Tip:</span> Consider your recovery capacity and training phase when selecting methods. Higher SFR methods require more recovery time between sessions.
+                </p>
+              </div>
+            </div>
+          </AccordionItem>
+        )}
+
+        {/* Step 7: Energy Systems */}
+        {assessmentData && selectedTrainingModel && (
+          <AccordionItem
+            value="energy-systems"
+            stepNumber="6"
+            title="Energy Systems"
+            instructions="Configure energy system development focus"
+            isComplete={!!selectedEnergySystem}
+          >
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+              <div className="mb-4">
+                <p className="text-gray-300 mb-2">
+                  Configure energy system emphasis for your {selectedTrainingModel.toLowerCase()} training model.
+                </p>
+                <p className="text-gray-400 text-sm">
+                  Select your primary energy system focus to optimize work-to-rest ratios and training intensity.
+                </p>
+              </div>
+
+              {/* Energy System Selection */}
+              <div className="flex flex-col gap-4 mb-6">
+                <div>
+                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                    Select energy system emphasis
+                    <span className="text-gray-400 ml-2" title="Primary energy pathway focus">ℹ️</span>
+                  </label>
+                  <select
+                    value={selectedEnergySystem}
+                    onChange={handleEnergySystemChange}
+                    className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none appearance-none"
                   >
-                    💾 Save Program
-                  </button>
-                  <button
-                    onClick={handleExportProgram}
-                    className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors font-medium flex-1"
+                    <option value="">Choose an energy system focus...</option>
+                    <option value="Aerobic Base">Aerobic Base</option>
+                    <option value="Anaerobic Capacity">Anaerobic Capacity</option>
+                    <option value="Hybrid/Concurrent">Hybrid/Concurrent</option>
+                    <option value="Minimize (Hypertrophy Focus)">Minimize (Hypertrophy Focus)</option>
+                  </select>
+                </div>
+
+                {/* Energy System Note */}
+                {energySystemNote && (
+                  <div className="p-3 bg-gray-700 rounded-lg">
+                    <p className="text-sm text-gray-400">
+                      <span className="font-medium text-gray-300">Recommendation: </span>
+                      {energySystemNote}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Apply Energy System Button */}
+              <div className="mt-4">
+                <button
+                  onClick={() => {
+                    handleApplyEnergySystem();
+                    setTimeout(() => setOpenAccordion('recovery'), 500);
+                  }}
+                  disabled={!selectedEnergySystem}
+                  className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg transition-colors font-medium"
+                  title="Apply energy system and continue to recovery parameters"
+                >
+                  Apply Energy System
+                </button>
+              </div>
+
+              {/* Energy System Description */}
+              {selectedEnergySystem && (
+                <div className="mt-6 p-4 bg-gray-700 rounded-lg">
+                  <h5 className="text-white font-medium mb-2">{selectedEnergySystem} Focus</h5>
+                  <div className="text-gray-300 text-sm">
+                    {selectedEnergySystem === 'Aerobic Base' && (
+                      <p>Develops aerobic capacity and fat oxidation. Low-intensity, high-volume training that builds endurance foundation and enhances recovery between sessions.</p>
+                    )}
+                    {selectedEnergySystem === 'Anaerobic Capacity' && (
+                      <p>Targets anaerobic power and lactate tolerance. High-intensity intervals that improve performance in short, intense efforts. Requires significant recovery.</p>
+                    )}
+                    {selectedEnergySystem === 'Hybrid/Concurrent' && (
+                      <p>Combines aerobic and anaerobic training. Can lead to interference effects where strength gains may be compromised. Careful programming and timing essential.</p>
+                    )}
+                    {selectedEnergySystem === 'Minimize (Hypertrophy Focus)' && (
+                      <p>Prioritizes muscle growth by minimizing cardio interference. Limited to warm-up and light recovery work to preserve energy for strength training.</p>
+                    )}
+                  </div>
+
+                  {/* Special warning for Hybrid/Concurrent */}
+                  {selectedEnergySystem === 'Hybrid/Concurrent' && (
+                    <div className="mt-3 p-2 bg-yellow-900/30 border border-yellow-600 rounded">
+                      <p className="text-yellow-400 text-xs font-medium">
+                        ⚠️ Interference Alert: Separate strength and endurance sessions by at least 6 hours to minimize negative adaptations.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="mt-4 p-3 bg-purple-900/30 border border-purple-600 rounded-lg">
+                <p className="text-purple-400 text-sm">
+                  <span className="font-bold">Energy Tip:</span> Your energy system focus should align with your primary training goals and the current phase of your program.
+                </p>
+              </div>
+            </div>
+          </AccordionItem>
+        )}
+
+        {/* Step 8: Recovery & Adaptation */}
+        {assessmentData && selectedTrainingModel && (
+          <AccordionItem
+            value="recovery"
+            stepNumber="7"
+            title="Recovery & Adaptation"
+            instructions="Configure deload strategies and recovery protocols"
+            isComplete={!!selectedDeloadType}
+          >
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+              <div className="mb-4">
+                <p className="text-gray-300 mb-2">
+                  Configure deload strategy for your {selectedTrainingModel.toLowerCase()} training model.
+                </p>
+                <p className="text-gray-400 text-sm">
+                  Select your deload approach to optimize recovery and prevent overreaching.
+                </p>
+              </div>
+
+              {/* Deload Type Selection */}
+              <div className="flex flex-col gap-4 mb-6">
+                <div>
+                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                    Select deload approach
+                    <span className="text-gray-400 ml-2" title="How and when to implement recovery periods">ℹ️</span>
+                  </label>
+                  <select
+                    value={selectedDeloadType}
+                    onChange={handleDeloadTypeChange}
+                    className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none appearance-none"
                   >
-                    📤 Export JSON
-                  </button>
-                  <button
-                    onClick={() => setShowPreview(false)}
-                    className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors font-medium"
+                    <option value="">Choose a deload type...</option>
+                    <option value="Scheduled (RP Style)">Scheduled (RP Style)</option>
+                    <option value="Earned (OPEX Style)">Earned (OPEX Style)</option>
+                    <option value="Technical (Bryant Style)">Technical (Bryant Style)</option>
+                    <option value="None">None</option>
+                  </select>
+                </div>
+
+                {/* Deload Protocol Note */}
+                {deloadProtocol && (
+                  <div className="p-3 bg-gray-700 rounded-lg">
+                    <p className="text-sm text-gray-400">
+                      <span className="font-medium text-gray-300">Protocol: </span>
+                      {deloadProtocol}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Apply Deload Button */}
+              <div className="mt-4">
+                <button
+                  onClick={() => {
+                    handleApplyDeload();
+                    setTimeout(() => setOpenAccordion('individual'), 500);
+                  }}
+                  disabled={!selectedDeloadType}
+                  className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg transition-colors font-medium"
+                  title="Apply deload strategy and continue to individual considerations"
+                >
+                  Apply Deload
+                </button>
+              </div>
+
+              {/* Deload Strategy Description */}
+              {selectedDeloadType && (
+                <div className="mt-6 p-4 bg-gray-700 rounded-lg">
+                  <h5 className="text-white font-medium mb-2">{selectedDeloadType} Strategy</h5>
+                  <div className="text-gray-300 text-sm">
+                    {selectedDeloadType === 'Scheduled (RP Style)' && (
+                      <p>Predetermined deloads based on Renaissance Periodization guidelines. MRV (Maximum Recoverable Volume) triggers a mandatory deload week at MV (Maintenance Volume) to restore recovery capacity.</p>
+                    )}
+                    {selectedDeloadType === 'Earned (OPEX Style)' && (
+                      <p>Individualized deloads based on readiness markers and subjective feedback. Only deload when biomarkers indicate accumulated fatigue, allowing for auto-regulation and optimal adaptation.</p>
+                    )}
+                    {selectedDeloadType === 'Technical (Bryant Style)' && (
+                      <p>Technique-focused deloads maintaining intensity while reducing volume. Emphasizes movement quality and skill refinement while allowing physiological recovery.</p>
+                    )}
+                    {selectedDeloadType === 'None' && (
+                      <p>No structured deload protocol. Relies on program completion or external factors to dictate recovery. Higher risk of overreaching but potentially faster adaptation in some individuals.</p>
+                    )}
+                  </div>
+
+                  {/* Special considerations for each type */}
+                  {selectedDeloadType === 'Earned (OPEX Style)' && (
+                    <div className="mt-3 p-2 bg-green-900/30 border border-green-600 rounded">
+                      <p className="text-green-400 text-xs font-medium">
+                        💡 Requires consistent tracking: HRV, sleep quality, motivation, and performance metrics
+                      </p>
+                    </div>
+                  )}
+
+                  {selectedDeloadType === 'None' && (
+                    <div className="mt-3 p-2 bg-red-900/30 border border-red-600 rounded">
+                      <p className="text-red-400 text-xs font-medium">
+                        ⚠️ Warning: Monitor closely for signs of overreaching, poor recovery, or decreased performance
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="mt-4 p-3 bg-orange-900/30 border border-orange-600 rounded-lg">
+                <p className="text-orange-400 text-sm">
+                  <span className="font-bold">Recovery Tip:</span> Your deload strategy should match your training experience, recovery capacity, and lifestyle factors.
+                </p>
+              </div>
+            </div>
+          </AccordionItem>
+        )}
+
+        {/* Step 9: Individual Considerations */}
+        {assessmentData && selectedTrainingModel && (
+          <AccordionItem
+            value="individual"
+            stepNumber="8"
+            title="Individual Considerations"
+            instructions="Personalize based on training age and chronotype"
+            isComplete={trainingAge && chronotype}
+          >
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+              <div className="mb-4">
+                <p className="text-gray-300 mb-2">
+                  Personalize your program based on individual factors and preferences.
+                </p>
+                <p className="text-gray-400 text-sm">
+                  These considerations help optimize training timing and adaptation strategies.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-4 mb-6">
+                {/* Training Age Input */}
+                <div>
+                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                    Training Age (years)
+                    <span className="text-gray-400 ml-2" title="Years of consistent resistance training experience">ℹ️</span>
+                  </label>
+                  <input
+                    type="number"
+                    value={trainingAge}
+                    onChange={(e) => setTrainingAge(e.target.value)}
+                    className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none"
+                    placeholder="Enter years of training experience..."
+                    min="0"
+                    step="0.5"
+                  />
+                </div>
+
+                {/* Chronotype Selection */}
+                <div>
+                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                    Chronotype
+                    <span className="text-gray-400 ml-2" title="Your natural circadian rhythm preference">ℹ️</span>
+                  </label>
+                  <select
+                    value={chronotype}
+                    onChange={handleChronotypeChange}
+                    className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none appearance-none"
                   >
-                    🔄 Regenerate
+                    <option value="">Select your chronotype...</option>
+                    <option value="Lion (Early)">Lion (Early)</option>
+                    <option value="Bear (Middle)">Bear (Middle)</option>
+                    <option value="Wolf (Late)">Wolf (Late)</option>
+                  </select>
+                </div>
+
+                {/* Chronotype Note */}
+                {chronotypeNote && (
+                  <div className="p-3 bg-gray-700 rounded-lg">
+                    <p className="text-sm text-gray-400">
+                      <span className="font-medium text-gray-300">Timing Recommendation: </span>
+                      {chronotypeNote}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Save Considerations Button */}
+              <div className="mt-4">
+                <button
+                  onClick={() => {
+                    handleSaveConsiderations();
+                    setTimeout(() => setOpenAccordion('tech'), 500);
+                  }}
+                  disabled={!trainingAge || !chronotype}
+                  className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg transition-colors font-medium"
+                  title="Save individual considerations and continue to tech integration"
+                >
+                  Save Considerations
+                </button>
+              </div>
+
+              <div className="mt-4 p-3 bg-blue-900/30 border border-blue-600 rounded-lg">
+                <p className="text-blue-400 text-sm">
+                  <span className="font-bold">Personalization Tip:</span> Training age and chronotype influence program periodization and optimal training times.
+                </p>
+              </div>
+            </div>
+          </AccordionItem>
+        )}
+
+        {/* Step 10: Tech Integration */}
+        {assessmentData && selectedTrainingModel && (
+          <AccordionItem
+            value="tech"
+            stepNumber="9"
+            title="Emerging Trends & Tech"
+            instructions="Integrate cutting-edge technology and monitoring"
+            isComplete={!!selectedTechIntegration}
+          >
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+              <div className="mb-4">
+                <p className="text-gray-300 mb-2">
+                  Integrate cutting-edge technology to enhance training effectiveness and monitoring.
+                </p>
+                <p className="text-gray-400 text-sm">
+                  Select advanced technologies to incorporate into your training program.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-4 mb-6">
+                {/* Tech Integration Selection */}
+                <div>
+                  <label className="block text-gray-300 text-sm font-medium mb-2">
+                    Select tech feature to add
+                    <span className="text-gray-400 ml-2" title="Advanced technology integrations">ℹ️</span>
+                  </label>
+                  <select
+                    value={selectedTechIntegration}
+                    onChange={handleTechIntegrationChange}
+                    className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none appearance-none"
+                    <option value="None">None</option>
+                  </select>
+                </div>
+
+                {/* Tech Note */}
+                {techNote && (
+                  <div className="p-3 bg-gray-700 rounded-lg">
+                    <p className="text-sm text-gray-400">
+                      <span className="font-medium text-gray-300">Implementation: </span>
+                      {techNote}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Apply Tech Button */}
+              <div className="mt-4">
+                <button
+                  onClick={() => {
+                    handleApplyTech();
+                    setTimeout(() => setOpenAccordion('preview'), 500);
+                  }}
+                  disabled={!selectedTechIntegration}
+                  className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-600 disabled:cursor-not-allowed text-white px-8 py-3 rounded-lg transition-colors font-medium"
+                  title="Apply tech integration and continue to preview"
+                >
+                  Apply Tech
+                </button>
+              </div>
+
+              <div className="mt-4 p-3 bg-purple-900/30 border border-purple-600 rounded-lg">
+                <p className="text-purple-400 text-sm">
+                  <span className="font-bold">Innovation Tip:</span> Technology integration should enhance, not complicate, your training approach.
+                </p>
+              </div>
+            </div>
+          </AccordionItem>
+        )}
+
+        {/* Step 11: Program Preview */}
+        {assessmentData && selectedTrainingModel && (
+          <AccordionItem
+            value="preview"
+            stepNumber="10"
+            title="Program Preview"
+            instructions="Generate and review your complete program structure"
+            isComplete={!!generatedProgram}
+          >
+            <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+              {!showPreview ? (
+                <div className="text-center">
+                  <div className="mb-4">
+                    <p className="text-gray-300 mb-2">
+                      Generate a preview of your complete training program based on all your selections.
+                    </p>
+                    <p className="text-gray-400 text-sm">
+                      This will create a structured program with phases, weekly breakdown, and all parameters.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      handleGeneratePreview();
+                      setTimeout(() => setOpenAccordion('generate'), 800);
+                    }}
+                    className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg transition-colors font-medium"
+                    title="Generate program preview and continue to final generation"
+                  >
+                    Generate Preview
                   </button>
                 </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+              ) : generatedProgram && (
+                <div className="space-y-6">
+                  {/* Program Overview */}
+                  <div className="bg-gray-700 p-4 rounded-lg">
+                    <h5 className="text-xl font-semibold text-white mb-3">Program Overview</h5>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-400">Name:</span>
+                        <span className="text-white ml-2">{generatedProgram.overview.name}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Goal:</span>
+                        <span className="text-white ml-2">{generatedProgram.overview.goal}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Duration:</span>
+                        <span className="text-white ml-2">{generatedProgram.overview.duration} weeks</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Training Model:</span>
+                        <span className="text-white ml-2">{generatedProgram.overview.trainingModel}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Training Days:</span>
+                        <span className="text-white ml-2">{generatedProgram.overview.trainingDays} per week</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Chronotype:</span>
+                        <span className="text-white ml-2">{generatedProgram.overview.chronotype || 'Not specified'}</span>
+                      </div>
+                    </div>
+                  </div>
 
-      {/* Generate Full Program - Only show if assessment and training model are selected */}
-      {assessmentData && selectedTrainingModel && (
-        <div className="max-w-md mx-auto px-4">
-          <div className="bg-gray-800 p-4 md:p-6 rounded-lg border border-gray-700 text-center">
-            <div className="mb-4">
-              <h3 className="text-lg md:text-xl font-semibold text-white mb-2">Ready to Generate?</h3>
-              <p className="text-gray-300 text-sm">
-                All parameters configured. Generate your complete macrocycle program with all specified settings.
+                  {/* Action Buttons */}
+                  <div className="flex flex-col md:flex-row gap-3 pt-4 border-t border-gray-600">
+                    <button
+                      onClick={handleSaveProgram}
+                      className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors font-medium flex-1"
+                      title="Save this program to your library"
+                    >
+                      💾 Save Program
+                    </button>
+                    <button
+                      onClick={handleExportProgram}
+                      className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors font-medium flex-1"
+                      title="Export program as JSON file"
+                    >
+                      📤 Export JSON
+                    </button>
+                    <button
+                      onClick={() => setShowPreview(false)}
+                      className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors font-medium"
+                      title="Regenerate program with current settings"
+                    >
+                      🔄 Regenerate
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </AccordionItem>
+        )}
+
+        {/* Step 12: Generate Full Program */}
+        {assessmentData && selectedTrainingModel && (
+          <AccordionItem
+            value="generate"
+            stepNumber="11"
+            title="Generate Full Program"
+            instructions="Create your complete training program with all configurations"
+            isComplete={false}
+          >
+            <div className="bg-gray-800 p-4 md:p-6 rounded-lg border border-gray-700 text-center">
+              <div className="mb-4">
+                <h5 className="text-lg md:text-xl font-semibold text-white mb-2">Ready to Generate?</h5>
+                <p className="text-gray-300 text-sm">
+                  All parameters configured. Generate your complete macrocycle program with all specified settings.
+                </p>
+              </div>
+
+              <button
+                onClick={handleGenerateFullProgram}
+                className="w-full bg-green-500 hover:bg-green-600 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg transition-colors font-bold text-base md:text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
+                title="Generate your complete program and proceed to builder"
+              >
+                🚀 Generate Full Program
+              </button>
+
+              <p className="text-gray-400 text-xs mt-3">
+                This will compile all your selections into a comprehensive training program
               </p>
             </div>
+          </AccordionItem>
+        )}
 
-            <button
-              onClick={handleGenerateFullProgram}
-              className="w-full bg-green-500 hover:bg-green-600 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg transition-colors font-bold text-base md:text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
-            >
-              🚀 Generate Full Program
-            </button>
-
-            <p className="text-gray-400 text-xs mt-3">
-              This will compile all your selections into a comprehensive training program
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* Planning Level Selection */}
-      <div>
-        <h2 className="text-2xl font-semibold text-white mb-6">Choose Your Planning Level</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            {
-              id: 'macro',
-              title: 'MACROCYCLE',
-              subtitle: '3-12 months',
-              description: 'Long-term periodization with RP + NEW Timeline View! 📅✨',
-              icon: '📅',
-              handler: onStartMacrocycle
-            },
-            {
-              id: 'meso',
-              title: 'MESOCYCLE',
-              subtitle: '4-6 weeks',
-              description: 'Training blocks and phases',
-              icon: '📊',
-              handler: onStartMesocycle
-            },
-            {
-              id: 'micro',
-              title: 'MICROCYCLE',
-              subtitle: '1 week',
-              description: 'Daily workout planning',
-              icon: '📋',
-              handler: onStartMicrocycle
-            }
-          ].map((level) => (
-            <div
-              key={level.id}
-              className={`bg-gray-800 rounded-lg p-6 border-2 cursor-pointer transition-all ${selectedLevel === level.id
-                ? 'border-red-500 bg-gray-700'
-                : 'border-gray-600 hover:border-gray-500'
-                }`}
-              onClick={() => setSelectedLevel(level.id)}
-            >
-              <div className="text-3xl mb-3">{level.icon}</div>
-              <h3 className="text-lg font-bold text-white mb-1">{level.title}</h3>
-              <p className="text-red-400 text-sm mb-2">{level.subtitle}</p>
-              <p className="text-gray-300 text-sm mb-4">{level.description}</p>
-              <div className="space-y-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedLevel(level.id);
-                    level.handler();
-                  }}
-                  className="w-full bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
-                >
-                  START NEW
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveTab('templates');
-                  }}
-                  className="w-full bg-white text-black px-4 py-2 rounded hover:bg-gray-100 transition-colors"
-                >
-                  TEMPLATES
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-        <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button
-            onClick={() => setActiveTab('calculator')}
-            className="bg-red-600 text-white p-4 rounded hover:bg-red-700 transition-colors"
-          >
-            <div className="text-2xl mb-2">🧮</div>
-            <div className="text-sm font-medium">Volume Calculator</div>
-          </button>
-          <button
-            onClick={() => setActiveTab('exercises')}
-            className="bg-red-600 text-white p-4 rounded hover:bg-red-700 transition-colors"
-          >
-            <div className="text-2xl mb-2">💪</div>
-            <div className="text-sm font-medium">Exercise Database</div>
-          </button>
-          <button
-            onClick={() => setActiveTab('templates')}
-            className="bg-red-600 text-white p-4 rounded hover:bg-red-700 transition-colors"
-          >
-            <div className="text-2xl mb-2">📋</div>
-            <div className="text-sm font-medium">Program Templates</div>
-          </button>
-          <button className="bg-red-600 text-white p-4 rounded hover:bg-red-700 transition-colors">
-            <div className="text-2xl mb-2">📚</div>
-            <div className="text-sm font-medium">RP Guidelines</div>
-          </button>
-        </div>
-      </div>
-
-      {/* Recent Programs */}
-      <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-        <h3 className="text-lg font-semibold text-white mb-4">Recent Programs</h3>
-        {isLoadingPrograms ? (
-          <div className="text-gray-400 text-center py-8">Loading programs...</div>
-        ) : recentPrograms.length > 0 ? (
-          <div className="space-y-3">
-            {recentPrograms.map((program) => (
+        {/* Planning Level Selection */}
+        <div className="mt-8 pt-8 border-t border-gray-600">
+          <h3 className="text-2xl font-semibold text-white mb-6">Choose Your Planning Level</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                id: 'macro',
+                title: 'MACROCYCLE',
+                subtitle: '3-12 months',
+                description: 'Long-term periodization with RP + NEW Timeline View! 📅✨',
+                icon: '📅',
+                handler: onStartMacrocycle
+              },
+              {
+                id: 'meso',
+                title: 'MESOCYCLE',
+                subtitle: '4-6 weeks',
+                description: 'Training blocks and phases',
+                icon: '📊',
+                handler: onStartMesocycle
+              },
+              {
+                id: 'micro',
+                title: 'MICROCYCLE',
+                subtitle: '1 week',
+                description: 'Daily workout planning',
+                icon: '📋',
+                handler: onStartMicrocycle
+              }
+            ].map((level) => (
               <div
-                key={program.id}
-                className="flex items-center justify-between p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+                key={level.id}
+                className={`bg-gray-800 rounded-lg p-6 border-2 cursor-pointer transition-all hover:border-gray-500`}
               >
-                <div>
-                  <h4 className="text-white font-medium">{program.name}</h4>
-                  <p className="text-gray-400 text-sm">
-                    {program.goal_type} • {program.duration_weeks} weeks • {program.training_days_per_week} days/week
-                  </p>
-                  <p className="text-gray-500 text-xs mt-1">
-                    Created: {new Date(program.created_at).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="flex items-center space-x-2">
+                <div className="text-3xl mb-3">{level.icon}</div>
+                <h4 className="text-lg font-bold text-white mb-1">{level.title}</h4>
+                <p className="text-red-400 text-sm mb-2">{level.subtitle}</p>
+                <p className="text-gray-300 text-sm mb-4">{level.description}</p>
+                <div className="space-y-2">
                   <button
-                    onClick={() => handleContinueProgram(program)}
-                    className="bg-green-600 text-black px-4 py-2 rounded hover:bg-green-700 transition-colors"
-                    title="Continue working on this program"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      level.handler();
+                    }}
+                    className="w-full bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
+                    title={`Start new ${level.title.toLowerCase()}`}
                   >
-                    Continue
-                  </button>
-                  <button
-                    onClick={() => handleDuplicateProgram(program)}
-                    className="bg-blue-600 text-black px-4 py-2 rounded hover:bg-blue-700 transition-colors"
-                    title="Create a copy of this program"
-                  >
-                    Duplicate
-                  </button>
-                  <button
-                    onClick={() => handleDeleteProgram(program)}
-                    className="bg-red-600 text-black px-4 py-2 rounded hover:bg-red-700 transition-colors"
-                    title="Delete this program permanently"
-                  >
-                    Delete
+                    START NEW
                   </button>
                 </div>
               </div>
             ))}
-          </div>
-        ) : (
-          <div className="text-gray-400 text-center py-8">
-            No recent programs. Create your first program above!
-          </div>
-        )}
-      </div>
-
-      {/* Recent Macrocycles */}
-      <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-        <h3 className="text-lg font-semibold text-white mb-4">Recent Macrocycles</h3>
-        {isLoadingMacrocycles ? (
-          <div className="text-gray-400 text-center py-8">Loading macrocycles...</div>
-        ) : recentMacrocycles.length > 0 ? (
-          <div className="space-y-3">
-            {recentMacrocycles.map((macrocycle) => (
-              <div
-                key={macrocycle.id}
-                className="flex items-center justify-between p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
-              >
-                <div>
-                  <h4 className="text-white font-medium">{macrocycle.name}</h4>
-                  <p className="text-gray-400 text-sm">
-                    {macrocycle.blocks?.length || 0} blocks • {macrocycle.selectedTemplate || 'Custom'}
-                  </p>
-                  <p className="text-gray-500 text-xs mt-1">
-                    {macrocycle.updatedAt
-                      ? `Updated: ${new Date(macrocycle.updatedAt).toLocaleDateString()}`
-                      : macrocycle.createdAt
-                        ? `Created: ${new Date(macrocycle.createdAt).toLocaleDateString()}`
-                        : 'No date'
-                    }
-                  </p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => handleContinueMacrocycle(macrocycle)}
-                    className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
-                    title="Continue working on this macrocycle"
-                  >
-                    Continue
-                  </button>
-                  <button
-                    onClick={() => handleDeleteMacrocycle(macrocycle)}
-                    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
-                    title="Delete this macrocycle permanently"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-gray-400 text-center py-8">
-            No saved macrocycles. Create your first macrocycle above!
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
-  const VolumeCalculator = () => {
-    const [muscleGroup, setMuscleGroup] = useState('chest');
-    const [trainingAge, setTrainingAge] = useState('intermediate');
-    const [weeks, setWeeks] = useState(4);
-
-    const { landmarks, progression } = calculateVolumeProgression(muscleGroup, weeks, trainingAge);
-
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => setActiveTab('overview')}
-            className="text-gray-400 hover:text-white"
-          >
-            ← Back to Overview
-          </button>
-          <h2 className="text-2xl font-semibold text-white">RP Volume Calculator</h2>
-        </div>
-
-        {/* Interactive Calculator */}
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h3 className="text-lg font-semibold text-white mb-4">Custom Volume Calculation</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div>
-              <label className="block text-gray-300 text-sm font-medium mb-2">Muscle Group</label>
-              <select
-                value={muscleGroup}
-                onChange={(e) => setMuscleGroup(e.target.value)}
-                className="w-full bg-white border border-gray-600 text-black px-4 py-3 rounded-lg focus:border-red-500 focus:outline-none"
-              >
-                {Object.keys(BASE_VOLUME_LANDMARKS).map(muscle => (
-                  <option key={muscle} value={muscle} className="capitalize">{muscle}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-gray-300 text-sm font-medium mb-2">Training Age</label>
-              <select
-                value={trainingAge}
-                onChange={(e) => setTrainingAge(e.target.value)}
-                className="w-full bg-white border border-gray-600 text-black px-4 py-3 rounded-lg focus:border-red-500 focus:outline-none"
-              >
-                <option value="beginner">Beginner (0-2 years)</option>
-                <option value="intermediate">Intermediate (2-5 years)</option>
-                <option value="advanced">Advanced (5+ years)</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-gray-300 text-sm font-medium mb-2">Block Duration</label>
-              <input
-                type="number"
-                value={weeks}
-                onChange={(e) => setWeeks(parseInt(e.target.value) || 4)}
-                className="w-full bg-white border border-gray-600 text-black px-4 py-3 rounded-lg focus:border-red-500 focus:outline-none"
-                min="2"
-                max="12"
-              />
-            </div>
-          </div>
-
-          {/* Results */}
-          <div className="bg-gray-700 rounded-lg p-4 mb-4">
-            <h4 className="text-white font-medium mb-3 capitalize">{muscleGroup} Volume Progression</h4>
-            <div className="grid grid-cols-3 gap-4 mb-4">
-              <div className="text-center">
-                <div className="text-gray-400 text-sm mb-1">MEV</div>
-                <div className="text-green-400 text-xl font-bold">{baseLandmarks.mev}</div>
-              </div>
-              <div className="text-center">
-                <div className="text-gray-400 text-sm mb-1">MRV</div>
-                <div className="text-red-400 text-xl font-bold">{baseLandmarks.mrv}</div>
-              </div>
-              <div className="text-center">
-                <div className="text-gray-400 text-sm mb-1">Week {weeks}</div>
-                <div className="text-blue-400 text-xl font-bold">{progression[progression.length - 1]}</div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-center space-x-2 text-sm">
-              <span className="text-gray-400">Weekly progression:</span>
-              <span className="text-white">{progression.join(' → ')}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Volume Landmarks Reference Table */}
-        <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
-          <h3 className="text-lg font-semibold text-white mb-4">Volume Landmarks Reference</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-600">
-                  <th className="text-left text-gray-300 p-3">Muscle Group</th>
-                  <th className="text-center text-gray-300 p-3">MV</th>
-                  <th className="text-center text-gray-300 p-3">MEV</th>
-                  <th className="text-center text-gray-300 p-3">MRV</th>
-                  <th className="text-center text-gray-300 p-3">Example 4-Week</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Object.entries(BASE_VOLUME_LANDMARKS).map(([muscle, baseLandmarks]) => {
-                  const { progression: exampleProgression } = calculateVolumeProgression(muscle, 4);
-                  return (
-                    <tr key={muscle} className="border-b border-gray-700 hover:bg-gray-700/50">
-                      <td className="text-white p-3 capitalize">{muscle}</td>
-                      <td className="text-center text-gray-300 p-3">{baseLandmarks.mv}</td>
-                      <td className="text-center text-green-400 p-3">{baseLandmarks.mev}</td>
-                      <td className="text-center text-red-400 p-3">{baseLandmarks.mrv}</td>
-                      <td className="text-center text-gray-300 p-3">
-                        {exampleProgression.join(' → ')}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Explanation Section */}
-        <div className="bg-gray-700 rounded-lg p-4">
-          <h4 className="text-white font-medium mb-3">Volume Landmarks Explained</h4>
-          <div className="space-y-2 text-sm">
-            <p><span className="text-blue-400 font-medium">MV (Maintenance Volume):</span> <span className="text-gray-300">Minimum volume to maintain current muscle mass</span></p>
-            <p><span className="text-green-400 font-medium">MEV (Minimum Effective Volume):</span> <span className="text-gray-300">Minimum volume needed for muscle growth</span></p>
-            <p><span className="text-red-400 font-medium">MRV (Maximum Recoverable Volume):</span> <span className="text-gray-300">Maximum volume you can recover from</span></p>
-            <p className="text-gray-400 text-xs mt-3">
-              <strong>Formula:</strong> Weekly Sets = MEV + (MRV - MEV) × (current_week - 1) / (total_weeks - 1)
-            </p>
           </div>
         </div>
       </div>

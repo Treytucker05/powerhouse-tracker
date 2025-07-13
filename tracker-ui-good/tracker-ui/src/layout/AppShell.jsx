@@ -1,46 +1,53 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, memo } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/api/supabaseClient';
 import TopNav from '../components/navigation/TopNav';
 
-export default function AppShell() {
-  console.log('🟢 AppShell rendering - timestamp:', Date.now());
-
+const AppShell = memo(function AppShell() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false); // Set to false by default for better UX
   const navigate = useNavigate();
   const location = useLocation();
 
-  console.log('🟢 AppShell state', {
-    user: !!user,
-    loading,
-    pathname: location.pathname,
-    timestamp: Date.now()
-  });
+  // Memoized auth handlers to prevent re-creation on every render
+  const handleAuthStateChange = useCallback((event, session) => {
+    setUser(session?.user ?? null);
+
+    // Only redirect to auth if we're not already there and no user
+    if (event === 'SIGNED_OUT' && location.pathname !== '/auth') {
+      navigate('/auth');
+    }
+  }, [navigate, location.pathname]);
 
   useEffect(() => {
+    let mounted = true;
+
     // Get initial session
     const getSession = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        setUser(session?.user ?? null);
+        if (mounted) {
+          setUser(session?.user ?? null);
+        }
       } catch (error) {
         console.warn('Auth session check failed:', error);
-        setUser(null);
+        if (mounted) {
+          setUser(null);
+        }
       }
       setLoading(false);
     };
 
     getSession();
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    // Listen for auth changes with the memoized handler
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [handleAuthStateChange]);
 
   // Protected routes - redirect to auth if not logged in (only for specific routes)
   useEffect(() => {
@@ -56,10 +63,11 @@ export default function AppShell() {
     }
   }, [user, loading, location.pathname, navigate]);
 
-  const _handleSignOut = async () => {
+  // Memoized sign out handler
+  const handleSignOut = useCallback(async () => {
     await supabase.auth.signOut();
     navigate('/');
-  };
+  }, [navigate]);
 
   // Show loading only briefly and only if explicitly loading
   if (loading) {
@@ -72,10 +80,12 @@ export default function AppShell() {
 
   return (
     <div className="min-h-screen bg-black">
-      <TopNav user={user} onSignOut={_handleSignOut} />
+      <TopNav user={user} onSignOut={handleSignOut} />
       <main className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         <Outlet />
       </main>
     </div>
   );
-}
+});
+
+export default AppShell;

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useBuilder } from '../../contexts/MacrocycleBuilderContext';
 import { calculatePersonalizedVolume } from '../../lib/algorithms/rpAlgorithms';
 import { calculateMacrocycleVolumeProgression } from '../../lib/algorithms/volumeProgression';
@@ -24,7 +23,6 @@ interface MuscleProgression {
 }
 
 const VolumeDistribution: React.FC = () => {
-    const navigate = useNavigate();
     const { state, dispatch, validateCurrentStep, canProceedToNextStep } = useBuilder();
     const { programDetails, blocks, specialization } = state;
     const [selectedMuscle, setSelectedMuscle] = useState<string>('chest');
@@ -74,6 +72,14 @@ const VolumeDistribution: React.FC = () => {
     useEffect(() => {
         if (blocks.length === 0) return;
 
+        // Debug logging
+        console.log('🔍 VolumeDistribution Debug:', {
+            programDetails,
+            blocks,
+            specialization,
+            blocksCount: blocks.length
+        });
+
         const specializationMuscles = specialization && specialization !== 'None'
             ? specialization.split(',').map(s => s.trim().toLowerCase())
             : [];
@@ -85,15 +91,23 @@ const VolumeDistribution: React.FC = () => {
             specializationMuscles
         );
 
+        console.log('🔍 Progression result:', progression);
+
         // Convert the progression data to the format expected by the component
         const progressions: MuscleProgression[] = muscleGroups.map(muscle => {
             const muscleData = progression.weeklyProgression[muscle] || [];
             const personalizedVolume = calculatePersonalizedVolume(
                 muscle,
-                programDetails.trainingExperience,
-                programDetails.dietPhase,
+                programDetails.trainingExperience || 'intermediate',
+                programDetails.dietPhase || 'maintenance',
                 specializationMuscles.includes(muscle)
             );
+
+            console.log(`🔍 ${muscle} progression:`, {
+                muscleData,
+                personalizedVolume,
+                weeklyProgressionLength: muscleData.length
+            });
 
             return {
                 muscle,
@@ -112,19 +126,26 @@ const VolumeDistribution: React.FC = () => {
             };
         });
 
+        console.log('🔍 Final progressions:', progressions);
         setVolumeProgressions(progressions);
     }, [programDetails.trainingExperience, programDetails.dietPhase, blocks, specialization]);
 
     // Handle navigation
     const handleBack = () => {
         dispatch({ type: 'SET_STEP', payload: 3 });
-        navigate('/program-design/timeline');
     };
 
     const handleNext = () => {
+        console.log('🔄 VolumeDistribution handleNext called');
+        console.log('🔄 canProceedToNextStep:', canProceedToNextStep());
+        console.log('🔄 Current step:', state.currentStep);
+        console.log('🔄 Blocks:', state.blocks);
+
         if (canProceedToNextStep()) {
+            console.log('🔄 Proceeding to review step...');
             dispatch({ type: 'SET_STEP', payload: 4 });
-            navigate('/program-design/review');
+        } else {
+            console.log('🚨 Cannot proceed to next step');
         }
     };
 
@@ -165,8 +186,8 @@ const VolumeDistribution: React.FC = () => {
                                     key={progression.muscle}
                                     onClick={() => setSelectedMuscle(progression.muscle)}
                                     className={`px-4 py-3 rounded-lg border transition-colors capitalize ${selectedMuscle === progression.muscle
-                                            ? 'bg-red-500 border-red-500 text-white'
-                                            : 'bg-gray-700 border-gray-600 text-gray-300 hover:border-gray-500 hover:bg-gray-600'
+                                        ? 'bg-red-500 border-red-500 text-white'
+                                        : 'bg-gray-700 border-gray-600 text-gray-300 hover:border-gray-500 hover:bg-gray-600'
                                         }`}
                                 >
                                     {progression.muscle}
@@ -281,12 +302,23 @@ const VolumeDistribution: React.FC = () => {
                             ← Back to Timeline
                         </button>
 
-                        <button
-                            onClick={handleNext}
-                            className="px-8 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors transform hover:scale-105"
-                        >
-                            Next: Review & Generate →
-                        </button>
+                        <div className="flex items-center space-x-4">
+                            {/* Debug info */}
+                            <div className="text-xs text-gray-400">
+                                Step: {state.currentStep}, Can proceed: {canProceedToNextStep().toString()}, Blocks: {state.blocks.length}
+                            </div>
+
+                            <button
+                                onClick={handleNext}
+                                disabled={!canProceedToNextStep()}
+                                className={`px-8 py-3 rounded-lg transition-colors transform hover:scale-105 ${canProceedToNextStep()
+                                    ? 'bg-red-600 text-white hover:bg-red-700'
+                                    : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                    }`}
+                            >
+                                Next: Review & Generate →
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

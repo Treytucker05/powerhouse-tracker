@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useBuilder } from '../contexts/MacrocycleBuilderContext';
 import { calculateMEV, calculateMRV, calculatePersonalizedVolume } from '../lib/algorithms/rpAlgorithms';
 import { MEV_RANGES, MRV_RANGES } from '../constants/rpConstants';
@@ -8,7 +7,6 @@ import { StepProgress } from '../lib/designSystem.jsx';
 const ProgramDetails: React.FC = () => {
     console.log('🟢 ProgramDetails component rendering...');
 
-    const navigate = useNavigate();
     const { state, dispatch, validateCurrentStep, canProceedToNextStep } = useBuilder();
     const { programDetails } = state;
 
@@ -25,12 +23,6 @@ const ProgramDetails: React.FC = () => {
         if (canProceedToNextStep()) {
             console.log('🔄 Proceeding to template selection...');
             dispatch({ type: 'SET_STEP', payload: 2 });
-
-            // Use setTimeout to ensure navigation happens after state updates
-            setTimeout(() => {
-                console.log('🔄 Navigating to template...');
-                navigate('/program-design/template');
-            }, 0);
         }
     };
 
@@ -364,7 +356,7 @@ const ProgramDetails: React.FC = () => {
                     {/* Navigation */}
                     <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-700">
                         <button
-                            onClick={() => navigate('/program-design')}
+                            onClick={() => dispatch({ type: 'RESET_BUILDER' })}
                             className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
                         >
                             Back to Overview

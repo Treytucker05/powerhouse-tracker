@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../lib/api/supabaseClient';
-import { useTrainingState } from '../context/trainingStateContext';
+import { useTrainingState } from '../context/TrainingStateContext.jsx';
 
 export function useWorkoutSessions() {
   const [sessions, setSessions] = useState([]);

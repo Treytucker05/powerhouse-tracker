@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useBuilder } from '../../contexts/MacrocycleBuilderContext';
+import { useBuilder, type Block } from '../../contexts/MacrocycleBuilderContext';
 import { templates, checkCompatibility, Template } from '../../data/templates';
 
 const TemplateSelection: React.FC = () => {
-    const navigate = useNavigate();
     const { state, dispatch } = useBuilder();
     const { programDetails } = state;
     const [showAllTemplates, setShowAllTemplates] = useState(false);
@@ -43,20 +41,108 @@ const TemplateSelection: React.FC = () => {
         });
 
         dispatch({ type: 'SET_STEP', payload: 3 });
-        navigate('/program-design/timeline');
     };
 
     // Handle custom build
     const handleBuildCustom = () => {
         dispatch({ type: 'SET_TEMPLATE', payload: 'custom' });
+
+        // Generate default blocks for custom template based on program duration
+        const weeks = programDetails.duration;
+        const defaultBlocks: Block[] = [];
+
+        if (weeks <= 8) {
+            // Simple progression for shorter programs
+            defaultBlocks.push({
+                id: 'accumulation-custom',
+                name: 'Accumulation',
+                type: 'accumulation' as const,
+                weeks: weeks - 1,
+                rirRange: [1, 3] as [number, number],
+                volumeProgression: 'linear' as const
+            });
+            defaultBlocks.push({
+                id: 'deload-custom',
+                name: 'Deload',
+                type: 'deload' as const,
+                weeks: 1,
+                rirRange: [3, 4] as [number, number],
+                volumeProgression: 'linear' as const
+            });
+        } else if (weeks <= 12) {
+            defaultBlocks.push({
+                id: 'accumulation-custom-1',
+                name: 'Accumulation 1',
+                type: 'accumulation' as const,
+                weeks: 6,
+                rirRange: [1, 3] as [number, number],
+                volumeProgression: 'linear' as const
+            });
+            defaultBlocks.push({
+                id: 'intensification-custom',
+                name: 'Intensification',
+                type: 'intensification' as const,
+                weeks: weeks - 7,
+                rirRange: [0, 2] as [number, number],
+                volumeProgression: 'linear' as const
+            });
+            defaultBlocks.push({
+                id: 'deload-custom',
+                name: 'Deload',
+                type: 'deload' as const,
+                weeks: 1,
+                rirRange: [3, 4] as [number, number],
+                volumeProgression: 'linear' as const
+            });
+        } else {
+            // Complex progression for longer programs
+            const accumulationWeeks = Math.floor(weeks * 0.4);
+            const intensificationWeeks = Math.floor(weeks * 0.3);
+            const realizationWeeks = Math.floor(weeks * 0.2);
+            const deloadWeeks = weeks - accumulationWeeks - intensificationWeeks - realizationWeeks;
+
+            defaultBlocks.push({
+                id: 'accumulation-custom',
+                name: 'Accumulation',
+                type: 'accumulation' as const,
+                weeks: accumulationWeeks,
+                rirRange: [1, 3] as [number, number],
+                volumeProgression: 'linear' as const
+            });
+            defaultBlocks.push({
+                id: 'intensification-custom',
+                name: 'Intensification',
+                type: 'intensification' as const,
+                weeks: intensificationWeeks,
+                rirRange: [0, 2] as [number, number],
+                volumeProgression: 'linear' as const
+            });
+            defaultBlocks.push({
+                id: 'realization-custom',
+                name: 'Realization',
+                type: 'realization' as const,
+                weeks: realizationWeeks,
+                rirRange: [0, 1] as [number, number],
+                volumeProgression: 'linear' as const
+            });
+            defaultBlocks.push({
+                id: 'deload-custom',
+                name: 'Recovery',
+                type: 'deload' as const,
+                weeks: deloadWeeks,
+                rirRange: [3, 4] as [number, number],
+                volumeProgression: 'linear' as const
+            });
+        }
+
+        // Clear existing blocks and add new ones
+        dispatch({ type: 'SET_BLOCKS', payload: defaultBlocks });
         dispatch({ type: 'SET_STEP', payload: 3 });
-        navigate('/program-design/timeline');
     };
 
     // Handle back navigation
     const handleBack = () => {
         dispatch({ type: 'SET_STEP', payload: 1 });
-        navigate('/program-design');
     };
 
     // Goal badge colors

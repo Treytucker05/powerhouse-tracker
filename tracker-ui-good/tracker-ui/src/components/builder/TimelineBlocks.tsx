@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useBuilder } from '../../contexts/MacrocycleBuilderContext';
 import { calculateMEV, calculateMRV } from '../../lib/algorithms/rpAlgorithms';
 
@@ -51,7 +50,6 @@ const blockTemplates = {
 import type { Block } from '../../contexts/MacrocycleBuilderContext';
 
 const TimelineBlocks: React.FC = () => {
-    const navigate = useNavigate();
     const { state, dispatch, validateCurrentStep, canProceedToNextStep } = useBuilder();
     const { programDetails } = state;
     const [selectedSpecialization, setSelectedSpecialization] = useState<string[]>([]);
@@ -163,22 +161,48 @@ const TimelineBlocks: React.FC = () => {
         if (canProceedToNextStep()) {
             console.log('🔄 Proceeding to volume distribution...');
             dispatch({ type: 'SET_STEP', payload: 3.5 });
-
-            setTimeout(() => {
-                console.log('🔄 Navigating to volume distribution...');
-                navigate('/program-design/volume-distribution');
-            }, 0);
         }
     };
 
     // Handle back button click
     const handleBack = () => {
         dispatch({ type: 'SET_STEP', payload: 2 });
-        navigate('/program-design/template');
     };
 
     // Form validation
     const isFormValid = validateCurrentStep();
+
+    // Handle block duration changes
+    const handleBlockWeeksChange = (blockIndex: number, newWeeks: number) => {
+        const updatedBlocks = blocks.map((block, index) => {
+            if (index === blockIndex) {
+                return { ...block, weeks: Math.max(1, Math.min(8, newWeeks)) };
+            }
+            return block;
+        });
+
+        // Update the blocks in state
+        dispatch({ type: 'SET_BLOCKS', payload: updatedBlocks });
+    };
+
+    // Handle block removal
+    const handleRemoveBlock = (blockIndex: number) => {
+        const updatedBlocks = blocks.filter((_, index) => index !== blockIndex);
+        dispatch({ type: 'SET_BLOCKS', payload: updatedBlocks });
+    };
+
+    // Handle adding a new block
+    const handleAddBlock = () => {
+        const newBlock = {
+            id: `new-block-${Date.now()}`,
+            name: 'New Block',
+            type: 'accumulation' as const,
+            weeks: 4,
+            rirRange: [1, 3] as [number, number],
+            volumeProgression: 'linear' as const
+        };
+        dispatch({ type: 'ADD_BLOCK', payload: newBlock });
+    };
 
     return (
         <div className="min-h-screen bg-black text-white py-8">
@@ -284,9 +308,32 @@ const TimelineBlocks: React.FC = () => {
                                                     <p className="text-sm text-gray-400">{template.description}</p>
                                                 </div>
                                             </div>
-                                            <div className="text-right">
-                                                <p className="text-white font-semibold">Weeks {startWeek}-{endWeek}</p>
-                                                <p className="text-sm text-gray-400">{block.weeks} weeks</p>
+                                            <div className="flex items-center space-x-4">
+                                                <div className="text-right">
+                                                    <p className="text-white font-semibold">Weeks {startWeek}-{endWeek}</p>
+                                                    <div className="flex items-center space-x-2 mt-1">
+                                                        <button
+                                                            onClick={() => handleBlockWeeksChange(index, block.weeks - 1)}
+                                                            className="w-6 h-6 bg-gray-700 hover:bg-gray-600 rounded text-white text-xs"
+                                                        >
+                                                            −
+                                                        </button>
+                                                        <span className="text-sm text-gray-400">{block.weeks} weeks</span>
+                                                        <button
+                                                            onClick={() => handleBlockWeeksChange(index, block.weeks + 1)}
+                                                            className="w-6 h-6 bg-gray-700 hover:bg-gray-600 rounded text-white text-xs"
+                                                        >
+                                                            +
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    onClick={() => handleRemoveBlock(index)}
+                                                    className="text-red-400 hover:text-red-300 p-1"
+                                                    title="Remove block"
+                                                >
+                                                    ✕
+                                                </button>
                                             </div>
                                         </div>
 
@@ -331,8 +378,8 @@ const TimelineBlocks: React.FC = () => {
                                     onClick={() => handleSpecializationChange(muscle)}
                                     disabled={!selectedSpecialization.includes(muscle) && selectedSpecialization.length >= 2}
                                     className={`p-3 rounded-lg border-2 transition-all duration-200 ${selectedSpecialization.includes(muscle)
-                                            ? 'border-red-500 bg-red-500/20 text-red-300'
-                                            : 'border-gray-600 bg-gray-800 text-gray-300 hover:border-gray-500 hover:bg-gray-700'
+                                        ? 'border-red-500 bg-red-500/20 text-red-300'
+                                        : 'border-gray-600 bg-gray-800 text-gray-300 hover:border-gray-500 hover:bg-gray-700'
                                         } ${!selectedSpecialization.includes(muscle) && selectedSpecialization.length >= 2
                                             ? 'opacity-50 cursor-not-allowed'
                                             : 'cursor-pointer'
@@ -384,6 +431,19 @@ const TimelineBlocks: React.FC = () => {
                                 Next: Volume Distribution →
                             </button>
                         </div>
+                    </div>
+
+                    {/* Add Block Button */}
+                    <div className="mt-4">
+                        <button
+                            onClick={handleAddBlock}
+                            className="w-full bg-gray-700 hover:bg-gray-600 border-2 border-dashed border-gray-600 hover:border-gray-500 rounded-lg p-4 transition-colors"
+                        >
+                            <div className="flex items-center justify-center space-x-2">
+                                <span className="text-gray-400 text-xl">+</span>
+                                <span className="text-gray-400">Add New Block</span>
+                            </div>
+                        </button>
                     </div>
                 </div>
             </div>
