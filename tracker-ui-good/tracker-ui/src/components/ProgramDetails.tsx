@@ -76,21 +76,7 @@ const ProgramDetails: React.FC = () => {
                 {/* Header */}
                 <div className="text-center mb-8">
                     <h1 className="text-4xl font-bold text-white mb-2">Program Details</h1>
-                    <p className="text-gray-400">Step 1 of 4 - Define your training parameters</p>
-
-                    {/* Progress Steps - Desktop */}
-                    <div className="hidden md:block mt-6">
-                        <StepProgress
-                            currentStep={1}
-                            totalSteps={4}
-                            steps={['Details', 'Template', 'Timeline', 'Review']}
-                        />
-                    </div>
-
-                    {/* Mobile Progress Bar */}
-                    <div className="w-full bg-gray-800 rounded-full h-2 mt-4 md:hidden">
-                        <div className="bg-red-600 h-2 rounded-full transition-all duration-300" style={{ width: '25%' }}></div>
-                    </div>
+                    <p className="text-gray-400">Define your training parameters</p>
                 </div>
 
                 {/* Form */}

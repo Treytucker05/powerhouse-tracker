@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import { supabase } from '../lib/api/supabaseClient';
 import { loadAllMacrocycles, deleteMacrocycle } from '../lib/storage';
@@ -171,8 +171,8 @@ ProgramForm.displayName = 'ProgramForm';
 
 // Move ProgramBuilder outside Program component to prevent re-creation
 const ProgramBuilder = memo(({
-  programData, setProgramData, selectedLevel, error, setError, isLoading,
-  saveProgram, setActiveTab
+  programData, setProgramData, selectedLevel, setSelectedLevel, error, setError, isLoading,
+  saveProgram, setActiveTab, onStartMacrocycle, onStartMesocycle, onStartMicrocycle
 }) => {
   return (
     <ContextAwareBuilder
@@ -181,10 +181,15 @@ const ProgramBuilder = memo(({
       programData={programData}
       setProgramData={setProgramData}
       selectedLevel={selectedLevel}
+      setSelectedLevel={setSelectedLevel}
       error={error}
       setError={setError}
       isLoading={isLoading}
       saveProgram={saveProgram}
+      setActiveTab={setActiveTab}
+      onStartMacrocycle={onStartMacrocycle}
+      onStartMesocycle={onStartMesocycle}
+      onStartMicrocycle={onStartMicrocycle}
     />
   );
 });
@@ -248,8 +253,32 @@ SortableBlock.displayName = 'SortableBlock';
 
 const Program = memo(() => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedLevel, setSelectedLevel] = useState(null);
+
+  // Auto-detect context from URL
+  useEffect(() => {
+    const path = location.pathname;
+    let detectedLevel = null;
+
+    if (path.includes('macrocycle') || path.includes('program-design')) {
+      detectedLevel = 'macro';
+    } else if (path.includes('mesocycle')) {
+      detectedLevel = 'meso';
+    } else if (path.includes('microcycle')) {
+      detectedLevel = 'micro';
+    } else if (path.includes('builder')) {
+      detectedLevel = 'macro'; // Default to macro for generic builder
+    }
+
+    if (detectedLevel && detectedLevel !== selectedLevel) {
+      setSelectedLevel(detectedLevel);
+      setActiveTab('builder'); // Auto-switch to builder tab
+      console.log(`🎯 Auto-detected ${detectedLevel.toUpperCase()} builder from URL:`, path);
+    }
+  }, [location.pathname, selectedLevel]);
+
   const [recentPrograms, setRecentPrograms] = useState([]);
   const [recentMacrocycles, setRecentMacrocycles] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -2493,7 +2522,7 @@ const Program = memo(() => {
               id: 'macro',
               title: 'MACROCYCLE',
               subtitle: '3-12 months',
-              description: 'Long-term periodization with Renaissance Periodization',
+              description: 'Long-term periodization with RP + NEW Timeline View! 📅✨',
               icon: '📅',
               handler: onStartMacrocycle
             },
@@ -2913,6 +2942,23 @@ const Program = memo(() => {
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
+
+        {/* Unified Flow Indicator */}
+        {selectedLevel && (
+          <div className="mb-4 p-3 bg-blue-900/30 border border-blue-500/50 rounded-lg">
+            <div className="flex items-center justify-center space-x-2 text-center">
+              <span className="text-blue-400">🎯</span>
+              <span className="text-blue-300 font-medium">
+                Unified Program Builder - {selectedLevel.toUpperCase()} Mode
+              </span>
+              <span className="text-blue-400">✨</span>
+            </div>
+            <p className="text-blue-200 text-sm text-center mt-1">
+              All builders have been merged into this unified experience
+            </p>
+          </div>
+        )}
+
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">Program Design</h1>
@@ -2966,11 +3012,15 @@ const Program = memo(() => {
             programData={programData}
             setProgramData={setProgramData}
             selectedLevel={selectedLevel}
+            setSelectedLevel={setSelectedLevel}
             error={error}
             setError={handleSetError}
             isLoading={isLoading}
             saveProgram={saveProgram}
             setActiveTab={handleSetActiveTab}
+            onStartMacrocycle={handleStartMacrocycle}
+            onStartMesocycle={handleStartMesocycle}
+            onStartMicrocycle={handleStartMicrocycle}
           />
         )}
 
