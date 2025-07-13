@@ -1,134 +1,182 @@
 import { Link, NavLink } from "react-router-dom";
 import { Avatar } from "../ui/avatar";
-import { Dumbbell, LogOut } from "lucide-react";
+import {
+  Dumbbell,
+  LogOut,
+  Menu,
+  X,
+  Home,
+  ClipboardList,
+  Cog,
+  Activity,
+  BarChart3,
+  BookOpen,
+  ChevronDown
+} from "lucide-react";
+import { useState } from "react";
 
 export default function TopNav({ user, onSignOut }) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
   const navItems = [
-    { to: "/", label: "Dashboard" },
-    { to: "/assessment", label: "Assessment" },
-    { to: "/program", label: "Program Design" },
-    { to: "/tracking", label: "Tracking" },
-    { to: "/analytics", label: "Analytics" },
+    { to: "/", label: "Dashboard", icon: Home },
+    { to: "/assessment", label: "Assessment", icon: ClipboardList },
+    { to: "/program", label: "Program Design", icon: Cog },
+    { to: "/tracking", label: "Tracking", icon: Activity },
+    { to: "/analytics", label: "Analytics", icon: BarChart3 },
+    { to: "/exercises", label: "Exercises", icon: Dumbbell },
+    { to: "/resources", label: "Resources", icon: BookOpen },
   ];
 
   return (
-    <header
-      className="sticky top-0 z-50 flex justify-between items-center"
-      style={{
-        backgroundColor: '#000',
-        padding: '1.5rem 2rem',
-        boxShadow: '0 2px 10px rgba(255, 0, 0, 0.3)'
-      }}
-    >
-      <div className="flex items-center gap-2">
-        <Dumbbell className="w-6 h-6" style={{ color: '#FF0000' }} />
-        <div style={{ fontSize: '1.5rem', fontWeight: '700' }}>
-          <span style={{ color: '#FF0000' }}>Power</span>
-          <span style={{ color: '#FFF', margin: '0 0.2rem' }}>House</span>
-          <span style={{
-            color: '#000',
-            backgroundColor: '#FFF',
-            padding: '0.2rem 0.5rem',
-            borderRadius: '5px'
-          }}>ATX</span>
+    <header className="sticky top-0 z-50 bg-gray-900 dark:bg-gray-900 shadow-md">
+      <div className="flex justify-between items-center p-4 gap-4 text-white">
+        {/* Logo */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Dumbbell className="w-6 h-6 text-red-500" />
+          <div className="text-xl font-bold">
+            <span className="text-red-500">Power</span>
+            <span className="text-white mx-1">House</span>
+            <span className="bg-white text-black px-2 py-1 rounded text-sm">ATX</span>
+          </div>
         </div>
-      </div>
 
-      <nav className="flex" style={{ gap: '1rem', listStyle: 'none', margin: 0, padding: 0 }}>
-        {navItems.map(({ to, label }) => (
-          <NavLink
-            key={to}
-            to={to}
-            style={{ textDecoration: 'none' }}
-          >
-            {({ isActive }) => (
-              <span
-                style={{
-                  padding: '0.5rem 1rem',
-                  whiteSpace: 'nowrap',
-                  fontSize: '1.1rem',
-                  transition: 'all 0.3s ease',
-                  backgroundColor: isActive ? '#FF0000' : 'transparent',
-                  color: isActive ? '#000' : '#fff',
-                  borderRadius: '5px',
-                  display: 'block'
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive) {
-                    e.target.style.backgroundColor = '#FF0000';
-                    e.target.style.color = '#000';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    e.target.style.backgroundColor = 'transparent';
-                    e.target.style.color = '#fff';
-                  }
-                }}
-              >
-                {label}
-              </span>
-            )}
-          </NavLink>
-        ))}
-      </nav>
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex gap-4 flex-1 justify-center">
+          {navItems.map(({ to, label, icon: Icon }) => (
+            <NavLink
+              key={to}
+              to={to}
+              className={({ isActive }) =>
+                `flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 whitespace-nowrap ${isActive
+                  ? 'bg-red-600 text-white'
+                  : 'text-gray-300 hover:text-red-300 hover:bg-gray-800'
+                }`
+              }
+            >
+              <Icon className="w-4 h-4" />
+              {label}
+            </NavLink>
+          ))}
+        </nav>
 
-      <div className="flex items-center gap-4">
-        {user && (
-          <span style={{
-            color: '#fff',
-            fontSize: '0.9rem',
-            padding: '0.3rem 0.8rem',
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            borderRadius: '5px'
-          }}>
-            {user.email}
-          </span>
-        )}
-        <div
-          style={{
-            padding: '0.5rem',
-            borderRadius: '5px',
-            transition: 'all 0.3s ease',
-            color: '#fff'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#FF0000';
-            e.currentTarget.style.color = '#000';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = '#fff';
-          }}
-        >
-          <Avatar />
-        </div>
-        {user && onSignOut && (
+        {/* Desktop User Section */}
+        <div className="hidden md:flex items-center gap-2 relative">
+          {/* Profile Avatar Button */}
           <button
-            onClick={onSignOut}
-            style={{
-              padding: '0.5rem',
-              backgroundColor: 'transparent',
-              border: 'none',
-              borderRadius: '5px',
-              transition: 'all 0.3s ease',
-              color: '#fff',
-              cursor: 'pointer'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = '#FF0000';
-              e.target.style.color = '#000';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = 'transparent';
-              e.target.style.color = '#fff';
-            }}
-            title="Sign Out"
+            onClick={() => setIsProfileOpen(!isProfileOpen)}
+            className="p-2 rounded-full transition-colors hover:bg-gray-800"
+            title="Profile"
           >
-            <LogOut className="w-5 h-5" />
+            <Avatar />
           </button>
-        )}
+
+          {/* Profile Dropdown */}
+          {isProfileOpen && (
+            <div className="absolute right-0 top-12 bg-gray-800 rounded-md shadow-lg py-2 min-w-48 border border-gray-700">
+              {user && (
+                <div className="px-4 py-2 border-b border-gray-700">
+                  <p className="text-sm text-gray-300 truncate">{user.email}</p>
+                </div>
+              )}
+              <Link
+                to="/profile"
+                className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
+                onClick={() => setIsProfileOpen(false)}
+              >
+                Profile Settings
+              </Link>
+            </div>
+          )}
+
+          {/* Logout Button */}
+          {user && onSignOut && (
+            <button
+              onClick={onSignOut}
+              className="p-2 bg-red-600 rounded-full transition-colors hover:bg-red-700"
+              title="Sign Out"
+            >
+              <LogOut className="w-4 h-4 text-white" />
+            </button>
+          )}
+        </div>
+
+        {/* Mobile Hamburger Menu */}
+        <div className="md:hidden">
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="text-gray-300 hover:text-white p-2 rounded-md transition-colors"
+          >
+            {isMobileMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Navigation Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden border-t border-gray-700 bg-gray-900">
+          <div className="px-4 py-2 space-y-1">
+            {navItems.map(({ to, label, icon: Icon }) => (
+              <NavLink
+                key={to}
+                to={to}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive
+                    ? 'bg-red-600 text-white'
+                    : 'text-gray-300 hover:text-red-300 hover:bg-gray-800'
+                  }`
+                }
+              >
+                <Icon className="w-5 h-5" />
+                {label}
+              </NavLink>
+            ))}
+
+            {/* Mobile Profile Link */}
+            <NavLink
+              to="/profile"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive
+                  ? 'bg-red-600 text-white'
+                  : 'text-gray-300 hover:text-red-300 hover:bg-gray-800'
+                }`
+              }
+            >
+              <Avatar />
+              Profile
+            </NavLink>
+
+            {/* Mobile Logout */}
+            {user && onSignOut && (
+              <button
+                onClick={() => {
+                  onSignOut();
+                  setIsMobileMenuOpen(false);
+                }}
+                className="flex items-center gap-3 w-full px-3 py-2 text-gray-300 hover:text-white hover:bg-red-600 rounded-md transition-colors"
+              >
+                <LogOut className="w-5 h-5" />
+                Sign Out
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Click outside to close profile dropdown */}
+      {isProfileOpen && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setIsProfileOpen(false)}
+        />
+      )}
     </header>
   );
 }

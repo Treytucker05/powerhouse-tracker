@@ -9,19 +9,17 @@ import './App.css';
 
 // Lazy load page components for better code splitting
 const TrackingEnhanced = lazy(() => import("./pages/TrackingEnhanced.jsx"));
-const MesocycleEnhanced = lazy(() => import("./pages/MesocycleEnhanced.jsx"));
-const Microcycle = lazy(() => import("./pages/MicrocycleNew.jsx"));
-const Macrocycle = lazy(() => import("./pages/Macrocycle.jsx"));
 const Home = lazy(() => import("./pages/Home.jsx"));
 const Program = lazy(() => import("./pages/Program.jsx"));
 const Assessment = lazy(() => import("./pages/Assessment.jsx"));
 const Analytics = lazy(() => import("./pages/Analytics.jsx"));
 const AuthPage = lazy(() => import("./pages/AuthPage.jsx"));
-const ProgramDetails = lazy(() => import('./components/ProgramDetails.tsx'));
-const TemplateSelection = lazy(() => import('./components/builder/TemplateSelection.tsx'));
-const TimelineBlocks = lazy(() => import('./components/builder/TimelineBlocks.tsx'));
-const VolumeDistribution = lazy(() => import('./components/builder/VolumeDistribution.tsx'));
-const ReviewGenerate = lazy(() => import('./components/builder/ReviewGenerate.tsx'));
+const MacrocycleRedirect = lazy(() => import("./pages/MacrocycleRedirect.jsx"));
+
+// Placeholder components for new routes
+const ExercisesPage = lazy(() => import('./pages/Exercises.jsx'));
+const ProfilePage = lazy(() => import('./pages/Profile.jsx'));
+const ResourcesPage = lazy(() => import('./pages/Resources.jsx'));
 
 // Loading component
 const LoadingSpinner = () => (
@@ -42,27 +40,19 @@ function App() {
             <Route path="assessment" element={<Assessment />} />
             <Route path="tracking" element={<TrackingEnhanced />} />
             <Route path="analytics" element={<Analytics />} />
-            <Route path="mesocycle" element={<MesocycleEnhanced />} />
-            <Route path="microcycle" element={<Microcycle />} />
-            <Route path="macrocycle" element={<Macrocycle />} />
-            <Route path="macrocycle/:id" element={<Macrocycle />} />
+            <Route path="exercises" element={<ExercisesPage />} />
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="resources" element={<ResourcesPage />} />
 
-            {/* Program Design Builder Routes */}
-            <Route path="program-design/*" element={
-              <ErrorBoundary>
-                <MacrocycleBuilderProvider>
-                  <Suspense fallback={<LoadingSpinner />}>
-                    <Routes>
-                      <Route index element={<ProgramDetails />} />
-                      <Route path="template" element={<TemplateSelection />} />
-                      <Route path="timeline" element={<TimelineBlocks />} />
-                      <Route path="volume-distribution" element={<VolumeDistribution />} />
-                      <Route path="review" element={<ReviewGenerate />} />
-                    </Routes>
-                  </Suspense>
-                </MacrocycleBuilderProvider>
-              </ErrorBoundary>
-            } />
+            {/* Unified Builder Routes - All redirect to /program with context */}
+            <Route path="mesocycle" element={<MacrocycleRedirect />} />
+            <Route path="microcycle" element={<MacrocycleRedirect />} />
+            <Route path="macrocycle" element={<MacrocycleRedirect />} />
+            <Route path="macrocycle/:id" element={<MacrocycleRedirect />} />
+            <Route path="builder" element={<MacrocycleRedirect />} />
+
+            {/* Legacy Program Design Routes - Redirect to unified /program */}
+            <Route path="program-design/*" element={<MacrocycleRedirect />} />
           </Route>
         </Routes>
       </Suspense>
