@@ -1,32 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { supabase } from '../lib/api/supabaseClient';
-import StepWizard from '../components/assessment/StepWizard';
+import { useApp } from '../context';
+import StepWizard from './assessment/StepWizard';
 
 const Assessment = () => {
     const navigate = useNavigate();
-    const [userProfile, setUserProfile] = useState(null);
-    const [isFormVisible, setIsFormVisible] = useState(false);
-    const [isComplete, setIsComplete] = useState(false);
-
-    // Check for existing user profile on mount
-    useEffect(() => {
-        const savedProfile = localStorage.getItem('userProfile');
-        if (savedProfile) {
-            const profile = JSON.parse(savedProfile);
-            setUserProfile(profile);
-            setIsComplete(true);
-        } else {
-            setIsFormVisible(true);
-        }
-    }, []);
+    const { assessment, clearUserData } = useApp();
 
     const handleProceedToProgram = () => {
-        navigate('/program');
+        navigate('/');
     };
 
-    if (isComplete && userProfile) {
+    const handleResetAssessment = () => {
+        clearUserData();
+    };
+
+    if (assessment) {
         return (
             <div className="min-h-screen bg-black text-white">
                 <div className="max-w-4xl mx-auto px-4 py-8">
@@ -43,7 +32,7 @@ const Assessment = () => {
                             <h3 className="text-green-400 font-semibold text-xl mb-2">Assessment Complete</h3>
                             <p className="text-white mb-4">Ready for Program Design</p>
                             <p className="text-gray-300 text-sm mb-6">
-                                Goal: {userProfile.primaryGoal} | Experience: {userProfile.trainingExperience} | Recommended: {userProfile.recommendedSystem}
+                                Goal: {assessment.primaryGoal} | Experience: {assessment.trainingExperience} | Recommended: {assessment.recommendedSystem}
                             </p>
                             <button
                                 onClick={handleProceedToProgram}
@@ -60,24 +49,24 @@ const Assessment = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label className="text-gray-400 text-sm">Primary Goal</label>
-                                <p className="text-white font-medium">{userProfile.primaryGoal}</p>
+                                <p className="text-white font-medium">{assessment.primaryGoal}</p>
                             </div>
                             <div>
                                 <label className="text-gray-400 text-sm">Training Experience</label>
-                                <p className="text-white font-medium">{userProfile.trainingExperience}</p>
+                                <p className="text-white font-medium">{assessment.trainingExperience}</p>
                             </div>
                             <div>
                                 <label className="text-gray-400 text-sm">Timeline</label>
-                                <p className="text-white font-medium">{userProfile.timeline}</p>
+                                <p className="text-white font-medium">{assessment.timeline}</p>
                             </div>
                             <div>
                                 <label className="text-gray-400 text-sm">Recommended System</label>
-                                <p className="text-blue-400 font-medium">{userProfile.recommendedSystem}</p>
+                                <p className="text-blue-400 font-medium">{assessment.recommendedSystem}</p>
                             </div>
                             <div>
                                 <label className="text-gray-400 text-sm">Assessment Date</label>
                                 <p className="text-white font-medium">
-                                    {userProfile.createdAt ? new Date(userProfile.createdAt).toLocaleDateString() : 'Not recorded'}
+                                    {assessment.createdAt ? new Date(assessment.createdAt).toLocaleDateString() : 'Not recorded'}
                                 </p>
                             </div>
                         </div>
@@ -86,12 +75,7 @@ const Assessment = () => {
                     {/* Reset Option */}
                     <div className="text-center">
                         <button
-                            onClick={() => {
-                                localStorage.removeItem('userProfile');
-                                setUserProfile(null);
-                                setIsComplete(false);
-                                setIsFormVisible(true);
-                            }}
+                            onClick={handleResetAssessment}
                             className="text-gray-400 hover:text-gray-300 text-sm underline"
                         >
                             Reset Assessment
@@ -100,10 +84,6 @@ const Assessment = () => {
                 </div>
             </div>
         );
-    }
-
-    if (!isFormVisible) {
-        return null;
     }
 
     return (
@@ -116,7 +96,7 @@ const Assessment = () => {
                 </div>
 
                 {/* StepWizard Component */}
-                <StepWizard setUserProfile={setUserProfile} />
+                <StepWizard />
             </div>
         </div>
     );
