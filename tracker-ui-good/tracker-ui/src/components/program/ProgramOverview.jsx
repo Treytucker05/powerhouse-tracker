@@ -57,7 +57,15 @@ const ProgramOverview = () => {
                             value={state.programData.name}
                             onChange={(e) => handleProgramDataChange('name', e.target.value)}
                             placeholder="Enter program name"
-                            className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-black placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            style={{
+                                backgroundColor: '#f9fafb !important',
+                                color: '#000000 !important',
+                                WebkitTextFillColor: '#000000 !important',
+                                WebkitBoxShadow: '0 0 0 1000px #f9fafb inset !important',
+                                border: '1px solid #d1d5db !important',
+                                borderRadius: '6px !important'
+                            }}
                         />
                     </div>
 
@@ -68,7 +76,14 @@ const ProgramOverview = () => {
                         <select
                             value={state.programData.goal}
                             onChange={(e) => handleProgramDataChange('goal', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-black placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            style={{
+                                backgroundColor: '#f9fafb !important',
+                                color: '#000000 !important',
+                                WebkitTextFillColor: '#000000 !important',
+                                border: '1px solid #d1d5db !important',
+                                borderRadius: '6px !important'
+                            }}
                         >
                             <option value="strength">Strength</option>
                             <option value="hypertrophy">Hypertrophy</option>
@@ -88,7 +103,15 @@ const ProgramOverview = () => {
                             max="52"
                             value={state.programData.duration}
                             onChange={(e) => handleProgramDataChange('duration', parseInt(e.target.value))}
-                            className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-black placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            style={{
+                                backgroundColor: '#f9fafb !important',
+                                color: '#000000 !important',
+                                WebkitTextFillColor: '#000000 !important',
+                                WebkitBoxShadow: '0 0 0 1000px #f9fafb inset !important',
+                                border: '1px solid #d1d5db !important',
+                                borderRadius: '6px !important'
+                            }}
                         />
                     </div>
 
@@ -99,7 +122,14 @@ const ProgramOverview = () => {
                         <select
                             value={state.programData.trainingDays}
                             onChange={(e) => handleProgramDataChange('trainingDays', parseInt(e.target.value))}
-                            className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-600 bg-gray-700 text-black placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            style={{
+                                backgroundColor: '#f9fafb !important',
+                                color: '#000000 !important',
+                                WebkitTextFillColor: '#000000 !important',
+                                border: '1px solid #d1d5db !important',
+                                borderRadius: '6px !important'
+                            }}
                         >
                             <option value={2}>2 Days</option>
                             <option value={3}>3 Days</option>
