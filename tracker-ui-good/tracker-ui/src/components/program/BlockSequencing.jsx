@@ -28,7 +28,7 @@ const SortableBlockItem = ({ block, index }) => {
             style={style}
             {...attributes}
             {...listeners}
-            className={`bg-white border-2 border-gray-200 rounded-lg p-4 cursor-move hover:border-gray-300 transition-colors ${isDragging ? 'shadow-lg' : 'shadow-sm'
+            className={`bg-gray-700 border-2 border-gray-600 rounded-lg p-4 cursor-move hover:border-gray-500 transition-colors ${isDragging ? 'shadow-lg' : 'shadow-sm'
                 }`}
         >
             <div className="flex items-center justify-between">
@@ -38,39 +38,39 @@ const SortableBlockItem = ({ block, index }) => {
                         style={{ backgroundColor: block.color }}
                     />
                     <div>
-                        <h4 className="font-medium text-gray-900">{block.name}</h4>
-                        <p className="text-sm text-gray-600">{block.duration} weeks</p>
+                        <h4 className="font-medium text-white">{block.name}</h4>
+                        <p className="text-sm text-gray-300">{block.duration} weeks</p>
                     </div>
                 </div>
 
                 <div className="text-right">
-                    <p className="text-sm font-medium text-gray-700">Week {getWeekRange(index)}</p>
-                    <p className="text-xs text-gray-500 capitalize">{block.phase}</p>
+                    <p className="text-sm font-medium text-gray-200">Week {getWeekRange(index)}</p>
+                    <p className="text-xs text-gray-400 capitalize">{block.phase}</p>
                 </div>
             </div>
 
-            <p className="text-sm text-gray-600 mt-2">{block.description}</p>
+            <p className="text-sm text-gray-300 mt-2">{block.description}</p>
 
             {/* Duration Controls */}
-            <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-                <span className="text-sm text-gray-600">Duration:</span>
+            <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-600">
+                <span className="text-sm text-gray-300">Duration:</span>
                 <div className="flex items-center space-x-2">
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            // Handle duration decrease
+                            actions.updateBlockDuration(block.id, Math.max(1, block.duration - 1));
                         }}
-                        className="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-sm"
+                        className="w-6 h-6 rounded-full bg-gray-600 hover:bg-gray-500 flex items-center justify-center text-sm text-white"
                     >
                         -
                     </button>
-                    <span className="text-sm font-medium">{block.duration}w</span>
+                    <span className="text-sm font-medium text-white">{block.duration}w</span>
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            // Handle duration increase
+                            actions.updateBlockDuration(block.id, block.duration + 1);
                         }}
-                        className="w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-sm"
+                        className="w-6 h-6 rounded-full bg-gray-600 hover:bg-gray-500 flex items-center justify-center text-sm text-white"
                     >
                         +
                     </button>
@@ -100,8 +100,8 @@ const CalendarView = ({ blocks }) => {
     });
 
     return (
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-            <h4 className="font-medium text-gray-900 mb-4">Program Calendar</h4>
+        <div className="bg-gray-800 rounded-lg border border-gray-700 p-4">
+            <h4 className="font-medium text-white mb-4">Program Calendar</h4>
 
             <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-2">
                 {weeks.map((week, index) => (
@@ -201,8 +201,8 @@ const BlockSequencing = () => {
     return (
         <div className="space-y-6">
             {/* Templates */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Block Templates</h3>
+            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+                <h3 className="text-lg font-semibold text-white mb-4">Block Templates</h3>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {blockTemplates.map((template) => (
@@ -233,9 +233,9 @@ const BlockSequencing = () => {
             </div>
 
             {/* Block Sequence */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
                 <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900">Block Sequence</h3>
+                    <h3 className="text-lg font-semibold text-white">Block Sequence</h3>
 
                     <div className="flex space-x-2">
                         <button

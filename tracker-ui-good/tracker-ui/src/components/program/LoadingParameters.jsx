@@ -83,7 +83,7 @@ const LoadingParameters = () => {
                                 className="w-full px-2 py-1 text-sm border border-gray-300 rounded"
                             />
                         </div>
-                        <span className="text-sm text-gray-600">%</span>
+                        <span className="text-sm text-gray-300">%</span>
                     </div>
 
                     {recommendation && (
@@ -128,7 +128,7 @@ const LoadingParameters = () => {
                     </label>
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs text-gray-600 mb-1">Sets per Exercise</label>
+                            <label className="block text-xs text-gray-300 mb-1">Sets per Exercise</label>
                             <select
                                 value={params.setsPerExercise || getDefaultSets(block.phase)}
                                 onChange={(e) => handleParameterChange(block.id, 'setsPerExercise', e.target.value)}
@@ -142,7 +142,7 @@ const LoadingParameters = () => {
                         </div>
 
                         <div>
-                            <label className="block text-xs text-gray-600 mb-1">Rep Range</label>
+                            <label className="block text-xs text-gray-300 mb-1">Rep Range</label>
                             <select
                                 value={params.repRange || getDefaultReps(block.phase)}
                                 onChange={(e) => handleParameterChange(block.id, 'repRange', e.target.value)}
@@ -197,19 +197,19 @@ const LoadingParameters = () => {
                         <h4 className="font-medium text-gray-900 mb-3">Loading Analysis</h4>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <p className="text-sm text-gray-600">Recommended Load</p>
+                                <p className="text-sm text-gray-300">Recommended Load</p>
                                 <p className="font-medium">{params.loadingResults.recommended_load}%</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600">Volume Load</p>
+                                <p className="text-sm text-gray-300">Volume Load</p>
                                 <p className="font-medium">{params.loadingResults.volume_load}%</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600">Intensity Zone</p>
+                                <p className="text-sm text-gray-300">Intensity Zone</p>
                                 <p className="font-medium">{params.loadingResults.intensity_zone}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600">Recovery Time</p>
+                                <p className="text-sm text-gray-300">Recovery Time</p>
                                 <p className="font-medium">{params.loadingResults.recovery_time}</p>
                             </div>
                         </div>
@@ -221,19 +221,19 @@ const LoadingParameters = () => {
 
     return (
         <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Loading Parameters</h3>
+            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+                <h3 className="text-lg font-semibold text-white mb-4">Loading Parameters</h3>
 
                 {/* Block Tabs */}
-                <div className="border-b border-gray-200 mb-6">
+                <div className="border-b border-gray-600 mb-6">
                     <nav className="-mb-px flex space-x-8">
                         {state.blockSequence.map((block) => (
                             <button
                                 key={block.id}
                                 onClick={() => setActiveTab(block.id)}
                                 className={`py-2 px-1 border-b-2 font-medium text-sm ${activeTab === block.id
-                                    ? 'border-blue-500 text-blue-600'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    ? 'border-blue-400 text-blue-300'
+                                    : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-500'
                                     }`}
                             >
                                 <div className="flex items-center space-x-2">
