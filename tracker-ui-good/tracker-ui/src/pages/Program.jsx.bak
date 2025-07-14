@@ -2975,7 +2975,8 @@ const Program = memo(() => {
                   <select
                     value={selectedTechIntegration}
                     onChange={handleTechIntegrationChange}
-                    className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none appearance-none">`n                  >`n                    <option value="None">None</option>
+                    className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none appearance-none"
+                    <option value="None">None</option>
                   </select>
                 </div>
 
