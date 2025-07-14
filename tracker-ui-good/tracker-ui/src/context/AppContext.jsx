@@ -26,7 +26,8 @@ const initialState = {
         program: false,
         timeline: false
     },
-    errors: {}
+    errors: {},
+    authRedirectNeeded: false
 };
 
 // Reducer
@@ -152,6 +153,12 @@ function appReducer(state, action) {
                 errors: { ...state.errors, [action.payload]: null }
             };
 
+        case APP_ACTIONS.SET_AUTH_REDIRECT_NEEDED:
+            return {
+                ...state,
+                authRedirectNeeded: action.payload
+            };
+
         default:
             return state;
     }
@@ -171,7 +178,37 @@ export function AppProvider({ children }) {
 
                 if (error) {
                     console.error('Auth error:', error);
+
+                    // Try to refresh session if initial auth fails
+                    console.log('Attempting to refresh Supabase session...');
+                    try {
+                        const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+
+                        if (refreshError) {
+                            console.error('Session refresh failed:', refreshError);
+                            loadLocalData();
+                            dispatch({ type: APP_ACTIONS.CLEAR_USER });
+                            // Direct navigation to login page
+                            console.log('Redirecting to login page - session refresh failed after auth error');
+                            window.location.href = '/auth';
+                            return;
+                        }
+
+                        if (refreshData?.user) {
+                            console.log('Session refreshed successfully');
+                            dispatch({ type: APP_ACTIONS.SET_USER, payload: refreshData.user });
+                            await loadUserData(refreshData.user.id);
+                            return;
+                        }
+                    } catch (refreshError) {
+                        console.error('Session refresh exception:', refreshError);
+                    }
+
+                    // If refresh fails, navigate to login
+                    loadLocalData();
                     dispatch({ type: APP_ACTIONS.CLEAR_USER });
+                    console.log('Redirecting to login page - session refresh failed');
+                    window.location.href = '/auth';
                     return;
                 }
 
@@ -179,18 +216,136 @@ export function AppProvider({ children }) {
                     dispatch({ type: APP_ACTIONS.SET_USER, payload: user });
                     await loadUserData(user.id);
                 } else {
-                    loadLocalData();
-                    dispatch({ type: APP_ACTIONS.CLEAR_USER });
+                    // No user found, try refreshing session before setting redirect flag
+                    console.log('No user found, attempting session refresh...');
+                    try {
+                        const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+
+                        if (refreshError) {
+                            console.log('Session refresh failed, will redirect to login:', refreshError.message);
+                            loadLocalData();
+                            dispatch({ type: APP_ACTIONS.CLEAR_USER });
+                            // Direct navigation to login page
+                            console.log('Redirecting to login page - no user session found');
+                            window.location.href = '/auth';
+                            return;
+                        }
+
+                        if (refreshData?.user) {
+                            console.log('Session refresh successful, user authenticated');
+                            dispatch({ type: APP_ACTIONS.SET_USER, payload: refreshData.user });
+                            await loadUserData(refreshData.user.id);
+                        } else {
+                            console.log('No user after session refresh, will redirect to login');
+                            loadLocalData();
+                            dispatch({ type: APP_ACTIONS.CLEAR_USER });
+                            // Direct navigation to login page
+                            console.log('Redirecting to login page - no user found after session refresh');
+                            window.location.href = '/auth';
+                        }
+                    } catch (refreshError) {
+                        console.error('Session refresh exception:', refreshError);
+                        loadLocalData();
+                        dispatch({ type: APP_ACTIONS.CLEAR_USER });
+                        // Direct navigation to login page
+                        console.log('Redirecting to login page - session refresh exception');
+                        window.location.href = '/auth';
+                    }
                 }
             } catch (error) {
                 console.error('User initialization error:', error);
+
+                // Try session refresh as last resort before setting redirect flag
+                try {
+                    console.log('Attempting session refresh after initialization error...');
+                    const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+
+                    if (!refreshError && refreshData?.user) {
+                        console.log('Session refresh successful after error recovery');
+                        dispatch({ type: APP_ACTIONS.SET_USER, payload: refreshData.user });
+                        await loadUserData(refreshData.user.id);
+                        return;
+                    }
+                } catch (refreshError) {
+                    console.error('Final session refresh attempt failed:', refreshError);
+                }
+
+                // Final fallback - navigate to login
                 loadLocalData();
                 dispatch({ type: APP_ACTIONS.CLEAR_USER });
+                console.log('Redirecting to login page - user initialization failed');
+                window.location.href = '/auth';
+            } finally {
+                dispatch({ type: APP_ACTIONS.SET_LOADING, payload: { key: 'user', value: false } });
             }
         };
 
         initializeUser();
     }, []);
+
+    // Handle window focus to refresh session
+    useEffect(() => {
+        const handleFocus = async () => {
+            console.log('Window focused - checking session validity...');
+
+            try {
+                // Check if we have a current session
+                const { data: { session }, error } = await supabase.auth.getSession();
+
+                if (error) {
+                    console.log('Session check error on focus, attempting refresh:', error);
+                    // Try to refresh session
+                    const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+
+                    if (refreshError) {
+                        console.log('Session refresh failed on focus:', refreshError);
+                        dispatch({ type: APP_ACTIONS.CLEAR_USER });
+                        // Direct navigation to login page
+                        console.log('Redirecting to login page - session refresh failed');
+                        window.location.href = '/auth';
+                        return;
+                    }
+
+                    if (refreshData?.user) {
+                        console.log('Session refreshed successfully on focus');
+                        dispatch({ type: APP_ACTIONS.SET_USER, payload: refreshData.user });
+                    }
+                } else if (!session?.user) {
+                    console.log('No session found on focus, attempting refresh...');
+                    // Try to refresh session
+                    const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+
+                    if (refreshError || !refreshData?.user) {
+                        console.log('Failed to restore session on focus');
+                        dispatch({ type: APP_ACTIONS.CLEAR_USER });
+                        // Direct navigation to login page
+                        console.log('Redirecting to login page - failed to restore session');
+                        window.location.href = '/auth';
+                    } else {
+                        console.log('Session restored successfully on focus');
+                        dispatch({ type: APP_ACTIONS.SET_USER, payload: refreshData.user });
+                    }
+                } else {
+                    // Session exists and is valid
+                    console.log('Valid session found on focus');
+                    if (!state.user || state.user.id !== session.user.id) {
+                        dispatch({ type: APP_ACTIONS.SET_USER, payload: session.user });
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking session on window focus:', error);
+                // Don't clear user state for focus errors unless it's critical
+            }
+        };
+
+        // Add event listener for window focus
+        window.addEventListener('focus', handleFocus);
+
+        // Cleanup event listener
+        return () => {
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [state.user]);
 
     // Load user data from Supabase
     const loadUserData = async (userId) => {
@@ -334,6 +489,10 @@ export function AppProvider({ children }) {
         localStorage.removeItem('userTimeline');
     };
 
+    const clearAuthRedirect = () => {
+        dispatch({ type: APP_ACTIONS.SET_AUTH_REDIRECT_NEEDED, payload: false });
+    };
+
     const value = {
         // State
         ...state,
@@ -343,6 +502,7 @@ export function AppProvider({ children }) {
         saveProgram,
         updateTimeline,
         clearUserData,
+        clearAuthRedirect,
 
         // Direct dispatch for advanced usage
         dispatch,
@@ -368,6 +528,24 @@ export const useApp = () => {
         throw new Error('useApp must be used within an AppProvider');
     }
     return context;
+};
+
+// Utility function for components to handle auth failures
+export const handleAuthFailure = (navigate, reason = 'Authentication required') => {
+    console.log(`Authentication failed: ${reason}`);
+
+    const currentPath = window.location.pathname;
+    const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password', '/', '/about', '/contact'];
+
+    if (!publicPaths.includes(currentPath)) {
+        navigate('/login', {
+            replace: true,
+            state: {
+                message: 'Please log in to continue',
+                redirectFrom: currentPath
+            }
+        });
+    }
 };
 
 export { AppContext };
