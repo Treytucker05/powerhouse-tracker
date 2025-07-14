@@ -27,5 +27,8 @@ export const APP_ACTIONS = {
 
     // Error handling
     SET_ERROR: 'SET_ERROR',
-    CLEAR_ERROR: 'CLEAR_ERROR'
+    CLEAR_ERROR: 'CLEAR_ERROR',
+
+    // Auth redirect
+    SET_AUTH_REDIRECT_NEEDED: 'SET_AUTH_REDIRECT_NEEDED'
 };

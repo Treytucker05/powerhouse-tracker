@@ -1,43 +1,24 @@
-import React from 'react';
-import ProgramNew from './ProgramNew';
-
-/**
- * Program.jsx - Refactored from 3454 lines to modular architecture
- * 
- * The original monolithic Program component has been broken down into:
- * 
- * 📁 src/contexts/
- *   └── ProgramContext.jsx - Centralized state management with reducer pattern
- * 
- * 📁 src/hooks/
- *   └── useProgramHooks.js - Custom hooks for complex logic (assessment, parameters, generation)
- * 
- * 📁 src/components/program/
- *   ├── ProgramOverview.jsx - Assessment data + training model selection
- *   ├── BlockSequencing.jsx - Drag & drop calendar interface with DND Kit
- *   ├── LoadingParameters.jsx - Per-block parameter configuration forms
- *   ├── TrainingMethods.jsx - Training method selection with guidelines
- *   └── ProgramPreview.jsx - Program generation and preview functionality
- * 
- * 📁 src/pages/
- *   └── ProgramNew.jsx - Main container with navigation and progress tracking
- * 
- * Benefits of this refactoring:
- * ✅ Eliminated Temporal Dead Zone issues completely
- * ✅ Much easier to debug specific functionality
- * ✅ Better separation of concerns
- * ✅ Easier unit testing of individual components
- * ✅ Improved performance through code splitting
- * ✅ Better maintainability and readability
- * ✅ Reusable components across different contexts
- */
-
-const Program = () => {
-  return <ProgramNew />;
-};
-
-export default Program;
-HIGH_SFR_EXERCISES,
+import React, { useState, useEffect, useCallback, memo } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import { supabase } from '../lib/api/supabaseClient';
+import { loadAllMacrocycles, deleteMacrocycle } from '../lib/storage';
+import { programService } from '../services/api';
+import ContextAwareBuilder from '../components/builder/ContextAwareBuilder.jsx';
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { GripVertical, Calendar, List, Plus, Minus } from 'lucide-react';
+import { Calendar as BigCalendar, momentLocalizer } from 'react-big-calendar';
+import moment from 'moment';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import '../styles/calendar.css';
+import {
+  BASE_VOLUME_LANDMARKS,
+  RIR_SCHEMES,
+  MACROCYCLE_TEMPLATES,
+  HIGH_SFR_EXERCISES,
   GOAL_TYPES,
   PHASE_FOCUS_MAPPING,
   calculateVolumeProgression
@@ -267,7 +248,7 @@ const SortableBlock = memo(({ id, name, description, index }) => {
           <h4 className="text-white font-medium">{name}</h4>
           <span className="text-gray-400 text-sm">#{index + 1}</span>
         </div>
-        <p className="text-gray-300 text-sm mt-1">{description || 'Training block description'}</p>
+        <p className="text-gray-300 text-sm mt-1">{description}</p>
       </div>
     </div>
   );
@@ -279,11 +260,6 @@ SortableBlock.displayName = 'SortableBlock';
 const BlockPalette = memo(({ blockSequence, blockTypeConfig, draggedBlock, setDraggedBlock, selectedTrainingModel }) => {
   // Filter blocks based on training model
   const getFilteredBlocks = () => {
-    // Safety check to prevent TDZ errors
-    if (!Array.isArray(blockSequence)) {
-      return [];
-    }
-
     if (selectedTrainingModel === 'Block') {
       return blockSequence.filter(block => ['accumulation', 'intensification', 'realization', 'deload'].includes(block.id));
     } else if (selectedTrainingModel === 'Hybrid') {
@@ -319,7 +295,7 @@ const BlockPalette = memo(({ blockSequence, blockTypeConfig, draggedBlock, setDr
                 color: config.textColor,
                 border: draggedBlock?.id === block.id ? '2px solid #FFFFFF' : 'none'
               }}
-              title={`${block.name} - ${block.description || 'Training block'}`}
+              title={`${block.name} - ${block.description}`}
             >
               <div className="font-semibold">{block.name}</div>
               <div className="text-xs opacity-80 mt-1">{config.focus}</div>
@@ -488,100 +464,10 @@ class ProgramErrorBoundary extends React.Component {
 }
 
 const Program = memo(() => {
-  // ALL HOOKS MUST be at the VERY TOP - useState, useEffect, useCallback, etc.
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedLevel, setSelectedLevel] = useState(null);
-  const [recentPrograms, setRecentPrograms] = useState([]);
-  const [recentMacrocycles, setRecentMacrocycles] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingPrograms, setIsLoadingPrograms] = useState(true);
-  const [isLoadingMacrocycles, setIsLoadingMacrocycles] = useState(true);
-  const [error, setError] = useState(null);
-  const [programData, setProgramData] = useState({
-    name: '',
-    goal: 'hypertrophy',
-    duration: 12,
-    trainingDays: 4,
-    selectedTemplate: null
-  });
-  const [savedBuilderState, setSavedBuilderState] = useState({
-    macro: null,
-    meso: null,
-    micro: null
-  });
-  const [assessmentData, setAssessmentData] = useState(null);
-  const [isLoadingAssessment, setIsLoadingAssessment] = useState(true);
-  const [assessmentError, setAssessmentError] = useState(null);
-  const [selectedTrainingModel, setSelectedTrainingModel] = useState('');
-  const [blockSequence, setBlockSequence] = useState([
-    {
-      id: 'accumulation',
-      name: 'Accumulation',
-      duration: 4,
-      color: '#10B981',
-      phase: 'accumulation',
-      description: 'High volume phase for building work capacity and muscle growth'
-    },
-    {
-      id: 'intensification',
-      name: 'Intensification',
-      duration: 3,
-      color: '#F59E0B',
-      phase: 'intensification',
-      description: 'Moderate volume, higher intensity phase for strength development'
-    },
-    {
-      id: 'realization',
-      name: 'Realization',
-      duration: 2,
-      color: '#EF4444',
-      phase: 'realization',
-      description: 'Low volume, peak intensity phase for expressing maximum strength'
-    },
-    {
-      id: 'deload',
-      name: 'Deload',
-      duration: 1,
-      color: '#6B7280',
-      phase: 'deload',
-      description: 'Recovery phase with reduced volume and intensity for adaptation'
-    }
-  ]);
-  const [calendarView, setCalendarView] = useState(true);
-  const [localEvents, setLocalEvents] = useState([]);
-  const [draggedBlock, setDraggedBlock] = useState(null);
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [blockParameters, setBlockParameters] = useState({
-    accumulation: { loading: 60, movement: 'Bilateral', loadingResults: null },
-    intensification: { loading: 75, movement: 'Unilateral', loadingResults: null },
-    realization: { loading: 85, movement: 'Bilateral', loadingResults: null },
-    deload: { loading: 40, movement: 'Bilateral', loadingResults: null }
-  });
-  const [activeBlockTab, setActiveBlockTab] = useState('accumulation');
-  const [selectedTrainingMethod, setSelectedTrainingMethod] = useState('');
-  const [methodSFR, setMethodSFR] = useState('');
-  const [selectedEnergySystem, setSelectedEnergySystem] = useState('');
-  const [energySystemNote, setEnergySystemNote] = useState('');
-  const [selectedDeloadType, setSelectedDeloadType] = useState('');
-  const [deloadProtocol, setDeloadProtocol] = useState('');
-  const [trainingAge, setTrainingAge] = useState('');
-  const [chronotype, setChronotype] = useState('');
-  const [chronotypeNote, setChronotypeNote] = useState('');
-  const [selectedTechIntegration, setSelectedTechIntegration] = useState('');
-  const [techNote, setTechNote] = useState('');
-  const [loadingResults, setLoadingResults] = useState(null);
-  const [showPreview, setShowPreview] = useState(false);
-  const [generatedProgram, setGeneratedProgram] = useState(null);
-  const [selectedExercise, setSelectedExercise] = useState('');
-  const [tempo, setTempo] = useState('3010');
-  const [rom, setRom] = useState('Full');
-
-  // Debug states after they're initialized - TDZ safe
-  useEffect(() => {
-    console.log('States ready:', { loadingResults, assessmentData, selectedExercise, tempo, rom });
-  }, [loadingResults, assessmentData, selectedExercise, tempo, rom]);
 
   // Auto-detect context from URL
   useEffect(() => {
@@ -605,35 +491,87 @@ const Program = memo(() => {
     }
   }, [location.pathname, selectedLevel]);
 
-  // Initialize block parameters when blockSequence changes
-  useEffect(() => {
-    // Safety check to prevent TDZ errors
-    if (!Array.isArray(blockSequence) || blockSequence.length === 0) {
-      return;
-    }
+  const [recentPrograms, setRecentPrograms] = useState([]);
+  const [recentMacrocycles, setRecentMacrocycles] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingPrograms, setIsLoadingPrograms] = useState(true);
+  const [isLoadingMacrocycles, setIsLoadingMacrocycles] = useState(true);
+  const [error, setError] = useState(null);
+  const [programData, setProgramData] = useState({
+    name: '',
+    goal: 'hypertrophy',
+    duration: 12,
+    trainingDays: 4,
+    selectedTemplate: null
+  });
 
-    setBlockParameters(prevParams => {
-      const newParams = { ...prevParams };
-      blockSequence.forEach(block => {
-        if (!newParams[block.id]) {
-          const defaults = getPhaseDefaults(block.id);
-          newParams[block.id] = {
-            // Loading parameters
-            oneRM: '',
-            intensity: defaults.defaultIntensity,
-            targetRIR: defaults.defaultRIR,
-            loadingResults: null,
-            // Movement parameters
-            exercises: [],
-            selectedExercise: '',
-            tempo: '3010',
-            rom: 'Full'
-          };
-        }
-      });
-      return newParams;
-    });
-  }, [blockSequence, getPhaseDefaults]);
+  // State persistence for tab switching
+  const [savedBuilderState, setSavedBuilderState] = useState({
+    macro: null,
+    meso: null,
+    micro: null
+  });
+
+  // Assessment data state
+  const [assessmentData, setAssessmentData] = useState(null);
+  const [isLoadingAssessment, setIsLoadingAssessment] = useState(true);
+  const [assessmentError, setAssessmentError] = useState(null);
+
+  // Training model state
+  const [selectedTrainingModel, setSelectedTrainingModel] = useState('');
+
+  // Block sequencing state
+  const [blockSequence, setBlockSequence] = useState([
+    {
+      id: 'accumulation',
+      name: 'Accumulation',
+      description: 'High volume, lower intensity phase for building work capacity'
+    },
+    {
+      id: 'intensification',
+      name: 'Intensification',
+      description: 'Moderate volume, higher intensity phase for strength development'
+    },
+    {
+      id: 'realization',
+      name: 'Realization',
+      description: 'Low volume, peak intensity phase for expressing adaptations'
+    },
+    {
+      id: 'deload',
+      name: 'Deload',
+      description: 'Recovery phase with reduced volume and intensity'
+    }
+  ]);
+
+  // Calendar integration for block sequencing
+  // Setup moment and localizer
+  moment.locale('en');
+  const localizer = momentLocalizer(moment);
+  const [calendarView, setCalendarView] = useState(true); // true for calendar, false for list
+  const [localEvents, setLocalEvents] = useState([]);
+  const [draggedBlock, setDraggedBlock] = useState(null);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
+  // Block type configurations with colors for TrainingPeaks-style visualization
+  const blockTypeConfig = {
+    accumulation: { color: '#3B82F6', textColor: '#FFFFFF', focus: 'Volume' }, // Blue
+    intensification: { color: '#F59E0B', textColor: '#000000', focus: 'Intensity' }, // Orange
+    realization: { color: '#10B981', textColor: '#FFFFFF', focus: 'Peaking' }, // Green
+    deload: { color: '#6B7280', textColor: '#FFFFFF', focus: 'Recovery' }, // Gray
+    specialization: { color: '#8B5CF6', textColor: '#FFFFFF', focus: 'Specialization' }, // Purple
+    competition: { color: '#EF4444', textColor: '#FFFFFF', focus: 'Competition' } // Red
+  };
+
+  // Per-block parameters state
+  const [blockParameters, setBlockParameters] = useState({});
+  const [activeBlockTab, setActiveBlockTab] = useState('accumulation');
+
+  // Computed values for current block parameters
+  const currentBlockParams = blockParameters[activeBlockTab] || {};
+  const selectedExercise = currentBlockParams.selectedExercise || '';
+  const tempo = currentBlockParams.tempo || '3010';
+  const rom = currentBlockParams.rom || 'Full';
 
   // Get phase-specific defaults
   const getPhaseDefaults = useCallback((blockType) => {
@@ -683,6 +621,56 @@ const Program = memo(() => {
     };
     return defaults[blockType] || defaults.accumulation;
   }, []);
+
+  // Initialize block parameters when blockSequence changes
+  useEffect(() => {
+    setBlockParameters(prevParams => {
+      const newParams = { ...prevParams };
+      blockSequence.forEach(block => {
+        if (!newParams[block.id]) {
+          const defaults = getPhaseDefaults(block.id);
+          newParams[block.id] = {
+            // Loading parameters
+            oneRM: '',
+            intensity: defaults.defaultIntensity,
+            targetRIR: defaults.defaultRIR,
+            loadingResults: null,
+            // Movement parameters
+            exercises: [],
+            selectedExercise: '',
+            tempo: '3010',
+            rom: 'Full'
+          };
+        }
+      });
+      return newParams;
+    });
+  }, [blockSequence, getPhaseDefaults]);
+
+  // Training methods state
+  const [selectedTrainingMethod, setSelectedTrainingMethod] = useState('');
+  const [methodSFR, setMethodSFR] = useState('');
+
+  // Energy systems state
+  const [selectedEnergySystem, setSelectedEnergySystem] = useState('');
+  const [energySystemNote, setEnergySystemNote] = useState('');
+
+  // Recovery & adaptation state
+  const [selectedDeloadType, setSelectedDeloadType] = useState('');
+  const [deloadProtocol, setDeloadProtocol] = useState('');
+
+  // Individual considerations state
+  const [trainingAge, setTrainingAge] = useState('');
+  const [chronotype, setChronotype] = useState('');
+  const [chronotypeNote, setChronotypeNote] = useState('');
+
+  // Emerging trends & tech state
+  const [selectedTechIntegration, setSelectedTechIntegration] = useState('');
+  const [techNote, setTechNote] = useState('');
+
+  // Program preview state
+  const [showPreview, setShowPreview] = useState(false);
+  const [generatedProgram, setGeneratedProgram] = useState(null);
 
   const handleSetError = useCallback((error) => {
     setError(error);
@@ -922,16 +910,16 @@ const Program = memo(() => {
         const oldIndex = items.findIndex((item) => item.id === active.id);
         const newIndex = items.findIndex((item) => item.id === over.id);
 
-        const newSequence = arrayMove(items, oldIndex, newIndex).map(ensureBlockProperties);
+        const newSequence = arrayMove(items, oldIndex, newIndex);
         console.log('Block sequence updated:', newSequence.map(block => block.name));
         return newSequence;
       });
     }
-  }, [ensureBlockProperties]);
+  }, []);
 
   // Handle save sequence
   const handleSaveSequence = useCallback(() => {
-    console.log('Saving block sequence:', Array.isArray(blockSequence) ? blockSequence.map(block => block.name) : 'blockSequence not ready');
+    console.log('Saving block sequence:', blockSequence.map(block => block.name));
     toast.success('Block sequence saved successfully!');
     // Update localEvents based on blockSequence changes
     setLocalEvents(prevEvents => [...prevEvents]); // Trigger re-render
@@ -1075,13 +1063,7 @@ const Program = memo(() => {
       }
     }));
 
-    // Also set global loading results for program generation
-    setLoadingResults(results);
-
-    // Safety check for blockSequence access
-    const blockName = Array.isArray(blockSequence)
-      ? blockSequence.find(b => b.id === blockId)?.name || blockId
-      : blockId;
+    const blockName = blockSequence.find(b => b.id === blockId)?.name || blockId;
     toast.success(`Loading parameters calculated for ${blockName} block`);
   }, [blockParameters, blockSequence, getPhaseDefaults]);
 
@@ -1111,10 +1093,7 @@ const Program = memo(() => {
       }
     }));
 
-    // Safety check for blockSequence access
-    const blockName = Array.isArray(blockSequence)
-      ? blockSequence.find(b => b.id === blockId)?.name || blockId
-      : blockId;
+    const blockName = blockSequence.find(b => b.id === blockId)?.name || blockId;
     toast.success(`Exercise added to ${blockName} block`);
   }, [blockParameters, blockSequence]);
 
@@ -1324,11 +1303,10 @@ const Program = memo(() => {
 
   // Generate program structure based on all parameters
   const generateProgramStructure = useCallback(() => {
-    // Safety checks to prevent TDZ errors
-    if (!assessmentData || !selectedTrainingModel || !programData) return null;
+    if (!assessmentData || !selectedTrainingModel) return null;
 
-    const duration = programData?.duration || 12; // weeks
-    const trainingDays = programData?.trainingDays || 4;
+    const duration = programData.duration || 12; // weeks
+    const trainingDays = programData.trainingDays || 4;
 
     // Generate phases based on training model
     let phases = [];
@@ -1379,8 +1357,8 @@ const Program = memo(() => {
 
     return {
       overview: {
-        name: programData?.name || 'Custom Training Program',
-        goal: programData?.goal || 'hypertrophy',
+        name: programData.name || 'Custom Training Program',
+        goal: programData.goal,
         duration: duration,
         trainingModel: selectedTrainingModel,
         trainingDays: trainingDays,
@@ -1390,7 +1368,7 @@ const Program = memo(() => {
       phases: phases,
       weeklyOutline: weeklyOutline.slice(0, duration),
       parameters: {
-        movement: { exercise: selectedExercise, tempo: tempo, rom: rom },
+        movement: { exercise: selectedExercise, tempo: rom },
         method: { type: selectedTrainingMethod, sfr: methodSFR },
         energySystem: { focus: selectedEnergySystem, note: energySystemNote },
         recovery: { strategy: selectedDeloadType, protocol: deloadProtocol },
@@ -1398,10 +1376,10 @@ const Program = memo(() => {
       }
     };
   }, [
-    assessmentData, selectedTrainingModel, programData, blockSequence, blockParameters,
-    selectedTrainingMethod, methodSFR, selectedEnergySystem, energySystemNote,
-    selectedDeloadType, deloadProtocol, trainingAge, chronotype,
-    selectedTechIntegration, techNote
+    assessmentData, selectedTrainingModel, programData, blockSequence,
+    selectedExercise, tempo, rom, selectedTrainingMethod, methodSFR,
+    selectedEnergySystem, energySystemNote, selectedDeloadType, deloadProtocol,
+    trainingAge, chronotype, selectedTechIntegration, techNote
   ]);
 
   // Handle preview generation
@@ -1528,9 +1506,6 @@ const Program = memo(() => {
 
   // Handle generate full program
   const handleGenerateFullProgram = useCallback(() => {
-    // Safety check for loadingResults to prevent ReferenceError
-    const safeLoadingResults = loadingResults ?? null;
-
     // Log programData before generation as requested
     console.log('programData before generation:', programData);
 
@@ -1540,7 +1515,7 @@ const Program = memo(() => {
       assessment: assessmentData,
       trainingModel: selectedTrainingModel,
       blockSequence: blockSequence,
-      loadingResults: safeLoadingResults,
+      loadingResults: loadingResults,
       movement: {
         exercise: selectedExercise,
         tempo: tempo,
@@ -1583,7 +1558,7 @@ const Program = memo(() => {
     assessmentData,
     selectedTrainingModel,
     blockSequence,
-    loadingResults,  // TDZ issue resolved by proper hook ordering
+    loadingResults,
     selectedExercise,
     tempo,
     rom,
@@ -1617,21 +1592,21 @@ const Program = memo(() => {
 
       // Prepare complete program data
       const completeProgram = {
-        name: programData?.name?.trim() || 'Untitled Program',
-        description: programData?.description || '',
+        name: programData.name.trim(),
+        description: programData.description || '',
         type: selectedLevel || 'macro',
-        goal: programData?.goal || 'hypertrophy',
-        duration: programData?.duration || 12,
-        trainingDaysPerWeek: programData?.trainingDays || 4,
-        selectedTemplate: programData?.selectedTemplate || null,
+        goal: programData.goal,
+        duration: programData.duration,
+        trainingDaysPerWeek: programData.trainingDays,
+        selectedTemplate: programData.selectedTemplate,
         assessmentId: assessmentData?.id,
-        totalDuration: programData?.duration || 12,
+        totalDuration: programData.duration,
         isActive: true,
         blocks: []
       };
 
       // Add blocks if template is selected
-      if (programData?.selectedTemplate && MACROCYCLE_TEMPLATES[programData.selectedTemplate]) {
+      if (programData.selectedTemplate && MACROCYCLE_TEMPLATES[programData.selectedTemplate]) {
         const template = MACROCYCLE_TEMPLATES[programData.selectedTemplate];
         completeProgram.blocks = template.blocks.map((block, index) => ({
           id: `block_${Date.now()}_${index}`,
@@ -1877,43 +1852,6 @@ const Program = memo(() => {
     }
   }, []);
 
-  // NOW all constants go here - after ALL hooks
-  moment.locale('en');
-  const localizer = momentLocalizer(moment);
-
-  const blockTypeConfig = {
-    accumulation: { color: '#3B82F6', textColor: '#FFFFFF', focus: 'Volume' },
-    intensification: { color: '#F59E0B', textColor: '#000000', focus: 'Intensity' },
-    realization: { color: '#10B981', textColor: '#FFFFFF', focus: 'Peaking' },
-    deload: { color: '#6B7280', textColor: '#FFFFFF', focus: 'Recovery' },
-    specialization: { color: '#8B5CF6', textColor: '#FFFFFF', focus: 'Specialization' },
-    competition: { color: '#EF4444', textColor: '#FFFFFF', focus: 'Competition' }
-  };
-
-  // Helper function to ensure all blocks have descriptions
-  const getBlockDescription = (blockId) => {
-    const descriptions = {
-      accumulation: 'High volume phase for building work capacity and muscle growth',
-      intensification: 'Moderate volume, higher intensity phase for strength development',
-      realization: 'Low volume, peak intensity phase for expressing maximum strength',
-      deload: 'Recovery phase with reduced volume and intensity for adaptation',
-      specialization: 'Focused phase for developing specific skills or movement patterns',
-      competition: 'Peak performance phase with competition-specific training'
-    };
-    return descriptions[blockId] || 'Training block for specific athletic development';
-  };
-
-  // Helper function to ensure block has all required properties
-  const ensureBlockProperties = (block) => ({
-    id: block.id,
-    name: block.name,
-    duration: block.duration || 4,
-    color: block.color || '#6B7280',
-    phase: block.phase || block.id,
-    description: block.description || getBlockDescription(block.id),
-    ...block // Preserve any additional properties
-  });
-
   const ProgramOverview = ({
     onStartMacrocycle,
     onStartMesocycle,
@@ -2059,6 +1997,7 @@ const Program = memo(() => {
               <div className="flex flex-col space-y-4">
                 <div>
                   <label className="block text-gray-300 text-sm font-medium mb-2">
+                   
                     Select your base training model
                     <span className="text-gray-400 ml-2" title="Your periodization strategy determines how training variables progress over time">ℹ️</span>
                   </label>
@@ -2231,11 +2170,11 @@ const Program = memo(() => {
                     onDragEnd={handleDragEnd}
                   >
                     <SortableContext
-                      items={Array.isArray(blockSequence) ? blockSequence.map(block => block.id) : []}
+                      items={blockSequence.map(block => block.id)}
                       strategy={verticalListSortingStrategy}
                     >
                       <div className="space-y-3 mb-6">
-                        {Array.isArray(blockSequence) && blockSequence.map((block, index) => (
+                        {blockSequence.map((block, index) => (
                           <SortableBlock
                             key={block.id}
                             id={block.id}
@@ -2274,7 +2213,8 @@ const Program = memo(() => {
                       </div>
                     ) : (
                       <p className="text-gray-400 text-sm">No training blocks scheduled yet.</p>
-                    )}
+                    )
+                    }
                   </div>
                 </div>
               )}
@@ -2339,7 +2279,7 @@ const Program = memo(() => {
               </div>
 
               {/* Active Block Tab Navigation */}
-              {Array.isArray(blockSequence) && blockSequence.length > 0 && (
+              {blockSequence.length > 0 && (
                 <div className="mb-6">
                   <div className="flex flex-wrap gap-2 mb-4">
                     {blockSequence.map((block) => {
@@ -2916,8 +2856,6 @@ const Program = memo(() => {
           </AccordionItem>
         )}
 
-        {/* Continue with remaining sections... */}
-
         {/* Step 9: Individual Considerations */}
         {assessmentData && selectedTrainingModel && (
           <AccordionItem
@@ -3037,14 +2975,7 @@ const Program = memo(() => {
                   <select
                     value={selectedTechIntegration}
                     onChange={handleTechIntegrationChange}
-                    className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none appearance-none"
-                  >
-                    <option value="">Choose a tech integration...</option>
-                    <option value="VBT (Velocity Tracking)">VBT (Velocity Tracking)</option>
-                    <option value="AI Optimization">AI Optimization</option>
-                    <option value="Wearables (HRV/Sleep)">Wearables (HRV/Sleep)</option>
-                    <option value="Digital Twin">Digital Twin</option>
-                    <option value="None">None</option>
+                    className="w-full p-2 border border-gray-600 bg-gray-800 text-white rounded-lg focus:border-blue-500 focus:outline-none appearance-none">`n                  >`n                    <option value="None">None</option>
                   </select>
                 </div>
 
@@ -3114,66 +3045,64 @@ const Program = memo(() => {
                     Generate Preview
                   </button>
                 </div>
-              ) : (
-                generatedProgram && (
-                  <div className="space-y-6">
-                    {/* Program Overview */}
-                    <div className="bg-gray-700 p-4 rounded-lg">
-                      <h5 className="text-xl font-semibold text-white mb-3">Program Overview</h5>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="text-gray-400">Name:</span>
-                          <span className="text-white ml-2">{generatedProgram.overview.name}</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-400">Goal:</span>
-                          <span className="text-white ml-2">{generatedProgram.overview.goal}</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-400">Duration:</span>
-                          <span className="text-white ml-2">{generatedProgram.overview.duration} weeks</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-400">Training Model:</span>
-                          <span className="text-white ml-2">{generatedProgram.overview.trainingModel}</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-400">Training Days:</span>
-                          <span className="text-white ml-2">{generatedProgram.overview.trainingDays} per week</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-400">Chronotype:</span>
-                          <span className="text-white ml-2">{generatedProgram.overview.chronotype || 'Not specified'}</span>
-                        </div>
+              ) : generatedProgram && (
+                <div className="space-y-6">
+                  {/* Program Overview */}
+                  <div className="bg-gray-700 p-4 rounded-lg">
+                    <h5 className="text-xl font-semibold text-white mb-3">Program Overview</h5>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-400">Name:</span>
+                        <span className="text-white ml-2">{generatedProgram.overview.name}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Goal:</span>
+                        <span className="text-white ml-2">{generatedProgram.overview.goal}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Duration:</span>
+                        <span className="text-white ml-2">{generatedProgram.overview.duration} weeks</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Training Model:</span>
+                        <span className="text-white ml-2">{generatedProgram.overview.trainingModel}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Training Days:</span>
+                        <span className="text-white ml-2">{generatedProgram.overview.trainingDays} per week</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-400">Chronotype:</span>
+                        <span className="text-white ml-2">{generatedProgram.overview.chronotype || 'Not specified'}</span>
                       </div>
                     </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex flex-col md:flex-row gap-3 pt-4 border-t border-gray-600">
-                      <button
-                        onClick={handleSaveProgram}
-                        className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors font-medium flex-1"
-                        title="Save this program to your library"
-                      >
-                        💾 Save Program
-                      </button>
-                      <button
-                        onClick={handleExportProgram}
-                        className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors font-medium flex-1"
-                        title="Export program as JSON file"
-                      >
-                        📤 Export JSON
-                      </button>
-                      <button
-                        onClick={() => setShowPreview(false)}
-                        className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors font-medium"
-                        title="Regenerate program with current settings"
-                      >
-                        🔄 Regenerate
-                      </button>
-                    </div>
                   </div>
-                )
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col md:flex-row gap-3 pt-4 border-t border-gray-600">
+                    <button
+                      onClick={handleSaveProgram}
+                      className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors font-medium flex-1"
+                      title="Save this program to your library"
+                    >
+                      💾 Save Program
+                    </button>
+                    <button
+                      onClick={handleExportProgram}
+                      className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors font-medium flex-1"
+                      title="Export program as JSON file"
+                    >
+                      📤 Export JSON
+                    </button>
+                    <button
+                      onClick={() => setShowPreview(false)}
+                      className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors font-medium"
+                      title="Regenerate program with current settings"
+                    >
+                      🔄 Regenerate
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
           </AccordionItem>
