@@ -1,32 +1,44 @@
-# PowerHouse Tracker v2.0.0
+# PowerHouse Tracker v3.0.0
 
 ![Vitest](https://img.shields.io/badge/tests-passing-brightgreen)
 ![React](https://img.shields.io/badge/React-19-blue)
 ![Vite](https://img.shields.io/badge/Vite-6-yellow)
+![Design System](https://img.shields.io/badge/Design%20System-Complete-brightgreen)
 
-A modern React-based training tracker with **complete program design system**, **professional dark theme**, and **cross-browser compatibility**.
+A modern React-based training tracker with **7-step periodization methodology**, **centralized design system**, and **cross-browser compatibility**.
 
-## 🎯 Latest Features (v2.0.0)
+## 🎯 Latest Features (v3.0.0)
 
-### ✅ **Complete Program Design System**
-- **Program Overview**: Assessment data collection with training model selection (Conjugate, Block Periodization, DUP, Linear)
-- **Block Sequencing**: Drag-and-drop block ordering with duration controls (+/- weeks)
-- **Loading Parameters**: Block-specific volume and intensity configuration
-- **Training Methods**: Westside Barbell methodology with Training Focus Distribution (Max/Repeated/Dynamic Effort)
-- **Program Preview**: Complete program generation, export, and implementation guidelines
+### 🎨 **Centralized Design System** ⭐ **NEW**
+- **Global Color Control**: Change one CSS variable to update ALL components across the app
+- **Red Input Fields**: All form inputs now use red backgrounds with proper contrast
+- **CSS Custom Properties**: Centralized design tokens for colors, spacing, and typography
+- **React Component Library**: Pre-built Card, FormInput, Button, and Grid components
+- **Theme Switching**: Easy switching between color schemes (default, blue inputs, high contrast)
+- **Cross-Browser Compatibility**: Aggressive CSS overrides for autocomplete visibility
+- **"Set It and Forget It"**: No more manual color fixes - update once, applies everywhere
 
-### 🎨 **Professional PowerHouse Dark Theme**
-- **Primary Colors**: PowerHouse red (#dc2626/#ef4444) with black/dark gray backgrounds
-- **Horizontal Navigation**: Clean horizontal navigation bars with red gradient buttons
-- **Cross-Browser Input Fields**: Aggressive CSS overrides for autocomplete visibility on light backgrounds
-- **High Contrast Design**: Optimal readability with professional dark theme
-- **Mobile Responsive**: Seamless experience across all device sizes with touch-optimized controls
+### ✅ **7-Step Periodization Program Design** ⭐ **ENHANCED**
+- **Goals & Needs Assessment**: Comprehensive athlete evaluation and training objective setting
+- **Macrocycle Structure**: Annual training timeline with periodization model selection
+- **Phase Design**: Preparatory, competitive, and transition phase planning  
+- **Mesocycle Planning**: 2-6 week training blocks with specific adaptations
+- **Microcycle Design**: Weekly training patterns and loading schemes
+- **Session & Monitoring**: Daily session templates and progress tracking protocols
+- **Implementation**: Program execution, tracking, and refinement strategies
+
+### 🎨 **Professional PowerHouse Dark Theme** ⭐ **UPGRADED**
+- **Design System Integration**: All colors managed through CSS custom properties
+- **Primary Colors**: PowerHouse red (#dc2626/#ef4444) with consistent application
+- **High Contrast Design**: Improved text visibility with proper color contrast ratios
+- **Mobile Responsive**: Touch-optimized controls with design system consistency
+- **Component Standardization**: Unified styling across all UI elements
 
 ### 🧠 **Enhanced Training Intelligence**
-- **Modular Architecture**: Clean separation between 5 program components with horizontal navigation
-- **State Management**: React Context with useReducer for centralized program state across tabs
-- **Real-Time Updates**: Immediate feedback and validation throughout program creation workflow
-- **Component Isolation**: Systematic debugging and error recovery systems with professional PowerHouse theme
+- **Evidence-Based Methodology**: 7-step periodization following sports science principles
+- **State Management**: React Context with useReducer for seamless tab navigation
+- **Real-Time Updates**: Immediate feedback and validation throughout program creation
+- **Component Isolation**: Systematic debugging with centralized styling system
 
 ## 🚀 Quick Start
 

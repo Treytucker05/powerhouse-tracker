@@ -192,7 +192,7 @@ const PhaseDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
             type="number"
             min="4"
             max="32"
-            className="w-32 px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+            className="w-32 px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
             value={phaseStructure.preparatoryPhase.duration}
             onChange={(e) => updatePhase('preparatoryPhase', null, 'duration', parseInt(e.target.value))}
           />
@@ -209,7 +209,7 @@ const PhaseDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
                   type="number"
                   min="2"
                   max="16"
-                  className="w-24 px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                  className="w-24 px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                   value={phaseStructure.preparatoryPhase.generalPrep.duration}
                   onChange={(e) => updatePhase('preparatoryPhase', 'generalPrep', 'duration', parseInt(e.target.value))}
                 />
@@ -217,7 +217,7 @@ const PhaseDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Primary Focus</label>
                 <select
-                  className="w-full px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                  className="w-full px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                   value={phaseStructure.preparatoryPhase.generalPrep.focus}
                   onChange={(e) => updatePhase('preparatoryPhase', 'generalPrep', 'focus', e.target.value)}
                 >
@@ -230,7 +230,7 @@ const PhaseDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">Volume</label>
                   <select
-                    className="w-full px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                    className="w-full px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                     value={phaseStructure.preparatoryPhase.generalPrep.volume}
                     onChange={(e) => updatePhase('preparatoryPhase', 'generalPrep', 'volume', e.target.value)}
                   >
@@ -242,7 +242,7 @@ const PhaseDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">Intensity</label>
                   <select
-                    className="w-full px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                    className="w-full px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                     value={phaseStructure.preparatoryPhase.generalPrep.intensity}
                     onChange={(e) => updatePhase('preparatoryPhase', 'generalPrep', 'intensity', e.target.value)}
                   >
@@ -265,7 +265,7 @@ const PhaseDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
                   type="number"
                   min="2"
                   max="16"
-                  className="w-24 px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                  className="w-24 px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                   value={phaseStructure.preparatoryPhase.specificPrep.duration}
                   onChange={(e) => updatePhase('preparatoryPhase', 'specificPrep', 'duration', parseInt(e.target.value))}
                 />
@@ -273,7 +273,7 @@ const PhaseDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-1">Primary Focus</label>
                 <select
-                  className="w-full px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                  className="w-full px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                   value={phaseStructure.preparatoryPhase.specificPrep.focus}
                   onChange={(e) => updatePhase('preparatoryPhase', 'specificPrep', 'focus', e.target.value)}
                 >
@@ -286,7 +286,7 @@ const PhaseDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">Volume</label>
                   <select
-                    className="w-full px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                    className="w-full px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                     value={phaseStructure.preparatoryPhase.specificPrep.volume}
                     onChange={(e) => updatePhase('preparatoryPhase', 'specificPrep', 'volume', e.target.value)}
                   >
@@ -298,7 +298,7 @@ const PhaseDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-1">Intensity</label>
                   <select
-                    className="w-full px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                    className="w-full px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                     value={phaseStructure.preparatoryPhase.specificPrep.intensity}
                     onChange={(e) => updatePhase('preparatoryPhase', 'specificPrep', 'intensity', e.target.value)}
                   >
@@ -327,7 +327,7 @@ const PhaseDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
               type="number"
               min="2"
               max="16"
-              className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
               value={phaseStructure.competitivePhase.duration}
               onChange={(e) => updatePhase('competitivePhase', null, 'duration', parseInt(e.target.value))}
             />
@@ -335,7 +335,7 @@ const PhaseDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Focus</label>
             <select
-              className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
               value={phaseStructure.competitivePhase.focus}
               onChange={(e) => updatePhase('competitivePhase', null, 'focus', e.target.value)}
             >
@@ -347,7 +347,7 @@ const PhaseDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Volume</label>
             <select
-              className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
               value={phaseStructure.competitivePhase.volume}
               onChange={(e) => updatePhase('competitivePhase', null, 'volume', e.target.value)}
             >
@@ -359,7 +359,7 @@ const PhaseDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Intensity</label>
             <select
-              className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
               value={phaseStructure.competitivePhase.intensity}
               onChange={(e) => updatePhase('competitivePhase', null, 'intensity', e.target.value)}
             >
@@ -385,7 +385,7 @@ const PhaseDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
               type="number"
               min="2"
               max="8"
-              className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
               value={phaseStructure.transitionPhase.duration}
               onChange={(e) => updatePhase('transitionPhase', null, 'duration', parseInt(e.target.value))}
             />
@@ -393,7 +393,7 @@ const PhaseDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Focus</label>
             <select
-              className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
               value={phaseStructure.transitionPhase.focus}
               onChange={(e) => updatePhase('transitionPhase', null, 'focus', e.target.value)}
             >
@@ -405,7 +405,7 @@ const PhaseDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Volume</label>
             <select
-              className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
               value={phaseStructure.transitionPhase.volume}
               onChange={(e) => updatePhase('transitionPhase', null, 'volume', e.target.value)}
             >
@@ -417,7 +417,7 @@ const PhaseDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Intensity</label>
             <select
-              className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
               value={phaseStructure.transitionPhase.intensity}
               onChange={(e) => updatePhase('transitionPhase', null, 'intensity', e.target.value)}
             >
@@ -464,3 +464,4 @@ const PhaseDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
 };
 
 export default PhaseDesign;
+

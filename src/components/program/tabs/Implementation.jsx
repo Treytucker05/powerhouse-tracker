@@ -316,7 +316,7 @@ const Implementation = ({ onPrevious, canGoPrevious }) => {
                                     type="number"
                                     min="1"
                                     max={programData.duration}
-                                    className="w-full px-2 py-1 bg-gray-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                                    className="w-full px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                                     value={tapering.startWeek}
                                     onChange={(e) => setTapering(prev => ({ ...prev, startWeek: parseInt(e.target.value) }))}
                                 />
@@ -328,7 +328,7 @@ const Implementation = ({ onPrevious, canGoPrevious }) => {
                                     type="number"
                                     min="20"
                                     max="80"
-                                    className="w-full px-2 py-1 bg-gray-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                                    className="w-full px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                                     value={tapering.volumeReduction}
                                     onChange={(e) => setTapering(prev => ({ ...prev, volumeReduction: parseInt(e.target.value) }))}
                                 />
@@ -340,7 +340,7 @@ const Implementation = ({ onPrevious, canGoPrevious }) => {
                                     type="number"
                                     min="70"
                                     max="100"
-                                    className="w-full px-2 py-1 bg-gray-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                                    className="w-full px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                                     value={tapering.intensityMaintenance}
                                     onChange={(e) => setTapering(prev => ({ ...prev, intensityMaintenance: parseInt(e.target.value) }))}
                                 />
@@ -455,3 +455,4 @@ const Implementation = ({ onPrevious, canGoPrevious }) => {
 };
 
 export default Implementation;
+

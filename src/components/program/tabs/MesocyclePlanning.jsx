@@ -270,13 +270,13 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
                     <input
                         type="text"
                         placeholder="Block name"
-                        className="px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                        className="px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
                         value={newMesocycle.name}
                         onChange={(e) => setNewMesocycle(prev => ({ ...prev, name: e.target.value }))}
                     />
 
                     <select
-                        className="px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+                        className="px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
                         value={newMesocycle.type}
                         onChange={(e) => setNewMesocycle(prev => ({ ...prev, type: e.target.value }))}
                     >
@@ -290,13 +290,13 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
                         min="1"
                         max="8"
                         placeholder="Weeks"
-                        className="px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+                        className="px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
                         value={newMesocycle.duration}
                         onChange={(e) => setNewMesocycle(prev => ({ ...prev, duration: parseInt(e.target.value) }))}
                     />
 
                     <select
-                        className="px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+                        className="px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
                         value={newMesocycle.volume}
                         onChange={(e) => setNewMesocycle(prev => ({ ...prev, volume: e.target.value }))}
                     >
@@ -306,7 +306,7 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
                     </select>
 
                     <select
-                        className="px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+                        className="px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
                         value={newMesocycle.intensity}
                         onChange={(e) => setNewMesocycle(prev => ({ ...prev, intensity: e.target.value }))}
                     >
@@ -316,7 +316,7 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
                     </select>
 
                     <select
-                        className="px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+                        className="px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
                         value={newMesocycle.focus}
                         onChange={(e) => setNewMesocycle(prev => ({ ...prev, focus: e.target.value }))}
                     >
@@ -436,3 +436,4 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
 };
 
 export default MesocyclePlanning;
+

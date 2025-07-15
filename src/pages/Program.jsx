@@ -92,15 +92,15 @@ const Program = () => {
                     {/* Header */}
                     <div className="mb-8">
                         <h1 className="text-3xl font-bold text-white mb-2">Program Design</h1>
-                        <p className="text-gray-400 mb-4">
+                        <p className="text-gray-300 mb-4">
                             Design comprehensive training programs using evidence-based periodization principles
                         </p>
 
                         {/* Progress Indicator */}
                         <div className="bg-gray-800 rounded-lg p-4">
                             <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm text-gray-400">Progress</span>
-                                <span className="text-sm text-gray-400">
+                                <span className="text-sm text-gray-300">Progress</span>
+                                <span className="text-sm text-gray-300">
                                     Step {getCurrentTabIndex() + 1} of {tabs.length}
                                 </span>
                             </div>
@@ -137,7 +137,7 @@ const Program = () => {
                                 <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
                                     <div className="mb-6">
                                         <h2 className="text-xl font-semibold text-white mb-2">{tab.label}</h2>
-                                        <p className="text-gray-400 text-sm">{tab.description}</p>
+                                        <p className="text-gray-300 text-sm">{tab.description}</p>
                                     </div>
 
                                     <tab.component

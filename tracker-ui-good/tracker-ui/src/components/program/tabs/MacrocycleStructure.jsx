@@ -102,7 +102,7 @@ const MacrocycleStructure = ({ onNext, onPrevious, canGoNext, canGoPrevious }) =
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Primary Goal</label>
             <select
-              className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
               value={macrocycle.programGoal}
               onChange={(e) => setMacrocycle(prev => ({ ...prev, programGoal: e.target.value }))}
             >
@@ -118,7 +118,7 @@ const MacrocycleStructure = ({ onNext, onPrevious, canGoNext, canGoPrevious }) =
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Macrocycle Duration</label>
             <select
-              className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
               value={macrocycle.duration}
               onChange={(e) => setMacrocycle(prev => ({ ...prev, duration: parseInt(e.target.value) }))}
             >
@@ -134,7 +134,7 @@ const MacrocycleStructure = ({ onNext, onPrevious, canGoNext, canGoPrevious }) =
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Training Days/Week</label>
             <select
-              className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+              className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
               value={macrocycle.trainingDays}
               onChange={(e) => setMacrocycle(prev => ({ ...prev, trainingDays: parseInt(e.target.value) }))}
             >
@@ -233,18 +233,18 @@ const MacrocycleStructure = ({ onNext, onPrevious, canGoNext, canGoPrevious }) =
             <input
               type="text"
               placeholder="Competition name"
-              className="px-3 py-2 bg-gray-700 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+              className="px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
               value={newCompetition.name}
               onChange={(e) => setNewCompetition(prev => ({ ...prev, name: e.target.value }))}
             />
             <input
               type="date"
-              className="px-3 py-2 bg-gray-700 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+              className="px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
               value={newCompetition.date}
               onChange={(e) => setNewCompetition(prev => ({ ...prev, date: e.target.value }))}
             />
             <select
-              className="px-3 py-2 bg-gray-700 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+              className="px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
               value={newCompetition.priority}
               onChange={(e) => setNewCompetition(prev => ({ ...prev, priority: e.target.value }))}
             >
@@ -333,3 +333,4 @@ const MacrocycleStructure = ({ onNext, onPrevious, canGoNext, canGoPrevious }) =
 };
 
 export default MacrocycleStructure;
+
