@@ -16,19 +16,17 @@ export const PROGRAM_ACTIONS = {
     SET_GENERATED_PROGRAM: 'SET_GENERATED_PROGRAM',
     SET_LOADING: 'SET_LOADING',
     SET_ERROR: 'SET_ERROR',
-    UPDATE_BLOCK_PARAMETER: 'UPDATE_BLOCK_PARAMETER',
-    TOGGLE_PERIODIZATION_MODE: 'TOGGLE_PERIODIZATION_MODE'
+    UPDATE_BLOCK_PARAMETER: 'UPDATE_BLOCK_PARAMETER'
 };
 
 // Initial state
 const initialState = {
     // UI State
-    activeTab: 'goals', // Default to periodization
+    activeTab: 'overview',
     selectedLevel: null,
     isLoading: false,
     error: null,
     showPreview: false,
-    usePeriodization: true, // New: controls which tab set to use
 
     // Program Data
     programData: {
@@ -169,13 +167,6 @@ function programReducer(state, action) {
         case PROGRAM_ACTIONS.SET_ERROR:
             return { ...state, error: action.payload };
 
-        case PROGRAM_ACTIONS.TOGGLE_PERIODIZATION_MODE:
-            return {
-                ...state,
-                usePeriodization: action.payload,
-                activeTab: action.payload ? 'goals' : 'overview'
-            };
-
         default:
             return state;
     }
@@ -201,7 +192,6 @@ export const ProgramProvider = ({ children }) => {
     const setGeneratedProgram = useCallback((program) => dispatch({ type: PROGRAM_ACTIONS.SET_GENERATED_PROGRAM, payload: program }), []);
     const setLoading = useCallback((loading) => dispatch({ type: PROGRAM_ACTIONS.SET_LOADING, payload: loading }), []);
     const setError = useCallback((error) => dispatch({ type: PROGRAM_ACTIONS.SET_ERROR, payload: error }), []);
-    const togglePeriodizationMode = useCallback((usePeriodization) => dispatch({ type: PROGRAM_ACTIONS.TOGGLE_PERIODIZATION_MODE, payload: usePeriodization }), []);
 
     const actions = {
         setActiveTab,
@@ -215,8 +205,7 @@ export const ProgramProvider = ({ children }) => {
         setLoadingResults,
         setGeneratedProgram,
         setLoading,
-        setError,
-        togglePeriodizationMode
+        setError
     };
 
     return (
@@ -234,3 +223,6 @@ export const useProgramContext = () => {
     }
     return context;
 };
+
+export default ProgramProvider;
+export { ProgramProvider };
