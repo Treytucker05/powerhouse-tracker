@@ -129,7 +129,7 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
                 </div>
 
                 <textarea
-                    className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                    className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
                     rows={4}
                     placeholder="Describe your long-term performance objectives (e.g., compete in powerlifting meet, improve 1RM squat by 50lbs, complete marathon under 4 hours)..."
                     value={goals.performanceGoals}
@@ -196,3 +196,4 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
 };
 
 export default GoalsAndNeeds;
+

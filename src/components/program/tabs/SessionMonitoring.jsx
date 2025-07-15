@@ -160,7 +160,7 @@ const SessionMonitoring = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
                                 type="number"
                                 min="5"
                                 max="30"
-                                className="w-20 px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                                className="w-20 px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                                 value={sessionStructure.warmupDuration}
                                 onChange={(e) => setSessionStructure(prev => ({ ...prev, warmupDuration: parseInt(e.target.value) }))}
                             />
@@ -180,7 +180,7 @@ const SessionMonitoring = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
                                 type="number"
                                 min="20"
                                 max="90"
-                                className="w-20 px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                                className="w-20 px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                                 value={sessionStructure.mainWorkDuration}
                                 onChange={(e) => setSessionStructure(prev => ({ ...prev, mainWorkDuration: parseInt(e.target.value) }))}
                             />
@@ -200,7 +200,7 @@ const SessionMonitoring = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
                                 type="number"
                                 min="5"
                                 max="20"
-                                className="w-20 px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                                className="w-20 px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                                 value={sessionStructure.cooldownDuration}
                                 onChange={(e) => setSessionStructure(prev => ({ ...prev, cooldownDuration: parseInt(e.target.value) }))}
                             />
@@ -261,7 +261,7 @@ const SessionMonitoring = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
                 <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-300 mb-2">Monitoring Frequency</label>
                     <select
-                        className="px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+                        className="px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
                         value={monitoringProtocols.frequency}
                         onChange={(e) => setMonitoringProtocols(prev => ({ ...prev, frequency: e.target.value }))}
                     >
@@ -402,3 +402,4 @@ const SessionMonitoring = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
 };
 
 export default SessionMonitoring;
+

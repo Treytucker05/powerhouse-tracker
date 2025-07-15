@@ -163,7 +163,7 @@ const MicrocycleDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-300 mb-2">Loading Pattern</label>
           <select
-            className="px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+            className="px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
             value={microcycleTemplate.loadingPattern}
             onChange={(e) => setMicrocycleTemplate(prev => ({ ...prev, loadingPattern: e.target.value }))}
           >
@@ -185,7 +185,7 @@ const MicrocycleDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
                 
                 <div>
                   <select
-                    className="w-full px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                    className="w-full px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                     value={day.type}
                     onChange={(e) => updateDaySettings(index, 'type', e.target.value)}
                   >
@@ -197,7 +197,7 @@ const MicrocycleDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
                 
                 <div>
                   <select
-                    className="w-full px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                    className="w-full px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                     value={day.focus}
                     onChange={(e) => updateDaySettings(index, 'focus', e.target.value)}
                   >
@@ -212,7 +212,7 @@ const MicrocycleDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
                     type="number"
                     min="0"
                     max="100"
-                    className="w-full px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                    className="w-full px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                     value={day.intensity}
                     onChange={(e) => updateDaySettings(index, 'intensity', parseInt(e.target.value))}
                     disabled={day.type === 'rest'}
@@ -222,7 +222,7 @@ const MicrocycleDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
                 
                 <div>
                   <select
-                    className="w-full px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                    className="w-full px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                     value={day.volume}
                     onChange={(e) => updateDaySettings(index, 'volume', e.target.value)}
                     disabled={day.type === 'rest'}
@@ -266,7 +266,7 @@ const MicrocycleDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
                       type="number"
                       min="0"
                       max="100"
-                      className="w-20 px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                      className="w-20 px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                       value={params.intensity.min}
                       onChange={(e) => updateLoadingParameter(category, 'intensity', 'min', parseInt(e.target.value))}
                     />
@@ -275,7 +275,7 @@ const MicrocycleDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
                       type="number"
                       min="0"
                       max="100"
-                      className="w-20 px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                      className="w-20 px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                       value={params.intensity.max}
                       onChange={(e) => updateLoadingParameter(category, 'intensity', 'max', parseInt(e.target.value))}
                     />
@@ -287,7 +287,7 @@ const MicrocycleDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
                   <label className="block text-sm text-gray-300 mb-1">Sets</label>
                   <input
                     type="text"
-                    className="w-full px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                    className="w-full px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                     value={params.volume.sets}
                     onChange={(e) => updateLoadingParameter(category, 'volume', 'sets', e.target.value)}
                   />
@@ -297,7 +297,7 @@ const MicrocycleDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
                   <label className="block text-sm text-gray-300 mb-1">Reps</label>
                   <input
                     type="text"
-                    className="w-full px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                    className="w-full px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                     value={params.volume.reps}
                     onChange={(e) => updateLoadingParameter(category, 'volume', 'reps', e.target.value)}
                   />
@@ -307,7 +307,7 @@ const MicrocycleDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
                   <label className="block text-sm text-gray-300 mb-1">Rest Periods</label>
                   <input
                     type="text"
-                    className="w-full px-2 py-1 bg-gray-700 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
+                    className="w-full px-2 py-1 bg-red-600 border border-gray-500 rounded text-white text-sm focus:border-blue-500 focus:outline-none"
                     value={params.rest}
                     onChange={(e) => updateLoadingParameter(category, 'rest', null, e.target.value)}
                   />
@@ -383,3 +383,4 @@ const MicrocycleDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
 };
 
 export default MicrocycleDesign;
+

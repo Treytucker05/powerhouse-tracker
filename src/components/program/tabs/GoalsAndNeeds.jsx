@@ -109,8 +109,8 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
                         <div
                             key={timeframe.value}
                             className={`p-4 border rounded-lg cursor-pointer transition-colors ${goals.timeframe === timeframe.value
-                                    ? 'border-blue-500 bg-blue-900/30'
-                                    : 'border-gray-500 hover:border-gray-400 bg-gray-600'
+                                ? 'border-blue-500 bg-blue-900/30'
+                                : 'border-gray-500 hover:border-gray-400 bg-gray-600'
                                 }`}
                             onClick={() => setGoals(prev => ({ ...prev, timeframe: timeframe.value }))}
                         >
@@ -129,7 +129,7 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
                 </div>
 
                 <textarea
-                    className="w-full px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                    className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
                     rows={4}
                     placeholder="Describe your long-term performance objectives (e.g., compete in powerlifting meet, improve 1RM squat by 50lbs, complete marathon under 4 hours)..."
                     value={goals.performanceGoals}
@@ -160,8 +160,8 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
                                         <button
                                             key={priority}
                                             className={`px-3 py-1 text-xs rounded-full border transition-colors ${goals.biomotorPriorities[ability.key] === priority
-                                                    ? getPriorityColor(priority)
-                                                    : 'bg-gray-700 text-gray-400 border-gray-500 hover:border-gray-400'
+                                                ? getPriorityColor(priority)
+                                                : 'bg-gray-700 text-white border-gray-500 hover:border-gray-400'
                                                 }`}
                                             onClick={() => handleBiomotorChange(ability.key, priority)}
                                         >
@@ -196,3 +196,4 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
 };
 
 export default GoalsAndNeeds;
+
