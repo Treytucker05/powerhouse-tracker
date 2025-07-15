@@ -2,6 +2,7 @@ import React from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { useApp } from './context'
 import Assessment from './components/Assessment'
+import Program from './pages/Program'
 
 function App() {
     const { user, assessment, loading } = useApp()
@@ -50,6 +51,7 @@ function App() {
                     )
                 } />
                 <Route path="/assessment" element={<Assessment />} />
+                <Route path="/program" element={<Program />} />
                 {/* Add more routes here as needed */}
             </Routes>
         </div>
