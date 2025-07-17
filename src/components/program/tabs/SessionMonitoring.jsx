@@ -230,8 +230,8 @@ const SessionMonitoring = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
                         <div
                             key={method.id}
                             className={`p-4 border rounded-lg cursor-pointer transition-colors ${sessionStructure.trainingMethods.includes(method.id)
-                                    ? 'border-blue-500 bg-blue-900/30'
-                                    : 'border-gray-500 hover:border-gray-400 bg-gray-600'
+                                ? 'border-blue-500 bg-blue-900/30'
+                                : 'border-gray-500 hover:border-gray-400 bg-gray-600'
                                 }`}
                             onClick={() => toggleTrainingMethod(method.id)}
                         >
@@ -281,8 +281,8 @@ const SessionMonitoring = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
                                 <div
                                     key={tool.id}
                                     className={`p-3 border rounded cursor-pointer transition-colors ${monitoringProtocols.subjective.includes(tool.id)
-                                            ? 'border-green-500 bg-green-900/30'
-                                            : 'border-gray-500 hover:border-gray-400'
+                                        ? 'border-green-500 bg-green-900/30'
+                                        : 'border-gray-500 hover:border-gray-400'
                                         }`}
                                     onClick={() => toggleMonitoringTool('subjective', tool.id)}
                                 >
@@ -309,8 +309,8 @@ const SessionMonitoring = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
                                 <div
                                     key={tool.id}
                                     className={`p-3 border rounded cursor-pointer transition-colors ${monitoringProtocols.objective.includes(tool.id)
-                                            ? 'border-blue-500 bg-blue-900/30'
-                                            : 'border-gray-500 hover:border-gray-400'
+                                        ? 'border-blue-500 bg-blue-900/30'
+                                        : 'border-gray-500 hover:border-gray-400'
                                         }`}
                                     onClick={() => toggleMonitoringTool('objective', tool.id)}
                                 >
@@ -343,7 +343,7 @@ const SessionMonitoring = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
                         <h4 className="font-medium text-red-400 mb-2">Warning Signs of Overtraining</h4>
                         <ul className="text-sm text-gray-300 space-y-1">
                             <li>• Decreased performance despite consistent training</li>
-                            <li>• Elevated resting heart rate (>5-10 bpm above baseline)</li>
+                            <li>• Elevated resting heart rate (&gt;5-10 bpm above baseline)</li>
                             <li>• Poor sleep quality or insomnia</li>
                             <li>• Decreased motivation to train</li>
                             <li>• Increased susceptibility to illness</li>

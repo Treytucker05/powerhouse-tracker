@@ -159,6 +159,62 @@ function appReducer(state, action) {
                 authRedirectNeeded: action.payload
             };
 
+        // Volume landmarks actions
+        case APP_ACTIONS.UPDATE_VOLUME_LANDMARKS:
+            return {
+                ...state,
+                assessment: {
+                    ...state.assessment,
+                    volumeLandmarks: { ...state.assessment?.volumeLandmarks, ...action.payload }
+                }
+            };
+
+        case APP_ACTIONS.SET_VOLUME_LANDMARKS:
+            return {
+                ...state,
+                assessment: {
+                    ...state.assessment,
+                    volumeLandmarks: action.payload
+                }
+            };
+
+        case APP_ACTIONS.CLEAR_VOLUME_LANDMARKS:
+            return {
+                ...state,
+                assessment: {
+                    ...state.assessment,
+                    volumeLandmarks: null
+                }
+            };
+
+        // Mesocycle integration actions
+        case APP_ACTIONS.UPDATE_MESOCYCLE:
+            return {
+                ...state,
+                assessment: {
+                    ...state.assessment,
+                    mesocycle: { ...state.assessment?.mesocycle, ...action.payload }
+                }
+            };
+
+        case APP_ACTIONS.SET_MESOCYCLE:
+            return {
+                ...state,
+                assessment: {
+                    ...state.assessment,
+                    mesocycle: action.payload
+                }
+            };
+
+        case APP_ACTIONS.CLEAR_MESOCYCLE:
+            return {
+                ...state,
+                assessment: {
+                    ...state.assessment,
+                    mesocycle: null
+                }
+            };
+
         default:
             return state;
     }
