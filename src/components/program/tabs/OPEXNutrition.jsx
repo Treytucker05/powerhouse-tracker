@@ -18,7 +18,7 @@ import {
     Calendar
 } from 'lucide-react';
 import { useAssessment } from '../../../hooks/useAssessment';
-import { useProgramContext } from '../../../context/ProgramContext';
+import { useProgramContext } from '../../../contexts/ProgramContext';
 
 const OPEXNutrition = ({ onDataUpdate }) => {
     const {
@@ -161,8 +161,8 @@ const OPEXNutrition = ({ onDataUpdate }) => {
                     <div className="text-right">
                         <div className="text-sm text-gray-400">BLGs Score</div>
                         <div className={`text-2xl font-bold ${blgsAssessment.percentage >= 85 ? 'text-green-500' :
-                                blgsAssessment.percentage >= 70 ? 'text-yellow-500' :
-                                    blgsAssessment.percentage >= 55 ? 'text-orange-500' : 'text-red-500'
+                            blgsAssessment.percentage >= 70 ? 'text-yellow-500' :
+                                blgsAssessment.percentage >= 55 ? 'text-orange-500' : 'text-red-500'
                             }`}>
                             {Math.round(blgsAssessment.percentage)}%
                         </div>
@@ -198,10 +198,10 @@ const OPEXNutrition = ({ onDataUpdate }) => {
                         onClick={() => tab.unlocked && setActiveTab(tab.id)}
                         disabled={!tab.unlocked}
                         className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === tab.id
-                                ? 'bg-blue-600 text-white'
-                                : tab.unlocked
-                                    ? 'text-gray-300 hover:text-white hover:bg-gray-600'
-                                    : 'text-gray-500 cursor-not-allowed'
+                            ? 'bg-blue-600 text-white'
+                            : tab.unlocked
+                                ? 'text-gray-300 hover:text-white hover:bg-gray-600'
+                                : 'text-gray-500 cursor-not-allowed'
                             }`}
                     >
                         {tab.unlocked ? <Unlock className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
@@ -306,9 +306,9 @@ const BLGsConsultationTab = ({ data, setData, assessment }) => {
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-semibold text-white">BLGs Assessment Results</h3>
                         <div className={`px-3 py-1 rounded-full text-sm font-medium ${assessment.tier === 'Mastery' ? 'bg-green-900 text-green-300' :
-                                assessment.tier === 'Proficient' ? 'bg-yellow-900 text-yellow-300' :
-                                    assessment.tier === 'Developing' ? 'bg-orange-900 text-orange-300' :
-                                        'bg-red-900 text-red-300'
+                            assessment.tier === 'Proficient' ? 'bg-yellow-900 text-yellow-300' :
+                                assessment.tier === 'Developing' ? 'bg-orange-900 text-orange-300' :
+                                    'bg-red-900 text-red-300'
                             }`}>
                             {assessment.tier}
                         </div>
@@ -334,8 +334,8 @@ const BLGsConsultationTab = ({ data, setData, assessment }) => {
                                         <AlertCircle className="h-4 w-4 text-yellow-500" />
                                         <span className="font-medium text-white">{suggestion.category}</span>
                                         <span className={`px-2 py-1 text-xs rounded ${suggestion.priority === 'High' ? 'bg-red-900 text-red-300' :
-                                                suggestion.priority === 'Medium' ? 'bg-yellow-900 text-yellow-300' :
-                                                    'bg-green-900 text-green-300'
+                                            suggestion.priority === 'Medium' ? 'bg-yellow-900 text-yellow-300' :
+                                                'bg-green-900 text-green-300'
                                             }`}>
                                             {suggestion.priority}
                                         </span>
@@ -452,9 +452,9 @@ const FuelAssessmentTab = ({ data, setData, assessment, blgsScore }) => {
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-semibold text-white">Fuel Profile Assessment</h3>
                         <div className={`px-3 py-1 rounded-full text-sm font-medium ${assessment.profile === 'Highest' ? 'bg-purple-900 text-purple-300' :
-                                assessment.profile === 'Optimal' ? 'bg-green-900 text-green-300' :
-                                    assessment.profile === 'Adequate' ? 'bg-yellow-900 text-yellow-300' :
-                                        'bg-red-900 text-red-300'
+                            assessment.profile === 'Optimal' ? 'bg-green-900 text-green-300' :
+                                assessment.profile === 'Adequate' ? 'bg-yellow-900 text-yellow-300' :
+                                    'bg-red-900 text-red-300'
                             }`}>
                             {assessment.profile}
                         </div>

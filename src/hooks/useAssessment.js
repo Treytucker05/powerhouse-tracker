@@ -429,7 +429,7 @@ export const useAssessment = () => {
     // Determine fuel profile (Inadequate → Adequate → Optimal → Highest)
     const determineFuelProfile = (fuelData) => {
         const processedFoodScore = 10 - (fuelData.processedMeals || 0); // Lower is better
-        const wholeF foodScore = fuelData.wholeFoods || 0;
+        const wholeFoodScore = fuelData.wholeFoods || 0;
         const consistencyScore = fuelData.mealConsistency || 0;
         const awarenessScore = fuelData.nutritionAwareness || 0;
 
@@ -846,6 +846,8 @@ export const useAssessment = () => {
         assessBLGs,
         assessFuel,
         assessPersonalization,
+        calculateTDEE,
+        calculateMacros,
         saveNutritionAssessment
     };
 };
