@@ -7,16 +7,60 @@ import PersonalInfoStep from './PersonalInfoStep';
 import TrainingExperienceStep from './TrainingExperienceStep';
 import TimelineStep from './TimelineStep';
 import RecommendationStep from './RecommendationStep';
+// Enhanced Assessment Steps
+import InjuryScreeningStep from './InjuryScreeningStep';
+import GainerTypeStep from './GainerTypeStep';
+import SmartGoalsStep from './SmartGoalsStep';
+import VolumeLandmarksStep from './VolumeLandmarksStep';
 
 const StepWizard = ({ setUserProfile }) => {
     const navigate = useNavigate();
     const { updateAssessment } = useApp();
     const [currentStep, setCurrentStep] = useState(0);
     const [assessmentData, setAssessmentData] = useState({
+        // Core Assessment (Original 4 steps)
         primaryGoal: '',
         trainingExperience: '',
         timeline: '',
-        recommendedSystem: ''
+        recommendedSystem: '',
+
+        // Enhanced Assessment Data (From Program Design)
+        injuryHistory: {
+            pastInjuries: [],
+            currentLimitations: '',
+            painLevel: 0,
+            previousSurgeries: '',
+            physicalTherapy: false
+        },
+        gainerType: {
+            reps: null,
+            classification: null,
+            fiberType: '',
+            powerOutput: null
+        },
+        smartGoals: {
+            specific: '',
+            measurable: '',
+            achievable: '',
+            relevant: '',
+            timeBound: ''
+        },
+        volumeLandmarks: {
+            benchPress: { current: 0, target: 0 },
+            squat: { current: 0, target: 0 },
+            deadlift: { current: 0, target: 0 },
+            weeklyVolume: 0
+        },
+        nutrition: {
+            currentApproach: '',
+            goals: [],
+            restrictions: ''
+        },
+        monitoring: {
+            trackingMethods: [],
+            recoveryIndicators: [],
+            fatigueSignals: []
+        }
     });
 
     // Auto-suggestion system based on inputs
@@ -83,14 +127,20 @@ const StepWizard = ({ setUserProfile }) => {
     }, [assessmentData.primaryGoal, assessmentData.trainingExperience, assessmentData.timeline]);
 
     const handleInputChange = (field, value) => {
-        setAssessmentData(prev => ({
-            ...prev,
-            [field]: value
-        }));
+        // Handle both simple field updates and complex nested object updates
+        if (typeof field === 'string') {
+            setAssessmentData(prev => ({
+                ...prev,
+                [field]: value
+            }));
+        } else {
+            // For complex updates from step components, field is already the full new data object
+            setAssessmentData(field);
+        }
     };
 
     const handleNext = () => {
-        if (currentStep < 3) {
+        if (currentStep < 7) {
             setCurrentStep(currentStep + 1);
         }
     };
@@ -106,7 +156,11 @@ const StepWizard = ({ setUserProfile }) => {
             case 0: return assessmentData.primaryGoal;
             case 1: return assessmentData.trainingExperience;
             case 2: return assessmentData.timeline;
-            case 3: return true; // Final step, always can proceed to submit
+            case 3: return true; // Injury screening - optional, always can proceed
+            case 4: return true; // Gainer type - optional, always can proceed  
+            case 5: return true; // SMART goals - optional, always can proceed
+            case 6: return true; // Volume landmarks - optional, always can proceed
+            case 7: return true; // Final step, always can proceed to submit
             default: return false;
         }
     };
@@ -237,6 +291,14 @@ const StepWizard = ({ setUserProfile }) => {
             case 2:
                 return <TimelineStep assessmentData={assessmentData} onInputChange={handleInputChange} />;
             case 3:
+                return <InjuryScreeningStep assessmentData={assessmentData} onInputChange={handleInputChange} />;
+            case 4:
+                return <GainerTypeStep assessmentData={assessmentData} onInputChange={handleInputChange} />;
+            case 5:
+                return <SmartGoalsStep assessmentData={assessmentData} onInputChange={handleInputChange} />;
+            case 6:
+                return <VolumeLandmarksStep assessmentData={assessmentData} onInputChange={handleInputChange} />;
+            case 7:
                 return <RecommendationStep assessmentData={assessmentData} />;
             default:
                 return null;
@@ -248,17 +310,17 @@ const StepWizard = ({ setUserProfile }) => {
             {/* Progress Bar */}
             <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-400">Assessment Progress</span>
-                    <span className="text-sm text-blue-400 font-medium">Step {currentStep + 1} of 4</span>
+                    <span className="text-sm text-gray-400">Comprehensive Assessment Progress</span>
+                    <span className="text-sm text-blue-400 font-medium">Step {currentStep + 1} of 8</span>
                 </div>
                 <div className="w-full bg-gray-700 rounded-full h-3">
                     <div
                         className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-300 ease-in-out"
-                        style={{ width: `${((currentStep + 1) / 4) * 100}%` }}
+                        style={{ width: `${((currentStep + 1) / 8) * 100}%` }}
                     ></div>
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
-                    {currentStep === 3 ? 'Ready to submit!' : 'Complete all steps to get your recommendation'}
+                    {currentStep === 7 ? 'Ready to submit your complete assessment!' : 'Complete all steps for your personalized program design'}
                 </p>
             </div>
 
@@ -283,7 +345,7 @@ const StepWizard = ({ setUserProfile }) => {
                     </button>
 
                     <div className="flex space-x-3">
-                        {currentStep < 3 ? (
+                        {currentStep < 7 ? (
                             <button
                                 type="button"
                                 onClick={handleNext}
