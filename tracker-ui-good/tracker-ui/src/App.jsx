@@ -8,7 +8,7 @@ import ErrorBoundary from './components/ErrorBoundary.jsx';
 import './App.css';
 
 // Lazy load page components for better code splitting
-const TrackingEnhanced = lazy(() => import("./pages/TrackingEnhanced.jsx"));
+const Tracking = lazy(() => import("./pages/Tracking.jsx"));
 const Home = lazy(() => import("./pages/Home.jsx"));
 const Program = lazy(() => import("./pages/Program.jsx"));
 const Assessment = lazy(() => import("./pages/Assessment.jsx"));
@@ -46,7 +46,7 @@ function App() {
                 </ErrorBoundary>
               } />
               <Route path="assessment" element={<Assessment />} />
-              <Route path="tracking" element={<TrackingEnhanced />} />
+              <Route path="tracking" element={<Tracking />} />
               <Route path="analytics" element={<Analytics />} />
               <Route path="exercises" element={<ExercisesPage />} />
               <Route path="profile" element={<ProfilePage />} />

@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { supabase } from '../lib/api/supabaseClient';
 import { useApp } from '../context';
+import { APP_ACTIONS } from '../context/appActions';
 import StepWizard from '../components/assessment/StepWizard';
 
 const Assessment = () => {
     const navigate = useNavigate();
-    const { assessment, updateAssessment } = useApp();
+    const { assessment, updateAssessment, dispatch } = useApp();
     const [userProfile, setUserProfile] = useState(null);
     const [isFormVisible, setIsFormVisible] = useState(false);
     const [isComplete, setIsComplete] = useState(false);
@@ -116,11 +117,20 @@ const Assessment = () => {
                     <div className="text-center">
                         <button
                             onClick={() => {
+                                // Clear localStorage
                                 localStorage.removeItem('userProfile');
-                                updateAssessment(null); // Clear AppContext assessment
+                                localStorage.removeItem('enhanced_assessment');
+
+                                // Clear AppContext assessment using proper action
+                                dispatch({ type: APP_ACTIONS.CLEAR_ASSESSMENT });
+
+                                // Reset local state
                                 setUserProfile(null);
                                 setIsComplete(false);
                                 setIsFormVisible(true);
+
+                                // Show success message
+                                toast.success('Assessment cleared successfully');
                             }}
                             className="text-gray-400 hover:text-gray-300 text-sm underline"
                         >
