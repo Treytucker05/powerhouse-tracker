@@ -33,6 +33,49 @@ html {
   background-color: #000000;
 }
 
+/* Slider styling for assessment components */
+.slider {
+  background: #4b5563;
+  outline: none;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: 2px solid #1e40af;
+  transition: all 0.2s;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  background: #2563eb;
+  transform: scale(1.1);
+}
+
+.slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: 2px solid #1e40af;
+  transition: all 0.2s;
+}
+
+.slider::-moz-range-thumb:hover {
+  background: #2563eb;
+  transform: scale(1.1);
+}
+
 /* Pulse animation for critical alerts */
 @keyframes pulse {
 
@@ -528,21 +571,21 @@ button[class*="bg-gray"]:not([class*="bg-red"]):hover {
   border-color: #b91c1c !important;
 }
 
-/* Ensure all form elements have proper contrast */
-input,
-select,
-textarea {
-  background-color: #ffffff !important;
-  color: #000000 !important;
-  border: 1px solid #d1d5db !important;
+/* Form elements styling - no forced overrides to allow component-level theming */
+input:not(.custom-styled),
+select:not(.custom-styled),
+textarea:not(.custom-styled) {
+  background-color: #374151;
+  color: #ffffff;
+  border: 1px solid #6b7280;
 }
 
-input:focus,
-select:focus,
-textarea:focus {
-  outline: 2px solid #dc2626 !important;
-  outline-offset: 2px !important;
-  border-color: #dc2626 !important;
+input:not(.custom-styled):focus,
+select:not(.custom-styled):focus,
+textarea:not(.custom-styled):focus {
+  outline: 2px solid #dc2626;
+  outline-offset: 2px;
+  border-color: #dc2626;
 }
 
 /* Default red button utility class */

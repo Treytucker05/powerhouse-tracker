@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Target, TrendingUp, Calendar, CheckCircle, User, Trophy, AlertTriangle, Activity, Zap, Info } from 'lucide-react';
+import { Target, TrendingUp, Calendar, CheckCircle, User, Trophy, AlertTriangle, Activity, Zap, Info, Plus, Minus } from 'lucide-react';
 import { useApp } from '../../../context';
 import { useAssessment } from '../../../hooks/useAssessment';
 
@@ -74,6 +74,34 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
         }
     });
 
+    const biomotorAbilities = [
+        { key: 'strength', label: 'Strength', description: 'Maximum force production' },
+        { key: 'power', label: 'Power', description: 'Rate of force development' },
+        { key: 'endurance', label: 'Endurance', description: 'Aerobic capacity & muscular endurance' },
+        { key: 'speed', label: 'Speed', description: 'Movement velocity' },
+        { key: 'agility', label: 'Agility', description: 'Change of direction ability' },
+        { key: 'flexibility', label: 'Flexibility', description: 'Range of motion & mobility' }
+    ];
+
+    const timeframes = [
+        { value: '6-month', label: '6 Months', description: 'Short-term focus & specific adaptations' },
+        { value: '1-year', label: '1 Year', description: 'Annual periodization cycle' },
+        { value: '2-year', label: '2 Years', description: 'Olympic/collegiate cycle' },
+        { value: '4-year', label: '4 Years', description: 'Long-term athlete development' }
+    ];
+
+    const experienceLevels = [
+        { value: 'novice', label: 'Novice', description: '< 1 year training experience' },
+        { value: 'intermediate', label: 'Intermediate', description: '1-3 years training experience' },
+        { value: 'advanced', label: 'Advanced', description: '3+ years training experience' },
+        { value: 'elite', label: 'Elite', description: 'Competitive/professional level' }
+    ];
+
+    const commonInjuries = [
+        'Neck', 'Shoulders', 'Upper Back', 'Lower Back', 'Elbows', 'Wrists',
+        'Hip', 'Knees', 'Ankles', 'Hamstrings', 'Quadriceps', 'Calves'
+    ];
+
     useEffect(() => {
         generateSuggestions({ ...goals, ...enhancedAssessment });
     }, [goals, enhancedAssessment]);
@@ -103,38 +131,23 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
     };
 
     const handleSaveAssessment = async () => {
-        const fullAssessment = { ...goals, ...enhancedAssessment };
-        const result = await saveAssessment(fullAssessment);
-
+        const result = await saveAssessment({ ...goals, ...enhancedAssessment });
         if (result.success) {
             console.log('Assessment saved successfully');
-        } else {
-            console.error('Failed to save assessment:', result.error);
         }
     };
 
-    const biomotorAbilities = [
-        { key: 'strength', label: 'Strength', description: 'Maximum force production' },
-        { key: 'power', label: 'Power', description: 'Rate of force development' },
-        { key: 'endurance', label: 'Endurance', description: 'Aerobic capacity & muscular endurance' },
-        { key: 'speed', label: 'Speed', description: 'Movement velocity' },
-        { key: 'agility', label: 'Agility', description: 'Change of direction ability' },
-        { key: 'flexibility', label: 'Flexibility', description: 'Range of motion & mobility' }
-    ];
-
-    const timeframes = [
-        { value: '6-month', label: '6 Months', description: 'Short-term focus & specific adaptations' },
-        { value: '1-year', label: '1 Year', description: 'Annual periodization cycle' },
-        { value: '2-year', label: '2 Years', description: 'Olympic/collegiate cycle' },
-        { value: '4-year', label: '4 Years', description: 'Long-term athlete development' }
-    ];
-
-    const experienceLevels = [
-        { value: 'novice', label: 'Novice', description: '< 1 year training experience' },
-        { value: 'intermediate', label: 'Intermediate', description: '1-3 years training experience' },
-        { value: 'advanced', label: 'Advanced', description: '3+ years training experience' },
-        { value: 'elite', label: 'Elite', description: 'Competitive/professional level' }
-    ];
+    const handleInjuryToggle = (injury) => {
+        setEnhancedAssessment(prev => ({
+            ...prev,
+            injuryHistory: {
+                ...prev.injuryHistory,
+                pastInjuries: prev.injuryHistory.pastInjuries.includes(injury)
+                    ? prev.injuryHistory.pastInjuries.filter(i => i !== injury)
+                    : [...prev.injuryHistory.pastInjuries, injury]
+            }
+        }));
+    };
 
     const handleBiomotorChange = (ability, priority) => {
         setGoals(prev => ({
@@ -232,44 +245,6 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
                 />
             </div>
 
-            {/* Biomotor Ability Priorities */}
-            <div className="bg-gray-700 rounded-lg p-6 border border-gray-600">
-                <div className="flex items-center gap-2 mb-4">
-                    <TrendingUp className="h-5 w-5 text-blue-400" />
-                    <h3 className="text-lg font-semibold text-white">Biomotor Ability Priorities</h3>
-                </div>
-                <p className="text-gray-400 mb-6 text-sm">
-                    Prioritize the physical qualities most important for your goals and sport demands.
-                </p>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {biomotorAbilities.map((ability) => (
-                        <div key={ability.key} className="bg-gray-600 p-4 rounded-lg border border-gray-500">
-                            <div className="flex items-center justify-between mb-2">
-                                <div>
-                                    <h4 className="font-semibold text-white">{ability.label}</h4>
-                                    <p className="text-sm text-gray-300">{ability.description}</p>
-                                </div>
-                                <div className="flex gap-1">
-                                    {['low', 'medium', 'high'].map((priority) => (
-                                        <button
-                                            key={priority}
-                                            className={`px-3 py-1 text-xs rounded-full border transition-colors ${goals.biomotorPriorities[ability.key] === priority
-                                                ? getPriorityColor(priority)
-                                                : 'bg-gray-700 text-white border-gray-500 hover:border-gray-400'
-                                                }`}
-                                            onClick={() => handleBiomotorChange(ability.key, priority)}
-                                        >
-                                            {priority.charAt(0).toUpperCase() + priority.slice(1)}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
             {/* Injury Screening */}
             <div className="bg-gray-700 rounded-lg p-6 border border-gray-600">
                 <div className="flex items-center gap-2 mb-4">
@@ -280,37 +255,18 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
                 <div className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Past Injuries (select all that apply)
+                            Past Injuries (check all that apply)
                         </label>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                            {['Lower Back', 'Knee', 'Shoulder', 'Ankle', 'Hip', 'Wrist', 'Neck', 'Elbow', 'Other'].map((injury) => (
-                                <label key={injury} className="flex items-center space-x-2 text-gray-300">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                            {commonInjuries.map((injury) => (
+                                <label key={injury} className="flex items-center space-x-2 text-sm">
                                     <input
                                         type="checkbox"
-                                        className="rounded border-gray-500 bg-red-600 text-blue-600 focus:ring-blue-500"
                                         checked={enhancedAssessment.injuryHistory.pastInjuries.includes(injury)}
-                                        onChange={(e) => {
-                                            const injuries = enhancedAssessment.injuryHistory.pastInjuries;
-                                            if (e.target.checked) {
-                                                setEnhancedAssessment(prev => ({
-                                                    ...prev,
-                                                    injuryHistory: {
-                                                        ...prev.injuryHistory,
-                                                        pastInjuries: [...injuries, injury]
-                                                    }
-                                                }));
-                                            } else {
-                                                setEnhancedAssessment(prev => ({
-                                                    ...prev,
-                                                    injuryHistory: {
-                                                        ...prev.injuryHistory,
-                                                        pastInjuries: injuries.filter(i => i !== injury)
-                                                    }
-                                                }));
-                                            }
-                                        }}
+                                        onChange={() => handleInjuryToggle(injury)}
+                                        className="rounded border-gray-500 text-red-600 focus:ring-red-500"
                                     />
-                                    <span className="text-sm">{injury}</span>
+                                    <span className="text-gray-300">{injury}</span>
                                 </label>
                             ))}
                         </div>
@@ -318,19 +274,16 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
 
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Current Limitations or Pain
+                            Current Limitations
                         </label>
                         <textarea
                             className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
-                            rows={3}
-                            placeholder="Describe any current pain, limitations, or areas of concern..."
+                            rows={2}
+                            placeholder="Describe any current physical limitations..."
                             value={enhancedAssessment.injuryHistory.currentLimitations}
                             onChange={(e) => setEnhancedAssessment(prev => ({
                                 ...prev,
-                                injuryHistory: {
-                                    ...prev.injuryHistory,
-                                    currentLimitations: e.target.value
-                                }
+                                injuryHistory: { ...prev.injuryHistory, currentLimitations: e.target.value }
                             }))}
                         />
                     </div>
@@ -339,17 +292,14 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
                         <label className="block text-sm font-medium text-gray-300 mb-2">
                             Movement Issues
                         </label>
-                        <input
-                            type="text"
+                        <textarea
                             className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
-                            placeholder="e.g., tight hamstrings, limited shoulder mobility, knee valgus..."
+                            rows={2}
+                            placeholder="Any movement restrictions or pain during exercise..."
                             value={enhancedAssessment.injuryHistory.movementIssues}
                             onChange={(e) => setEnhancedAssessment(prev => ({
                                 ...prev,
-                                injuryHistory: {
-                                    ...prev.injuryHistory,
-                                    movementIssues: e.target.value
-                                }
+                                injuryHistory: { ...prev.injuryHistory, movementIssues: e.target.value }
                             }))}
                         />
                     </div>
@@ -359,84 +309,87 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
             {/* Gainer Type Test */}
             <div className="bg-gray-700 rounded-lg p-6 border border-gray-600">
                 <div className="flex items-center gap-2 mb-4">
-                    <Zap className="h-5 w-5 text-yellow-400" />
+                    <Activity className="h-5 w-5 text-green-400" />
                     <h3 className="text-lg font-semibold text-white">Gainer Type Assessment</h3>
-                    <div className="ml-auto">
-                        <Info className="h-4 w-4 text-gray-400" title="Test your response to training volume" />
-                    </div>
                 </div>
 
-                <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                        How many reps can you perform at 80% of your 1RM?
-                    </label>
-                    <input
-                        type="number"
-                        min="1"
-                        max="20"
-                        className="w-24 px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
-                        placeholder="Reps"
-                        onChange={(e) => handleGainerTest(e.target.value)}
-                    />
-                    <p className="text-xs text-gray-400 mt-1">
-                        Test with a compound movement like squat, bench, or deadlift
-                    </p>
-                </div>
-
-                {enhancedAssessment.gainerType.classification && (
-                    <div className="bg-gray-600 p-4 rounded-lg border border-gray-500">
-                        <h4 className="font-semibold text-white mb-2">
-                            Classification: {enhancedAssessment.gainerType.classification.type}
-                        </h4>
-                        <p className="text-sm text-gray-300 mb-3">
-                            {enhancedAssessment.gainerType.classification.characteristics}
+                <div className="space-y-4">
+                    <div className="bg-blue-900/30 p-4 rounded-lg border border-blue-500">
+                        <h4 className="font-semibold text-blue-200 mb-2">Test Instructions</h4>
+                        <p className="text-blue-100 text-sm">
+                            How many reps can you perform at 80% of your 1RM? This helps determine your fiber type dominance and optimal training approach.
                         </p>
-                        <div className="text-sm text-gray-300">
-                            <strong>Training Recommendations:</strong>
-                            <ul className="list-disc list-inside mt-1 space-y-1">
-                                {enhancedAssessment.gainerType.recommendations.slice(0, 3).map((rec, index) => (
-                                    <li key={index}>{rec}</li>
-                                ))}
-                            </ul>
-                        </div>
                     </div>
-                )}
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Reps at 80% 1RM
+                        </label>
+                        <input
+                            type="number"
+                            min="1"
+                            max="25"
+                            className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                            placeholder="Enter number of reps"
+                            value={enhancedAssessment.gainerType.reps || ''}
+                            onChange={(e) => handleGainerTest(e.target.value)}
+                        />
+                    </div>
+
+                    {enhancedAssessment.gainerType.classification && (
+                        <div className="bg-gray-600 p-4 rounded-lg">
+                            <h4 className="font-semibold text-white mb-2">
+                                Classification: {enhancedAssessment.gainerType.classification.type}
+                            </h4>
+                            <p className="text-gray-300 text-sm mb-3">
+                                {enhancedAssessment.gainerType.classification.characteristics}
+                            </p>
+                            <div className="space-y-1">
+                                {enhancedAssessment.gainerType.classification.recommendations.slice(0, 3).map((rec, index) => (
+                                    <div key={index} className="text-green-400 text-sm flex items-start gap-2">
+                                        <span className="text-green-400 mt-1">•</span>
+                                        {rec}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
 
-            {/* Fiber Dominance */}
+            {/* Fiber Dominance Assessment */}
             <div className="bg-gray-700 rounded-lg p-6 border border-gray-600">
                 <div className="flex items-center gap-2 mb-4">
-                    <Activity className="h-5 w-5 text-green-400" />
+                    <Zap className="h-5 w-5 text-yellow-400" />
                     <h3 className="text-lg font-semibold text-white">Muscle Fiber Dominance</h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {['hamstrings', 'quadriceps', 'chest'].map((muscle) => (
-                        <div key={muscle} className="bg-gray-600 p-4 rounded-lg border border-gray-500">
-                            <h4 className="font-semibold text-white mb-2 capitalize">{muscle}</h4>
-                            <select
-                                className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
-                                value={enhancedAssessment.fiberDominance[muscle]}
-                                onChange={(e) => setEnhancedAssessment(prev => ({
-                                    ...prev,
-                                    fiberDominance: {
-                                        ...prev.fiberDominance,
-                                        [muscle]: e.target.value
-                                    }
-                                }))}
-                            >
-                                <option value="fast">Fast-Twitch Dominant</option>
-                                <option value="mixed">Mixed Fiber Type</option>
-                                <option value="slow">Slow-Twitch Dominant</option>
-                            </select>
-                            {enhancedAssessment.fiberDominance[muscle] && (
-                                <div className="mt-2">
-                                    {(() => {
-                                        const rec = getFiberRecommendations(muscle, enhancedAssessment.fiberDominance[muscle]);
-                                        return rec ? (
-                                            <p className="text-xs text-gray-300">{rec.training}</p>
-                                        ) : null;
-                                    })()}
+                <div className="space-y-4">
+                    {Object.entries(enhancedAssessment.fiberDominance).map(([muscle, dominance]) => (
+                        <div key={muscle} className="bg-gray-600 p-4 rounded-lg">
+                            <label className="block text-sm font-medium text-gray-300 mb-2 capitalize">
+                                {muscle} Fiber Dominance
+                            </label>
+                            <div className="flex gap-2">
+                                {['fast', 'mixed', 'slow'].map((type) => (
+                                    <button
+                                        key={type}
+                                        className={`px-3 py-1 text-xs rounded-full border transition-colors ${dominance === type
+                                            ? 'bg-yellow-600 text-white border-yellow-500'
+                                            : 'bg-gray-700 text-gray-400 border-gray-500 hover:border-gray-400'
+                                            }`}
+                                        onClick={() => setEnhancedAssessment(prev => ({
+                                            ...prev,
+                                            fiberDominance: { ...prev.fiberDominance, [muscle]: type }
+                                        }))}
+                                    >
+                                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                                    </button>
+                                ))}
+                            </div>
+                            {dominance && (
+                                <div className="mt-2 text-sm text-gray-300">
+                                    {getFiberRecommendations(muscle, dominance)?.training}
                                 </div>
                             )}
                         </div>
@@ -444,16 +397,16 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
                 </div>
             </div>
 
-            {/* Mileage Assessment */}
+            {/* Mileage/Capacity Assessment */}
             <div className="bg-gray-700 rounded-lg p-6 border border-gray-600">
                 <div className="flex items-center gap-2 mb-4">
-                    <TrendingUp className="h-5 w-5 text-purple-400" />
+                    <Target className="h-5 w-5 text-purple-400" />
                     <h3 className="text-lg font-semibold text-white">Training Capacity Assessment</h3>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-gray-600 p-4 rounded-lg border border-gray-500">
-                        <h4 className="font-semibold text-white mb-2">Age Group</h4>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">Age Group</label>
                         <select
                             className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
                             value={enhancedAssessment.mileage.ageGroup}
@@ -462,14 +415,14 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
                                 mileage: { ...prev.mileage, ageGroup: e.target.value }
                             }))}
                         >
-                            <option value="youth">Youth (Under 18)</option>
+                            <option value="youth">Youth (under 18)</option>
                             <option value="adult">Adult (18-40)</option>
                             <option value="masters">Masters (40+)</option>
                         </select>
                     </div>
 
-                    <div className="bg-gray-600 p-4 rounded-lg border border-gray-500">
-                        <h4 className="font-semibold text-white mb-2">Training Experience</h4>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">Training Experience</label>
                         <select
                             className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
                             value={enhancedAssessment.mileage.trainingAge}
@@ -478,14 +431,14 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
                                 mileage: { ...prev.mileage, trainingAge: e.target.value }
                             }))}
                         >
-                            <option value="beginner">Beginner (0-1 years)</option>
+                            <option value="beginner">Beginner (0-1 year)</option>
                             <option value="intermediate">Intermediate (1-3 years)</option>
                             <option value="advanced">Advanced (3+ years)</option>
                         </select>
                     </div>
 
-                    <div className="bg-gray-600 p-4 rounded-lg border border-gray-500">
-                        <h4 className="font-semibold text-white mb-2">Recovery Capacity</h4>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">Recovery Capacity</label>
                         <select
                             className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
                             value={enhancedAssessment.mileage.recoveryCapacity}
@@ -494,46 +447,47 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
                                 mileage: { ...prev.mileage, recoveryCapacity: e.target.value }
                             }))}
                         >
-                            <option value="poor">Poor (Slow recovery)</option>
-                            <option value="average">Average (Normal recovery)</option>
-                            <option value="excellent">Excellent (Fast recovery)</option>
+                            <option value="poor">Poor</option>
+                            <option value="average">Average</option>
+                            <option value="excellent">Excellent</option>
                         </select>
                     </div>
                 </div>
 
-                {enhancedAssessment.mileage.ageGroup && enhancedAssessment.mileage.trainingAge && (
-                    <div className="mt-4 bg-gray-600 p-4 rounded-lg border border-gray-500">
-                        <h5 className="font-semibold text-white mb-2">Capacity Recommendations:</h5>
-                        <ul className="text-sm text-gray-300 space-y-1">
-                            {getMileageRecommendations(
-                                enhancedAssessment.mileage.ageGroup,
-                                enhancedAssessment.mileage.trainingAge,
-                                enhancedAssessment.mileage.recoveryCapacity
-                            ).slice(0, 3).map((rec, index) => (
-                                <li key={index}>• {rec}</li>
-                            ))}
-                        </ul>
+                <div className="mt-4 bg-gray-600 p-4 rounded-lg">
+                    <h4 className="font-semibold text-white mb-2">Capacity Recommendations</h4>
+                    <div className="space-y-1">
+                        {getMileageRecommendations(
+                            enhancedAssessment.mileage.ageGroup,
+                            enhancedAssessment.mileage.trainingAge,
+                            enhancedAssessment.mileage.recoveryCapacity
+                        ).slice(0, 3).map((rec, index) => (
+                            <div key={index} className="text-purple-300 text-sm flex items-start gap-2">
+                                <span className="text-purple-400 mt-1">•</span>
+                                {rec}
+                            </div>
+                        ))}
                     </div>
-                )}
+                </div>
             </div>
 
-            {/* SMART Goals */}
+            {/* SMART Goals Framework */}
             <div className="bg-gray-700 rounded-lg p-6 border border-gray-600">
                 <div className="flex items-center gap-2 mb-4">
-                    <Target className="h-5 w-5 text-blue-400" />
+                    <CheckCircle className="h-5 w-5 text-green-400" />
                     <h3 className="text-lg font-semibold text-white">SMART Goals Framework</h3>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-4">
+                <div className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">
-                                Specific <span className="text-red-400">*</span>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                                Specific
                             </label>
-                            <input
-                                type="text"
+                            <textarea
                                 className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
-                                placeholder="e.g., Increase bench press 1RM"
+                                rows={2}
+                                placeholder="What exactly do you want to achieve?"
                                 value={enhancedAssessment.smartGoals.specific}
                                 onChange={(e) => setEnhancedAssessment(prev => ({
                                     ...prev,
@@ -543,13 +497,13 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">
-                                Measurable <span className="text-red-400">*</span>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                                Measurable
                             </label>
-                            <input
-                                type="text"
+                            <textarea
                                 className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
-                                placeholder="e.g., From 225lbs to 275lbs"
+                                rows={2}
+                                placeholder="How will you measure progress?"
                                 value={enhancedAssessment.smartGoals.measurable}
                                 onChange={(e) => setEnhancedAssessment(prev => ({
                                     ...prev,
@@ -559,26 +513,8 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">
-                                Time-Bound <span className="text-red-400">*</span>
-                            </label>
-                            <input
-                                type="text"
-                                className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
-                                placeholder="e.g., Within 16 weeks"
-                                value={enhancedAssessment.smartGoals.timeBound}
-                                onChange={(e) => setEnhancedAssessment(prev => ({
-                                    ...prev,
-                                    smartGoals: { ...prev.smartGoals, timeBound: e.target.value }
-                                }))}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">
-                                Achievable <span className="text-red-400">*</span>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                                Achievable
                             </label>
                             <textarea
                                 className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
@@ -593,8 +529,8 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-300 mb-1">
-                                Relevant <span className="text-red-400">*</span>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                                Relevant
                             </label>
                             <textarea
                                 className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
@@ -608,14 +544,28 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
                             />
                         </div>
                     </div>
-                </div>
 
-                <div className="mt-4 flex gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                            Time-bound
+                        </label>
+                        <input
+                            type="text"
+                            className="w-full px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                            placeholder="When will you achieve this goal?"
+                            value={enhancedAssessment.smartGoals.timeBound}
+                            onChange={(e) => setEnhancedAssessment(prev => ({
+                                ...prev,
+                                smartGoals: { ...prev.smartGoals, timeBound: e.target.value }
+                            }))}
+                        />
+                    </div>
+
                     <button
                         onClick={handleSMARTValidation}
                         className={`px-4 py-2 rounded-md text-white transition-colors ${enhancedAssessment.smartGoals.validated
-                                ? 'bg-green-600 hover:bg-green-700'
-                                : 'bg-blue-600 hover:bg-blue-700'
+                            ? 'bg-green-600 hover:bg-green-700'
+                            : 'bg-blue-600 hover:bg-blue-700'
                             }`}
                     >
                         {enhancedAssessment.smartGoals.validated ? (
@@ -647,6 +597,44 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
                     </ul>
                 </div>
             )}
+
+            {/* Biomotor Ability Priorities */}
+            <div className="bg-gray-700 rounded-lg p-6 border border-gray-600">
+                <div className="flex items-center gap-2 mb-4">
+                    <TrendingUp className="h-5 w-5 text-blue-400" />
+                    <h3 className="text-lg font-semibold text-white">Biomotor Ability Priorities</h3>
+                </div>
+                <p className="text-gray-400 mb-6 text-sm">
+                    Prioritize the physical qualities most important for your goals and sport demands.
+                </p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {biomotorAbilities.map((ability) => (
+                        <div key={ability.key} className="bg-gray-600 p-4 rounded-lg border border-gray-500">
+                            <div className="flex items-center justify-between mb-2">
+                                <div>
+                                    <h4 className="font-semibold text-white">{ability.label}</h4>
+                                    <p className="text-sm text-gray-300">{ability.description}</p>
+                                </div>
+                                <div className="flex gap-1">
+                                    {['low', 'medium', 'high'].map((priority) => (
+                                        <button
+                                            key={priority}
+                                            className={`px-3 py-1 text-xs rounded-full border transition-colors ${goals.biomotorPriorities[ability.key] === priority
+                                                ? getPriorityColor(priority)
+                                                : 'bg-gray-700 text-gray-400 border-gray-500 hover:border-gray-400'
+                                                }`}
+                                            onClick={() => handleBiomotorChange(ability.key, priority)}
+                                        >
+                                            {priority.charAt(0).toUpperCase() + priority.slice(1)}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
 
             {/* Navigation */}
             <div className="flex justify-between pt-6 border-t border-gray-600">

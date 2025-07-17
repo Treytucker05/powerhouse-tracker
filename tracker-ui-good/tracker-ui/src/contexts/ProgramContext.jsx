@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useReducer, useCallback } from 'react';
+import React, { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
+import { useApp } from '../context';
 
 // Program state management
 const ProgramContext = createContext();
@@ -184,6 +185,63 @@ function programReducer(state, action) {
 // Context Provider
 export const ProgramProvider = ({ children }) => {
     const [state, dispatch] = useReducer(programReducer, initialState);
+
+    // Safe access to AppContext
+    let appContextData;
+    try {
+        appContextData = useApp();
+    } catch (error) {
+        console.warn('ProgramProvider: Unable to access AppContext:', error);
+        appContextData = { state: { assessment: null } };
+    }
+
+    const assessment = appContextData?.state?.assessment;
+
+    // Load assessment data when component mounts or when AppContext assessment changes
+    useEffect(() => {
+        const loadAssessmentData = () => {
+            try {
+                let assessmentData = null;
+
+                // First, try to get from AppContext
+                if (assessment) {
+                    assessmentData = assessment;
+                    console.log('Assessment loaded from AppContext:', assessmentData);
+                } else {
+                    // Fallback to localStorage
+                    const localProfile = localStorage.getItem('userProfile');
+                    if (localProfile) {
+                        const profile = JSON.parse(localProfile);
+                        assessmentData = {
+                            primaryGoal: profile.primaryGoal,
+                            trainingExperience: profile.trainingExperience,
+                            timeline: profile.timeline,
+                            recommendedSystem: profile.recommendedSystem,
+                            createdAt: profile.createdAt
+                        };
+                        console.log('Assessment loaded from localStorage:', assessmentData);
+                    }
+                }
+
+                if (assessmentData) {
+                    dispatch({
+                        type: PROGRAM_ACTIONS.SET_ASSESSMENT_DATA,
+                        payload: assessmentData
+                    });
+                } else {
+                    console.log('No assessment data found in AppContext or localStorage');
+                }
+            } catch (error) {
+                console.error('Error loading assessment data:', error);
+                dispatch({
+                    type: PROGRAM_ACTIONS.SET_ERROR,
+                    payload: 'Failed to load assessment data'
+                });
+            }
+        };
+
+        loadAssessmentData();
+    }, [assessment]); // Re-run when AppContext assessment changes
 
     // Action creators - simplified without nested useCallback
     const setActiveTab = useCallback((tab) => dispatch({ type: PROGRAM_ACTIONS.SET_ACTIVE_TAB, payload: tab }), []);

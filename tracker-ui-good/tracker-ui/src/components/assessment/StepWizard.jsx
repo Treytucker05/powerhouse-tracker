@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { supabase } from '../../lib/api/supabaseClient';
+import { useApp } from '../../context';
 import PersonalInfoStep from './PersonalInfoStep';
 import TrainingExperienceStep from './TrainingExperienceStep';
 import TimelineStep from './TimelineStep';
@@ -9,6 +10,7 @@ import RecommendationStep from './RecommendationStep';
 
 const StepWizard = ({ setUserProfile }) => {
     const navigate = useNavigate();
+    const { updateAssessment } = useApp();
     const [currentStep, setCurrentStep] = useState(0);
     const [assessmentData, setAssessmentData] = useState({
         primaryGoal: '',
@@ -151,6 +153,15 @@ const StepWizard = ({ setUserProfile }) => {
                 localStorage.setItem('userProfile', JSON.stringify(profileData));
                 setUserProfile(profileData);
 
+                // Save to AppContext for Program Design
+                await updateAssessment({
+                    primaryGoal: assessmentData.primaryGoal,
+                    trainingExperience: assessmentData.trainingExperience,
+                    timeline: assessmentData.timeline,
+                    recommendedSystem: assessmentData.recommendedSystem,
+                    createdAt: profileData.createdAt
+                });
+
                 // Dismiss loading toast and show success
                 toast.dismiss(loadingToast);
                 toast.success('Assessment saved successfully! Redirecting...');
@@ -165,6 +176,15 @@ const StepWizard = ({ setUserProfile }) => {
                 console.log('User not authenticated, saving to localStorage only');
                 localStorage.setItem('userProfile', JSON.stringify(profileData));
                 setUserProfile(profileData);
+
+                // Save to AppContext for Program Design
+                await updateAssessment({
+                    primaryGoal: assessmentData.primaryGoal,
+                    trainingExperience: assessmentData.trainingExperience,
+                    timeline: assessmentData.timeline,
+                    recommendedSystem: assessmentData.recommendedSystem,
+                    createdAt: profileData.createdAt
+                });
 
                 // Dismiss loading toast and show success
                 toast.dismiss(loadingToast);
@@ -182,6 +202,19 @@ const StepWizard = ({ setUserProfile }) => {
 
             localStorage.setItem('userProfile', JSON.stringify(profileData));
             setUserProfile(profileData);
+
+            // Save to AppContext for Program Design even on error
+            try {
+                await updateAssessment({
+                    primaryGoal: assessmentData.primaryGoal,
+                    trainingExperience: assessmentData.trainingExperience,
+                    timeline: assessmentData.timeline,
+                    recommendedSystem: assessmentData.recommendedSystem,
+                    createdAt: profileData.createdAt
+                });
+            } catch (contextError) {
+                console.error('Failed to save to AppContext:', contextError);
+            }
 
             // Dismiss loading toast and show error with fallback success
             toast.dismiss(loadingToast);

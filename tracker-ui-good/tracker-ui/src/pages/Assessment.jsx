@@ -2,25 +2,54 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { supabase } from '../lib/api/supabaseClient';
+import { useApp } from '../context';
 import StepWizard from '../components/assessment/StepWizard';
 
 const Assessment = () => {
     const navigate = useNavigate();
+    const { assessment, updateAssessment } = useApp();
     const [userProfile, setUserProfile] = useState(null);
     const [isFormVisible, setIsFormVisible] = useState(false);
     const [isComplete, setIsComplete] = useState(false);
 
     // Check for existing user profile on mount
     useEffect(() => {
-        const savedProfile = localStorage.getItem('userProfile');
-        if (savedProfile) {
-            const profile = JSON.parse(savedProfile);
-            setUserProfile(profile);
-            setIsComplete(true);
-        } else {
-            setIsFormVisible(true);
-        }
-    }, []);
+        const loadExistingAssessment = () => {
+            let existingProfile = null;
+
+            // First check AppContext
+            if (assessment) {
+                existingProfile = assessment;
+                console.log('Found assessment in AppContext:', existingProfile);
+            } else {
+                // Fallback to localStorage
+                const savedProfile = localStorage.getItem('userProfile');
+                if (savedProfile) {
+                    const profile = JSON.parse(savedProfile);
+                    existingProfile = profile;
+                    console.log('Found assessment in localStorage:', existingProfile);
+
+                    // Sync to AppContext
+                    updateAssessment({
+                        primaryGoal: profile.primaryGoal,
+                        trainingExperience: profile.trainingExperience,
+                        timeline: profile.timeline,
+                        recommendedSystem: profile.recommendedSystem,
+                        createdAt: profile.createdAt
+                    });
+                }
+            }
+
+            if (existingProfile) {
+                setUserProfile(existingProfile);
+                setIsComplete(true);
+            } else {
+                setIsFormVisible(true);
+            }
+        };
+
+        loadExistingAssessment();
+    }, [assessment, updateAssessment]);
 
     const handleProceedToProgram = () => {
         navigate('/program');
@@ -88,6 +117,7 @@ const Assessment = () => {
                         <button
                             onClick={() => {
                                 localStorage.removeItem('userProfile');
+                                updateAssessment(null); // Clear AppContext assessment
                                 setUserProfile(null);
                                 setIsComplete(false);
                                 setIsFormVisible(true);
