@@ -1,5 +1,0 @@
-#!/usr/bin/env sh
-. "$(dirname "$0")/_/husky.sh"
-echo "Running quick repo audit (head-only)…"
-bash scripts/repo-audit.sh | head -n 20
-# block push if audit fails
