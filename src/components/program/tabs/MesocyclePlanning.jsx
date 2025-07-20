@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { Layers, RotateCcw, CheckCircle, Target, TrendingUp, Zap } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Layers, RotateCcw, CheckCircle, Target, TrendingUp, Zap, AlertTriangle, Calendar } from 'lucide-react';
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { useRecoveryMonitor } from '../../hooks/useRecoveryMonitor';
 
 // Sortable Mesocycle Item Component
 const SortableMesocycleItem = ({ mesocycle, index, onUpdate, onRemove }) => {
@@ -102,6 +103,8 @@ const SortableMesocycleItem = ({ mesocycle, index, onUpdate, onRemove }) => {
 };
 
 const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
+    const { monitorRecovery, autoDeloadCheck } = useRecoveryMonitor();
+
     const [mesocycles, setMesocycles] = useState([
         {
             id: 'accumulation-1',
@@ -111,7 +114,11 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
             volume: 'high',
             intensity: 'moderate',
             focus: 'base_building',
-            hasDeload: true
+            hasDeload: true,
+            weekStart: 1,
+            weekEnd: 4,
+            deloadWeek: 4,
+            deloadType: 'scheduled' // 'scheduled', 'fatigue-triggered', 'manual'
         },
         {
             id: 'transmutation-1',
@@ -121,7 +128,11 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
             volume: 'moderate',
             intensity: 'high',
             focus: 'strength',
-            hasDeload: false
+            hasDeload: false,
+            weekStart: 5,
+            weekEnd: 7,
+            deloadWeek: null,
+            deloadType: null
         },
         {
             id: 'realization-1',
@@ -131,9 +142,36 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
             volume: 'low',
             intensity: 'very_high',
             focus: 'peaking',
-            hasDeload: false
+            hasDeload: false,
+            weekStart: 8,
+            weekEnd: 9,
+            deloadWeek: null,
+            deloadType: null
         }
     ]);
+
+    const [deloadSettings, setDeloadSettings] = useState({
+        autoSchedule: true,
+        frequency: 4, // Every 4 weeks (Bryant: 3-6 weeks)
+        volumeReduction: 0.65, // Bryant: 60-70%
+        duration: 1, // 1 week
+        fatigueThreshold: 7, // Trigger if fatigue > 7/10
+        enabled: true
+    });
+
+    const [fatigueData, setFatigueData] = useState({
+        currentWeek: 1,
+        fatigueScores: {
+            fuel: 3,
+            nervous: 3,
+            messengers: 3,
+            tissues: 3
+        },
+        recoveryCapacity: 'good',
+        lastUpdate: new Date().toISOString()
+    });
+
+    const [deloadRecommendations, setDeloadRecommendations] = useState([]);
 
     const [newMesocycle, setNewMesocycle] = useState({
         name: '',
@@ -193,9 +231,14 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
 
     const addMesocycle = () => {
         if (newMesocycle.name) {
+            const lastWeekEnd = mesocycles.reduce((max, m) => Math.max(max, m.weekEnd || 0), 0);
             const mesocycle = {
                 ...newMesocycle,
-                id: `${newMesocycle.type}-${Date.now()}`
+                id: `${newMesocycle.type}-${Date.now()}`,
+                weekStart: lastWeekEnd + 1,
+                weekEnd: lastWeekEnd + newMesocycle.duration,
+                deloadWeek: newMesocycle.hasDeload ? lastWeekEnd + newMesocycle.duration : null,
+                deloadType: newMesocycle.hasDeload ? 'scheduled' : null
             };
             setMesocycles(prev => [...prev, mesocycle]);
             setNewMesocycle({
@@ -208,6 +251,109 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
                 hasDeload: true
             });
         }
+    };
+
+    // Bryant Periodization: Proactive reload scheduling every 3-6 weeks
+    const scheduleProactiveReloads = (mesocycleList) => {
+        try {
+            if (!deloadSettings.autoSchedule || !deloadSettings.enabled) {
+                return mesocycleList;
+            }
+
+            return mesocycleList.map((mesocycle, index) => {
+                const cumulativeWeeks = mesocycle.weekEnd || (index + 1) * mesocycle.duration;
+
+                // Schedule reload every 4 weeks (Bryant: 3-6 weeks optimal range)
+                const shouldHaveReload = cumulativeWeeks % deloadSettings.frequency === 0;
+
+                if (shouldHaveReload && !mesocycle.hasDeload) {
+                    return {
+                        ...mesocycle,
+                        hasDeload: true,
+                        deloadWeek: mesocycle.weekEnd,
+                        deloadType: 'scheduled',
+                        volumeReduction: deloadSettings.volumeReduction,
+                        deloadDuration: deloadSettings.duration
+                    };
+                }
+
+                return mesocycle;
+            });
+        } catch (error) {
+            console.warn('Error in proactive reload scheduling:', error);
+            return mesocycleList; // Return original if scheduling fails
+        }
+    };
+
+    // Monitor fatigue and trigger emergency reloads
+    const checkFatigueTriggeredReloads = () => {
+        try {
+            if (!fatigueData.fatigueScores) {
+                console.warn('Fatigue data missing - using default values');
+                return [];
+            }
+
+            const currentWeek = fatigueData.currentWeek;
+            const deloadCheck = autoDeloadCheck(currentWeek, fatigueData.fatigueScores);
+
+            if (deloadCheck.recommended && deloadCheck.type === 'fatigue-triggered') {
+                return [{
+                    week: currentWeek,
+                    type: 'emergency',
+                    reason: deloadCheck.reasoning,
+                    volumeReduction: deloadCheck.volumeReduction,
+                    duration: deloadCheck.duration,
+                    recommendations: deloadCheck.recommendations || []
+                }];
+            }
+
+            return [];
+        } catch (error) {
+            console.error('Error checking fatigue-triggered reloads:', error);
+            // Return empty array with error handling
+            return [{
+                week: fatigueData.currentWeek,
+                type: 'error',
+                reason: 'Unable to assess fatigue - manual monitoring recommended',
+                volumeReduction: 0.7, // Default to 70% volume
+                duration: '1 week',
+                recommendations: [
+                    'Monitor training readiness manually',
+                    'Consider consulting with coach',
+                    'Check fatigue assessment inputs'
+                ]
+            }];
+        }
+    };
+
+    // Update mesocycles with automatic reload scheduling
+    useEffect(() => {
+        if (deloadSettings.autoSchedule) {
+            const updatedMesocycles = scheduleProactiveReloads(mesocycles);
+            if (JSON.stringify(updatedMesocycles) !== JSON.stringify(mesocycles)) {
+                setMesocycles(updatedMesocycles);
+            }
+        }
+    }, [deloadSettings.autoSchedule, deloadSettings.frequency]);
+
+    // Monitor fatigue and update recommendations
+    useEffect(() => {
+        const recommendations = checkFatigueTriggeredReloads();
+        setDeloadRecommendations(recommendations);
+    }, [fatigueData.fatigueScores, fatigueData.currentWeek]);
+
+    // Calculate total program duration and reload frequency
+    const calculateProgramStats = () => {
+        const totalWeeks = mesocycles.reduce((sum, m) => sum + m.duration, 0);
+        const scheduledReloads = mesocycles.filter(m => m.hasDeload).length;
+        const reloadFrequency = totalWeeks / Math.max(scheduledReloads, 1);
+
+        return {
+            totalWeeks,
+            scheduledReloads,
+            reloadFrequency: Math.round(reloadFrequency * 10) / 10,
+            isOptimal: reloadFrequency >= 3 && reloadFrequency <= 6 // Bryant: 3-6 weeks
+        };
     };
 
     const removeMesocycle = (id) => {

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { ProgramProvider, useProgramContext } from '../contexts/ProgramContext';
+import {
+  ProgramProvider, useProgramContext
+} from '../contexts/ProgramContext';
 
 // Import legacy components to preserve all functionality
 import ProgramOverview from '../components/program/ProgramOverview';
@@ -40,35 +42,55 @@ import VolumeLandmarksTab from '../components/program/tabs/VolumeLandmarksTab';
 const ProgramNavigation = () => {
   const { state, actions } = useProgramContext();
 
-  // Complete unified program design system with all functionality
+  // 5-Component Framework integrating all 15 features (7 core + 8 specialized)
   const unifiedTabs = [
-    { id: 'goals', name: 'Assessment & Goals', icon: '🎯', step: 1, description: 'Athlete assessment and goal setting' },
-    { id: 'macrocycle', name: 'Periodization Design', icon: '📅', step: 2, description: 'Macrocycle structure and timeline' },
-    { id: 'phases', name: 'Training Blocks', icon: '🔄', step: 3, description: 'Phase design and block sequencing' },
-    { id: 'mesocycles', name: 'Mesocycles', icon: '📊', step: 4, description: '2-6 week training blocks' },
-    { id: 'microcycles', name: 'Session Structure', icon: '📋', step: 5, description: 'Weekly patterns and sessions' },
-    { id: 'monitoring', name: 'Monitoring & Recovery', icon: '💪', step: 6, description: 'Progress tracking and recovery' },
-    { id: 'implementation', name: 'Implementation', icon: '🚀', step: 7, description: 'Program execution and export' }
-  ];
-
-  // Additional specialized tabs available via sub-navigation
-  const specializedTabs = [
-    { id: 'overview', name: 'Program Overview', icon: '📋', component: ProgramOverview },
-    { id: 'loading', name: 'Loading Parameters', icon: '⚖️', component: LoadingParameters },
-    { id: 'methods', name: 'Training Methods', icon: '⚡', component: TrainingMethods },
-    { id: 'nutrition', name: 'OPEX Nutrition', icon: '🥗', component: OPEXNutrition },
-    { id: 'specificity', name: 'Specificity', icon: '🎪', component: SpecificityTab },
-    { id: 'variables', name: 'Variable Manipulation', icon: '🔧', component: VariableManipulationTab },
-    { id: 'landmarks', name: 'Volume Landmarks', icon: '📏', component: VolumeLandmarksTab },
-    { id: 'preview', name: 'Program Preview', icon: '👁️', component: ProgramPreview }
+    {
+      id: 'assessment-screening',
+      name: 'Assessment & Screening',
+      icon: '🎯',
+      step: 1,
+      description: 'Comprehensive athlete profiling, movement screening, and program overview',
+      integratedFeatures: ['Assessment & Goals', 'Program Overview']
+    },
+    {
+      id: 'goal-setting',
+      name: 'Goal Setting',
+      icon: '🎯',
+      step: 2,
+      description: 'Define specific, measurable goals with specialty focus and performance targets',
+      integratedFeatures: ['Goals & Needs', 'Specialty']
+    },
+    {
+      id: 'periodization',
+      name: 'Periodization',
+      icon: '�',
+      step: 3,
+      description: 'Complete periodization strategy: macrocycles, training blocks, mesocycles with volume landmarks',
+      integratedFeatures: ['Periodization Design', 'Training Blocks', 'Mesocycles', 'Volume Landmarks']
+    },
+    {
+      id: 'program-design',
+      name: 'Program Design',
+      icon: '⚙️',
+      step: 4,
+      description: 'Comprehensive program design: sessions, training methods, loading parameters, variable manipulation',
+      integratedFeatures: ['Session Structure', 'Loading Parameters', 'Training Methods', 'Variable Manipulation']
+    },
+    {
+      id: 'implementation-monitoring',
+      name: 'Implementation & Monitoring',
+      icon: '�',
+      step: 5,
+      description: 'Complete implementation with monitoring, recovery tracking, nutrition, and program preview',
+      integratedFeatures: ['Monitoring & Recovery', 'Implementation', 'OPEX Nutrition', 'Program Preview']
+    }
   ];
 
   const handleTabClick = (tabId) => {
     actions.setActiveTab(tabId);
   };
 
-  const currentTab = unifiedTabs.find(tab => tab.id === state.activeTab) ||
-    specializedTabs.find(tab => tab.id === state.activeTab);
+  const currentTab = unifiedTabs.find(tab => tab.id === state.activeTab);
 
   return (
     <div className="bg-gray-800 border-b border-gray-700 px-6 py-4">
@@ -78,7 +100,7 @@ const ProgramNavigation = () => {
           <h2 className="text-lg font-semibold text-white">Program Design - Complete Edition</h2>
           {currentTab?.step && (
             <div className="text-sm text-gray-400">
-              Step {currentTab.step} of 7 - {currentTab.description}
+              Step {currentTab.step} of 5 - {currentTab.description}
             </div>
           )}
           {currentTab && !currentTab.step && (
@@ -89,7 +111,7 @@ const ProgramNavigation = () => {
         </div>
         <div className="flex items-center space-x-2">
           <div className="text-xs text-gray-400">
-            All Functionality Preserved
+            15 Features Integrated into 5 Components
           </div>
         </div>
       </div>
@@ -117,25 +139,7 @@ const ProgramNavigation = () => {
         </div>
       </div>
 
-      {/* Specialized Tools Navigation */}
-      <div>
-        <div className="text-xs text-gray-400 mb-2">Specialized Tools</div>
-        <div className="flex items-center space-x-2 overflow-x-auto">
-          {specializedTabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => handleTabClick(tab.id)}
-              className={`flex items-center space-x-2 px-2 py-1.5 rounded-md text-xs font-medium whitespace-nowrap ${state.activeTab === tab.id
-                ? 'bg-green-600 text-white'
-                : 'text-gray-400 hover:text-white hover:bg-gray-700'
-                }`}
-            >
-              <span>{tab.icon}</span>
-              <span>{tab.name}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* Note: Specialized tools are now integrated within the main framework tabs */}
     </div>
   );
 };
@@ -143,14 +147,14 @@ const ProgramNavigation = () => {
 const ProgramContent = () => {
   const { state, actions } = useProgramContext();
 
-  // Navigation helpers for main workflow
+  // Navigation helpers for main workflow (5-component framework)
   const getCurrentTabIndex = () => {
-    const mainTabs = ['goals', 'macrocycle', 'phases', 'mesocycles', 'microcycles', 'monitoring', 'implementation'];
+    const mainTabs = ['assessment-screening', 'goal-setting', 'periodization', 'program-design', 'implementation-monitoring'];
     return mainTabs.findIndex(tab => tab === state.activeTab);
   };
 
   const handleNext = () => {
-    const mainTabs = ['goals', 'macrocycle', 'phases', 'mesocycles', 'microcycles', 'monitoring', 'implementation'];
+    const mainTabs = ['assessment-screening', 'goal-setting', 'periodization', 'program-design', 'implementation-monitoring'];
     const currentIndex = getCurrentTabIndex();
     if (currentIndex >= 0 && currentIndex < mainTabs.length - 1) {
       actions.setActiveTab(mainTabs[currentIndex + 1]);
@@ -158,7 +162,7 @@ const ProgramContent = () => {
   };
 
   const handlePrevious = () => {
-    const mainTabs = ['goals', 'macrocycle', 'phases', 'mesocycles', 'microcycles', 'monitoring', 'implementation'];
+    const mainTabs = ['assessment-screening', 'goal-setting', 'periodization', 'program-design', 'implementation-monitoring'];
     const currentIndex = getCurrentTabIndex();
     if (currentIndex > 0) {
       actions.setActiveTab(mainTabs[currentIndex - 1]);
@@ -176,13 +180,13 @@ const ProgramContent = () => {
       canGoPrevious: getCurrentTabIndex() > 0
     };
 
-    // Main workflow tabs
+    // 5-Component Framework tabs with integrated features
     switch (state.activeTab) {
-      case 'goals':
+      case 'assessment-screening':
         return (
           <div className="space-y-6">
             <GoalsAndNeeds {...commonProps} />
-            {/* Enhanced Goals section could include program overview */}
+            {/* Integrated: Program Overview */}
             <div className="border-t border-gray-700 pt-6">
               <h3 className="text-lg font-semibold text-white mb-4">Program Overview Integration</h3>
               <ProgramOverview />
@@ -190,40 +194,39 @@ const ProgramContent = () => {
           </div>
         );
 
-      case 'macrocycle':
-        return <MacrocycleStructure {...commonProps} />;
-
-      case 'phases':
+      case 'goal-setting':
         return (
           <div className="space-y-6">
+            <GoalsAndNeeds {...commonProps} />
+            {/* Integrated: Specialty */}
+            <div className="border-t border-gray-700 pt-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Specialty Focus</h3>
+              <SpecificityTab />
+            </div>
+          </div>
+        );
+
+      case 'periodization':
+        return (
+          <div className="space-y-6">
+            <MacrocycleStructure {...commonProps} />
             <PhaseDesign {...commonProps} />
-            {/* Enhanced Phases section includes block sequencing */}
-            <div className="border-t border-gray-700 pt-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Block Sequencing</h3>
-              <BlockSequencing />
-            </div>
-          </div>
-        );
-
-      case 'mesocycles':
-        return (
-          <div className="space-y-6">
             <MesocyclePlanning {...commonProps} />
-            {/* Enhanced Mesocycles section includes integration tab */}
+            {/* Integrated: Volume Landmarks */}
             <div className="border-t border-gray-700 pt-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Mesocycle Integration</h3>
-              <MesocycleIntegrationTab />
+              <h3 className="text-lg font-semibold text-white mb-4">Volume Landmarks Integration</h3>
+              <VolumeLandmarksTab />
             </div>
           </div>
         );
 
-      case 'microcycles':
+      case 'program-design':
         return (
           <div className="space-y-6">
             <MicrocycleDesign {...commonProps} />
-            {/* Enhanced Microcycles section includes loading parameters and training methods */}
+            {/* Integrated: Loading Parameters, Training Methods, Variable Manipulation */}
             <div className="border-t border-gray-700 pt-6">
-              <div className="grid gap-6 md:grid-cols-2">
+              <div className="grid gap-6 md:grid-cols-3">
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-4">Loading Parameters</h3>
                   <LoadingParameters />
@@ -232,103 +235,124 @@ const ProgramContent = () => {
                   <h3 className="text-lg font-semibold text-white mb-4">Training Methods</h3>
                   <TrainingMethods />
                 </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4">Variable Manipulation</h3>
+                  <VariableManipulationTab />
+                </div>
               </div>
             </div>
           </div>
         );
 
-      case 'monitoring':
+      case 'implementation-monitoring':
         return (
           <div className="space-y-6">
             <SessionMonitoring {...commonProps} />
-            {/* Enhanced Monitoring section includes specialized monitoring tab */}
-            <div className="border-t border-gray-700 pt-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Advanced Monitoring</h3>
-              <MonitoringTab />
-            </div>
-          </div>
-        );
-
-      case 'implementation':
-        return (
-          <div className="space-y-6">
             <Implementation {...commonProps} />
-            {/* Enhanced Implementation section includes program preview and export */}
+            {/* Integrated: OPEX Nutrition, Program Preview */}
             <div className="border-t border-gray-700 pt-6">
-              <div className="grid gap-6">
+              <div className="grid gap-6 md:grid-cols-2">
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-4">Program Preview & Export</h3>
-                  <ProgramPreview />
+                  <h3 className="text-lg font-semibold text-white mb-4">OPEX Nutrition</h3>
+                  <OPEXNutrition />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-4">OPEX Nutrition Integration</h3>
-                  <OPEXNutrition />
+                  <h3 className="text-lg font-semibold text-white mb-4">Program Preview</h3>
+                  <ProgramPreview />
                 </div>
               </div>
             </div>
           </div>
         );
 
-      // Specialized tool tabs
+      // Legacy tab support for backwards compatibility
+      case 'goals':
+        return (
+          <div className="space-y-6">
+            <GoalsAndNeeds {...commonProps} />
+            <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+              <p className="text-blue-400 text-sm">
+                ℹ️ Legacy tab redirected to new Assessment & Screening framework
+              </p>
+            </div>
+          </div>
+        );
+      case 'macrocycle':
+      case 'phases':
+      case 'mesocycles':
+        // Redirect to new Periodization tab
+        actions.setActiveTab('periodization');
+        return null;
+      case 'microcycles':
+        // Redirect to new Program Design tab  
+        actions.setActiveTab('program-design');
+        return null;
+      case 'monitoring':
+      case 'implementation':
+        // Redirect to new Implementation & Monitoring tab
+        actions.setActiveTab('implementation-monitoring');
+        return null;
+
+      // Specialized tool tabs redirect to their integrated framework tabs
       case 'overview':
-        return <ProgramOverview />;
+        actions.setActiveTab('assessment-screening');
+        return null;
       case 'loading':
-        return <LoadingParameters />;
       case 'methods':
-        return <TrainingMethods />;
-      case 'nutrition':
-        return <OPEXNutrition />;
-      case 'specificity':
-        return <SpecificityTab />;
       case 'variables':
-        return <VariableManipulationTab />;
-      case 'landmarks':
-        return <VolumeLandmarksTab />;
+        actions.setActiveTab('program-design');
+        return null;
+      case 'nutrition':
       case 'preview':
-        return <ProgramPreview />;
+        actions.setActiveTab('implementation-monitoring');
+        return null;
+      case 'specificity':
+        actions.setActiveTab('goal-setting');
+        return null;
+      case 'landmarks':
+        actions.setActiveTab('periodization');
+        return null;
 
       default:
-        // Default to first tab with comprehensive welcome
+        // Default to first tab of 5-component framework
+        actions.setActiveTab('assessment-screening');
         return (
           <div className="space-y-6">
             <div className="bg-gray-800 rounded-lg p-6">
               <h3 className="text-xl font-semibold text-white mb-4">
-                Welcome to Complete Program Design
+                Welcome to Enhanced Program Design - 5-Component Framework
               </h3>
               <p className="text-gray-300 mb-6">
-                This system includes all functionality from previous versions plus enhanced integration.
+                All 15 features (7 core tabs + 8 specialized tools) are now integrated into 5 streamlined components for optimal workflow.
               </p>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="bg-blue-900/20 border border-blue-500 rounded-lg p-4">
-                  <h4 className="font-medium text-white mb-2">📚 Main Workflow (7 Steps)</h4>
-                  <p className="text-gray-300 text-sm mb-3">
-                    Follow the evidence-based 7-step periodization process with integrated legacy functionality.
-                  </p>
-                  <button
-                    onClick={() => actions.setActiveTab('goals')}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm"
-                  >
-                    Start Program Design
-                  </button>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-6">
+                <div className="bg-gray-700 p-4 rounded-lg">
+                  <h4 className="font-semibold text-white mb-2">🎯 Assessment & Screening</h4>
+                  <p className="text-sm text-gray-300">Comprehensive athlete profiling + Program Overview</p>
                 </div>
-
-                <div className="bg-green-900/20 border border-green-500 rounded-lg p-4">
-                  <h4 className="font-medium text-white mb-2">🔧 Specialized Tools</h4>
-                  <p className="text-gray-300 text-sm mb-3">
-                    Access individual components for specific program design tasks and analysis.
-                  </p>
-                  <button
-                    onClick={() => actions.setActiveTab('overview')}
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm"
-                  >
-                    Open Tools
-                  </button>
+                <div className="bg-gray-700 p-4 rounded-lg">
+                  <h4 className="font-semibold text-white mb-2">🎯 Goal Setting</h4>
+                  <p className="text-sm text-gray-300">SMART goals + Specialty focus</p>
+                </div>
+                <div className="bg-gray-700 p-4 rounded-lg">
+                  <h4 className="font-semibold text-white mb-2">📅 Periodization</h4>
+                  <p className="text-sm text-gray-300">Macrocycles + Training Blocks + Mesocycles + Volume Landmarks</p>
+                </div>
+                <div className="bg-gray-700 p-4 rounded-lg">
+                  <h4 className="font-semibold text-white mb-2">⚙️ Program Design</h4>
+                  <p className="text-sm text-gray-300">Sessions + Loading + Methods + Variables</p>
+                </div>
+                <div className="bg-gray-700 p-4 rounded-lg">
+                  <h4 className="font-semibold text-white mb-2">🚀 Implementation</h4>
+                  <p className="text-sm text-gray-300">Monitoring + Recovery + Nutrition + Preview</p>
                 </div>
               </div>
-            </div>
 
-            <GoalsAndNeeds {...commonProps} />
+              <p className="text-blue-400 text-sm">
+                Click "Assessment & Screening" above to start with your enhanced 5-component framework!
+              </p>
+            </div>
           </div>
         );
     }
@@ -356,13 +380,13 @@ const ProgramContent = () => {
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-gray-300">Main Workflow Progress</span>
                 <span className="text-sm text-gray-300">
-                  Step {getCurrentTabIndex() + 1} of 7
+                  Step {getCurrentTabIndex() + 1} of 5
                 </span>
               </div>
               <div className="w-full bg-gray-700 rounded-full h-2">
                 <div
                   className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${((getCurrentTabIndex() + 1) / 7) * 100}%` }}
+                  style={{ width: `${((getCurrentTabIndex() + 1) / 5) * 100}%` }}
                 />
               </div>
             </div>
