@@ -18,6 +18,12 @@
 *.md text eol=lf
 
 # CSS should be LF
+
+# Exclude system files from Git operations
+desktop.ini export-ignore
+Thumbs.db export-ignore
+.DS_Store export-ignore
+*.tmp export-ignore
 *.css text eol=lf
 
 # HTML should be LF
