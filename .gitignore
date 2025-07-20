@@ -45,3 +45,10 @@ playwright-report/
 # Archive and legacy files
 archive*/
 tracker-ui-good/
+
+# System files (prevent Windows/macOS system files from causing Git corruption)
+desktop.ini
+Thumbs.db
+.DS_Store
+*.tmp
+ehthumbs.db
