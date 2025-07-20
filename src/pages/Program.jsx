@@ -2,12 +2,21 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { useApp } from '../context';
 
-// Import the new consolidated tab components
-import AssessmentGoals from '../tracker-ui-good/tracker-ui/src/components/program/tabs/consolidated/AssessmentGoals';
-import ExerciseSelectionProgression from '../tracker-ui-good/tracker-ui/src/components/program/tabs/consolidated/ExerciseSelectionProgression';
-import VolumeRecoveryManagement from '../tracker-ui-good/tracker-ui/src/components/program/tabs/consolidated/VolumeRecoveryManagement';
-import PeriodizationPlanning from '../tracker-ui-good/tracker-ui/src/components/program/tabs/consolidated/PeriodizationPlanning';
-import ImplementationTracking from '../tracker-ui-good/tracker-ui/src/components/program/tabs/consolidated/ImplementationTracking';
+// Import components for the new unified 7-tab system
+import GoalsAndNeeds from '../components/program/tabs/GoalsAndNeeds';
+import MacrocycleStructure from '../components/program/tabs/MacrocycleStructure';
+import MesocyclePlanning from '../components/program/tabs/MesocyclePlanning';
+import MicrocycleDesign from '../components/program/tabs/MicrocycleDesign';
+import SessionMonitoring from '../components/program/tabs/SessionMonitoring';
+import Implementation from '../components/program/tabs/Implementation';
+
+// Import enhanced components we created
+import TrainingBlocks from '../components/program/tabs/TrainingBlocks';
+
+// Import legacy components to preserve all functionality
+import EnhancedAssessmentGoals from '../components/program/tabs/EnhancedAssessmentGoals';
+import EnhancedSessionStructure from '../components/program/tabs/EnhancedSessionStructure';
+import EnhancedImplementation from '../components/program/tabs/EnhancedImplementation';
 
 // Import existing program components to integrate
 import { ProgramProvider } from '../contexts/ProgramContext';
@@ -20,32 +29,44 @@ const Program = () => {
         {
             id: 'assessment',
             label: 'Assessment & Goals',
-            component: AssessmentGoals,
-            description: 'Complete athlete profiling, goal setting, and movement assessment'
-        },
-        {
-            id: 'exercise-selection',
-            label: 'Exercise Selection & Progression',
-            component: ExerciseSelectionProgression,
-            description: 'Choose exercises, training variables, and progression strategies'
-        },
-        {
-            id: 'volume-recovery',
-            label: 'Volume & Recovery Management',
-            component: VolumeRecoveryManagement,
-            description: 'Determine training volumes, landmarks, and recovery protocols'
+            component: EnhancedAssessmentGoals,
+            description: 'Comprehensive athlete profiling, program overview, and goal setting'
         },
         {
             id: 'periodization',
-            label: 'Periodization Planning',
-            component: PeriodizationPlanning,
-            description: 'Design macrocycle, mesocycles, and competition planning'
+            label: 'Periodization Design',
+            component: MacrocycleStructure,
+            description: 'Design macrocycles with multiple goals, periodization models, and calendar view'
+        },
+        {
+            id: 'training-blocks',
+            label: 'Training Blocks',
+            component: TrainingBlocks,
+            description: 'Design phases, mesocycles, and block sequencing with specific training focus'
+        },
+        {
+            id: 'mesocycles',
+            label: 'Mesocycles',
+            component: MesocyclePlanning,
+            description: 'Plan 2-6 week training blocks with specific focus and periodization'
+        },
+        {
+            id: 'session-structure',
+            label: 'Session Structure',
+            component: EnhancedSessionStructure,
+            description: 'Design microcycles, loading parameters, and training methods'
+        },
+        {
+            id: 'monitoring',
+            label: 'Monitoring & Recovery',
+            component: SessionMonitoring,
+            description: 'Session tracking, recovery protocols, and progress monitoring'
         },
         {
             id: 'implementation',
-            label: 'Implementation & Tracking',
-            component: ImplementationTracking,
-            description: 'Generate program, track progress, and monitor adaptations'
+            label: 'Implementation',
+            component: EnhancedImplementation,
+            description: 'Program execution, preview, nutrition integration, and performance tracking'
         }
     ];
 
@@ -77,9 +98,9 @@ const Program = () => {
                 <div className="container mx-auto px-6 py-8">
                     {/* Header */}
                     <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-white mb-2">Program Design - Streamlined Edition</h1>
+                        <h1 className="text-3xl font-bold text-white mb-2">Program Design - Complete Edition</h1>
                         <p className="text-gray-300 mb-4">
-                            Design comprehensive training programs using our consolidated 5-step framework for efficiency and clarity
+                            Design comprehensive training programs using our complete 7-step framework with all legacy functionality preserved
                         </p>
 
                         {/* Progress Indicator */}
@@ -87,7 +108,7 @@ const Program = () => {
                             <div className="flex items-center justify-between mb-2">
                                 <span className="text-sm text-gray-300">Progress</span>
                                 <span className="text-sm text-gray-300">
-                                    Step {getCurrentTabIndex() + 1} of {tabs.length} - Consolidated Framework
+                                    Step {getCurrentTabIndex() + 1} of {tabs.length} - Complete Framework
                                 </span>
                             </div>
                             <div className="w-full bg-gray-700 rounded-full h-2">
@@ -101,7 +122,7 @@ const Program = () => {
 
                     {/* Tab Navigation */}
                     <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-                        <TabsList className="grid w-full grid-cols-5 mb-6 bg-gray-800 border border-gray-700">{tabs.map((tab, index) => (
+                        <TabsList className="grid w-full grid-cols-7 mb-6 bg-gray-800 border border-gray-700">{tabs.map((tab, index) => (
                             <TabsTrigger
                                 key={tab.id}
                                 value={tab.id}
