@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, RotateCcw, CheckCircle, Download, Calendar, TrendingUp, AlertTriangle } from 'lucide-react';
+import FitnessFatigueTracker from '../../recovery/FitnessFatigueTracker';
+import { useRecoveryMonitor } from '../../hooks/useRecoveryMonitor';
 
 const Implementation = ({ onPrevious, canGoPrevious }) => {
+    const { recoveryData, monitorRecovery } = useRecoveryMonitor();
+    
     const [implementationPhase, setImplementationPhase] = useState('planning');
     const [programData, setProgramData] = useState({
         name: 'Periodized Training Program',
@@ -11,12 +15,381 @@ const Implementation = ({ onPrevious, canGoPrevious }) => {
         completedSessions: 0
     });
 
+    // Enhanced fatigue trac                </div>
+            </div>
+
+            {/* Enhanced Fitness-Fatigue Model Dashboard with Real Data */}
+            <EnhancedFitnessFatigueTracker />
+
+            {/* Optional: Original FitnessFatigueTracker for comparison */}
+            <div className="bg-gray-800 rounded-lg p-6">
+                <h3 className="text-xl font-bold text-white mb-4">
+                    Standard Fitness-Fatigue Tracker
+                </h3>
+                <FitnessFatigueTracker />
+            </div>
+
+            {/* Navigation */}
+            <div className="flex justify-between pt-6 border-t border-gray-600">
+                <div className="flex items-center">
+                    {canGoPrevious && (
+                        <button
+                            onClick={onPrevious}
+                            className="flex items-center gap-2 px-4 py-2 text-gray-300 hover:text-white transition-colors"
+                        >
+                            <RotateCcw className="h-4 w-4" />
+                            Previousl data integration
+    const [fatigueMetrics, setFatigueMetrics] = useState({
+        // Data from fatigue.js algorithms
+        sorenessRecoveryDays: 0,
+        currentSessionGap: 0,
+        frequencyOptimal: true,
+        recoveryRatio: 1.0,
+        // Bryant FF Model data
+        fitnessScore: recoveryData.fitnessScore || 100,
+        fatigueScore: recoveryData.fatigueScore || 0,
+        netReadiness: recoveryData.netReadiness || 100,
+        lastUpdated: new Date().toISOString()
+    });
+
+    // Training logs data for fitness score calculation
+    const [trainingLogs, setTrainingLogs] = useState([
+        {
+            week: 1,
+            sessions: 4,
+            totalVolume: 120, // sets
+            averageIntensity: 75, // % 1RM
+            rpe: 7.2,
+            compliance: 100
+        },
+        {
+            week: 2, 
+            sessions: 4,
+            totalVolume: 130,
+            averageIntensity: 78,
+            rpe: 7.8,
+            compliance: 95
+        },
+        {
+            week: 3,
+            sessions: 4,
+            totalVolume: 140,
+            averageIntensity: 80,
+            rpe: 8.1,
+            compliance: 90
+        }
+    ]);
+
+    // Assessment data for fatigue score calculation
+    const [fatigueAssessments, setFatigueAssessments] = useState([
+        {
+            date: new Date(Date.now() - 86400000).toISOString(), // Yesterday
+            fuel: 4,
+            nervous: 3,
+            messengers: 3,
+            tissues: 4,
+            sleepQuality: 7,
+            motivation: 6,
+            overallFatigue: 4.0
+        },
+        {
+            date: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+            fuel: 3,
+            nervous: 4,
+            messengers: 3,
+            tissues: 3,
+            sleepQuality: 8,
+            motivation: 7,
+            overallFatigue: 3.3
+        }
+    ]);
+
     const [tapering, setTapering] = useState({
         enabled: true,
         startWeek: 14,
         volumeReduction: 50,
         intensityMaintenance: 90
     });
+
+    // Data integration functions for FF Model
+    const calculateFitnessFromLogs = (logs) => {
+        try {
+            if (!logs || logs.length === 0) {
+                console.warn('No training logs available for fitness calculation');
+                return 100; // Default baseline
+            }
+
+            const recentLogs = logs.slice(-4); // Last 4 weeks
+            const avgVolume = recentLogs.reduce((sum, log) => sum + log.totalVolume, 0) / recentLogs.length;
+            const avgIntensity = recentLogs.reduce((sum, log) => sum + log.averageIntensity, 0) / recentLogs.length;
+            const avgCompliance = recentLogs.reduce((sum, log) => sum + log.compliance, 0) / recentLogs.length;
+
+            // Bryant FF Model: Fitness = f(Volume, Intensity, Consistency, Time)
+            const volumeComponent = Math.min(100, (avgVolume / 100) * 40); // 40% weight
+            const intensityComponent = Math.min(100, (avgIntensity / 85) * 30); // 30% weight
+            const complianceComponent = (avgCompliance / 100) * 30; // 30% weight
+
+            return Math.round(volumeComponent + intensityComponent + complianceComponent);
+        } catch (error) {
+            console.error('Error calculating fitness from logs:', error);
+            return fatigueMetrics.fitnessScore; // Return current value on error
+        }
+    };
+
+    const calculateFatigueFromAssessments = (assessments) => {
+        try {
+            if (!assessments || assessments.length === 0) {
+                console.warn('No fatigue assessments available');
+                return 0; // Default no fatigue
+            }
+
+            const recentAssessment = assessments[0]; // Most recent
+            const { fuel, nervous, messengers, tissues, sleepQuality } = recentAssessment;
+
+            // Bryant 4-category fatigue model
+            const fatigueCategories = [fuel, nervous, messengers, tissues];
+            const avgFatigue = fatigueCategories.reduce((sum, score) => sum + score, 0) / 4;
+
+            // Sleep quality inverse relationship (poor sleep = more fatigue)
+            const sleepFactor = Math.max(0, (10 - sleepQuality) / 10);
+
+            // Convert to 0-100 scale (higher = more fatigued)
+            const fatigueScore = ((avgFatigue / 10) * 70) + (sleepFactor * 30);
+            
+            return Math.round(Math.min(100, fatigueScore));
+        } catch (error) {
+            console.error('Error calculating fatigue from assessments:', error);
+            return fatigueMetrics.fatigueScore; // Return current value on error
+        }
+    };
+
+    // Integration with fatigue.js algorithms
+    const integrateFrequencyAnalysis = async () => {
+        try {
+            // Simulate fatigue.js analyzeFrequency function
+            const recentAssessment = fatigueAssessments[0];
+            if (!recentAssessment) return;
+
+            const sorenessLevel = (recentAssessment.tissues / 10) * 7; // Convert to days
+            const currentGap = 2; // Assume every other day training
+
+            const recoveryRatio = sorenessLevel / currentGap;
+            
+            setFatigueMetrics(prev => ({
+                ...prev,
+                sorenessRecoveryDays: Math.round(sorenessLevel),
+                currentSessionGap: currentGap,
+                recoveryRatio: Math.round(recoveryRatio * 100) / 100,
+                frequencyOptimal: recoveryRatio >= 0.7 && recoveryRatio <= 1.3
+            }));
+        } catch (error) {
+            console.error('Error integrating frequency analysis:', error);
+        }
+    };
+
+    // Update FF Model with real data
+    useEffect(() => {
+        try {
+            const calculatedFitness = calculateFitnessFromLogs(trainingLogs);
+            const calculatedFatigue = calculateFatigueFromAssessments(fatigueAssessments);
+            const netReadiness = Math.max(0, calculatedFitness - calculatedFatigue);
+
+            setFatigueMetrics(prev => ({
+                ...prev,
+                fitnessScore: calculatedFitness,
+                fatigueScore: calculatedFatigue,
+                netReadiness,
+                lastUpdated: new Date().toISOString()
+            }));
+
+            // Integrate frequency analysis
+            integrateFrequencyAnalysis();
+        } catch (error) {
+            console.error('Error updating FF Model:', error);
+            // Continue with current values - don't crash the component
+        }
+    }, [trainingLogs, fatigueAssessments]);
+
+    // Enhanced FF Model component with supercompensation tracking
+    const EnhancedFitnessFatigueTracker = () => {
+        const [showDetails, setShowDetails] = useState(false);
+        const [supercompensationPhase, setSupercompensationPhase] = useState('loading');
+
+        // Determine supercompensation phase
+        useEffect(() => {
+            const { fitnessScore, fatigueScore, netReadiness } = fatigueMetrics;
+            
+            if (fatigueScore > fitnessScore) {
+                setSupercompensationPhase('overreaching'); // Fatigue > Fitness
+            } else if (netReadiness > 85) {
+                setSupercompensationPhase('supercompensation'); // Peak readiness
+            } else if (netReadiness < 60) {
+                setSupercompensationPhase('fatigue_accumulation');
+            } else {
+                setSupercompensationPhase('adaptation'); // Normal training
+            }
+        }, [fatigueMetrics]);
+
+        const getPhaseColor = (phase) => {
+            switch (phase) {
+                case 'supercompensation': return 'text-green-400 bg-green-900/20 border-green-500';
+                case 'adaptation': return 'text-blue-400 bg-blue-900/20 border-blue-500';
+                case 'overreaching': return 'text-yellow-400 bg-yellow-900/20 border-yellow-500';
+                case 'fatigue_accumulation': return 'text-red-400 bg-red-900/20 border-red-500';
+                default: return 'text-gray-400 bg-gray-900/20 border-gray-500';
+            }
+        };
+
+        return (
+            <div className="bg-gray-800 rounded-lg p-6">
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold text-white">
+                        Fitness-Fatigue Model Dashboard
+                    </h3>
+                    <button
+                        onClick={() => setShowDetails(!showDetails)}
+                        className="text-sm text-blue-400 hover:text-blue-300"
+                    >
+                        {showDetails ? 'Hide Details' : 'Show Details'}
+                    </button>
+                </div>
+
+                {/* Supercompensation Phase Indicator */}
+                <div className={`rounded-lg p-4 mb-6 border ${getPhaseColor(supercompensationPhase)}`}>
+                    <h4 className="font-semibold text-lg mb-2">
+                        Current Phase: {supercompensationPhase.replace('_', ' ').toUpperCase()}
+                    </h4>
+                    <p className="text-sm opacity-90">
+                        {(() => {
+                            switch (supercompensationPhase) {
+                                case 'supercompensation':
+                                    return 'Optimal performance window - consider testing or competing';
+                                case 'adaptation':
+                                    return 'Normal training adaptations occurring';
+                                case 'overreaching':
+                                    return 'Functional overreaching - recovery needed soon';
+                                case 'fatigue_accumulation':
+                                    return 'High fatigue - deload recommended';
+                                default:
+                                    return 'Monitoring training response...';
+                            }
+                        })()}
+                    </p>
+                </div>
+
+                {/* Main FF Model Display */}
+                <div className="grid gap-6 md:grid-cols-3 mb-6">
+                    <div className="bg-blue-900/20 border border-blue-500 rounded-lg p-4 text-center">
+                        <h4 className="text-blue-400 font-medium mb-2">💪 FITNESS</h4>
+                        <div className="text-3xl font-bold text-white mb-1">
+                            {fatigueMetrics.fitnessScore}%
+                        </div>
+                        <p className="text-xs text-gray-400">
+                            From training logs
+                        </p>
+                    </div>
+
+                    <div className="bg-red-900/20 border border-red-500 rounded-lg p-4 text-center">
+                        <h4 className="text-red-400 font-medium mb-2">😴 FATIGUE</h4>
+                        <div className="text-3xl font-bold text-white mb-1">
+                            {fatigueMetrics.fatigueScore}%
+                        </div>
+                        <p className="text-xs text-gray-400">
+                            From assessments
+                        </p>
+                    </div>
+
+                    <div className={`border rounded-lg p-4 text-center ${
+                        fatigueMetrics.netReadiness >= 80 ? 'bg-green-900/20 border-green-500' :
+                        fatigueMetrics.netReadiness >= 60 ? 'bg-yellow-900/20 border-yellow-500' :
+                        'bg-red-900/20 border-red-500'
+                    }`}>
+                        <h4 className="font-medium mb-2">⚡ NET READINESS</h4>
+                        <div className="text-3xl font-bold text-white mb-1">
+                            {fatigueMetrics.netReadiness}%
+                        </div>
+                        <p className="text-xs text-gray-400">
+                            Fitness - Fatigue
+                        </p>
+                    </div>
+                </div>
+
+                {/* Detailed metrics when expanded */}
+                {showDetails && (
+                    <div className="space-y-4">
+                        <h4 className="text-lg font-semibold text-white">Detailed Analysis</h4>
+                        
+                        {/* Frequency Analysis Integration */}
+                        <div className="bg-gray-700 rounded-lg p-4">
+                            <h5 className="font-medium text-white mb-3">Frequency Analysis (from fatigue.js)</h5>
+                            <div className="grid gap-4 md:grid-cols-2">
+                                <div>
+                                    <p className="text-sm text-gray-300">
+                                        <strong>Recovery Ratio:</strong> {fatigueMetrics.recoveryRatio}
+                                    </p>
+                                    <p className="text-sm text-gray-300">
+                                        <strong>Soreness Recovery:</strong> {fatigueMetrics.sorenessRecoveryDays} days
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-300">
+                                        <strong>Session Gap:</strong> {fatigueMetrics.currentSessionGap} days
+                                    </p>
+                                    <p className={`text-sm font-medium ${
+                                        fatigueMetrics.frequencyOptimal ? 'text-green-400' : 'text-red-400'
+                                    }`}>
+                                        <strong>Frequency:</strong> {fatigueMetrics.frequencyOptimal ? 'Optimal' : 'Needs Adjustment'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Training Load Trends */}
+                        <div className="bg-gray-700 rounded-lg p-4">
+                            <h5 className="font-medium text-white mb-3">Recent Training Data</h5>
+                            {trainingLogs.slice(-2).map((log, index) => (
+                                <div key={index} className="flex justify-between text-sm mb-2">
+                                    <span className="text-gray-300">Week {log.week}:</span>
+                                    <span className="text-white">
+                                        {log.totalVolume} sets, {log.averageIntensity}% intensity, RPE {log.rpe}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Latest Assessment */}
+                        {fatigueAssessments[0] && (
+                            <div className="bg-gray-700 rounded-lg p-4">
+                                <h5 className="font-medium text-white mb-3">Latest Fatigue Assessment</h5>
+                                <div className="grid gap-2 md:grid-cols-4 text-sm">
+                                    <div>
+                                        <span className="text-gray-400">Fuel:</span>
+                                        <span className="text-white ml-1">{fatigueAssessments[0].fuel}/10</span>
+                                    </div>
+                                    <div>
+                                        <span className="text-gray-400">Nervous:</span>
+                                        <span className="text-white ml-1">{fatigueAssessments[0].nervous}/10</span>
+                                    </div>
+                                    <div>
+                                        <span className="text-gray-400">Hormonal:</span>
+                                        <span className="text-white ml-1">{fatigueAssessments[0].messengers}/10</span>
+                                    </div>
+                                    <div>
+                                        <span className="text-gray-400">Tissue:</span>
+                                        <span className="text-white ml-1">{fatigueAssessments[0].tissues}/10</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                <div className="mt-4 text-xs text-gray-500 text-center">
+                    Last updated: {new Date(fatigueMetrics.lastUpdated).toLocaleString()}
+                </div>
+            </div>
+        );
+    };
 
     const [evaluationMetrics, setEvaluationMetrics] = useState([
         { metric: '1RM Squat', baseline: 315, current: 315, target: 350, unit: 'lbs' },
