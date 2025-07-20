@@ -1,13 +1,13 @@
 import React from 'react';
-import UnifiedMacrocyclePlanner from '../../macrocycle/UnifiedMacrocyclePlanner';
+import { EnhancedMacrocyclePlanner } from '../../macrocycle/EnhancedMacrocyclePlanner';
 
 /**
  * MacrocycleStructure - Unified macrocycle planning component
- * Now uses the complete unified system merging all features
+ * Now uses the enhanced multi-goal system instead of the legacy single-goal approach
  */
 const MacrocycleStructure = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
     return (
-        <UnifiedMacrocyclePlanner
+        <EnhancedMacrocyclePlanner
             onNext={onNext}
             onPrevious={onPrevious}
             canGoNext={canGoNext}
