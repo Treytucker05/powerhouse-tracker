@@ -109,6 +109,18 @@ const UnifiedMacrocyclePlanner = ({ onNext, onPrevious, canGoNext, canGoPrevious
             disadvantages: ['Less specific adaptations', 'Complex tracking', 'Potential overreaching'],
             icon: '🌊',
             color: 'green'
+        },
+        reverse_linear: {
+            id: 'reverse_linear',
+            name: 'Reverse Linear Periodization',
+            description: 'Start high intensity/low volume, progressively build volume for hypertrophy/endurance',
+            duration: '12-16 weeks',
+            bestFor: 'Advanced athletes, hypertrophy focus, endurance building after strength phase',
+            phases: ['Power', 'Hypertrophy', 'Volume'],
+            advantages: ['Volume tolerance building', 'Strength maintenance', 'Neural recovery'],
+            disadvantages: ['Requires high initial fitness', 'Complex volume management', 'Risk of overuse'],
+            icon: '📉',
+            color: 'cyan'
         }
     };
 
@@ -317,7 +329,7 @@ const UnifiedMacrocyclePlanner = ({ onNext, onPrevious, canGoNext, canGoPrevious
             }
         ];
 
-        const sampleMesocycles = generateMesocyclesFromGoals(sampleGoals, startDate);
+        const sampleMesocycles = generateMesocyclesFromGoals(sampleGoals, startDate, macrocycle.periodizationModel);
 
         setMacrocycle(prev => ({
             ...prev,
@@ -336,20 +348,32 @@ const UnifiedMacrocyclePlanner = ({ onNext, onPrevious, canGoNext, canGoPrevious
         }));
     };
 
-    const generateMesocyclesFromGoals = (goals, startDate) => {
+    const generateMesocyclesFromGoals = (goals, startDate, periodizationModel = 'linear') => {
         const mesocycles = [];
         let mesoId = 1;
+
+        // Debug logging for reverse linear testing
+        console.log(`🔍 Generating mesocycles with ${periodizationModel} model`);
 
         goals.forEach(goal => {
             const goalConfig = programGoals[goal.type];
             const mesocycleCount = Math.ceil(goal.duration / 3);
+
+            console.log(`📊 Goal: ${goal.name}, Blocks: ${mesocycleCount}, Model: ${periodizationModel}`);
 
             for (let i = 0; i < mesocycleCount; i++) {
                 const startWeek = goal.startWeek + (i * 3);
                 const duration = Math.min(4, goal.startWeek + goal.duration - startWeek);
 
                 if (duration > 0) {
-                    const mesoType = selectMesocycleType(goalConfig.mesocycleTypes, i, mesocycleCount);
+                    const mesoType = selectMesocycleType(goalConfig.mesocycleTypes, i, mesocycleCount, periodizationModel);
+                    const volume = calculateVolumeTarget(goalConfig, mesoType, periodizationModel, i, mesocycleCount);
+                    const intensity = calculateIntensityTarget(goalConfig, mesoType, periodizationModel, i, mesocycleCount);
+
+                    // Debug reverse linear progression
+                    if (periodizationModel === 'reverse_linear') {
+                        console.log(`🔄 Block ${i + 1}/${mesocycleCount}: ${mesoType} | Vol: ${volume}% | Int: ${intensity}%`);
+                    }
 
                     mesocycles.push({
                         id: `meso-${mesoId++}`,
@@ -361,11 +385,11 @@ const UnifiedMacrocyclePlanner = ({ onNext, onPrevious, canGoNext, canGoPrevious
                         duration,
                         startDate: new Date(startDate.getTime() + (startWeek - 1) * 7 * 24 * 60 * 60 * 1000),
                         endDate: new Date(startDate.getTime() + (startWeek + duration - 2) * 7 * 24 * 60 * 60 * 1000),
-                        volume: calculateVolumeTarget(goalConfig, mesoType),
-                        intensity: calculateIntensityTarget(goalConfig, mesoType),
+                        volume: volume,
+                        intensity: intensity,
                         focus: goalConfig.description,
                         exercises: [],
-                        progressionModel: 'linear',
+                        progressionModel: periodizationModel === 'reverse_linear' ? 'reverse_linear' : 'linear',
                         microcyclePattern: 'linear',
                         deloadProtocol: mesocycleTypes[mesoType].deloadType
                     });
@@ -376,9 +400,18 @@ const UnifiedMacrocyclePlanner = ({ onNext, onPrevious, canGoNext, canGoPrevious
         return mesocycles.sort((a, b) => a.startWeek - b.startWeek);
     };
 
-    const selectMesocycleType = (availableTypes, blockIndex, totalBlocks) => {
+    const selectMesocycleType = (availableTypes, blockIndex, totalBlocks, periodizationModel = 'linear') => {
         if (totalBlocks === 1) return availableTypes[0] || 'accumulation';
 
+        // Reverse linear periodization: Start with high intensity, end with high volume
+        if (periodizationModel === 'reverse_linear') {
+            if (blockIndex === 0) return 'realization'; // Start with power/intensity
+            if (blockIndex === Math.floor(totalBlocks / 2)) return 'intensification'; // Middle hypertrophy
+            if (blockIndex >= totalBlocks - 2) return 'accumulation'; // End with volume
+            return 'intensification'; // Default to hypertrophy range
+        }
+
+        // Traditional linear and block periodization logic
         if (availableTypes.includes('accumulation') && blockIndex < totalBlocks - 1) {
             return 'accumulation';
         }
@@ -392,7 +425,7 @@ const UnifiedMacrocyclePlanner = ({ onNext, onPrevious, canGoNext, canGoPrevious
         return availableTypes[blockIndex % availableTypes.length] || 'accumulation';
     };
 
-    const calculateVolumeTarget = (goalConfig, mesoType) => {
+    const calculateVolumeTarget = (goalConfig, mesoType, periodizationModel = 'linear', blockIndex = 0, totalBlocks = 1) => {
         const mesoConfig = mesocycleTypes[mesoType];
         const baseVolume = (mesoConfig.volumeRange[0] + mesoConfig.volumeRange[1]) / 2;
 
@@ -406,10 +439,18 @@ const UnifiedMacrocyclePlanner = ({ onNext, onPrevious, canGoNext, canGoPrevious
             maintenance: 0.6
         }[goalConfig] || 1.0;
 
-        return Math.round(baseVolume * goalMultiplier);
+        let progressionMultiplier = 1.0;
+
+        // Reverse linear: Start low volume, progressively increase
+        if (periodizationModel === 'reverse_linear' && totalBlocks > 1) {
+            const progressionFactor = blockIndex / (totalBlocks - 1); // 0 to 1
+            progressionMultiplier = 0.6 + (0.8 * progressionFactor); // 60% to 140% progression
+        }
+
+        return Math.round(baseVolume * goalMultiplier * progressionMultiplier);
     };
 
-    const calculateIntensityTarget = (goalConfig, mesoType) => {
+    const calculateIntensityTarget = (goalConfig, mesoType, periodizationModel = 'linear', blockIndex = 0, totalBlocks = 1) => {
         const mesoConfig = mesocycleTypes[mesoType];
         const baseIntensity = (mesoConfig.intensityRange[0] + mesoConfig.intensityRange[1]) / 2;
 
@@ -423,7 +464,15 @@ const UnifiedMacrocyclePlanner = ({ onNext, onPrevious, canGoNext, canGoPrevious
             maintenance: 0.7
         }[goalConfig] || 1.0;
 
-        return Math.round(baseIntensity * goalMultiplier);
+        let progressionMultiplier = 1.0;
+
+        // Reverse linear: Start high intensity, gradually decrease
+        if (periodizationModel === 'reverse_linear' && totalBlocks > 1) {
+            const progressionFactor = blockIndex / (totalBlocks - 1); // 0 to 1
+            progressionMultiplier = 1.2 - (0.4 * progressionFactor); // 120% to 80% progression
+        }
+
+        return Math.round(baseIntensity * goalMultiplier * progressionMultiplier);
     };
 
     const handleDragEnd = (event) => {
@@ -464,7 +513,7 @@ const UnifiedMacrocyclePlanner = ({ onNext, onPrevious, canGoNext, canGoPrevious
                 : 1
         };
 
-        const newMesocycles = generateMesocyclesFromGoals([newGoal], macrocycle.startDate);
+        const newMesocycles = generateMesocyclesFromGoals([newGoal], macrocycle.startDate, macrocycle.periodizationModel);
 
         setMacrocycle(prev => ({
             ...prev,
@@ -674,8 +723,8 @@ const PlanningView = ({
                         <div
                             key={key}
                             className={`p-4 border rounded-lg cursor-pointer transition-all ${macrocycle.periodizationModel === key
-                                    ? `border-${model.color}-500 bg-${model.color}-900/30`
-                                    : 'border-gray-500 hover:border-gray-400 bg-gray-600'
+                                ? `border-${model.color}-500 bg-${model.color}-900/30`
+                                : 'border-gray-500 hover:border-gray-400 bg-gray-600'
                                 }`}
                             onClick={() => setMacrocycle(prev => ({ ...prev, periodizationModel: key }))}
                         >
@@ -728,8 +777,8 @@ const PlanningView = ({
                                             </div>
                                         </div>
                                         <span className={`px-2 py-1 rounded text-xs font-medium ${goal.priority === 'high' ? 'bg-red-900 text-red-300' :
-                                                goal.priority === 'medium' ? 'bg-yellow-900 text-yellow-300' :
-                                                    'bg-green-900 text-green-300'
+                                            goal.priority === 'medium' ? 'bg-yellow-900 text-yellow-300' :
+                                                'bg-green-900 text-green-300'
                                             }`}>
                                             {goal.priority} priority
                                         </span>
