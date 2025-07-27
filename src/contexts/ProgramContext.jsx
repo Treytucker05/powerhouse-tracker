@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useReducer, useCallback } from 'react';
-import { useVolumeAlgorithms } from '../tracker-ui-good/tracker-ui/src/hooks/useVolumeAlgorithms';
-import { useFatigueAlgorithms } from '../tracker-ui-good/tracker-ui/src/hooks/useFatigueAlgorithms';
-import { useIntelligenceAlgorithms } from '../tracker-ui-good/tracker-ui/src/hooks/useIntelligenceAlgorithms';
-import { useExerciseAlgorithms } from '../tracker-ui-good/tracker-ui/src/hooks/useExerciseAlgorithms';
+import { useVolumeAlgorithms } from '../hooks/useVolumeAlgorithms';
+import { useFatigueAlgorithms } from '../hooks/useFatigueAlgorithms';
+import { useIntelligenceAlgorithms } from '../hooks/useIntelligenceAlgorithms';
+import { useExerciseAlgorithms } from '../hooks/useExerciseAlgorithms';
 
 // Program state management
 const ProgramContext = createContext();
@@ -272,12 +272,11 @@ export const ProgramProvider = ({ children }) => {
         if (!sessionData) return null;
 
         try {
-            const volumeProgression = volumeAlgorithms.generateVolumeProgression({
-                currentVolume: sessionData.volume,
-                targetWeeks: state.programData.duration,
-                goal: state.programData.goal,
-                experienceLevel: state.assessmentData?.experienceLevel || 'intermediate'
-            });
+            const volumeProgression = volumeAlgorithms.generateVolumeProgression(
+                sessionData.volume || 10,
+                state.programData.targetVolume || 20,
+                state.programData.duration || 4
+            );
 
             updateAlgorithmData({ volumeMetrics: volumeProgression });
             return volumeProgression;
@@ -285,19 +284,18 @@ export const ProgramProvider = ({ children }) => {
             console.error('Volume calculation error:', error);
             return null;
         }
-    }, [volumeAlgorithms, state.programData, state.assessmentData, updateAlgorithmData]);
+    }, [volumeAlgorithms, state.programData, updateAlgorithmData]);
 
     const analyzeFatigueStatus = useCallback(async (trainingData) => {
         if (!trainingData) return null;
 
         try {
-            const fatigueAnalysis = fatigueAlgorithms.calculateFatigueScore({
-                volume: trainingData.volume,
-                intensity: trainingData.intensity,
-                frequency: trainingData.frequency,
-                sleepQuality: trainingData.sleepQuality || 7,
-                stressLevel: trainingData.stressLevel || 5
-            });
+            const fatigueAnalysis = fatigueAlgorithms.calculateFatigueScore([{
+                totalSets: trainingData.volume || 10,
+                avgRIR: (10 - (trainingData.intensity || 75) / 10),
+                duration: 60,
+                completed: true
+            }]);
 
             updateAlgorithmData({ fatigueAnalysis });
             return fatigueAnalysis;
@@ -309,13 +307,11 @@ export const ProgramProvider = ({ children }) => {
 
     const generateIntelligentRecommendations = useCallback(async () => {
         try {
-            const recommendations = intelligenceAlgorithms.generateRecommendations({
-                programData: state.programData,
-                assessmentData: state.assessmentData,
-                volumeData: state.algorithmData.volumeMetrics,
-                fatigueData: state.algorithmData.fatigueAnalysis,
-                bryantConfig: state.bryantConfig
-            });
+            const { recommendations } = intelligenceAlgorithms.generateRecommendations(
+                state.programData,
+                [], // training history - would come from actual data
+                state.assessmentData?.goals || []
+            );
 
             updateAlgorithmData({ intelligenceRecommendations: recommendations });
             return recommendations;
@@ -329,18 +325,16 @@ export const ProgramProvider = ({ children }) => {
         if (!criteria) return null;
 
         try {
-            const exerciseSelection = exerciseAlgorithms.selectOptimalExercises({
-                targetMuscles: criteria.targetMuscles || [],
-                goal: state.programData.goal,
-                availableEquipment: criteria.equipment || [],
+            const exerciseSelection = exerciseAlgorithms.selectExercises({
+                muscleGroups: criteria.targetMuscles || [],
+                goal: state.programData.goal || 'hypertrophy',
+                equipment: criteria.equipment || [],
                 experienceLevel: state.assessmentData?.experienceLevel || 'intermediate',
-                fatigueConstraint: state.algorithmData.fatigueAnalysis?.currentLevel || 5,
-                timeConstraint: criteria.timeConstraint || 'normal'
+                maxFatigueIndex: 8,
+                sessionType: criteria.timeConstraint === 'minimal' ? 'minimal' : 'normal'
             });
 
-            const optimizedOrder = exerciseAlgorithms.optimizeExerciseOrder(
-                exerciseSelection.recommendations.map(r => r.primaryRecommendation).filter(Boolean)
-            );
+            const optimizedOrder = exerciseAlgorithms.optimizeExerciseOrder(exerciseSelection);
 
             updateAlgorithmData({
                 exerciseSelections: {
