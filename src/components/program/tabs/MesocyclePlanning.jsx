@@ -1,28 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Layers, RotateCcw, CheckCircle, Target, TrendingUp, Zap, AlertTriangle, Calendar } from 'lucide-react';
-import { DndContext, closestCenter } from '@dnd-kit/core';
-import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { useRecoveryMonitor } from '../../hooks/useRecoveryMonitor';
+import React, { useState } from 'react';
+import { Layers, RotateCcw, CheckCircle, Target, TrendingUp, Zap } from 'lucide-react';
 
-// Sortable Mesocycle Item Component
+// Simple sortable component without DndKit dependency
 const SortableMesocycleItem = ({ mesocycle, index, onUpdate, onRemove }) => {
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-        isDragging,
-    } = useSortable({ id: mesocycle.id });
-
-    const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.5 : 1,
-    };
-
     const getBlockTypeIcon = (type) => {
         switch (type) {
             case 'accumulation': return Target;
@@ -44,14 +24,7 @@ const SortableMesocycleItem = ({ mesocycle, index, onUpdate, onRemove }) => {
     const BlockIcon = getBlockTypeIcon(mesocycle.type);
 
     return (
-        <div
-            ref={setNodeRef}
-            style={style}
-            {...attributes}
-            {...listeners}
-            className={`bg-gray-600 border-2 border-gray-500 rounded-lg p-4 cursor-move hover:border-gray-400 transition-colors ${isDragging ? 'shadow-lg' : 'shadow-sm'
-                }`}
-        >
+        <div className="bg-gray-600 border-2 border-gray-500 rounded-lg p-4 hover:border-gray-400 transition-colors">
             <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center space-x-3">
                     <div className={`w-3 h-3 rounded-full ${getBlockTypeColor(mesocycle.type)}`} />
@@ -103,8 +76,6 @@ const SortableMesocycleItem = ({ mesocycle, index, onUpdate, onRemove }) => {
 };
 
 const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
-    const { monitorRecovery, autoDeloadCheck } = useRecoveryMonitor();
-
     const [mesocycles, setMesocycles] = useState([
         {
             id: 'accumulation-1',
@@ -114,11 +85,7 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
             volume: 'high',
             intensity: 'moderate',
             focus: 'base_building',
-            hasDeload: true,
-            weekStart: 1,
-            weekEnd: 4,
-            deloadWeek: 4,
-            deloadType: 'scheduled' // 'scheduled', 'fatigue-triggered', 'manual'
+            hasDeload: true
         },
         {
             id: 'transmutation-1',
@@ -128,11 +95,7 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
             volume: 'moderate',
             intensity: 'high',
             focus: 'strength',
-            hasDeload: false,
-            weekStart: 5,
-            weekEnd: 7,
-            deloadWeek: null,
-            deloadType: null
+            hasDeload: false
         },
         {
             id: 'realization-1',
@@ -142,36 +105,9 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
             volume: 'low',
             intensity: 'very_high',
             focus: 'peaking',
-            hasDeload: false,
-            weekStart: 8,
-            weekEnd: 9,
-            deloadWeek: null,
-            deloadType: null
+            hasDeload: false
         }
     ]);
-
-    const [deloadSettings, setDeloadSettings] = useState({
-        autoSchedule: true,
-        frequency: 4, // Every 4 weeks (Bryant: 3-6 weeks)
-        volumeReduction: 0.65, // Bryant: 60-70%
-        duration: 1, // 1 week
-        fatigueThreshold: 7, // Trigger if fatigue > 7/10
-        enabled: true
-    });
-
-    const [fatigueData, setFatigueData] = useState({
-        currentWeek: 1,
-        fatigueScores: {
-            fuel: 3,
-            nervous: 3,
-            messengers: 3,
-            tissues: 3
-        },
-        recoveryCapacity: 'good',
-        lastUpdate: new Date().toISOString()
-    });
-
-    const [deloadRecommendations, setDeloadRecommendations] = useState([]);
 
     const [newMesocycle, setNewMesocycle] = useState({
         name: '',
@@ -231,14 +167,9 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
 
     const addMesocycle = () => {
         if (newMesocycle.name) {
-            const lastWeekEnd = mesocycles.reduce((max, m) => Math.max(max, m.weekEnd || 0), 0);
             const mesocycle = {
                 ...newMesocycle,
-                id: `${newMesocycle.type}-${Date.now()}`,
-                weekStart: lastWeekEnd + 1,
-                weekEnd: lastWeekEnd + newMesocycle.duration,
-                deloadWeek: newMesocycle.hasDeload ? lastWeekEnd + newMesocycle.duration : null,
-                deloadType: newMesocycle.hasDeload ? 'scheduled' : null
+                id: `${newMesocycle.type}-${Date.now()}`
             };
             setMesocycles(prev => [...prev, mesocycle]);
             setNewMesocycle({
@@ -253,124 +184,8 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
         }
     };
 
-    // Bryant Periodization: Proactive reload scheduling every 3-6 weeks
-    const scheduleProactiveReloads = (mesocycleList) => {
-        try {
-            if (!deloadSettings.autoSchedule || !deloadSettings.enabled) {
-                return mesocycleList;
-            }
-
-            return mesocycleList.map((mesocycle, index) => {
-                const cumulativeWeeks = mesocycle.weekEnd || (index + 1) * mesocycle.duration;
-
-                // Schedule reload every 4 weeks (Bryant: 3-6 weeks optimal range)
-                const shouldHaveReload = cumulativeWeeks % deloadSettings.frequency === 0;
-
-                if (shouldHaveReload && !mesocycle.hasDeload) {
-                    return {
-                        ...mesocycle,
-                        hasDeload: true,
-                        deloadWeek: mesocycle.weekEnd,
-                        deloadType: 'scheduled',
-                        volumeReduction: deloadSettings.volumeReduction,
-                        deloadDuration: deloadSettings.duration
-                    };
-                }
-
-                return mesocycle;
-            });
-        } catch (error) {
-            console.warn('Error in proactive reload scheduling:', error);
-            return mesocycleList; // Return original if scheduling fails
-        }
-    };
-
-    // Monitor fatigue and trigger emergency reloads
-    const checkFatigueTriggeredReloads = () => {
-        try {
-            if (!fatigueData.fatigueScores) {
-                console.warn('Fatigue data missing - using default values');
-                return [];
-            }
-
-            const currentWeek = fatigueData.currentWeek;
-            const deloadCheck = autoDeloadCheck(currentWeek, fatigueData.fatigueScores);
-
-            if (deloadCheck.recommended && deloadCheck.type === 'fatigue-triggered') {
-                return [{
-                    week: currentWeek,
-                    type: 'emergency',
-                    reason: deloadCheck.reasoning,
-                    volumeReduction: deloadCheck.volumeReduction,
-                    duration: deloadCheck.duration,
-                    recommendations: deloadCheck.recommendations || []
-                }];
-            }
-
-            return [];
-        } catch (error) {
-            console.error('Error checking fatigue-triggered reloads:', error);
-            // Return empty array with error handling
-            return [{
-                week: fatigueData.currentWeek,
-                type: 'error',
-                reason: 'Unable to assess fatigue - manual monitoring recommended',
-                volumeReduction: 0.7, // Default to 70% volume
-                duration: '1 week',
-                recommendations: [
-                    'Monitor training readiness manually',
-                    'Consider consulting with coach',
-                    'Check fatigue assessment inputs'
-                ]
-            }];
-        }
-    };
-
-    // Update mesocycles with automatic reload scheduling
-    useEffect(() => {
-        if (deloadSettings.autoSchedule) {
-            const updatedMesocycles = scheduleProactiveReloads(mesocycles);
-            if (JSON.stringify(updatedMesocycles) !== JSON.stringify(mesocycles)) {
-                setMesocycles(updatedMesocycles);
-            }
-        }
-    }, [deloadSettings.autoSchedule, deloadSettings.frequency]);
-
-    // Monitor fatigue and update recommendations
-    useEffect(() => {
-        const recommendations = checkFatigueTriggeredReloads();
-        setDeloadRecommendations(recommendations);
-    }, [fatigueData.fatigueScores, fatigueData.currentWeek]);
-
-    // Calculate total program duration and reload frequency
-    const calculateProgramStats = () => {
-        const totalWeeks = mesocycles.reduce((sum, m) => sum + m.duration, 0);
-        const scheduledReloads = mesocycles.filter(m => m.hasDeload).length;
-        const reloadFrequency = totalWeeks / Math.max(scheduledReloads, 1);
-
-        return {
-            totalWeeks,
-            scheduledReloads,
-            reloadFrequency: Math.round(reloadFrequency * 10) / 10,
-            isOptimal: reloadFrequency >= 3 && reloadFrequency <= 6 // Bryant: 3-6 weeks
-        };
-    };
-
     const removeMesocycle = (id) => {
         setMesocycles(prev => prev.filter(m => m.id !== id));
-    };
-
-    const handleDragEnd = (event) => {
-        const { active, over } = event;
-
-        if (active.id !== over.id) {
-            setMesocycles((items) => {
-                const oldIndex = items.findIndex(item => item.id === active.id);
-                const newIndex = items.findIndex(item => item.id === over.id);
-
-                return arrayMove(items, oldIndex, newIndex);
-            });
-        }
     };
 
     const getTotalDuration = () => {
@@ -379,6 +194,17 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
 
     return (
         <div className="space-y-6">
+            {/* Header */}
+            <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-4">
+                <h3 className="text-purple-400 font-semibold mb-2 flex items-center gap-2">
+                    <Layers className="h-5 w-5" />
+                    Mesocycle Planning
+                </h3>
+                <p className="text-purple-300 text-sm">
+                    Design training blocks and sequence them for optimal adaptation
+                </p>
+            </div>
+
             {/* Mesocycle Theory */}
             <div className="bg-gray-700 rounded-lg p-6 border border-gray-600">
                 <div className="flex items-center gap-2 mb-4">
@@ -416,13 +242,13 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
                     <input
                         type="text"
                         placeholder="Block name"
-                        className="px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
+                        className="px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none"
                         value={newMesocycle.name}
                         onChange={(e) => setNewMesocycle(prev => ({ ...prev, name: e.target.value }))}
                     />
 
                     <select
-                        className="px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+                        className="px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
                         value={newMesocycle.type}
                         onChange={(e) => setNewMesocycle(prev => ({ ...prev, type: e.target.value }))}
                     >
@@ -436,13 +262,13 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
                         min="1"
                         max="8"
                         placeholder="Weeks"
-                        className="px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+                        className="px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
                         value={newMesocycle.duration}
                         onChange={(e) => setNewMesocycle(prev => ({ ...prev, duration: parseInt(e.target.value) }))}
                     />
 
                     <select
-                        className="px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+                        className="px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
                         value={newMesocycle.volume}
                         onChange={(e) => setNewMesocycle(prev => ({ ...prev, volume: e.target.value }))}
                     >
@@ -452,7 +278,7 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
                     </select>
 
                     <select
-                        className="px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+                        className="px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
                         value={newMesocycle.intensity}
                         onChange={(e) => setNewMesocycle(prev => ({ ...prev, intensity: e.target.value }))}
                     >
@@ -462,7 +288,7 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
                     </select>
 
                     <select
-                        className="px-3 py-2 bg-red-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
+                        className="px-3 py-2 bg-gray-600 border border-gray-500 rounded-md text-white focus:border-blue-500 focus:outline-none"
                         value={newMesocycle.focus}
                         onChange={(e) => setNewMesocycle(prev => ({ ...prev, focus: e.target.value }))}
                     >
@@ -491,26 +317,16 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
                 </div>
 
                 {mesocycles.length > 0 ? (
-                    <DndContext
-                        collisionDetection={closestCenter}
-                        onDragEnd={handleDragEnd}
-                    >
-                        <SortableContext
-                            items={mesocycles.map(m => m.id)}
-                            strategy={verticalListSortingStrategy}
-                        >
-                            <div className="space-y-3">
-                                {mesocycles.map((mesocycle, index) => (
-                                    <SortableMesocycleItem
-                                        key={mesocycle.id}
-                                        mesocycle={mesocycle}
-                                        index={index}
-                                        onRemove={removeMesocycle}
-                                    />
-                                ))}
-                            </div>
-                        </SortableContext>
-                    </DndContext>
+                    <div className="space-y-3">
+                        {mesocycles.map((mesocycle, index) => (
+                            <SortableMesocycleItem
+                                key={mesocycle.id}
+                                mesocycle={mesocycle}
+                                index={index}
+                                onRemove={removeMesocycle}
+                            />
+                        ))}
+                    </div>
                 ) : (
                     <div className="text-center py-12 text-gray-400">
                         <Layers className="h-12 w-12 mx-auto mb-3 opacity-50" />
@@ -546,40 +362,8 @@ const MesocyclePlanning = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => 
                     </div>
                 </div>
             </div>
-
-            {/* Navigation */}
-            <div className="flex justify-between pt-6 border-t border-gray-600">
-                <div className="flex items-center">
-                    {canGoPrevious && (
-                        <button
-                            onClick={onPrevious}
-                            className="flex items-center gap-2 px-4 py-2 text-gray-300 hover:text-white transition-colors"
-                        >
-                            <RotateCcw className="h-4 w-4" />
-                            Previous
-                        </button>
-                    )}
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <div className="text-sm text-gray-400">
-                        Step 4 of 7: Plan Mesocycles
-                    </div>
-
-                    {canGoNext && (
-                        <button
-                            onClick={onNext}
-                            className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                        >
-                            Next: Microcycle Design
-                            <CheckCircle className="h-4 w-4" />
-                        </button>
-                    )}
-                </div>
-            </div>
         </div>
     );
 };
 
 export default MesocyclePlanning;
-

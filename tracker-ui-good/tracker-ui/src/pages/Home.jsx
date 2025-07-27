@@ -2,7 +2,6 @@ import React from 'react';
 import SimpleVolumeChart from '../components/dashboard/SimpleVolumeChart';
 import TrainingStatusCard from '../components/dashboard/TrainingStatusCard';
 import TrainingSplitOverview from '../components/dashboard/TrainingSplitOverview';
-import UpcomingSessionsPreview from '../components/UpcomingSessionsPreview';
 import VolumeTonnageCard from '../components/dashboard/VolumeTonnageCard';
 import DashboardCard from '../components/ui/DashboardCard';
 import HeroHeader from '../components/ui/HeroHeader';
@@ -63,7 +62,7 @@ export default function Home() {
       background: 'linear-gradient(135deg, #1C1C1C 0%, #0A0A0A 100%)'
     }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        
+
         {/* 1 · Hero header (transparent wrapper) */}
         <DashboardCard className="border-none bg-transparent p-0">
           <HeroHeader />
@@ -83,16 +82,28 @@ export default function Home() {
         {/* 5 · Split & upcoming workouts */}
         <div className="flex flex-col gap-8">
           <TrainingSplitOverview split={["Push", "Pull", "Legs", "Rest"]} />
-          <UpcomingSessionsPreview
-            sessions={[
-              { id: "s1", dateStr: "Friday", focus: "Push" },
-              { id: "s2", dateStr: "Sunday", focus: "Pull + Arms" },
-              { id: "s3", dateStr: "Tuesday", focus: "Legs" },
-            ]}
-          />
+
+          {/* Upcoming Sessions - Component temporarily removed during cleanup */}
+          <DashboardCard>
+            <h3 className="text-lg font-semibold mb-4">Upcoming Sessions</h3>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <span className="font-medium">Friday</span>
+                <span className="text-sm text-gray-600">Push</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <span className="font-medium">Sunday</span>
+                <span className="text-sm text-gray-600">Pull + Arms</span>
+              </div>
+              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <span className="font-medium">Tuesday</span>
+                <span className="text-sm text-gray-600">Legs</span>
+              </div>
+            </div>
+          </DashboardCard>
         </div>
       </div>
-      
+
       {/* Sticky AI insight footer */}
       <AIInsightBar insight={aiInsight} />
     </div>

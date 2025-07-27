@@ -1,0 +1,3983 @@
+{
+  "timestamp": "2025-07-24T17:09:32.790Z",
+  "routes": [
+    {
+      "file": "archive\\macrocycle-legacy-20250703\\Macrocycle7.1.25.fixed.jsx",
+      "routes": [
+        {
+          "path": "/program",
+          "type": "programmatic-navigation",
+          "action": "navigate"
+        },
+        {
+          "path": "/program",
+          "type": "programmatic-navigation",
+          "action": "navigate"
+        }
+      ],
+      "type": "unknown"
+    },
+    {
+      "file": "src\\App.jsx",
+      "routes": [
+        {
+          "path": "/",
+          "element": null,
+          "component": null,
+          "type": "react-router"
+        },
+        {
+          "path": "/assessment",
+          "element": null,
+          "component": null,
+          "type": "react-router"
+        },
+        {
+          "path": "/program",
+          "element": null,
+          "component": null,
+          "type": "react-router"
+        }
+      ],
+      "type": "unknown"
+    },
+    {
+      "file": "src\\components\\assessment\\StepWizard.jsx",
+      "routes": [
+        {
+          "path": "/",
+          "type": "programmatic-navigation",
+          "action": "navigate"
+        }
+      ],
+      "type": "unknown"
+    },
+    {
+      "file": "src\\components\\Assessment.jsx",
+      "routes": [
+        {
+          "path": "/",
+          "type": "programmatic-navigation",
+          "action": "navigate"
+        }
+      ],
+      "type": "unknown"
+    },
+    {
+      "file": "tracker-ui-good\\tracker-ui\\src\\App.jsx",
+      "routes": [
+        {
+          "path": "/auth",
+          "element": null,
+          "component": null,
+          "type": "react-router"
+        },
+        {
+          "path": "/",
+          "element": null,
+          "component": null,
+          "type": "react-router"
+        },
+        {
+          "path": "program",
+          "element": null,
+          "component": null,
+          "type": "react-router"
+        },
+        {
+          "path": "assessment",
+          "element": null,
+          "component": null,
+          "type": "react-router"
+        },
+        {
+          "path": "tracking",
+          "element": null,
+          "component": null,
+          "type": "react-router"
+        },
+        {
+          "path": "analytics",
+          "element": null,
+          "component": null,
+          "type": "react-router"
+        },
+        {
+          "path": "exercises",
+          "element": null,
+          "component": null,
+          "type": "react-router"
+        },
+        {
+          "path": "profile",
+          "element": null,
+          "component": null,
+          "type": "react-router"
+        },
+        {
+          "path": "resources",
+          "element": null,
+          "component": null,
+          "type": "react-router"
+        },
+        {
+          "path": "mesocycle",
+          "element": null,
+          "component": null,
+          "type": "react-router"
+        },
+        {
+          "path": "microcycle",
+          "element": null,
+          "component": null,
+          "type": "react-router"
+        },
+        {
+          "path": "macrocycle",
+          "element": null,
+          "component": null,
+          "type": "react-router"
+        },
+        {
+          "path": "macrocycle/:id",
+          "element": null,
+          "component": null,
+          "type": "react-router"
+        },
+        {
+          "path": "builder",
+          "element": null,
+          "component": null,
+          "type": "react-router"
+        },
+        {
+          "path": "program-design",
+          "element": null,
+          "component": null,
+          "type": "react-router"
+        }
+      ],
+      "type": "react-router-dom"
+    },
+    {
+      "file": "tracker-ui-good\\tracker-ui\\src\\components\\assessment\\StepWizard.jsx",
+      "routes": [
+        {
+          "path": "/program",
+          "type": "programmatic-navigation",
+          "action": "navigate"
+        },
+        {
+          "path": "/program",
+          "type": "programmatic-navigation",
+          "action": "navigate"
+        },
+        {
+          "path": "/program",
+          "type": "programmatic-navigation",
+          "action": "navigate"
+        }
+      ],
+      "type": "unknown"
+    },
+    {
+      "file": "tracker-ui-good\\tracker-ui\\src\\components\\NavBar.jsx",
+      "routes": [
+        {
+          "path": "/auth",
+          "type": "programmatic-navigation",
+          "action": "navigate"
+        }
+      ],
+      "type": "unknown"
+    },
+    {
+      "file": "tracker-ui-good\\tracker-ui\\src\\layout\\AppShell.jsx",
+      "routes": [
+        {
+          "path": "/auth",
+          "type": "programmatic-navigation",
+          "action": "navigate"
+        },
+        {
+          "path": "/auth",
+          "type": "programmatic-navigation",
+          "action": "navigate"
+        },
+        {
+          "path": "/",
+          "type": "programmatic-navigation",
+          "action": "navigate"
+        }
+      ],
+      "type": "unknown"
+    },
+    {
+      "file": "tracker-ui-good\\tracker-ui\\src\\pages\\Assessment.jsx",
+      "routes": [
+        {
+          "path": "/program",
+          "type": "programmatic-navigation",
+          "action": "navigate"
+        }
+      ],
+      "type": "unknown"
+    },
+    {
+      "file": "tracker-ui-good\\tracker-ui\\src\\pages\\AuthPage.jsx",
+      "routes": [
+        {
+          "path": "/",
+          "type": "programmatic-navigation",
+          "action": "navigate"
+        },
+        {
+          "path": "/",
+          "type": "programmatic-navigation",
+          "action": "navigate"
+        },
+        {
+          "path": "/",
+          "type": "programmatic-navigation",
+          "action": "navigate"
+        }
+      ],
+      "type": "unknown"
+    },
+    {
+      "file": "tracker-ui-good\\tracker-ui\\src\\pages\\Macrocycle.jsx",
+      "routes": [
+        {
+          "path": "/macrocycle",
+          "type": "programmatic-navigation",
+          "action": "navigate"
+        },
+        {
+          "path": "/program",
+          "type": "programmatic-navigation",
+          "action": "navigate"
+        },
+        {
+          "path": "/program",
+          "type": "programmatic-navigation",
+          "action": "navigate"
+        }
+      ],
+      "type": "unknown"
+    }
+  ],
+  "pages": [
+    {
+      "path": "src\\pages\\design\\Mesocycle.jsx",
+      "name": "function",
+      "exports": [
+        {
+          "type": "default",
+          "name": "function"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "MesocycleWizard",
+          "from": "../../components/mesocycle/MesocycleWizard",
+          "isLocal": true
+        },
+        {
+          "imports": "{ useTrainingState }",
+          "from": "../../lib/state/trainingState",
+          "isLocal": true
+        }
+      ],
+      "routes": [],
+      "tabs": [],
+      "navigation": false,
+      "components": [
+        "MesocycleWizard"
+      ],
+      "hooks": [
+        "useTrainingState"
+      ],
+      "size": 708,
+      "complexity": 2
+    },
+    {
+      "path": "src\\pages\\Program.jsx",
+      "name": "Program",
+      "exports": [
+        {
+          "type": "default",
+          "name": "Program"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Tabs, TabsContent, TabsList, TabsTrigger }",
+          "from": "../components/ui/tabs",
+          "isLocal": true
+        },
+        {
+          "imports": "{ useApp }",
+          "from": "../context",
+          "isLocal": true
+        },
+        {
+          "imports": "ProgramOverview",
+          "from": "../components/program/tabs/ProgramOverview",
+          "isLocal": true
+        },
+        {
+          "imports": "BlockSequencing",
+          "from": "../components/program/tabs/BlockSequencing",
+          "isLocal": true
+        },
+        {
+          "imports": "LoadingParameters",
+          "from": "../components/program/tabs/LoadingParameters",
+          "isLocal": true
+        },
+        {
+          "imports": "TrainingMethods",
+          "from": "../components/program/tabs/TrainingMethods",
+          "isLocal": true
+        },
+        {
+          "imports": "ProgramPreview",
+          "from": "../components/program/tabs/ProgramPreview",
+          "isLocal": true
+        },
+        {
+          "imports": "{ ProgramProvider }",
+          "from": "../contexts/ProgramContext",
+          "isLocal": true
+        }
+      ],
+      "routes": [],
+      "tabs": [
+        {
+          "id": "overview",
+          "label": "Overview"
+        },
+        {
+          "id": "block-sequencing",
+          "label": "Block Sequencing"
+        },
+        {
+          "id": "loading-parameters",
+          "label": "Loading Parameters"
+        },
+        {
+          "id": "training-methods",
+          "label": "Training Methods"
+        },
+        {
+          "id": "program-preview",
+          "label": "Program Preview"
+        }
+      ],
+      "navigation": true,
+      "components": [
+        "ProgramProvider",
+        "Tabs",
+        "TabsList",
+        "TabsTrigger",
+        "TabsContent"
+      ],
+      "hooks": [
+        "useApp",
+        "useState"
+      ],
+      "size": 7353,
+      "complexity": 6
+    }
+  ],
+  "components": [
+    {
+      "path": "src\\components\\assessment\\index.js",
+      "directory": "src/components",
+      "name": "index",
+      "type": "assessment",
+      "exports": [],
+      "imports": [],
+      "props": [],
+      "hooks": [],
+      "hasState": false,
+      "hasEffects": false,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": false,
+      "size": 331,
+      "complexity": 0,
+      "lastModified": "2025-07-13T05:59:06.764Z"
+    },
+    {
+      "path": "src\\components\\assessment\\PersonalInfoStep.jsx",
+      "directory": "src/components",
+      "name": "PersonalInfoStep",
+      "type": "assessment",
+      "exports": [
+        {
+          "type": "default",
+          "name": "PersonalInfoStep"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React",
+          "from": "react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "assessmentData",
+        "onInputChange"
+      ],
+      "hooks": [],
+      "hasState": false,
+      "hasEffects": false,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": false,
+      "size": 1433,
+      "complexity": 0,
+      "lastModified": "2025-07-13T05:59:06.527Z"
+    },
+    {
+      "path": "src\\components\\assessment\\RecommendationStep.jsx",
+      "directory": "src/components",
+      "name": "RecommendationStep",
+      "type": "assessment",
+      "exports": [
+        {
+          "type": "default",
+          "name": "RecommendationStep"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React",
+          "from": "react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "assessmentData"
+      ],
+      "hooks": [],
+      "hasState": false,
+      "hasEffects": false,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": false,
+      "size": 2363,
+      "complexity": 0,
+      "lastModified": "2025-07-13T05:59:06.648Z"
+    },
+    {
+      "path": "src\\components\\assessment\\StepWizard.jsx",
+      "directory": "src/components",
+      "name": "StepWizard",
+      "type": "assessment",
+      "exports": [
+        {
+          "type": "default",
+          "name": "StepWizard"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ useNavigate }",
+          "from": "react-router-dom",
+          "isLocal": false
+        },
+        {
+          "imports": "{ useApp }",
+          "from": "../../context",
+          "isLocal": true
+        },
+        {
+          "imports": "PersonalInfoStep",
+          "from": "./PersonalInfoStep",
+          "isLocal": true
+        },
+        {
+          "imports": "TrainingExperienceStep",
+          "from": "./TrainingExperienceStep",
+          "isLocal": true
+        },
+        {
+          "imports": "TimelineStep",
+          "from": "./TimelineStep",
+          "isLocal": true
+        },
+        {
+          "imports": "RecommendationStep",
+          "from": "./RecommendationStep",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "primaryGoal",
+        "trainingExperience",
+        "timeline",
+        "recommendedSystem"
+      ],
+      "hooks": [
+        "useNavigate",
+        "useApp",
+        "useState",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 8357,
+      "complexity": 20,
+      "lastModified": "2025-07-13T06:06:45.273Z"
+    },
+    {
+      "path": "src\\components\\assessment\\TimelineStep.jsx",
+      "directory": "src/components",
+      "name": "React",
+      "type": "assessment",
+      "exports": [
+        {
+          "type": "default",
+          "name": "React"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useMemo, useCallback }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ FixedSizeList as List }",
+          "from": "react-window",
+          "isLocal": false
+        },
+        {
+          "imports": "{ debounce }",
+          "from": "lodash",
+          "isLocal": false
+        },
+        {
+          "imports": "{ unstable_batchedUpdates }",
+          "from": "react-dom",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "events",
+        "onEventClick",
+        "onDateSelect",
+        "selectedDate"
+      ],
+      "hooks": [
+        "useCallback",
+        "useMemo"
+      ],
+      "hasState": false,
+      "hasEffects": false,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": false,
+      "size": 13084,
+      "complexity": 6,
+      "lastModified": "2025-07-13T06:17:41.528Z"
+    },
+    {
+      "path": "src\\components\\assessment\\TrainingExperienceStep.jsx",
+      "directory": "src/components",
+      "name": "TrainingExperienceStep",
+      "type": "assessment",
+      "exports": [
+        {
+          "type": "default",
+          "name": "TrainingExperienceStep"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React",
+          "from": "react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "assessmentData",
+        "onInputChange"
+      ],
+      "hooks": [],
+      "hasState": false,
+      "hasEffects": false,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": false,
+      "size": 1461,
+      "complexity": 0,
+      "lastModified": "2025-07-13T05:59:06.528Z"
+    },
+    {
+      "path": "src\\components\\Assessment.jsx",
+      "directory": "src/components",
+      "name": "Assessment",
+      "type": "unknown",
+      "exports": [
+        {
+          "type": "default",
+          "name": "Assessment"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ useNavigate }",
+          "from": "react-router-dom",
+          "isLocal": false
+        },
+        {
+          "imports": "{ useApp }",
+          "from": "../context",
+          "isLocal": true
+        },
+        {
+          "imports": "StepWizard",
+          "from": "./assessment/StepWizard",
+          "isLocal": true
+        }
+      ],
+      "props": [],
+      "hooks": [
+        "useNavigate",
+        "useApp"
+      ],
+      "hasState": false,
+      "hasEffects": false,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": false,
+      "size": 5090,
+      "complexity": 1,
+      "lastModified": "2025-07-13T06:06:45.289Z"
+    },
+    {
+      "path": "src\\components\\bryant\\BryantClusterInterface.jsx",
+      "directory": "src/components",
+      "name": "BryantClusterInterface",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "BryantClusterInterface"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect, useCallback }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ AlertCircle, Clock, Target, BarChart3, Play, Pause, RotateCcw }",
+          "from": "lucide-react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "onClusterConfigUpdate",
+        "initialConfig = null",
+        "exerciseData = null",
+        "sessionActive = false"
+      ],
+      "hooks": [
+        "useState",
+        "useEffect",
+        "useCallback"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 21292,
+      "complexity": 29,
+      "lastModified": "2025-07-24T13:44:15.024Z"
+    },
+    {
+      "path": "src\\components\\bryant\\BryantPeriodizationDashboard.jsx",
+      "directory": "src/components",
+      "name": "BryantPeriodizationDashboard",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "BryantPeriodizationDashboard"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect, useCallback }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ TrendingUp, Calendar, Target, Settings, BarChart3, Users, Shield, Activity }",
+          "from": "lucide-react",
+          "isLocal": false
+        },
+        {
+          "imports": "BryantClusterInterface",
+          "from": "./BryantClusterInterface",
+          "isLocal": true
+        },
+        {
+          "imports": "BryantStrongmanInterface",
+          "from": "./BryantStrongmanInterface",
+          "isLocal": true
+        },
+        {
+          "imports": "BryantTacticalInterface",
+          "from": "./BryantTacticalInterface",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "currentPhase",
+        "weekNumber",
+        "cycleNumber",
+        "totalCycles",
+        "phaseGoals",
+        "completedSessions",
+        "totalSessions"
+      ],
+      "hooks": [
+        "useState",
+        "useCallback"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": false,
+      "hasTabs": true,
+      "hasValidation": false,
+      "size": 26169,
+      "complexity": 19,
+      "lastModified": "2025-07-24T13:44:15.344Z"
+    },
+    {
+      "path": "src\\components\\bryant\\BryantStrongmanInterface.jsx",
+      "directory": "src/components",
+      "name": "BryantStrongmanInterface",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "BryantStrongmanInterface"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect, useCallback }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Truck, Timer, MapPin, Target, Calculator, Play, AlertTriangle, CheckCircle }",
+          "from": "lucide-react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "onEventUpdate",
+        "onSessionComplete",
+        "experienceLevel = 'intermediate'",
+        "availableEquipment = []"
+      ],
+      "hooks": [
+        "useState",
+        "useCallback",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 31258,
+      "complexity": 35,
+      "lastModified": "2025-07-24T13:44:15.129Z"
+    },
+    {
+      "path": "src\\components\\bryant\\BryantTacticalInterface.jsx",
+      "directory": "src/components",
+      "name": "BryantTacticalInterface",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "BryantTacticalInterface"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect, useCallback }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Shield, Target, Clock, Users, MapPin, Activity, AlertTriangle, CheckCircle, Star }",
+          "from": "lucide-react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "onMissionUpdate",
+        "onAssessmentComplete",
+        "experienceLevel = 'intermediate'",
+        "unit = 'individual'",
+        "environment = 'urban'"
+      ],
+      "hooks": [
+        "useState",
+        "useCallback"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 30179,
+      "complexity": 23,
+      "lastModified": "2025-07-24T13:44:15.249Z"
+    },
+    {
+      "path": "src\\components\\bryant\\index.js",
+      "directory": "src/components",
+      "name": "BryantConfig",
+      "type": "unknown",
+      "exports": [
+        {
+          "type": "named",
+          "name": "BryantConfig"
+        },
+        {
+          "type": "named",
+          "name": "BryantTypes"
+        }
+      ],
+      "imports": [],
+      "props": [],
+      "hooks": [],
+      "hasState": false,
+      "hasEffects": false,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": false,
+      "size": 1618,
+      "complexity": 0,
+      "lastModified": "2025-07-24T13:44:15.353Z"
+    },
+    {
+      "path": "src\\components\\macrocycle\\EnhancedMacrocyclePlanner.jsx",
+      "directory": "src/components",
+      "name": "EnhancedMacrocyclePlanner",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "EnhancedMacrocyclePlanner"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ DndContext, closestCenter, PointerSensor, useSensor, useSensors }",
+          "from": "@dnd-kit/core",
+          "isLocal": false
+        },
+        {
+          "imports": "{ SortableContext, verticalListSortingStrategy }",
+          "from": "@dnd-kit/sortable",
+          "isLocal": false
+        },
+        {
+          "imports": "{ SortableMesocycleCard }",
+          "from": "./SortableMesocycleCard",
+          "isLocal": true
+        },
+        {
+          "imports": "{ MacrocycleCalendar }",
+          "from": "./MacrocycleCalendar",
+          "isLocal": true
+        },
+        {
+          "imports": "{ GoalSelector }",
+          "from": "./GoalSelector",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "onNext",
+        "onPrevious",
+        "canGoNext",
+        "canGoPrevious"
+      ],
+      "hooks": [
+        "useState",
+        "useSensors",
+        "useSensor",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": false,
+      "size": 34788,
+      "complexity": 22,
+      "lastModified": "2025-07-20T04:42:52.482Z"
+    },
+    {
+      "path": "src\\components\\macrocycle\\GoalSelector.jsx",
+      "directory": "src/components",
+      "name": "GoalSelector",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "named",
+          "name": "GoalSelector"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Plus, Target, X, Calendar, Clock }",
+          "from": "lucide-react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "programGoals",
+        "onAddGoal",
+        "onClose"
+      ],
+      "hooks": [
+        "useState"
+      ],
+      "hasState": true,
+      "hasEffects": false,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 16201,
+      "complexity": 11,
+      "lastModified": "2025-07-20T04:42:52.733Z"
+    },
+    {
+      "path": "src\\components\\macrocycle\\MacrocycleCalendar.jsx",
+      "directory": "src/components",
+      "name": "MacrocycleCalendar",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "named",
+          "name": "MacrocycleCalendar"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState }",
+          "from": "react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "macrocycle",
+        "mesocycleTypes",
+        "programGoals",
+        "onUpdateMesocycle"
+      ],
+      "hooks": [
+        "useState"
+      ],
+      "hasState": true,
+      "hasEffects": false,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": false,
+      "size": 17450,
+      "complexity": 15,
+      "lastModified": "2025-07-20T04:42:52.727Z"
+    },
+    {
+      "path": "src\\components\\macrocycle\\SortableMesocycleCard.jsx",
+      "directory": "src/components",
+      "name": "SortableMesocycleCard",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "named",
+          "name": "SortableMesocycleCard"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ useSortable }",
+          "from": "@dnd-kit/sortable",
+          "isLocal": false
+        },
+        {
+          "imports": "{ CSS }",
+          "from": "@dnd-kit/utilities",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "mesocycle",
+        "mesocycleTypes",
+        "programGoals",
+        "index",
+        "onUpdate",
+        "onRemove"
+      ],
+      "hooks": [
+        "useState",
+        "useSortable"
+      ],
+      "hasState": true,
+      "hasEffects": false,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": false,
+      "size": 17766,
+      "complexity": 9,
+      "lastModified": "2025-07-20T04:42:52.727Z"
+    },
+    {
+      "path": "src\\components\\macrocycle\\UnifiedMacrocyclePlanner.jsx",
+      "directory": "src/components",
+      "name": "UnifiedMacrocyclePlanner",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "UnifiedMacrocyclePlanner"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ DndContext, closestCenter, PointerSensor, useSensor, useSensors }",
+          "from": "@dnd-kit/core",
+          "isLocal": false
+        },
+        {
+          "imports": "{ SortableContext, verticalListSortingStrategy }",
+          "from": "@dnd-kit/sortable",
+          "isLocal": false
+        },
+        {
+          "imports": "{ SortableMesocycleCard }",
+          "from": "./SortableMesocycleCard",
+          "isLocal": true
+        },
+        {
+          "imports": "{ MacrocycleCalendar }",
+          "from": "./MacrocycleCalendar",
+          "isLocal": true
+        },
+        {
+          "imports": "{ GoalSelector }",
+          "from": "./GoalSelector",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "onNext",
+        "onPrevious",
+        "canGoNext",
+        "canGoPrevious"
+      ],
+      "hooks": [
+        "useState",
+        "useSensors",
+        "useSensor",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": false,
+      "size": 44613,
+      "complexity": 29,
+      "lastModified": "2025-07-20T08:08:29.803Z"
+    },
+    {
+      "path": "src\\components\\mesocycle\\MesocycleWizard.jsx",
+      "directory": "src/components",
+      "name": "function",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "function"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "{ useState }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ useTrainingState }",
+          "from": "../../lib/state/trainingState",
+          "isLocal": true
+        },
+        {
+          "imports": "{ designMesocycle }",
+          "from": "../../lib/algorithms/mesocycleDesigner",
+          "isLocal": true
+        }
+      ],
+      "props": [],
+      "hooks": [
+        "useTrainingState",
+        "useState"
+      ],
+      "hasState": true,
+      "hasEffects": false,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": false,
+      "size": 1472,
+      "complexity": 9,
+      "lastModified": "2025-06-25T16:14:53.008Z"
+    },
+    {
+      "path": "src\\components\\program\\ClusterSetComponent.jsx",
+      "directory": "src/components",
+      "name": "ClusterSetComponent",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "ClusterSetComponent"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Timer, Activity, BarChart3, Info }",
+          "from": "lucide-react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "intraRest",
+        "clustersPerSet",
+        "repsPerCluster",
+        "totalSets",
+        "bryantCompliant",
+        "...initialConfig"
+      ],
+      "hooks": [
+        "useState",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": false,
+      "size": 11991,
+      "complexity": 12,
+      "lastModified": "2025-07-23T18:05:33.231Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\BlockSequencing.jsx",
+      "directory": "src/components",
+      "name": "BlockSequencing",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "BlockSequencing"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Calendar, Move, ArrowRight, ArrowLeft, Shuffle, Clock }",
+          "from": "lucide-react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "assessmentData",
+        "onNext",
+        "onPrevious",
+        "canGoNext",
+        "canGoPrevious"
+      ],
+      "hooks": [
+        "useState"
+      ],
+      "hasState": true,
+      "hasEffects": false,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 14562,
+      "complexity": 9,
+      "lastModified": "2025-07-24T16:38:29.909Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\consolidated\\AssessmentGoals.jsx",
+      "directory": "src/components",
+      "name": "AssessmentGoals",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "AssessmentGoals"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ useProgramContext }",
+          "from": "../../../../contexts/ProgramContext",
+          "isLocal": true
+        },
+        {
+          "imports": "{ useAssessment }",
+          "from": "../../../../hooks/useAssessment",
+          "isLocal": true
+        },
+        {
+          "imports": "{ validateBryantIntegration }",
+          "from": "../../../../utils/legacyMigration",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "onNext",
+        "onPrevious"
+      ],
+      "hooks": [
+        "useProgramContext",
+        "useAssessment",
+        "useState",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 23134,
+      "complexity": 24,
+      "lastModified": "2025-07-24T17:01:30.463Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\consolidated\\ConsolidatedFramework.jsx",
+      "directory": "src/components",
+      "name": "ConsolidatedFramework",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "ConsolidatedFramework"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ useProgramContext }",
+          "from": "../../../../contexts/ProgramContext",
+          "isLocal": true
+        },
+        {
+          "imports": "AssessmentGoals",
+          "from": "./AssessmentGoals",
+          "isLocal": true
+        },
+        {
+          "imports": "PeriodizationPlanning",
+          "from": "./PeriodizationPlanning",
+          "isLocal": true
+        },
+        {
+          "imports": "ExerciseSelectionProgression",
+          "from": "./ExerciseSelectionProgression",
+          "isLocal": true
+        },
+        {
+          "imports": "VolumeRecoveryManagement",
+          "from": "./VolumeRecoveryManagement",
+          "isLocal": true
+        },
+        {
+          "imports": "ImplementationTracking",
+          "from": "./ImplementationTracking",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "initialized",
+        "totalSteps",
+        "canNavigateForward",
+        "canNavigateBackward",
+        "progressPercentage"
+      ],
+      "hooks": [
+        "useProgramContext",
+        "useState",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 16054,
+      "complexity": 28,
+      "lastModified": "2025-07-24T13:27:51.250Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\consolidated\\ExerciseSelectionProgression.jsx",
+      "directory": "src/components",
+      "name": "ExerciseSelectionProgression",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "ExerciseSelectionProgression"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ useProgramContext }",
+          "from": "../../../../contexts/ProgramContext",
+          "isLocal": true
+        },
+        {
+          "imports": "{ useExerciseLibrary }",
+          "from": "../../../../hooks/useExerciseLibrary",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "onNext",
+        "onPrevious"
+      ],
+      "hooks": [
+        "useProgramContext",
+        "useExerciseLibrary",
+        "useState",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 40594,
+      "complexity": 40,
+      "lastModified": "2025-07-24T13:27:50.919Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\consolidated\\ImplementationTracking.jsx",
+      "directory": "src/components",
+      "name": "ImplementationTracking",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "ImplementationTracking"
+        },
+        {
+          "type": "named",
+          "name": "handleExport"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ useProgramContext }",
+          "from": "../../../../contexts/ProgramContext",
+          "isLocal": true
+        },
+        {
+          "imports": "{ useImplementation }",
+          "from": "../../../../hooks/useImplementation",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "onNext",
+        "onPrevious"
+      ],
+      "hooks": [
+        "useProgramContext",
+        "useImplementation",
+        "useState",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 33179,
+      "complexity": 30,
+      "lastModified": "2025-07-24T13:27:51.103Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\consolidated\\PeriodizationPlanning.jsx",
+      "directory": "src/components",
+      "name": "PeriodizationPlanning",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "PeriodizationPlanning"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ useProgramContext }",
+          "from": "../../../../contexts/ProgramContext",
+          "isLocal": true
+        },
+        {
+          "imports": "{ useBryantPeriodization }",
+          "from": "../../../../hooks/useBryantPeriodization",
+          "isLocal": true
+        },
+        {
+          "imports": "{ calculateBryantPhases }",
+          "from": "../../../../utils/bryantCalculations",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "onNext",
+        "onPrevious"
+      ],
+      "hooks": [
+        "useProgramContext",
+        "useBryantPeriodization",
+        "useState",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 31866,
+      "complexity": 40,
+      "lastModified": "2025-07-24T13:27:50.798Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\consolidated\\VolumeRecoveryManagement.jsx",
+      "directory": "src/components",
+      "name": "VolumeRecoveryManagement",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "VolumeRecoveryManagement"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ useProgramContext }",
+          "from": "../../../../contexts/ProgramContext",
+          "isLocal": true
+        },
+        {
+          "imports": "{ useRPCalculations }",
+          "from": "../../../../hooks/useRPCalculations",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "onNext",
+        "onPrevious"
+      ],
+      "hooks": [
+        "useProgramContext",
+        "useRPCalculations",
+        "useState",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 39903,
+      "complexity": 46,
+      "lastModified": "2025-07-24T13:27:51.027Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\EnhancedAssessmentGoals.jsx",
+      "directory": "src/components",
+      "name": "EnhancedAssessmentGoals",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "EnhancedAssessmentGoals"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Tabs, TabsContent, TabsList, TabsTrigger }",
+          "from": "../../ui/tabs",
+          "isLocal": true
+        },
+        {
+          "imports": "{ Card, CardContent, CardHeader, CardTitle }",
+          "from": "../../ui/card",
+          "isLocal": true
+        },
+        {
+          "imports": "{ Button }",
+          "from": "../../ui/button",
+          "isLocal": true
+        },
+        {
+          "imports": "{ Badge }",
+          "from": "../../ui/badge",
+          "isLocal": true
+        },
+        {
+          "imports": "{ User, Target, TrendingUp, FileText, Settings }",
+          "from": "lucide-react",
+          "isLocal": false
+        },
+        {
+          "imports": "GoalsAndNeeds",
+          "from": "./GoalsAndNeeds",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "assessmentData",
+        "user",
+        "onNext",
+        "onPrevious",
+        "canGoNext",
+        "canGoPrevious"
+      ],
+      "hooks": [
+        "useState"
+      ],
+      "hasState": true,
+      "hasEffects": false,
+      "hasNavigation": true,
+      "hasTabs": true,
+      "hasValidation": true,
+      "size": 11192,
+      "complexity": 9,
+      "lastModified": "2025-07-20T05:44:34.264Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\EnhancedImplementation.jsx",
+      "directory": "src/components",
+      "name": "EnhancedImplementation",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "EnhancedImplementation"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Tabs, TabsContent, TabsList, TabsTrigger }",
+          "from": "../../ui/tabs",
+          "isLocal": true
+        },
+        {
+          "imports": "{ Card, CardContent, CardHeader, CardTitle }",
+          "from": "../../ui/card",
+          "isLocal": true
+        },
+        {
+          "imports": "{ Button }",
+          "from": "../../ui/button",
+          "isLocal": true
+        },
+        {
+          "imports": "{ Badge }",
+          "from": "../../ui/badge",
+          "isLocal": true
+        },
+        {
+          "imports": "{ Play, Eye, FileText, Download, Calendar, TrendingUp }",
+          "from": "lucide-react",
+          "isLocal": false
+        },
+        {
+          "imports": "Implementation",
+          "from": "./Implementation",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "assessmentData",
+        "user",
+        "onNext",
+        "onPrevious",
+        "canGoNext",
+        "canGoPrevious"
+      ],
+      "hooks": [
+        "useState",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": true,
+      "hasTabs": true,
+      "hasValidation": true,
+      "size": 11171,
+      "complexity": 9,
+      "lastModified": "2025-07-20T05:44:34.264Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\EnhancedSessionStructure.jsx",
+      "directory": "src/components",
+      "name": "EnhancedSessionStructure",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "EnhancedSessionStructure"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Tabs, TabsContent, TabsList, TabsTrigger }",
+          "from": "../../ui/tabs",
+          "isLocal": true
+        },
+        {
+          "imports": "{ Card, CardContent, CardHeader, CardTitle }",
+          "from": "../../ui/card",
+          "isLocal": true
+        },
+        {
+          "imports": "{ Button }",
+          "from": "../../ui/button",
+          "isLocal": true
+        },
+        {
+          "imports": "{ Badge }",
+          "from": "../../ui/badge",
+          "isLocal": true
+        },
+        {
+          "imports": "{ Calendar, BarChart3, Zap, Settings, TrendingUp }",
+          "from": "lucide-react",
+          "isLocal": false
+        },
+        {
+          "imports": "MicrocycleDesign",
+          "from": "./MicrocycleDesign",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "assessmentData",
+        "user",
+        "onNext",
+        "onPrevious",
+        "canGoNext",
+        "canGoPrevious"
+      ],
+      "hooks": [
+        "useState"
+      ],
+      "hasState": true,
+      "hasEffects": false,
+      "hasNavigation": true,
+      "hasTabs": true,
+      "hasValidation": true,
+      "size": 15026,
+      "complexity": 11,
+      "lastModified": "2025-07-20T05:44:34.264Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\GoalsAndNeeds.jsx",
+      "directory": "src/components",
+      "name": "GoalsAndNeeds",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "GoalsAndNeeds"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Target, TrendingUp, Calendar, CheckCircle, User, Trophy, AlertTriangle, Activity, Zap, Info }",
+          "from": "lucide-react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ useApp }",
+          "from": "../../../context",
+          "isLocal": true
+        },
+        {
+          "imports": "{ useAssessment }",
+          "from": "../../../hooks/useAssessment",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "assessmentData",
+        "onNext",
+        "canGoNext"
+      ],
+      "hooks": [
+        "useApp",
+        "useAssessment",
+        "useState",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 35824,
+      "complexity": 14,
+      "lastModified": "2025-07-16T20:40:23.442Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\GoalsAndNeedsWithDesignSystem.jsx",
+      "directory": "src/components",
+      "name": "GoalsAndNeedsWithDesignSystem",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "GoalsAndNeedsWithDesignSystem"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Target, TrendingUp, Calendar, CheckCircle, User, Trophy }",
+          "from": "lucide-react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "assessmentData",
+        "onNext",
+        "canGoNext"
+      ],
+      "hooks": [
+        "useState"
+      ],
+      "hasState": true,
+      "hasEffects": false,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 9135,
+      "complexity": 4,
+      "lastModified": "2025-07-15T22:08:11.238Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\Implementation.jsx",
+      "directory": "src/components",
+      "name": "Implementation",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "Implementation"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Play, RotateCcw, CheckCircle, Download, Calendar, TrendingUp, AlertTriangle }",
+          "from": "lucide-react",
+          "isLocal": false
+        },
+        {
+          "imports": "FitnessFatigueTracker",
+          "from": "../../recovery/FitnessFatigueTracker",
+          "isLocal": true
+        },
+        {
+          "imports": "{ useRecoveryMonitor }",
+          "from": "../../hooks/useRecoveryMonitor",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "onPrevious",
+        "canGoPrevious"
+      ],
+      "hooks": [
+        "useRecoveryMonitor",
+        "useState",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 40724,
+      "complexity": 41,
+      "lastModified": "2025-07-20T07:10:05.686Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\LoadingParameters.jsx",
+      "directory": "src/components",
+      "name": "LoadingParameters",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "LoadingParameters"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Settings, TrendingUp, BarChart3, Target, AlertCircle }",
+          "from": "lucide-react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "assessmentData",
+        "onNext",
+        "onPrevious",
+        "canGoNext",
+        "canGoPrevious"
+      ],
+      "hooks": [
+        "useState"
+      ],
+      "hasState": true,
+      "hasEffects": false,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 20284,
+      "complexity": 7,
+      "lastModified": "2025-07-24T16:38:29.909Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\MacrocycleStructure.jsx",
+      "directory": "src/components",
+      "name": "MacrocycleStructure",
+      "type": "unknown",
+      "exports": [
+        {
+          "type": "default",
+          "name": "MacrocycleStructure"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "UnifiedMacrocyclePlanner",
+          "from": "../../macrocycle/UnifiedMacrocyclePlanner",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "onNext",
+        "onPrevious",
+        "canGoNext",
+        "canGoPrevious"
+      ],
+      "hooks": [],
+      "hasState": false,
+      "hasEffects": false,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": false,
+      "size": 590,
+      "complexity": 0,
+      "lastModified": "2025-07-20T05:36:49.658Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\MacrocycleStructure_NEW.jsx",
+      "directory": "src/components",
+      "name": "MacrocycleStructure",
+      "type": "unknown",
+      "exports": [
+        {
+          "type": "default",
+          "name": "MacrocycleStructure"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ EnhancedMacrocyclePlanner }",
+          "from": "../../macrocycle/EnhancedMacrocyclePlanner",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "onNext",
+        "onPrevious",
+        "canGoNext",
+        "canGoPrevious"
+      ],
+      "hooks": [],
+      "hasState": false,
+      "hasEffects": false,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": false,
+      "size": 622,
+      "complexity": 0,
+      "lastModified": "2025-07-20T04:58:16.186Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\MesocyclePlanning.jsx",
+      "directory": "src/components",
+      "name": "MesocyclePlanning",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "MesocyclePlanning"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Layers, RotateCcw, CheckCircle, Target, TrendingUp, Zap, AlertTriangle, Calendar }",
+          "from": "lucide-react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ DndContext, closestCenter }",
+          "from": "@dnd-kit/core",
+          "isLocal": false
+        },
+        {
+          "imports": "{ arrayMove, SortableContext, verticalListSortingStrategy }",
+          "from": "@dnd-kit/sortable",
+          "isLocal": false
+        },
+        {
+          "imports": "{ useSortable }",
+          "from": "@dnd-kit/sortable",
+          "isLocal": false
+        },
+        {
+          "imports": "{ CSS }",
+          "from": "@dnd-kit/utilities",
+          "isLocal": false
+        },
+        {
+          "imports": "{ useRecoveryMonitor }",
+          "from": "../../hooks/useRecoveryMonitor",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "mesocycle",
+        "index",
+        "onUpdate",
+        "onRemove"
+      ],
+      "hooks": [
+        "useSortable",
+        "useRecoveryMonitor",
+        "useState",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 24738,
+      "complexity": 30,
+      "lastModified": "2025-07-20T07:10:05.701Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\MicrocycleDesign.jsx",
+      "directory": "src/components",
+      "name": "MicrocycleDesign",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "MicrocycleDesign"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Calendar, RotateCcw, CheckCircle, TrendingUp, Activity, Zap }",
+          "from": "lucide-react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "onNext",
+        "onPrevious",
+        "canGoNext",
+        "canGoPrevious"
+      ],
+      "hooks": [
+        "useState"
+      ],
+      "hasState": true,
+      "hasEffects": false,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 23621,
+      "complexity": 10,
+      "lastModified": "2025-07-23T18:35:48.546Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\OPEXNutrition.jsx",
+      "directory": "src/components",
+      "name": "OPEXNutrition",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "OPEXNutrition"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ useAssessment }",
+          "from": "../../../hooks/useAssessment",
+          "isLocal": true
+        },
+        {
+          "imports": "{ useProgramContext }",
+          "from": "../../../contexts/ProgramContext",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "onDataUpdate"
+      ],
+      "hooks": [
+        "useAssessment",
+        "useProgramContext",
+        "useState",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": false,
+      "hasTabs": true,
+      "hasValidation": true,
+      "size": 40651,
+      "complexity": 32,
+      "lastModified": "2025-07-17T23:12:20.944Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\PhaseDesign.jsx",
+      "directory": "src/components",
+      "name": "PhaseDesign",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "PhaseDesign"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ TrendingUp, Clock, Target, RotateCcw, CheckCircle, Activity, Battery }",
+          "from": "lucide-react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "onNext",
+        "onPrevious",
+        "canGoNext",
+        "canGoPrevious"
+      ],
+      "hooks": [
+        "useState"
+      ],
+      "hasState": true,
+      "hasEffects": false,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": false,
+      "size": 25850,
+      "complexity": 4,
+      "lastModified": "2025-07-15T22:01:30.963Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\ProgramOverview.jsx",
+      "directory": "src/components",
+      "name": "ProgramOverview",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "ProgramOverview"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ BarChart3, Users, Target, Calendar, CheckCircle, AlertTriangle }",
+          "from": "lucide-react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "assessmentData",
+        "onNext",
+        "onPrevious",
+        "canGoNext",
+        "canGoPrevious"
+      ],
+      "hooks": [
+        "useState",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 13275,
+      "complexity": 8,
+      "lastModified": "2025-07-24T16:44:32.081Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\ProgramPreview.jsx",
+      "directory": "src/components",
+      "name": "ProgramPreview",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "ProgramPreview"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Eye, Download, Calendar, BarChart3, Target, CheckCircle, Play }",
+          "from": "lucide-react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "assessmentData",
+        "onNext",
+        "onPrevious",
+        "canGoNext",
+        "canGoPrevious"
+      ],
+      "hooks": [
+        "useState"
+      ],
+      "hasState": true,
+      "hasEffects": false,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 19607,
+      "complexity": 13,
+      "lastModified": "2025-07-24T16:38:30.057Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\SessionMonitoring.jsx",
+      "directory": "src/components",
+      "name": "SessionMonitoring",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "SessionMonitoring"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Activity, RotateCcw, CheckCircle, Monitor, Target, Heart }",
+          "from": "lucide-react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "onNext",
+        "onPrevious",
+        "canGoNext",
+        "canGoPrevious"
+      ],
+      "hooks": [
+        "useState"
+      ],
+      "hasState": true,
+      "hasEffects": false,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": false,
+      "size": 21278,
+      "complexity": 8,
+      "lastModified": "2025-07-16T20:16:41.865Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\Specialty.jsx",
+      "directory": "src/components",
+      "name": "Specialty",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "Specialty"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Trophy, Target, Users, Activity }",
+          "from": "lucide-react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "assessmentData",
+        "onNext",
+        "onPrevious",
+        "canGoNext",
+        "canGoPrevious"
+      ],
+      "hooks": [
+        "useState"
+      ],
+      "hasState": true,
+      "hasEffects": false,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 4868,
+      "complexity": 4,
+      "lastModified": "2025-07-24T16:38:30.057Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\TrainingBlocks.jsx",
+      "directory": "src/components",
+      "name": "TrainingBlocks",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "TrainingBlocks"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Card, CardContent, CardHeader, CardTitle }",
+          "from": "../../ui/card",
+          "isLocal": true
+        },
+        {
+          "imports": "{ Button }",
+          "from": "../../ui/button",
+          "isLocal": true
+        },
+        {
+          "imports": "{ Badge }",
+          "from": "../../ui/badge",
+          "isLocal": true
+        },
+        {
+          "imports": "{ Tabs, TabsContent, TabsList, TabsTrigger }",
+          "from": "../../ui/tabs",
+          "isLocal": true
+        },
+        {
+          "imports": "{ Plus, Calendar, Target, TrendingUp, Clock, BarChart3 }",
+          "from": "lucide-react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "assessmentData",
+        "user",
+        "onNext",
+        "onPrevious",
+        "canGoNext",
+        "canGoPrevious"
+      ],
+      "hooks": [
+        "useState",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": true,
+      "hasTabs": true,
+      "hasValidation": true,
+      "size": 17120,
+      "complexity": 15,
+      "lastModified": "2025-07-20T05:36:50.115Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\TrainingMethods.jsx",
+      "directory": "src/components",
+      "name": "TrainingMethods",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "TrainingMethods"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Zap, Target, Users, Activity, CheckCircle, AlertTriangle }",
+          "from": "lucide-react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "assessmentData",
+        "onNext",
+        "onPrevious",
+        "canGoNext",
+        "canGoPrevious"
+      ],
+      "hooks": [
+        "useState"
+      ],
+      "hasState": true,
+      "hasEffects": false,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 20056,
+      "complexity": 9,
+      "lastModified": "2025-07-24T16:38:30.040Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\VariableManipulation.jsx",
+      "directory": "src/components",
+      "name": "VariableManipulation",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "VariableManipulation"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Settings, TrendingUp, BarChart3 }",
+          "from": "lucide-react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "assessmentData",
+        "onNext",
+        "onPrevious",
+        "canGoNext",
+        "canGoPrevious"
+      ],
+      "hooks": [
+        "useState"
+      ],
+      "hasState": true,
+      "hasEffects": false,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 3504,
+      "complexity": 4,
+      "lastModified": "2025-07-24T16:38:30.033Z"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\VolumeLandmarks.jsx",
+      "directory": "src/components",
+      "name": "VolumeLandmarks",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "VolumeLandmarks"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ BarChart3, TrendingUp, Target }",
+          "from": "lucide-react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "assessmentData",
+        "onNext",
+        "onPrevious",
+        "canGoNext",
+        "canGoPrevious"
+      ],
+      "hooks": [
+        "useState"
+      ],
+      "hasState": true,
+      "hasEffects": false,
+      "hasNavigation": true,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 4493,
+      "complexity": 4,
+      "lastModified": "2025-07-24T16:38:30.040Z"
+    },
+    {
+      "path": "src\\components\\StrongmanEventComponent.jsx",
+      "directory": "src/components",
+      "name": "StrongmanEventComponent",
+      "type": "stateful-component",
+      "exports": [
+        {
+          "type": "default",
+          "name": "StrongmanEventComponent"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ calcSetsReps }",
+          "from": "../utils/programLogic",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "distance",
+        "duration",
+        "rest",
+        "loadFactor",
+        "timeBased",
+        "bryantCompliant",
+        "tacticalApplication",
+        "events",
+        "...initialConfig"
+      ],
+      "hooks": [
+        "useState",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": false,
+      "size": 19434,
+      "complexity": 20,
+      "lastModified": "2025-07-23T18:14:37.474Z"
+    },
+    {
+      "path": "src\\components\\ui\\DesignSystem.jsx",
+      "directory": "src/components",
+      "name": "AppContainer",
+      "type": "unknown",
+      "exports": [
+        {
+          "type": "named",
+          "name": "AppContainer"
+        },
+        {
+          "type": "named",
+          "name": "ContentContainer"
+        },
+        {
+          "type": "named",
+          "name": "PageHeader"
+        },
+        {
+          "type": "named",
+          "name": "Card"
+        },
+        {
+          "type": "named",
+          "name": "CardHeader"
+        },
+        {
+          "type": "named",
+          "name": "FormGroup"
+        },
+        {
+          "type": "named",
+          "name": "FormLabel"
+        },
+        {
+          "type": "named",
+          "name": "FormInput"
+        },
+        {
+          "type": "named",
+          "name": "FormSelect"
+        },
+        {
+          "type": "named",
+          "name": "FormTextarea"
+        },
+        {
+          "type": "named",
+          "name": "Button"
+        },
+        {
+          "type": "named",
+          "name": "LinkButton"
+        },
+        {
+          "type": "named",
+          "name": "ProgressContainer"
+        },
+        {
+          "type": "named",
+          "name": "ProgressHeader"
+        },
+        {
+          "type": "named",
+          "name": "ProgressBar"
+        },
+        {
+          "type": "named",
+          "name": "Section"
+        },
+        {
+          "type": "named",
+          "name": "SectionHeader"
+        },
+        {
+          "type": "named",
+          "name": "Grid"
+        },
+        {
+          "type": "named",
+          "name": "TabList"
+        },
+        {
+          "type": "named",
+          "name": "TabTrigger"
+        },
+        {
+          "type": "named",
+          "name": "TabContent"
+        },
+        {
+          "type": "named",
+          "name": "InputField"
+        },
+        {
+          "type": "named",
+          "name": "SelectField"
+        },
+        {
+          "type": "named",
+          "name": "TextareaField"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React",
+          "from": "react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "children",
+        "className = ''"
+      ],
+      "hooks": [],
+      "hasState": false,
+      "hasEffects": false,
+      "hasNavigation": true,
+      "hasTabs": true,
+      "hasValidation": true,
+      "size": 7186,
+      "complexity": 0,
+      "lastModified": "2025-07-15T22:08:10.728Z"
+    },
+    {
+      "path": "src\\components\\ui\\tabs.jsx",
+      "directory": "src/components",
+      "name": "TabsContext",
+      "type": "unknown",
+      "exports": [
+        {
+          "type": "named",
+          "name": "Tabs"
+        },
+        {
+          "type": "named",
+          "name": "TabsList"
+        },
+        {
+          "type": "named",
+          "name": "TabsTrigger"
+        },
+        {
+          "type": "named",
+          "name": "TabsContent"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { createContext, useContext }",
+          "from": "react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "value",
+        "onValueChange",
+        "className",
+        "children"
+      ],
+      "hooks": [
+        "useContext"
+      ],
+      "hasState": false,
+      "hasEffects": false,
+      "hasNavigation": false,
+      "hasTabs": true,
+      "hasValidation": true,
+      "size": 1862,
+      "complexity": 1,
+      "lastModified": "2025-07-15T21:58:37.892Z"
+    },
+    {
+      "path": "src\\contexts\\ProgramContext.jsx",
+      "directory": "src/contexts",
+      "name": "ProgramProvider",
+      "type": "context",
+      "exports": [
+        {
+          "type": "default",
+          "name": "ProgramProvider"
+        },
+        {
+          "type": "named",
+          "name": "PROGRAM_ACTIONS"
+        },
+        {
+          "type": "named",
+          "name": "ProgramProvider"
+        },
+        {
+          "type": "named",
+          "name": "useProgramContext"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { createContext, useContext, useReducer, useCallback }",
+          "from": "react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "children"
+      ],
+      "hooks": [
+        "useReducer",
+        "useCallback",
+        "useContext"
+      ],
+      "hasState": false,
+      "hasEffects": false,
+      "hasNavigation": false,
+      "hasTabs": true,
+      "hasValidation": true,
+      "size": 7956,
+      "complexity": 5,
+      "lastModified": "2025-07-15T21:53:46.476Z"
+    },
+    {
+      "path": "src\\hooks\\useAssessment.js",
+      "directory": "src/hooks",
+      "name": "useAssessment",
+      "type": "hook",
+      "exports": [
+        {
+          "type": "named",
+          "name": "useAssessment"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "{ useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ useApp }",
+          "from": "../context",
+          "isLocal": true
+        },
+        {
+          "imports": "{ APP_ACTIONS }",
+          "from": "../context/appActions",
+          "isLocal": true
+        },
+        {
+          "imports": "{ supabase }",
+          "from": "../lib/supabaseClient",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "category",
+        "priority",
+        "recommendations",
+        "'Create dark",
+        "cool environment (65-68°F)'",
+        "'Establish consistent bedtime routine'",
+        "'Consider magnesium supplementation'",
+        "'Journal or stretch before bed'\r\n                ]"
+      ],
+      "hooks": [
+        "useApp",
+        "useState"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 34980,
+      "complexity": 54,
+      "lastModified": "2025-07-17T23:12:20.795Z"
+    },
+    {
+      "path": "src\\hooks\\useDesignSystem.js",
+      "directory": "src/hooks",
+      "name": "useDesignSystem",
+      "type": "hook",
+      "exports": [
+        {
+          "type": "default",
+          "name": "useDesignSystem"
+        },
+        {
+          "type": "named",
+          "name": "useDesignSystem"
+        },
+        {
+          "type": "named",
+          "name": "withDesignSystem"
+        },
+        {
+          "type": "named",
+          "name": "DesignSystemProvider"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "React, { useMemo }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ activeTheme, componentConfig, generateCSSCustomProperties }",
+          "from": "../config/designSystem",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "children"
+      ],
+      "hooks": [
+        "useMemo",
+        "useDesignSystem",
+        "useEffect"
+      ],
+      "hasState": false,
+      "hasEffects": true,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": false,
+      "size": 3323,
+      "complexity": 6,
+      "lastModified": "2025-07-15T22:08:11.238Z"
+    },
+    {
+      "path": "src\\hooks\\useProgram.js",
+      "directory": "src/hooks",
+      "name": "useProgram",
+      "type": "hook",
+      "exports": [
+        {
+          "type": "default",
+          "name": "useProgram"
+        },
+        {
+          "type": "named",
+          "name": "useProgram"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "{ useContext }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ AppContext }",
+          "from": "../context/AppContext",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "...currentProgram",
+        "...updates",
+        "updatedAt"
+      ],
+      "hooks": [
+        "useContext"
+      ],
+      "hasState": false,
+      "hasEffects": false,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 11980,
+      "complexity": 18,
+      "lastModified": "2025-07-13T06:14:52.094Z"
+    },
+    {
+      "path": "src\\utils\\coreUtilities.js",
+      "directory": "src/utils",
+      "name": "CoreUtilities",
+      "type": "utility",
+      "exports": [
+        {
+          "type": "default",
+          "name": "CoreUtilities"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "{ migrateFromSrc, useMigration }",
+          "from": "./migrationUtils.js",
+          "isLocal": true
+        },
+        {
+          "imports": "{ performPHAScreening, usePHAScreening }",
+          "from": "./phaScreening.js",
+          "isLocal": true
+        }
+      ],
+      "props": [
+        "event_type",
+        "event_name",
+        "volume",
+        "tactical"
+      ],
+      "hooks": [],
+      "hasState": false,
+      "hasEffects": false,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 11169,
+      "complexity": 19,
+      "lastModified": "2025-07-24T13:36:34.690Z"
+    },
+    {
+      "path": "src\\utils\\migrationUtils.js",
+      "directory": "src/utils",
+      "name": "migrateFromSrc",
+      "type": "utility",
+      "exports": [
+        {
+          "type": "named",
+          "name": "migrateFromSrc"
+        },
+        {
+          "type": "named",
+          "name": "useMigration"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "{ useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "sourceData",
+        "modernData",
+        "validationResult",
+        "applicationResult",
+        "backup"
+      ],
+      "hooks": [
+        "useState"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": false,
+      "hasTabs": true,
+      "hasValidation": true,
+      "size": 16812,
+      "complexity": 27,
+      "lastModified": "2025-07-24T13:36:34.537Z"
+    },
+    {
+      "path": "src\\utils\\phaScreening.js",
+      "directory": "src/utils",
+      "name": "performPHAScreening",
+      "type": "utility",
+      "exports": [
+        {
+          "type": "named",
+          "name": "performPHAScreening"
+        },
+        {
+          "type": "named",
+          "name": "usePHAScreening"
+        }
+      ],
+      "imports": [
+        {
+          "imports": "{ useState, useEffect }",
+          "from": "react",
+          "isLocal": false
+        }
+      ],
+      "props": [
+        "cardiovascularRisk",
+        "orthopedicRisk",
+        "metabolicRisk",
+        "bryantAssessment",
+        "strictMode"
+      ],
+      "hooks": [
+        "useState",
+        "useEffect"
+      ],
+      "hasState": true,
+      "hasEffects": true,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 22805,
+      "complexity": 69,
+      "lastModified": "2025-07-24T13:36:34.682Z"
+    },
+    {
+      "path": "src\\utils\\programLogic.js",
+      "directory": "src/utils",
+      "name": "calculateVolumeProgression",
+      "type": "utility",
+      "exports": [
+        {
+          "type": "named",
+          "name": "calculateVolumeProgression"
+        },
+        {
+          "type": "named",
+          "name": "getMethodologyDefaults"
+        },
+        {
+          "type": "named",
+          "name": "calcSetsReps"
+        },
+        {
+          "type": "named",
+          "name": "calculateIntensityProgression"
+        },
+        {
+          "type": "named",
+          "name": "calculateTrainingFrequency"
+        },
+        {
+          "type": "named",
+          "name": "generateBlockStructure"
+        },
+        {
+          "type": "named",
+          "name": "validateBlockParameters"
+        }
+      ],
+      "imports": [],
+      "props": [],
+      "hooks": [],
+      "hasState": false,
+      "hasEffects": false,
+      "hasNavigation": false,
+      "hasTabs": false,
+      "hasValidation": true,
+      "size": 22749,
+      "complexity": 41,
+      "lastModified": "2025-07-23T18:35:48.546Z"
+    }
+  ],
+  "unused": [
+    {
+      "path": "src\\pages\\design\\Mesocycle.jsx",
+      "type": "component",
+      "size": 708,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\assessment\\index.js",
+      "type": "assessment",
+      "size": 331,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\assessment\\TimelineStep.jsx",
+      "type": "assessment",
+      "size": 13084,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\bryant\\BryantPeriodizationDashboard.jsx",
+      "type": "stateful-component",
+      "size": 26169,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\bryant\\index.js",
+      "type": "unknown",
+      "size": 1618,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\mesocycle\\MesocycleWizard.jsx",
+      "type": "stateful-component",
+      "size": 1472,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\program\\ClusterSetComponent.jsx",
+      "type": "stateful-component",
+      "size": 11991,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\consolidated\\ConsolidatedFramework.jsx",
+      "type": "stateful-component",
+      "size": 16054,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\EnhancedAssessmentGoals.jsx",
+      "type": "stateful-component",
+      "size": 11192,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\EnhancedImplementation.jsx",
+      "type": "stateful-component",
+      "size": 11171,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\EnhancedSessionStructure.jsx",
+      "type": "stateful-component",
+      "size": 15026,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\GoalsAndNeedsWithDesignSystem.jsx",
+      "type": "stateful-component",
+      "size": 9135,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\MacrocycleStructure.jsx",
+      "type": "unknown",
+      "size": 590,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\MacrocycleStructure_NEW.jsx",
+      "type": "unknown",
+      "size": 622,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\MesocyclePlanning.jsx",
+      "type": "stateful-component",
+      "size": 24738,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\OPEXNutrition.jsx",
+      "type": "stateful-component",
+      "size": 40651,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\PhaseDesign.jsx",
+      "type": "stateful-component",
+      "size": 25850,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\SessionMonitoring.jsx",
+      "type": "stateful-component",
+      "size": 21278,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\Specialty.jsx",
+      "type": "stateful-component",
+      "size": 4868,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\TrainingBlocks.jsx",
+      "type": "stateful-component",
+      "size": 17120,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\VariableManipulation.jsx",
+      "type": "stateful-component",
+      "size": 3504,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\program\\tabs\\VolumeLandmarks.jsx",
+      "type": "stateful-component",
+      "size": 4493,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\StrongmanEventComponent.jsx",
+      "type": "stateful-component",
+      "size": 19434,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\ui\\DesignSystem.jsx",
+      "type": "unknown",
+      "size": 7186,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\components\\ui\\tabs.jsx",
+      "type": "unknown",
+      "size": 1862,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\contexts\\ProgramContext.jsx",
+      "type": "context",
+      "size": 7956,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\hooks\\useDesignSystem.js",
+      "type": "hook",
+      "size": 3323,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\hooks\\useProgram.js",
+      "type": "hook",
+      "size": 11980,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\utils\\coreUtilities.js",
+      "type": "utility",
+      "size": 11169,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\utils\\migrationUtils.js",
+      "type": "utility",
+      "size": 16812,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\utils\\phaScreening.js",
+      "type": "utility",
+      "size": 22805,
+      "reason": "No imports found"
+    },
+    {
+      "path": "src\\utils\\programLogic.js",
+      "type": "utility",
+      "size": 22749,
+      "reason": "No imports found"
+    }
+  ],
+  "dependencies": {
+    "src\\pages\\design\\Mesocycle.jsx": {
+      "dependencies": [
+        "../../components/mesocycle/MesocycleWizard",
+        "../../lib/state/trainingState"
+      ],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\pages\\Program.jsx": {
+      "dependencies": [
+        "../components/ui/tabs",
+        "../context",
+        "../components/program/tabs/ProgramOverview",
+        "../components/program/tabs/BlockSequencing",
+        "../components/program/tabs/LoadingParameters",
+        "../components/program/tabs/TrainingMethods",
+        "../components/program/tabs/ProgramPreview",
+        "../contexts/ProgramContext"
+      ],
+      "dependents": [
+        "src\\pages\\Program.jsx",
+        "src\\pages\\Program.jsx",
+        "src\\pages\\Program.jsx",
+        "src\\components\\program\\tabs\\consolidated\\AssessmentGoals.jsx",
+        "src\\components\\program\\tabs\\consolidated\\ConsolidatedFramework.jsx",
+        "src\\components\\program\\tabs\\consolidated\\ExerciseSelectionProgression.jsx",
+        "src\\components\\program\\tabs\\consolidated\\ImplementationTracking.jsx",
+        "src\\components\\program\\tabs\\consolidated\\PeriodizationPlanning.jsx",
+        "src\\components\\program\\tabs\\consolidated\\VolumeRecoveryManagement.jsx",
+        "src\\components\\program\\tabs\\OPEXNutrition.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\assessment\\index.js": {
+      "dependencies": [],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\assessment\\PersonalInfoStep.jsx": {
+      "dependencies": [],
+      "dependents": [
+        "src\\components\\assessment\\StepWizard.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\assessment\\RecommendationStep.jsx": {
+      "dependencies": [],
+      "dependents": [
+        "src\\components\\assessment\\StepWizard.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\assessment\\StepWizard.jsx": {
+      "dependencies": [
+        "../../context",
+        "./PersonalInfoStep",
+        "./TrainingExperienceStep",
+        "./TimelineStep",
+        "./RecommendationStep"
+      ],
+      "dependents": [
+        "src\\components\\Assessment.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\assessment\\TimelineStep.jsx": {
+      "dependencies": [],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\assessment\\TrainingExperienceStep.jsx": {
+      "dependencies": [],
+      "dependents": [
+        "src\\components\\assessment\\StepWizard.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\Assessment.jsx": {
+      "dependencies": [
+        "../context",
+        "./assessment/StepWizard"
+      ],
+      "dependents": [
+        "src\\components\\program\\tabs\\consolidated\\AssessmentGoals.jsx",
+        "src\\components\\program\\tabs\\consolidated\\ConsolidatedFramework.jsx",
+        "src\\components\\program\\tabs\\GoalsAndNeeds.jsx",
+        "src\\components\\program\\tabs\\OPEXNutrition.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\bryant\\BryantClusterInterface.jsx": {
+      "dependencies": [],
+      "dependents": [
+        "src\\components\\bryant\\BryantPeriodizationDashboard.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\bryant\\BryantPeriodizationDashboard.jsx": {
+      "dependencies": [
+        "./BryantClusterInterface",
+        "./BryantStrongmanInterface",
+        "./BryantTacticalInterface"
+      ],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\bryant\\BryantStrongmanInterface.jsx": {
+      "dependencies": [],
+      "dependents": [
+        "src\\components\\bryant\\BryantPeriodizationDashboard.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\bryant\\BryantTacticalInterface.jsx": {
+      "dependencies": [],
+      "dependents": [
+        "src\\components\\bryant\\BryantPeriodizationDashboard.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\bryant\\index.js": {
+      "dependencies": [],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\macrocycle\\EnhancedMacrocyclePlanner.jsx": {
+      "dependencies": [
+        "./SortableMesocycleCard",
+        "./MacrocycleCalendar",
+        "./GoalSelector"
+      ],
+      "dependents": [
+        "src\\components\\program\\tabs\\MacrocycleStructure_NEW.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\macrocycle\\GoalSelector.jsx": {
+      "dependencies": [],
+      "dependents": [
+        "src\\components\\macrocycle\\EnhancedMacrocyclePlanner.jsx",
+        "src\\components\\macrocycle\\UnifiedMacrocyclePlanner.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\macrocycle\\MacrocycleCalendar.jsx": {
+      "dependencies": [],
+      "dependents": [
+        "src\\components\\macrocycle\\EnhancedMacrocyclePlanner.jsx",
+        "src\\components\\macrocycle\\UnifiedMacrocyclePlanner.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\macrocycle\\SortableMesocycleCard.jsx": {
+      "dependencies": [],
+      "dependents": [
+        "src\\components\\macrocycle\\EnhancedMacrocyclePlanner.jsx",
+        "src\\components\\macrocycle\\UnifiedMacrocyclePlanner.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\macrocycle\\UnifiedMacrocyclePlanner.jsx": {
+      "dependencies": [
+        "./SortableMesocycleCard",
+        "./MacrocycleCalendar",
+        "./GoalSelector"
+      ],
+      "dependents": [
+        "src\\components\\program\\tabs\\MacrocycleStructure.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\mesocycle\\MesocycleWizard.jsx": {
+      "dependencies": [
+        "../../lib/state/trainingState",
+        "../../lib/algorithms/mesocycleDesigner"
+      ],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\program\\ClusterSetComponent.jsx": {
+      "dependencies": [],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\program\\tabs\\BlockSequencing.jsx": {
+      "dependencies": [],
+      "dependents": [
+        "src\\pages\\Program.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\program\\tabs\\consolidated\\AssessmentGoals.jsx": {
+      "dependencies": [
+        "../../../../contexts/ProgramContext",
+        "../../../../hooks/useAssessment",
+        "../../../../utils/legacyMigration"
+      ],
+      "dependents": [
+        "src\\components\\program\\tabs\\consolidated\\ConsolidatedFramework.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\program\\tabs\\consolidated\\ConsolidatedFramework.jsx": {
+      "dependencies": [
+        "../../../../contexts/ProgramContext",
+        "./AssessmentGoals",
+        "./PeriodizationPlanning",
+        "./ExerciseSelectionProgression",
+        "./VolumeRecoveryManagement",
+        "./ImplementationTracking"
+      ],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\program\\tabs\\consolidated\\ExerciseSelectionProgression.jsx": {
+      "dependencies": [
+        "../../../../contexts/ProgramContext",
+        "../../../../hooks/useExerciseLibrary"
+      ],
+      "dependents": [
+        "src\\components\\program\\tabs\\consolidated\\ConsolidatedFramework.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\program\\tabs\\consolidated\\ImplementationTracking.jsx": {
+      "dependencies": [
+        "../../../../contexts/ProgramContext",
+        "../../../../hooks/useImplementation"
+      ],
+      "dependents": [
+        "src\\components\\program\\tabs\\consolidated\\ConsolidatedFramework.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\program\\tabs\\consolidated\\PeriodizationPlanning.jsx": {
+      "dependencies": [
+        "../../../../contexts/ProgramContext",
+        "../../../../hooks/useBryantPeriodization",
+        "../../../../utils/bryantCalculations"
+      ],
+      "dependents": [
+        "src\\components\\program\\tabs\\consolidated\\ConsolidatedFramework.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\program\\tabs\\consolidated\\VolumeRecoveryManagement.jsx": {
+      "dependencies": [
+        "../../../../contexts/ProgramContext",
+        "../../../../hooks/useRPCalculations"
+      ],
+      "dependents": [
+        "src\\components\\program\\tabs\\consolidated\\ConsolidatedFramework.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\program\\tabs\\EnhancedAssessmentGoals.jsx": {
+      "dependencies": [
+        "../../ui/tabs",
+        "../../ui/card",
+        "../../ui/button",
+        "../../ui/badge",
+        "./GoalsAndNeeds"
+      ],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\program\\tabs\\EnhancedImplementation.jsx": {
+      "dependencies": [
+        "../../ui/tabs",
+        "../../ui/card",
+        "../../ui/button",
+        "../../ui/badge",
+        "./Implementation"
+      ],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\program\\tabs\\EnhancedSessionStructure.jsx": {
+      "dependencies": [
+        "../../ui/tabs",
+        "../../ui/card",
+        "../../ui/button",
+        "../../ui/badge",
+        "./MicrocycleDesign"
+      ],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\program\\tabs\\GoalsAndNeeds.jsx": {
+      "dependencies": [
+        "../../../context",
+        "../../../hooks/useAssessment"
+      ],
+      "dependents": [
+        "src\\components\\program\\tabs\\EnhancedAssessmentGoals.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\program\\tabs\\GoalsAndNeedsWithDesignSystem.jsx": {
+      "dependencies": [],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\program\\tabs\\Implementation.jsx": {
+      "dependencies": [
+        "../../recovery/FitnessFatigueTracker",
+        "../../hooks/useRecoveryMonitor"
+      ],
+      "dependents": [
+        "src\\components\\program\\tabs\\consolidated\\ConsolidatedFramework.jsx",
+        "src\\components\\program\\tabs\\consolidated\\ImplementationTracking.jsx",
+        "src\\components\\program\\tabs\\EnhancedImplementation.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\program\\tabs\\LoadingParameters.jsx": {
+      "dependencies": [],
+      "dependents": [
+        "src\\pages\\Program.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\program\\tabs\\MacrocycleStructure.jsx": {
+      "dependencies": [
+        "../../macrocycle/UnifiedMacrocyclePlanner"
+      ],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\program\\tabs\\MacrocycleStructure_NEW.jsx": {
+      "dependencies": [
+        "../../macrocycle/EnhancedMacrocyclePlanner"
+      ],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\program\\tabs\\MesocyclePlanning.jsx": {
+      "dependencies": [
+        "../../hooks/useRecoveryMonitor"
+      ],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\program\\tabs\\MicrocycleDesign.jsx": {
+      "dependencies": [],
+      "dependents": [
+        "src\\components\\program\\tabs\\EnhancedSessionStructure.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\program\\tabs\\OPEXNutrition.jsx": {
+      "dependencies": [
+        "../../../hooks/useAssessment",
+        "../../../contexts/ProgramContext"
+      ],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\program\\tabs\\PhaseDesign.jsx": {
+      "dependencies": [],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\program\\tabs\\ProgramOverview.jsx": {
+      "dependencies": [],
+      "dependents": [
+        "src\\pages\\Program.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\program\\tabs\\ProgramPreview.jsx": {
+      "dependencies": [],
+      "dependents": [
+        "src\\pages\\Program.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\program\\tabs\\SessionMonitoring.jsx": {
+      "dependencies": [],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\program\\tabs\\Specialty.jsx": {
+      "dependencies": [],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\program\\tabs\\TrainingBlocks.jsx": {
+      "dependencies": [
+        "../../ui/card",
+        "../../ui/button",
+        "../../ui/badge",
+        "../../ui/tabs"
+      ],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\program\\tabs\\TrainingMethods.jsx": {
+      "dependencies": [],
+      "dependents": [
+        "src\\pages\\Program.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\components\\program\\tabs\\VariableManipulation.jsx": {
+      "dependencies": [],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\program\\tabs\\VolumeLandmarks.jsx": {
+      "dependencies": [],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\StrongmanEventComponent.jsx": {
+      "dependencies": [
+        "../utils/programLogic"
+      ],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\ui\\DesignSystem.jsx": {
+      "dependencies": [],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\components\\ui\\tabs.jsx": {
+      "dependencies": [],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\contexts\\ProgramContext.jsx": {
+      "dependencies": [],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\hooks\\useAssessment.js": {
+      "dependencies": [
+        "../context",
+        "../context/appActions",
+        "../lib/supabaseClient"
+      ],
+      "dependents": [
+        "src\\components\\program\\tabs\\consolidated\\AssessmentGoals.jsx",
+        "src\\components\\program\\tabs\\GoalsAndNeeds.jsx",
+        "src\\components\\program\\tabs\\OPEXNutrition.jsx"
+      ],
+      "isUsed": true
+    },
+    "src\\hooks\\useDesignSystem.js": {
+      "dependencies": [
+        "../config/designSystem"
+      ],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\hooks\\useProgram.js": {
+      "dependencies": [
+        "../context/AppContext"
+      ],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\utils\\coreUtilities.js": {
+      "dependencies": [
+        "./migrationUtils.js",
+        "./phaScreening.js"
+      ],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\utils\\migrationUtils.js": {
+      "dependencies": [],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\utils\\phaScreening.js": {
+      "dependencies": [],
+      "dependents": [],
+      "isUsed": false
+    },
+    "src\\utils\\programLogic.js": {
+      "dependencies": [],
+      "dependents": [],
+      "isUsed": false
+    }
+  },
+  "entryPoints": [
+    {
+      "path": "src/main.jsx",
+      "type": "main",
+      "imports": [
+        {
+          "imports": "{ StrictMode }",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ createRoot }",
+          "from": "react-dom/client",
+          "isLocal": false
+        },
+        {
+          "imports": "{ QueryClient, QueryClientProvider }",
+          "from": "@tanstack/react-query",
+          "isLocal": false
+        },
+        {
+          "imports": "{ BrowserRouter }",
+          "from": "react-router-dom",
+          "isLocal": false
+        },
+        {
+          "imports": "{ ToastContainer }",
+          "from": "react-toastify",
+          "isLocal": false
+        },
+        {
+          "imports": "App",
+          "from": "./App.jsx",
+          "isLocal": true
+        },
+        {
+          "imports": "{ AppProvider }",
+          "from": "./context",
+          "isLocal": true
+        }
+      ],
+      "routes": [],
+      "size": 1481
+    },
+    {
+      "path": "src/App.jsx",
+      "type": "app",
+      "imports": [
+        {
+          "imports": "React",
+          "from": "react",
+          "isLocal": false
+        },
+        {
+          "imports": "{ Routes, Route }",
+          "from": "react-router-dom",
+          "isLocal": false
+        },
+        {
+          "imports": "{ useApp }",
+          "from": "./context",
+          "isLocal": true
+        },
+        {
+          "imports": "Assessment",
+          "from": "./components/Assessment",
+          "isLocal": true
+        },
+        {
+          "imports": "Program",
+          "from": "./pages/Program",
+          "isLocal": true
+        }
+      ],
+      "routes": [
+        "/",
+        "/assessment",
+        "/program"
+      ],
+      "size": 3078
+    }
+  ],
+  "summary": {
+    "totalFiles": 60,
+    "pages": 2,
+    "components": 58,
+    "routes": 36,
+    "unusedFiles": 32,
+    "entryPoints": 2,
+    "complexity": {
+      "total": 961,
+      "average": 16.016666666666666
+    }
+  }
+}

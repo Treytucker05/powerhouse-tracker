@@ -166,6 +166,142 @@ export const getMethodologyDefaults = (methodology, blockType) => {
 };
 
 /**
+ * Calculate sets, reps, and volume for different training methods including Bryant clusters
+ * @param {string} trainingGoal - 'strength', 'hypertrophy', 'endurance', 'cluster'
+ * @param {string} exerciseType - 'standard', 'cluster', 'complexes'
+ * @param {Object} constraints - Training constraints and parameters
+ * @returns {Object} - {sets, reps, rest, volume, clusterConfig}
+ */
+export const calcSetsReps = (trainingGoal, exerciseType = 'standard', constraints = {}) => {
+    const {
+        experienceLevel = 'intermediate',
+        fatigueLevel = 5,
+        timeConstraint = 'moderate',
+        bryantCompliant = false
+    } = constraints;
+
+    // Bryant cluster configuration
+    if (exerciseType === 'cluster' || trainingGoal === 'cluster') {
+        const clusterConfig = {
+            intraRest: 15, // 15s between mini-sets
+            clustersPerSet: 3, // 3 mini-sets per cluster
+            repsPerCluster: bryantCompliant ?
+                (experienceLevel === 'advanced' ? 5 : 4) : 3,
+            totalSets: experienceLevel === 'beginner' ? 3 :
+                experienceLevel === 'intermediate' ? 4 : 5
+        };
+
+        // Calculate total volume: sets * (reps_per_cluster * clusters_per_set)
+        const totalReps = clusterConfig.totalSets *
+            (clusterConfig.repsPerCluster * clusterConfig.clustersPerSet);
+
+        // Calculate effective volume: total_reps * (1 - (intraRest / 60))
+        const effectiveVolume = Math.round(totalReps * (1 - (clusterConfig.intraRest / 60)));
+
+        return {
+            sets: clusterConfig.totalSets,
+            reps: `${clusterConfig.clustersPerSet}×${clusterConfig.repsPerCluster}`,
+            rest: `${clusterConfig.intraRest}s intra-set, 2-3min between clusters`,
+            volume: effectiveVolume,
+            totalReps: totalReps,
+            clusterConfig: clusterConfig,
+            bryantMethod: true,
+            description: `Bryant Cluster: ${clusterConfig.totalSets} clusters of ${clusterConfig.clustersPerSet}×${clusterConfig.repsPerCluster} with ${clusterConfig.intraRest}s rest`
+        };
+    }
+
+    // Bryant strongman configuration
+    if (exerciseType === 'strongman' || trainingGoal === 'strongman' || trainingGoal === 'tactical') {
+        const strongmanConfig = {
+            distance: constraints.distance || 150, // Default 150ft
+            duration: constraints.duration || 30, // Default 30s
+            restBetweenEvents: constraints.rest || 90, // Default 90s
+            events: experienceLevel === 'beginner' ? 3 :
+                experienceLevel === 'intermediate' ? 4 : 5,
+            loadFactor: constraints.loadFactor || 1.2,
+            timeBased: constraints.timeBased !== undefined ? constraints.timeBased : true,
+            bodyweightFactor: constraints.bodyweightFactor || 200 // Default 200lb bodyweight
+        };
+
+        // Calculate estimated reps: distance / 5 + duration / 10
+        const distanceReps = strongmanConfig.distance > 0 ? (strongmanConfig.distance / 5) : 0;
+        const durationReps = strongmanConfig.duration > 0 ? (strongmanConfig.duration / 10) : 0;
+        const estimatedReps = Math.round(distanceReps + durationReps);
+
+        // Calculate total volume: estimated_reps * (load / bodyweight_factor) * events
+        const loadRatio = constraints.load ? (constraints.load / strongmanConfig.bodyweightFactor) : strongmanConfig.loadFactor;
+        const totalVolume = Math.round(estimatedReps * loadRatio * strongmanConfig.events);
+
+        // Conversion to rep-equivalent for hybrid programming
+        const repEquivalent = Math.round(totalVolume / strongmanConfig.events);
+
+        // Conflict resolution: if not timeBased, fallback to reps
+        const repBasedFallback = !strongmanConfig.timeBased ? {
+            sets: strongmanConfig.events,
+            reps: `${estimatedReps}`,
+            rest: `${strongmanConfig.restBetweenEvents}s`,
+            standardFormat: true
+        } : null;
+
+        return {
+            events: strongmanConfig.events,
+            distance: strongmanConfig.distance > 0 ? `${strongmanConfig.distance}ft` : 'N/A',
+            duration: `${strongmanConfig.duration}s`,
+            rest: `${strongmanConfig.restBetweenEvents}s between events`,
+            volume: totalVolume,
+            estimatedReps: estimatedReps,
+            repEquivalent: repEquivalent, // For rep-based conversion
+            repBasedFallback: repBasedFallback, // For hybrid integration
+            strongmanConfig: strongmanConfig,
+            bryantMethod: true,
+            timeBased: strongmanConfig.timeBased,
+            tacticalApplication: true,
+            volumeFormula: `estimated_reps(${estimatedReps}) * load_ratio(${loadRatio.toFixed(2)}) * events(${strongmanConfig.events}) = ${totalVolume}`,
+            hybridWeeks: 'Weeks 1-4 recommended for strongman phase',
+            description: `Bryant Strongman: ${strongmanConfig.events} events × ${strongmanConfig.distance > 0 ? strongmanConfig.distance + 'ft' : strongmanConfig.duration + 's'} with ${strongmanConfig.restBetweenEvents}s rest`
+        };
+    }
+
+    // Standard sets/reps calculations for non-cluster/non-strongman exercises
+    const standardConfigs = {
+        strength: {
+            sets: experienceLevel === 'beginner' ? 3 :
+                experienceLevel === 'intermediate' ? 4 : 5,
+            reps: [1, 5],
+            rest: '3-5min',
+            volume: null
+        },
+        hypertrophy: {
+            sets: experienceLevel === 'beginner' ? 3 :
+                experienceLevel === 'intermediate' ? 4 : 5,
+            reps: [6, 12],
+            rest: '2-3min',
+            volume: null
+        },
+        endurance: {
+            sets: 3,
+            reps: [12, 20],
+            rest: '1-2min',
+            volume: null
+        }
+    };
+
+    const config = standardConfigs[trainingGoal] || standardConfigs.hypertrophy;
+    const avgReps = (config.reps[0] + config.reps[1]) / 2;
+
+    return {
+        sets: config.sets,
+        reps: `${config.reps[0]}-${config.reps[1]}`,
+        rest: config.rest,
+        volume: Math.round(config.sets * avgReps),
+        totalReps: Math.round(config.sets * avgReps),
+        clusterConfig: null,
+        bryantMethod: false,
+        description: `Standard ${trainingGoal}: ${config.sets} sets of ${config.reps[0]}-${config.reps[1]} reps`
+    };
+};
+
+/**
  * Calculate intensity progression for a block
  * @param {Object} block - The program block object
  * @param {number} week - The week number (1-based)

@@ -355,6 +355,7 @@ export function AppProvider({ children }) {
         saveProgram,
         updateTimeline,
         clearUserData,
+        setUser: (user) => dispatch({ type: APP_ACTIONS.SET_USER, payload: user }),
 
         // Direct dispatch for advanced usage
         dispatch,

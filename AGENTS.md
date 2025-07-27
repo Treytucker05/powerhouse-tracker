@@ -7,10 +7,10 @@
 - React UI components in `tracker-ui/` subdirectory
 
 ## Running Tests
-- Install dependencies with `pnpm install`
-- Run `pnpm run test:unit` to execute Vitest test suite with coverage
-- Run `pnpm run test:e2e` to execute Playwright end-to-end tests
-- Run `pnpm run verify` to build, test, and lint in one command
+- Install dependencies with `npm install`
+- Run `npm run test:unit` to execute Vitest test suite with coverage
+- Run `npm run test:e2e` to execute Playwright end-to-end tests
+- Run `npm run verify` to build, test, and lint in one command
 
 ## Button Handler Mapping
 Handlers live in `js/ui/globals.js` and `js/ui/additionalHandlers.js`. Buttons follow the `btnActionName` naming convention. Event delegation in `js/app.js` maps button IDs to these handlers.

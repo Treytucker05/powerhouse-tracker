@@ -4,6 +4,11 @@ import { useApp } from '../../../context';
 import { useAssessment } from '../../../hooks/useAssessment';
 
 const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
+    console.log('🔴 DEBUG: GoalsAndNeeds component is rendering');
+    console.log('🔴 DEBUG: Props received:', { assessmentData, onNext, canGoNext });
+    console.log('🔴 DEBUG: Current URL:', window.location.pathname);
+    console.log('🔴 DEBUG: Stack trace:', new Error().stack);
+
     const { state, dispatch } = useApp();
     const {
         classifyGainerType,
@@ -614,8 +619,8 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
                     <button
                         onClick={handleSMARTValidation}
                         className={`px-4 py-2 rounded-md text-white transition-colors ${enhancedAssessment.smartGoals.validated
-                                ? 'bg-green-600 hover:bg-green-700'
-                                : 'bg-blue-600 hover:bg-blue-700'
+                            ? 'bg-green-600 hover:bg-green-700'
+                            : 'bg-blue-600 hover:bg-blue-700'
                             }`}
                     >
                         {enhancedAssessment.smartGoals.validated ? (

@@ -3,6 +3,9 @@ import { Routes, Route } from 'react-router-dom'
 import { useApp } from './context'
 import Assessment from './components/Assessment'
 import Program from './pages/Program'
+import Auth from './pages/Auth'
+import Navbar from './components/ui/Navbar'
+import ProtectedRoute from './components/ui/ProtectedRoute'
 
 function App() {
     const { user, assessment, loading } = useApp()
@@ -20,40 +23,36 @@ function App() {
 
     return (
         <div className="min-h-screen bg-black">
-            <Routes>
-                <Route path="/" element={
-                    assessment ? (
-                        <div className="min-h-screen bg-black text-white flex items-center justify-center">
-                            <div className="text-center">
-                                <h1 className="text-4xl font-bold mb-4">Welcome to PowerHouse Tracker</h1>
-                                <p className="text-gray-400 mb-8">Your assessment is complete!</p>
+            <Navbar />
+            <main className="pt-16">
+                <Routes>
+                    <Route path="/login" element={<Auth />} />
+                    <Route path="/signup" element={<Auth />} />
+                    <Route path="/" element={
+                        <ProtectedRoute>
+                            <div className="text-center py-12">
+                                <h1 className="text-4xl font-bold text-white mb-4">Welcome to PowerHouse Tracker</h1>
+                                <p className="text-gray-400 mb-8">Complete your assessment and build your program</p>
                                 <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 max-w-md mx-auto">
-                                    <h2 className="text-xl font-semibold mb-4">Your Profile</h2>
-                                    <div className="space-y-2 text-sm">
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-400">Goal:</span>
-                                            <span className="text-white">{assessment.primaryGoal}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-400">Experience:</span>
-                                            <span className="text-white">{assessment.trainingExperience}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-400">System:</span>
-                                            <span className="text-blue-400">{assessment.recommendedSystem}</span>
-                                        </div>
-                                    </div>
+                                    <h2 className="text-xl font-semibold mb-4">Getting Started</h2>
+                                    <p className="text-gray-300 mb-4">Click "Program Design" to start your integrated assessment and program building process.</p>
+                                    <a
+                                        href="/program"
+                                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg inline-block transition-colors"
+                                    >
+                                        Start Program Design
+                                    </a>
                                 </div>
                             </div>
-                        </div>
-                    ) : (
-                        <Assessment />
-                    )
-                } />
-                <Route path="/assessment" element={<Assessment />} />
-                <Route path="/program" element={<Program />} />
-                {/* Add more routes here as needed */}
-            </Routes>
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/program" element={
+                        <ProtectedRoute>
+                            <Program />
+                        </ProtectedRoute>
+                    } />
+                </Routes>
+            </main>
         </div>
     )
 }

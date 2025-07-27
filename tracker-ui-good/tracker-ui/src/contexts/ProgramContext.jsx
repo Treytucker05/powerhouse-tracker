@@ -18,13 +18,15 @@ export const PROGRAM_ACTIONS = {
     SET_LOADING: 'SET_LOADING',
     SET_ERROR: 'SET_ERROR',
     UPDATE_BLOCK_PARAMETER: 'UPDATE_BLOCK_PARAMETER',
-    TOGGLE_PERIODIZATION_MODE: 'TOGGLE_PERIODIZATION_MODE'
+    TOGGLE_PERIODIZATION_MODE: 'TOGGLE_PERIODIZATION_MODE',
+    SET_BRYANT_INTEGRATED: 'SET_BRYANT_INTEGRATED',
+    SET_LEGACY_MIGRATION_STATUS: 'SET_LEGACY_MIGRATION_STATUS'
 };
 
 // Initial state
 const initialState = {
     // UI State
-    activeTab: 'goals', // Default to periodization
+    activeTab: 'primary-goal', // Start with Step 1: Primary Goal
     selectedLevel: null,
     isLoading: false,
     error: null,
@@ -112,6 +114,15 @@ const initialState = {
     selectedTechIntegration: '',
     techNote: '',
 
+    // Bryant Periodization Integration
+    bryantIntegrated: false,
+    bryantFeatures: [],
+    bryantValidation: null,
+
+    // Legacy Migration
+    legacyMigrationStatus: null,
+    migrationReport: null,
+
     // Results
     loadingResults: null,
     generatedProgram: null,
@@ -175,6 +186,21 @@ function programReducer(state, action) {
                 ...state,
                 usePeriodization: action.payload,
                 activeTab: action.payload ? 'goals' : 'overview'
+            };
+
+        case PROGRAM_ACTIONS.SET_BRYANT_INTEGRATED:
+            return {
+                ...state,
+                bryantIntegrated: action.payload.integrated,
+                bryantFeatures: action.payload.features || [],
+                bryantValidation: action.payload.validation || null
+            };
+
+        case PROGRAM_ACTIONS.SET_LEGACY_MIGRATION_STATUS:
+            return {
+                ...state,
+                legacyMigrationStatus: action.payload.status,
+                migrationReport: action.payload.report || null
             };
 
         default:
@@ -260,6 +286,14 @@ export const ProgramProvider = ({ children }) => {
     const setLoading = useCallback((loading) => dispatch({ type: PROGRAM_ACTIONS.SET_LOADING, payload: loading }), []);
     const setError = useCallback((error) => dispatch({ type: PROGRAM_ACTIONS.SET_ERROR, payload: error }), []);
     const togglePeriodizationMode = useCallback((usePeriodization) => dispatch({ type: PROGRAM_ACTIONS.TOGGLE_PERIODIZATION_MODE, payload: usePeriodization }), []);
+    const setBryantIntegrated = useCallback((integrated, features, validation) => dispatch({
+        type: PROGRAM_ACTIONS.SET_BRYANT_INTEGRATED,
+        payload: { integrated, features, validation }
+    }), []);
+    const setLegacyMigrationStatus = useCallback((status, report) => dispatch({
+        type: PROGRAM_ACTIONS.SET_LEGACY_MIGRATION_STATUS,
+        payload: { status, report }
+    }), []);
 
     const actions = {
         setActiveTab,
@@ -274,7 +308,9 @@ export const ProgramProvider = ({ children }) => {
         setGeneratedProgram,
         setLoading,
         setError,
-        togglePeriodizationMode
+        togglePeriodizationMode,
+        setBryantIntegrated,
+        setLegacyMigrationStatus
     };
 
     return (
