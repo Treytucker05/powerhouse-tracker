@@ -1888,6 +1888,221 @@ export const useAssessment = () => {
         }
     };
 
+    // BRYANT PERIODIZATION PHA HEALTH SCREENING
+
+    // Assess PHA (Peripheral Heart Action) eligibility based on Bryant research
+    const assessPHAHealth = (phaHealthData) => {
+        const { highBP, cardiacHistory, fitness } = phaHealthData;
+
+        // Determine contraindication status based on Bryant guidelines
+        const contraindications = [];
+        let eligibilityScore = 10; // Start with full eligibility
+
+        // High blood pressure contraindication
+        if (highBP) {
+            contraindications.push({
+                factor: 'High Blood Pressure',
+                severity: 'critical',
+                description: 'PHA circuits create significant cardiovascular stress',
+                impact: 'Complete contraindication for no-rest circuits'
+            });
+            eligibilityScore -= 10; // Complete disqualification
+        }
+
+        // Cardiac history contraindication
+        if (cardiacHistory) {
+            contraindications.push({
+                factor: 'Cardiac History',
+                severity: 'critical',
+                description: 'Previous heart conditions increase risk during high-intensity circuits',
+                impact: 'Medical clearance required before PHA participation'
+            });
+            eligibilityScore -= 8; // Near complete disqualification
+        }
+
+        // Poor fitness level contraindication
+        if (fitness === 'poor') {
+            contraindications.push({
+                factor: 'Poor Cardiovascular Fitness',
+                severity: 'moderate',
+                description: 'Insufficient fitness base for high-intensity no-rest training',
+                impact: 'Build fitness base before attempting PHA circuits'
+            });
+            eligibilityScore -= 6; // Significant concern
+        }
+
+        // Determine final eligibility status
+        let eligibilityStatus, recommendations;
+
+        if (eligibilityScore <= 0) {
+            eligibilityStatus = 'contraindicated';
+            recommendations = [
+                'PHA circuits are not recommended based on current health status',
+                'Focus on traditional strength training with adequate rest periods',
+                'Consult healthcare provider before high-intensity training',
+                'Consider alternative conditioning methods (steady-state cardio, tempo work)'
+            ];
+        } else if (eligibilityScore <= 4) {
+            eligibilityStatus = 'conditional';
+            recommendations = [
+                'PHA circuits may be possible with modifications and medical clearance',
+                'Start with longer rest periods (30-60 seconds) between exercises',
+                'Monitor heart rate and blood pressure responses',
+                'Progress gradually over 8-12 weeks before attempting no-rest circuits'
+            ];
+        } else if (eligibilityScore <= 7) {
+            eligibilityStatus = 'limited';
+            recommendations = [
+                'PHA circuits appropriate with careful progression',
+                'Begin with modified circuits (15-30 second rest periods)',
+                'Focus on movement quality over intensity initially',
+                'Build up to no-rest circuits over 4-6 weeks'
+            ];
+        } else {
+            eligibilityStatus = 'eligible';
+            recommendations = [
+                'Cleared for full PHA circuit training',
+                'Can safely perform no-rest circuits as per Bryant protocols',
+                'Follow 4-6 week PHA blocks with mandatory deload',
+                'Monitor for signs of overreaching (elevated HR, poor recovery)'
+            ];
+        }
+
+        // Generate PHA-specific program modifications
+        const programModifications = generatePHAModifications(eligibilityStatus, contraindications);
+
+        return {
+            eligibilityStatus,
+            eligibilityScore,
+            contraindications,
+            recommendations,
+            programModifications,
+            bryantGuidelines: {
+                maxCycleDuration: '4-6 weeks',
+                restBetweenExercises: eligibilityStatus === 'eligible' ? '0 seconds' : '15-30 seconds',
+                transitionTime: '30 seconds maximum',
+                mandatoryDeload: 'Required after each PHA block',
+                progressionRate: '5-10% weekly increases in volume/intensity'
+            }
+        };
+    };
+
+    // Generate PHA program modifications based on eligibility
+    const generatePHAModifications = (eligibilityStatus, contraindications) => {
+        const modifications = [];
+
+        switch (eligibilityStatus) {
+            case 'contraindicated':
+                modifications.push({
+                    type: 'exercise_selection',
+                    change: 'Exclude all PHA circuits from program templates',
+                    alternative: 'Use traditional strength training with 2-5 minute rest periods'
+                });
+                modifications.push({
+                    type: 'conditioning',
+                    change: 'Avoid high-intensity circuit training',
+                    alternative: 'Low-intensity steady-state cardio, walking, swimming'
+                });
+                break;
+
+            case 'conditional':
+                modifications.push({
+                    type: 'rest_periods',
+                    change: 'Extend rest periods to 30-60 seconds between exercises',
+                    alternative: 'Traditional supersets with adequate recovery'
+                });
+                modifications.push({
+                    type: 'intensity_limits',
+                    change: 'Limit circuit intensity to 60-75% of maximum effort',
+                    alternative: 'Focus on movement quality and technique'
+                });
+                break;
+
+            case 'limited':
+                modifications.push({
+                    type: 'progression_timeline',
+                    change: 'Extended 6-8 week progression to no-rest circuits',
+                    alternative: 'Start with 15-30 second rest, gradually reduce'
+                });
+                modifications.push({
+                    type: 'monitoring',
+                    change: 'Enhanced heart rate and recovery monitoring',
+                    alternative: 'Use RPE and HR zones to guide intensity'
+                });
+                break;
+
+            case 'eligible':
+                modifications.push({
+                    type: 'full_protocols',
+                    change: 'Can implement complete Bryant PHA protocols',
+                    alternative: 'No modifications needed - follow research guidelines'
+                });
+                break;
+        }
+
+        return modifications;
+    };
+
+    // Integration with existing fatigue functions for PHA-specific checks
+    const integratePHAWithFatigue = (fatigueData, phaHealthScreen) => {
+        // If PHA contraindicated, modify fatigue recommendations
+        if (phaHealthScreen?.eligibilityStatus === 'contraindicated') {
+            return {
+                ...fatigueData,
+                phaEligible: false,
+                modifiedRecommendations: [
+                    ...fatigueData.recommendations,
+                    'Avoid high-intensity circuit training due to health contraindications',
+                    'Focus on low-impact conditioning methods',
+                    'Consider medical evaluation before increasing training intensity'
+                ]
+            };
+        }
+
+        // For eligible users, add PHA-specific fatigue monitoring
+        if (phaHealthScreen?.eligibilityStatus === 'eligible') {
+            return {
+                ...fatigueData,
+                phaEligible: true,
+                phaSpecificMonitoring: [
+                    'Monitor heart rate recovery between circuits',
+                    'Track morning heart rate for overreaching signs',
+                    'Assess sleep quality after PHA sessions',
+                    'Watch for elevated fatigue lasting >48 hours'
+                ]
+            };
+        }
+
+        return fatigueData;
+    };
+
+    // Save PHA health screening assessment
+    const savePHAHealthAssessment = async (phaHealthData) => {
+        setLoading(true);
+        try {
+            // Update context with PHA health screening data
+            if (dispatch) {
+                dispatch({
+                    type: APP_ACTIONS.UPDATE_ASSESSMENT,
+                    payload: {
+                        ...state?.assessment,
+                        phaHealthScreen: phaHealthData
+                    }
+                });
+            }
+
+            // Store in localStorage as backup
+            localStorage.setItem('pha_health_screen', JSON.stringify(phaHealthData));
+
+            return { success: true, data: phaHealthData };
+        } catch (error) {
+            console.error('Error saving PHA health assessment:', error);
+            return { success: false, error: error.message };
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // VOLUME LANDMARKS INTEGRATION ("How Much Should I Train?" Pages 1-50)
 
     // Calculate Minimum Effective Volume (MEV) per muscle group
@@ -2374,6 +2589,12 @@ export const useAssessment = () => {
         generateWeeklyVolumeProgression,
         adjustVolumeLandmarks,
         generateDeloadProtocol,
-        saveVolumeLandmarks
+        saveVolumeLandmarks,
+
+        // PHA Health Screening functions (Bryant Periodization)
+        assessPHAHealth,
+        generatePHAModifications,
+        integratePHAWithFatigue,
+        savePHAHealthAssessment
     };
 };

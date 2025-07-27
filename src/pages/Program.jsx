@@ -2,86 +2,69 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { useApp } from '../context';
 
-// Import all 15 components to combine into 5 framework tabs
-// Core 7-tab system
-import GoalsAndNeeds from '../components/program/tabs/GoalsAndNeeds';
-import MacrocycleStructure from '../components/program/tabs/MacrocycleStructure';
-import MesocyclePlanning from '../components/program/tabs/MesocyclePlanning';
-import MicrocycleDesign from '../components/program/tabs/MicrocycleDesign';
-import SessionMonitoring from '../components/program/tabs/SessionMonitoring';
-import Implementation from '../components/program/tabs/Implementation';
-import TrainingBlocks from '../components/program/tabs/TrainingBlocks';
+// Import assessment components for integration
+import IntegratedPersonalProfile from '../components/program/tabs/IntegratedPersonalProfile';
 
-// Enhanced components
-import EnhancedAssessmentGoals from '../components/program/tabs/EnhancedAssessmentGoals';
-import EnhancedSessionStructure from '../components/program/tabs/EnhancedSessionStructure';
-import EnhancedImplementation from '../components/program/tabs/EnhancedImplementation';
-
-// Specialized Tools (8 components)
+// Import original 5-tab system components
 import ProgramOverview from '../components/program/tabs/ProgramOverview';
+import BlockSequencing from '../components/program/tabs/BlockSequencing';
 import LoadingParameters from '../components/program/tabs/LoadingParameters';
 import TrainingMethods from '../components/program/tabs/TrainingMethods';
-import OPEXNutrition from '../components/program/tabs/OPEXNutrition';
-import Specialty from '../components/program/tabs/Specialty';
-import VariableManipulation from '../components/program/tabs/VariableManipulation';
-import VolumeLandmarks from '../components/program/tabs/VolumeLandmarks';
 import ProgramPreview from '../components/program/tabs/ProgramPreview';
 
 // Import existing program components to integrate
 import { ProgramProvider } from '../contexts/ProgramContext';
 
 const Program = () => {
+    console.log('🚀 PROGRAM.JSX IS RENDERING - Main Program Page');
+    console.log('📍 Current URL:', window.location.pathname);
+    console.log('🎯 Component: src/pages/Program.jsx');
+
     const { assessment, user } = useApp();
-    const [activeTab, setActiveTab] = useState('assessment-screening');
+    const [activeTab, setActiveTab] = useState('personal-profile');
 
     const tabs = [
         {
-            id: 'assessment-screening',
-            label: 'Assessment & Screening',
-            component: EnhancedAssessmentGoals,
-            description: 'Comprehensive athlete profiling, movement screening, and needs analysis with program overview',
-            subComponents: ['Assessment', 'Movement Screening', 'Athletic Profile'],
-            integratedComponents: ['EnhancedAssessmentGoals', 'ProgramOverview'],
-            specializedTools: ['Program Overview']
+            id: 'personal-profile',
+            label: 'Personal Profile',
+            component: IntegratedPersonalProfile,
+            description: 'Define your training goals, experience, and timeline',
+            icon: '�'
         },
         {
-            id: 'goal-setting',
-            label: 'Goal Setting',
-            component: GoalsAndNeeds,
-            description: 'Define specific, measurable goals with specialty focus and performance targets',
-            subComponents: ['SMART Goals', 'Performance Targets', 'Timeline Planning'],
-            integratedComponents: ['GoalsAndNeeds', 'Specialty'],
-            specializedTools: ['Specialty']
+            id: 'overview',
+            label: 'Program Overview',
+            component: ProgramOverview,
+            description: 'Program setup and basic configuration',
+            icon: '📋'
         },
         {
-            id: 'periodization',
-            label: 'Periodization',
-            component: MacrocycleStructure,
-            description: 'Complete periodization strategy: macrocycles, training blocks, mesocycles with volume landmarks',
-            subComponents: ['Macrocycle Design', 'Training Blocks', 'Mesocycle Planning'],
-            integratedComponents: ['MacrocycleStructure', 'TrainingBlocks', 'MesocyclePlanning', 'VolumeLandmarks'],
-            specializedTools: ['Volume Landmarks'],
-            combinedFeatures: ['periodization-design', 'training-blocks', 'mesocycles', 'volume-landmarks']
+            id: 'block-sequencing',
+            label: 'Block Sequencing',
+            component: BlockSequencing,
+            description: 'Design your training timeline and block progression',
+            icon: '🔄'
         },
         {
-            id: 'program-design',
-            label: 'Program Design',
-            component: EnhancedSessionStructure,
-            description: 'Comprehensive program design: sessions, training methods, loading parameters, variable manipulation',
-            subComponents: ['Strength Training', 'Cardiovascular', 'Mobility', 'Recovery Protocols'],
-            integratedComponents: ['EnhancedSessionStructure', 'MicrocycleDesign', 'LoadingParameters', 'TrainingMethods', 'VariableManipulation'],
-            specializedTools: ['Loading Parameters', 'Training Methods', 'Variable Manipulation'],
-            combinedFeatures: ['session-structure', 'microcycle-design', 'loading-parameters', 'training-methods', 'variable-manipulation']
+            id: 'loading-parameters',
+            label: 'Loading Parameters',
+            component: LoadingParameters,
+            description: 'Set intensity zones and training parameters',
+            icon: '⚙️'
         },
         {
-            id: 'implementation-monitoring',
-            label: 'Implementation & Monitoring',
-            component: EnhancedImplementation,
-            description: 'Complete implementation with monitoring, recovery tracking, nutrition, and program preview',
-            subComponents: ['Program Execution', 'Performance Monitoring', 'Recovery Tracking', 'Progress Analysis', 'Nutrition Planning'],
-            integratedComponents: ['EnhancedImplementation', 'Implementation', 'SessionMonitoring', 'OPEXNutrition', 'ProgramPreview'],
-            specializedTools: ['OPEX Nutrition', 'Program Preview'],
-            combinedFeatures: ['monitoring-recovery', 'implementation', 'session-monitoring', 'nutrition', 'program-preview']
+            id: 'training-methods',
+            label: 'Training Methods',
+            component: TrainingMethods,
+            description: 'Select and configure training techniques',
+            icon: '💪'
+        },
+        {
+            id: 'program-preview',
+            label: 'Program Preview',
+            component: ProgramPreview,
+            description: 'Review and finalize your complete program',
+            icon: '👁️'
         }
     ];
 
@@ -94,9 +77,17 @@ const Program = () => {
     };
 
     const handleNext = () => {
+        console.log('🔄 Next button clicked!');
         const currentIndex = getCurrentTabIndex();
+        console.log('📍 Current tab index:', currentIndex);
+        console.log('📍 Current tab ID:', activeTab);
+
         if (currentIndex < tabs.length - 1) {
-            setActiveTab(tabs[currentIndex + 1].id);
+            const nextTab = tabs[currentIndex + 1];
+            console.log('➡️ Moving to next tab:', nextTab.id, '-', nextTab.label);
+            setActiveTab(nextTab.id);
+        } else {
+            console.log('⚠️ Already at last tab');
         }
     };
 
@@ -113,12 +104,14 @@ const Program = () => {
                 <div className="container mx-auto px-6 py-8">
                     {/* Header */}
                     <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-white mb-2">Program Design - Complete Edition</h1>
+                        <h1 className="text-3xl font-bold text-white mb-2">
+                            🔴 DEBUG: Program Design System (src/pages/Program.jsx)
+                        </h1>
                         <p className="text-gray-300 mb-4">
-                            Design comprehensive training programs using your complete 5-component framework with all 15 legacy features integrated
+                            Create comprehensive training programs using the evidence-based 5-step methodology
                         </p>
                         <div className="text-sm text-gray-400 mb-4">
-                            <span className="font-semibold">Integrated Components:</span> 7 Core Tabs + 8 Specialized Tools = 15 Total Features
+                            <span className="font-semibold">Original 5-Tab System:</span> Overview → Block Sequencing → Loading Parameters → Training Methods → Program Preview
                         </div>
 
                         {/* Progress Indicator */}
@@ -126,7 +119,7 @@ const Program = () => {
                             <div className="flex items-center justify-between mb-2">
                                 <span className="text-sm text-gray-300">Progress</span>
                                 <span className="text-sm text-gray-300">
-                                    Step {getCurrentTabIndex() + 1} of {tabs.length} - Complete Framework
+                                    Step {getCurrentTabIndex() + 1} of {tabs.length}
                                 </span>
                             </div>
                             <div className="w-full bg-gray-700 rounded-full h-2">
@@ -148,6 +141,7 @@ const Program = () => {
                                 title={tab.description}
                             >
                                 <div className="flex flex-col items-center">
+                                    <span className="text-lg mb-1">{tab.icon}</span>
                                     <span className="text-xs font-medium">{index + 1}</span>
                                     <span className="text-xs text-center leading-tight">{tab.label}</span>
                                 </div>

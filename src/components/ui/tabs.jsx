@@ -1,50 +1,53 @@
 import React, { createContext, useContext } from 'react';
 
+// Tabs Context for state management
 const TabsContext = createContext();
 
-export const Tabs = ({ value, onValueChange, className, children }) => {
+// Main Tabs component
+export const Tabs = ({ value, onValueChange, className = '', children, ...props }) => {
     return (
         <TabsContext.Provider value={{ value, onValueChange }}>
-            <div className={className}>
+            <div className={`tabs ${className}`} {...props}>
                 {children}
             </div>
         </TabsContext.Provider>
     );
 };
 
-export const TabsList = ({ className, children }) => {
+// TabsList component
+export const TabsList = ({ className = '', children, ...props }) => {
     return (
-        <div className={`inline-flex h-10 items-center justify-center rounded-md p-1 ${className}`}>
+        <div className={`tabs-list ${className}`} {...props}>
             {children}
         </div>
     );
 };
 
-export const TabsTrigger = ({ value, className, children, title }) => {
-    const { value: selectedValue, onValueChange } = useContext(TabsContext);
-    const isActive = selectedValue === value;
+// TabsTrigger component
+export const TabsTrigger = ({ value, className = '', children, ...props }) => {
+    const { value: activeValue, onValueChange } = useContext(TabsContext);
+    const isActive = activeValue === value;
 
     return (
         <button
-            className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${className} ${isActive ? 'bg-blue-600 text-white shadow-sm' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
-                }`}
-            onClick={() => onValueChange(value)}
-            title={title}
+            className={`tabs-trigger ${isActive ? 'active' : ''} ${className}`}
+            onClick={() => onValueChange?.(value)}
+            {...props}
         >
             {children}
         </button>
     );
 };
 
-export const TabsContent = ({ value, className, children }) => {
-    const { value: selectedValue } = useContext(TabsContext);
+// TabsContent component
+export const TabsContent = ({ value, className = '', children, ...props }) => {
+    const { value: activeValue } = useContext(TabsContext);
+    const isActive = activeValue === value;
 
-    if (selectedValue !== value) {
-        return null;
-    }
+    if (!isActive) return null;
 
     return (
-        <div className={`ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${className}`}>
+        <div className={`tabs-content ${className}`} {...props}>
             {children}
         </div>
     );

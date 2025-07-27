@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useProgramContext } from '../../contexts/ProgramContext';
+import BryantClusterInterface from './tabs/BryantClusterInterface';
+import BryantStrongmanInterface from './tabs/BryantStrongmanInterface';
 
 const TrainingMethods = () => {
     const { state, actions } = useProgramContext();
+    const [activeAdvancedMethod, setActiveAdvancedMethod] = useState(null);
 
     const trainingMethods = [
         {
@@ -40,6 +43,26 @@ const TrainingMethods = () => {
             intensity: 'Variable',
             volume: 'Moderate',
             recovery: '48-72 hours'
+        },
+        {
+            id: 'bryant_cluster',
+            name: 'Bryant Cluster Sets',
+            description: 'Mini-sets within sets with intra-set rest periods for strength/power',
+            bestFor: 'Strength, power development, volume accumulation',
+            intensity: '80-95%',
+            volume: 'High effective volume',
+            recovery: '48-72 hours',
+            advanced: true
+        },
+        {
+            id: 'bryant_strongman',
+            name: 'Bryant Strongman Events',
+            description: 'Functional movement patterns using strongman implements',
+            bestFor: 'Functional strength, work capacity, tactical applications',
+            intensity: '70-90%',
+            volume: 'Variable',
+            recovery: '48-96 hours',
+            advanced: true
         }
     ];
 
@@ -72,6 +95,15 @@ const TrainingMethods = () => {
 
     const handleMethodSelect = (methodId) => {
         actions.setProgramData({ selectedTrainingMethod: methodId });
+
+        // Handle advanced methods
+        if (methodId === 'bryant_cluster') {
+            setActiveAdvancedMethod('cluster');
+        } else if (methodId === 'bryant_strongman') {
+            setActiveAdvancedMethod('strongman');
+        } else {
+            setActiveAdvancedMethod(null);
+        }
     };
 
     const handleTrainingFocusSelect = (focusId) => {
@@ -96,7 +128,14 @@ const TrainingMethods = () => {
                         >
                             <div className="flex items-start justify-between">
                                 <div className="flex-1">
-                                    <h4 className="font-medium text-white">{method.name}</h4>
+                                    <div className="flex items-center gap-2">
+                                        <h4 className="font-medium text-white">{method.name}</h4>
+                                        {method.advanced && (
+                                            <span className="px-2 py-1 text-xs bg-purple-600 text-white rounded-full">
+                                                Advanced
+                                            </span>
+                                        )}
+                                    </div>
                                     <p className="text-sm text-gray-300 mt-1">{method.description}</p>
                                     <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
                                         <div>
@@ -224,6 +263,40 @@ const TrainingMethods = () => {
                             ))}
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* Advanced Bryant Method Interfaces */}
+            {activeAdvancedMethod === 'cluster' && (
+                <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+                    <h3 className="text-lg font-semibold text-white mb-4">Bryant Cluster Sets Configuration</h3>
+                    <BryantClusterInterface
+                        onClusterConfigUpdate={(config) => {
+                            actions.setProgramData({
+                                clusterConfig: config,
+                                advancedMethodConfig: config
+                            });
+                        }}
+                        exerciseData={state.programData}
+                    />
+                </div>
+            )}
+
+            {activeAdvancedMethod === 'strongman' && (
+                <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+                    <h3 className="text-lg font-semibold text-white mb-4">Bryant Strongman Events Configuration</h3>
+                    <BryantStrongmanInterface
+                        onEventUpdate={(events) => {
+                            actions.setProgramData({
+                                strongmanEvents: events,
+                                advancedMethodConfig: events
+                            });
+                        }}
+                        onSessionComplete={(session) => {
+                            actions.setProgramData({ strongmanSession: session });
+                        }}
+                        experienceLevel={state.assessmentData?.trainingExperience || 'intermediate'}
+                    />
                 </div>
             )}
 

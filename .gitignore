@@ -1,6 +1,5 @@
 ﻿# Dependencies
 node_modules/
-.pnpm-store/
 *.log
 
 # Build outputs
@@ -31,8 +30,7 @@ $RECYCLE.BIN/
 
 # Package manager
 yarn.lock
-package-lock.json
-.pnpm-lock.yaml
+pnpm-lock.yaml
 
 # Test coverage
 coverage/

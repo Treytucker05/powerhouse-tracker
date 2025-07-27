@@ -21,7 +21,6 @@ export default function TopNav({ user, onSignOut }) {
 
   const navItems = [
     { to: "/", label: "Dashboard", icon: Home },
-    { to: "/assessment", label: "Assessment", icon: ClipboardList },
     { to: "/program", label: "Program Design", icon: Cog },
     { to: "/tracking", label: "Tracking", icon: Activity },
     { to: "/analytics", label: "Analytics", icon: BarChart3 },

@@ -2,6 +2,123 @@ import React, { useState, useEffect } from 'react';
 import { Target, CheckCircle, Calendar, TrendingUp, BarChart3, AlertTriangle } from 'lucide-react';
 import { useApp } from '../../../context';
 
+// Quick Assessment Form Component
+const QuickAssessmentForm = ({ onComplete }) => {
+    const [formData, setFormData] = useState({
+        primaryGoal: '',
+        trainingExperience: '',
+        timeline: '',
+        recommendedSystem: ''
+    });
+
+    const handleInputChange = (field, value) => {
+        const updatedData = { ...formData, [field]: value };
+        setFormData(updatedData);
+
+        // Auto-generate recommendation
+        if (updatedData.primaryGoal && updatedData.trainingExperience && updatedData.timeline) {
+            updatedData.recommendedSystem = generateRecommendation(updatedData);
+        }
+    };
+
+    const generateRecommendation = (data) => {
+        if (data.primaryGoal === 'Powerlifting Competition') return 'Block Periodization';
+        if (data.primaryGoal === 'Bodybuilding/Physique') return 'Volume Progression';
+        if (data.primaryGoal === 'Athletic Performance') return 'Conjugate Method';
+        return 'Linear Progression';
+    };
+
+    const handleSubmit = () => {
+        if (formData.primaryGoal && formData.trainingExperience && formData.timeline) {
+            // Save to context and localStorage
+            localStorage.setItem('userProfile', JSON.stringify(formData));
+            onComplete(formData);
+        }
+    };
+
+    return (
+        <div className="space-y-4">
+            {/* Primary Goal */}
+            <div>
+                <label className="block text-sm font-medium text-blue-300 mb-2">Primary Training Goal</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {['Powerlifting Competition', 'Bodybuilding/Physique', 'Athletic Performance', 'General Fitness'].map((goal) => (
+                        <label key={goal} className="flex items-center space-x-2 cursor-pointer p-2 rounded border border-gray-600 hover:border-blue-500">
+                            <input
+                                type="radio"
+                                name="primaryGoal"
+                                value={goal}
+                                checked={formData.primaryGoal === goal}
+                                onChange={(e) => handleInputChange('primaryGoal', e.target.value)}
+                                className="text-blue-500"
+                            />
+                            <span className="text-white text-sm">{goal}</span>
+                        </label>
+                    ))}
+                </div>
+            </div>
+
+            {/* Experience Level */}
+            <div>
+                <label className="block text-sm font-medium text-blue-300 mb-2">Training Experience</label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    {['Beginner (0-1yr)', 'Intermediate (1-3yr)', 'Advanced (3-5yr)', 'Expert (5+yr)'].map((exp) => (
+                        <label key={exp} className="flex items-center space-x-2 cursor-pointer p-2 rounded border border-gray-600 hover:border-blue-500">
+                            <input
+                                type="radio"
+                                name="trainingExperience"
+                                value={exp}
+                                checked={formData.trainingExperience === exp}
+                                onChange={(e) => handleInputChange('trainingExperience', e.target.value)}
+                                className="text-blue-500"
+                            />
+                            <span className="text-white text-xs">{exp}</span>
+                        </label>
+                    ))}
+                </div>
+            </div>
+
+            {/* Timeline */}
+            <div>
+                <label className="block text-sm font-medium text-blue-300 mb-2">Program Timeline</label>
+                <div className="grid grid-cols-4 gap-2">
+                    {['6 weeks', '8 weeks', '12 weeks', '16 weeks'].map((time) => (
+                        <label key={time} className="flex items-center space-x-2 cursor-pointer p-2 rounded border border-gray-600 hover:border-blue-500">
+                            <input
+                                type="radio"
+                                name="timeline"
+                                value={time}
+                                checked={formData.timeline === time}
+                                onChange={(e) => handleInputChange('timeline', e.target.value)}
+                                className="text-blue-500"
+                            />
+                            <span className="text-white text-xs">{time}</span>
+                        </label>
+                    ))}
+                </div>
+            </div>
+
+            {/* Recommendation Preview */}
+            {formData.recommendedSystem && (
+                <div className="bg-green-900/20 border border-green-500/30 rounded p-3">
+                    <p className="text-green-400 text-sm">
+                        <strong>Recommended:</strong> {formData.recommendedSystem}
+                    </p>
+                </div>
+            )}
+
+            {/* Submit */}
+            <button
+                onClick={handleSubmit}
+                disabled={!formData.primaryGoal || !formData.trainingExperience || !formData.timeline}
+                className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+            >
+                Complete Setup & Continue
+            </button>
+        </div>
+    );
+};
+
 const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
     console.log('GoalsAndNeeds - Component rendering');
 
@@ -115,22 +232,17 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
                     )}
                 </div>
             ) : (
-                /* No Assessment Completed */
-                <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-6">
+                /* No Assessment Completed - Inline Quick Assessment */
+                <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-6">
                     <div className="flex items-center gap-2 mb-4">
-                        <AlertTriangle className="h-5 w-5 text-yellow-500" />
-                        <h3 className="text-lg font-semibold text-yellow-400">Assessment Required</h3>
+                        <Target className="h-5 w-5 text-blue-500" />
+                        <h3 className="text-lg font-semibold text-blue-400">Quick Assessment Setup</h3>
                     </div>
-                    <p className="text-gray-300 mb-4">
-                        Complete your comprehensive assessment first to generate personalized program recommendations.
+                    <p className="text-blue-300 mb-6">
+                        Let's quickly set up your basic training profile to get started with program design.
                     </p>
-                    <a
-                        href="/assessment"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                    >
-                        <Target className="h-4 w-4" />
-                        Start Assessment
-                    </a>
+
+                    <QuickAssessmentForm onComplete={(data) => setAssessmentSummary(data)} />
                 </div>
             )}
 

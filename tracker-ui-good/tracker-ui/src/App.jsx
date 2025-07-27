@@ -11,7 +11,6 @@ import './App.css';
 const Tracking = lazy(() => import("./pages/Tracking.jsx"));
 const Home = lazy(() => import("./pages/Home.jsx"));
 const Program = lazy(() => import("./pages/Program.jsx"));
-const Assessment = lazy(() => import("./pages/Assessment.jsx"));
 const Analytics = lazy(() => import("./pages/Analytics.jsx"));
 const AuthPage = lazy(() => import("./pages/AuthPage.jsx"));
 const MacrocycleRedirect = lazy(() => import("./pages/MacrocycleRedirect.jsx"));
@@ -45,7 +44,6 @@ function App() {
                   <Program />
                 </ErrorBoundary>
               } />
-              <Route path="assessment" element={<Assessment />} />
               <Route path="tracking" element={<Tracking />} />
               <Route path="analytics" element={<Analytics />} />
               <Route path="exercises" element={<ExercisesPage />} />

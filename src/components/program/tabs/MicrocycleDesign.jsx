@@ -68,8 +68,75 @@ const MicrocycleDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
             description: 'Max effort and dynamic effort days',
             example: 'ME Upper → DE Lower → ME Lower → DE Upper',
             bestFor: 'Powerlifters, advanced athletes'
+        },
+        {
+            pattern: 'bryant_cluster',
+            name: 'Bryant Cluster',
+            description: 'Cluster sets with 15s intra-set rest for metabolic stress',
+            example: '3×(3×4) with 15s rest between mini-sets',
+            bestFor: 'Hypertrophy, metabolic conditioning, intermediate to advanced'
+        },
+        {
+            pattern: 'bryant_strongman',
+            name: 'Bryant Strongman',
+            description: 'Time/distance-based strongman events for tactical conditioning',
+            example: '4 events × 150ft farmer\'s walk with 90s rest',
+            bestFor: 'Tactical athletes, functional strength, advanced conditioning'
         }
     ];
+
+    const setStructureOptions = {
+        standard: {
+            name: 'Standard Sets',
+            description: 'Traditional straight sets with full rest',
+            config: { type: 'standard', rest: '2-5min', structure: 'sets × reps' }
+        },
+        cluster: {
+            name: 'Bryant Cluster Sets',
+            description: 'Mini-sets with brief intra-set rest periods',
+            config: {
+                type: 'cluster',
+                intraRest: 15,
+                clustersPerSet: 3,
+                repsRange: '3-5',
+                structure: 'sets × (clusters × reps)',
+                bryantCompliant: true,
+                effectiveVolumeFormula: 'total_reps * (1 - (intraRest / 60))'
+            }
+        },
+        strongman: {
+            name: 'Bryant Strongman Events',
+            description: 'Time/distance-based strongman training for tactical application',
+            config: {
+                type: 'strongman',
+                timeBased: true,
+                metrics: 'ft/s',
+                integration: 'tactical',
+                distance: 150,
+                duration: 30,
+                restBetweenEvents: 90,
+                structure: 'events × distance/time',
+                bryantCompliant: true,
+                volumeFormula: 'estimated_reps * (load / bodyweight_factor) * events',
+                tacticalApplication: true,
+                effortRange: '30-60s',
+                loadFactorRange: '1.2-1.8',
+                hybridPhase: 'weeks_1_4',
+                conflictResolution: 'rep_equivalent_conversion',
+                sampleExercises: ['farmers_walk', 'tire_flip', 'atlas_stones', 'yoke_walk', 'sled_push']
+            }
+        },
+        superset: {
+            name: 'Supersets',
+            description: 'Back-to-back exercises with no rest',
+            config: { type: 'superset', rest: '0s between exercises, 2-3min between pairs' }
+        },
+        circuit: {
+            name: 'Circuit Training',
+            description: 'Multiple exercises performed consecutively',
+            config: { type: 'circuit', rest: '30s-2min between rounds' }
+        }
+    };
 
     const loadingPatterns = [
         { value: 'heavy_light_medium', label: 'Heavy-Light-Medium', description: 'High intensity, recovery, moderate' },
@@ -136,8 +203,8 @@ const MicrocycleDesign = ({ onNext, onPrevious, canGoNext, canGoPrevious }) => {
                         <div
                             key={pattern.pattern}
                             className={`p-4 border rounded-lg cursor-pointer transition-colors ${microcycleTemplate.pattern === pattern.pattern
-                                    ? 'border-blue-500 bg-blue-900/30'
-                                    : 'border-gray-500 hover:border-gray-400 bg-gray-600'
+                                ? 'border-blue-500 bg-blue-900/30'
+                                : 'border-gray-500 hover:border-gray-400 bg-gray-600'
                                 }`}
                             onClick={() => setMicrocycleTemplate(prev => ({ ...prev, pattern: pattern.pattern }))}
                         >
