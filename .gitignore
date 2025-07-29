@@ -46,7 +46,19 @@ tracker-ui-good/
 
 # System files (prevent Windows/macOS system files from causing Git corruption)
 desktop.ini
+Desktop.ini
+[Dd]esktop.ini
 Thumbs.db
+ehthumbs.db
 .DS_Store
+.AppleDouble
+.LSOverride
+*.lnk
+
+# Google Drive and cloud sync files
+*.tmp
+.~lock.*
+~$*
+*.goutputstream*
 *.tmp
 ehthumbs.db
