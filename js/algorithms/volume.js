@@ -1,12 +1,14 @@
 /**
  * Renaissance Periodization Volume Algorithms
  * Implements RP Table 2.2 (MEV Stimulus Estimator) and Table 2.3 (Set Progression Algorithm)
+ * Integrated with 5/3/1 Training Max system
  */
 
 import Chart from "chart.js/auto";
 import trainingState from "../core/trainingState.js";
 import { isHighFatigue } from "./fatigue.js";
 import { debugLog } from "../utils/debug.js";
+import { fiveThreeOne, get531Status, score531MainLift } from "./fiveThreeOne.js";
 
 /**
  * RP Table 2.2: MEV Stimulus Estimator
@@ -52,7 +54,53 @@ function scoreStimulus({ mmc, pump, disruption }) {
 }
 
 /**
- * Auto-Volume Progression System
+ * Enhanced Stimulus Scoring with 5/3/1 Integration
+ * Combines RP stimulus scoring with 5/3/1 main lift performance
+ * @param {Object} feedback - Combined feedback data
+ * @returns {Object} - Enhanced scoring with both methodologies
+ */
+export function scoreEnhancedStimulus(feedback) {
+  const {
+    // RP feedback
+    mmc = 0, pump = 0, disruption = 0,
+    // 5/3/1 feedback (optional)
+    mainLiftData = null,
+    // Session type
+    sessionType = "assistance" // "main_lift" or "assistance"
+  } = feedback;
+
+  // Get base RP stimulus score
+  const rpScore = scoreStimulus({ mmc, pump, disruption });
+
+  // If this is a main lift session with 5/3/1 data, integrate both scores
+  if (sessionType === "main_lift" && mainLiftData) {
+    const fiveThreeOneScore = score531MainLift(mainLiftData);
+
+    return {
+      combinedScore: Math.max(rpScore.score, fiveThreeOneScore.totalScore),
+      methodology: "RP + 5/3/1",
+      rpComponent: rpScore,
+      fiveThreeOneComponent: fiveThreeOneScore,
+      primaryAdvice: fiveThreeOneScore.recommendation,
+      volumeAdvice: rpScore.advice,
+      integrationNotes: "Main lift performance drives progression, RP manages assistance volume"
+    };
+  }
+
+  // For assistance work, use standard RP scoring
+  return {
+    ...rpScore,
+    methodology: "RP Volume",
+    integrationNotes: "Standard RP progression for assistance work"
+  };
+}
+disruption: clampedWorkload,
+    },
+  };
+}
+
+/**
+ * Auto-Volume Progression System with 5/3/1 Integration
  * Automatically increments sets based on MEV/MRV status and recovery feedback
  * @param {string} muscle - Target muscle group
  * @param {Object} feedback - {stimulus: 0-9, soreness: 0-3, perf: -1 to 2, recoverySession: boolean}
@@ -73,13 +121,32 @@ function autoSetIncrement(muscle, feedback = {}, state) {
     feedback.recoveryMuscle === "recovered" ||
     feedback.recoveryMuscle === "fully recovered";
 
-  // No progression if at MRV, recovery session, or high volume
+  // Check 5/3/1 status for integration
+  const fiveThreeOneStatus = get531Status();
+  const isDeloadWeek = fiveThreeOneStatus.isDeload;
+  const mainLiftProgression = feedback.mainLiftProgression || null;
+
+  // No progression if at MRV, recovery session, high volume, or 5/3/1 deload week
   if (
     atMRV ||
     feedback.recoverySession ||
+    isDeloadWeek ||
     ["maintenance", "optimal", "high", "maximum"].includes(vStat)
-  )
-    return { add: false, delta: 0, reason: "At volume ceiling or recovery" };
+  ) {
+    const reason = isDeloadWeek
+      ? "5/3/1 deload week - maintaining volume"
+      : "At volume ceiling or recovery";
+    return { add: false, delta: 0, reason };
+  }
+
+  // 5/3/1 Integration: Strong main lift performance can drive assistance progression
+  if (mainLiftProgression && mainLiftProgression.shouldProgress) {
+    return {
+      add: true,
+      delta: 1,
+      reason: `Strong main lift performance (${mainLiftProgression.lift}) - increase assistance volume`
+    };
+  }
 
   // Enhanced RP logic: +2 sets when stimulus ≤3 AND near MRV (≥4 sets to MRV)
   if (lowStim && nearMRV && goodRec) {
@@ -101,6 +168,89 @@ function autoSetIncrement(muscle, feedback = {}, state) {
     };
 
   return { add: false, delta: 0, reason: "No progression criteria met" };
+}
+
+/**
+ * Enhanced Volume Progression with 5/3/1 Training Max Integration
+ * Combines RP volume landmarks with 5/3/1 percentage-based progression
+ * @param {string} muscle - Target muscle group
+ * @param {Object} feedback - Enhanced feedback including main lift data
+ * @param {Object} state - Training state
+ * @returns {Object} - Comprehensive progression recommendation
+ */
+export function autoSetIncrementWithFiveThreeOne(muscle, feedback = {}, state) {
+  // Get base RP progression
+  const rpProgression = autoSetIncrement(muscle, feedback, state);
+
+  // Get 5/3/1 status
+  const fiveThreeOneStatus = get531Status();
+
+  // If this muscle is trained via main lifts and we have main lift data
+  const mainLiftMuscles = {
+    "Quads": ["squat", "deadlift"],
+    "Glutes": ["squat", "deadlift"],
+    "Hamstrings": ["deadlift"],
+    "Chest": ["bench"],
+    "Shoulders": ["press", "bench"],
+    "Back": ["deadlift"],
+    "Triceps": ["bench", "press"],
+    "Biceps": ["deadlift"]
+  };
+
+  const relevantLifts = mainLiftMuscles[muscle] || [];
+  const hasMainLiftData = relevantLifts.some(lift =>
+    fiveThreeOneStatus.trainingMaxes[lift] > 0
+  );
+
+  if (hasMainLiftData && feedback.mainLiftPerformance) {
+    // Integrate 5/3/1 progression with RP volume management
+    const mainLiftScore = score531MainLift(feedback.mainLiftPerformance);
+
+    return {
+      ...rpProgression,
+      methodology: "RP + 5/3/1",
+      mainLiftComponent: mainLiftScore,
+      fiveThreeOneStatus,
+      trainingMaxProgression: feedback.trainingMaxProgression,
+      integrationAdvice: generateIntegrationAdvice(rpProgression, mainLiftScore, fiveThreeOneStatus)
+    };
+  }
+
+  // Standard RP progression for non-main lift muscles
+  return {
+    ...rpProgression,
+    methodology: "RP Volume",
+    fiveThreeOneStatus: fiveThreeOneStatus.integrationStatus
+  };
+}
+
+/**
+ * Generate integration advice combining RP and 5/3/1 methodologies
+ * @param {Object} rpProgression - RP progression recommendation
+ * @param {Object} mainLiftScore - 5/3/1 main lift performance
+ * @param {Object} fiveThreeOneStatus - Current 5/3/1 status
+ * @returns {string} - Integration advice
+ */
+function generateIntegrationAdvice(rpProgression, mainLiftScore, fiveThreeOneStatus) {
+  const { isDeload, currentWeek } = fiveThreeOneStatus;
+
+  if (isDeload) {
+    return "5/3/1 deload week: Maintain current assistance volume, focus on recovery";
+  }
+
+  if (mainLiftScore.totalScore >= 6 && rpProgression.add) {
+    return `Strong main lift performance + RP progression: ${rpProgression.reason} + consider Training Max increase`;
+  }
+
+  if (mainLiftScore.totalScore < 4 && rpProgression.add) {
+    return `Struggling main lift + RP progression: ${rpProgression.reason} but review main lift technique`;
+  }
+
+  if (currentWeek === 3) {
+    return "Week 3 (AMRAP week): Focus on main lift performance, maintain assistance volume";
+  }
+
+  return `Week ${currentWeek}: ${rpProgression.reason}`;
 }
 
 /**
