@@ -7,6 +7,23 @@
 
 A modern React-based training tracker with **complete program design system**, **centralized design system**, **7-step periodization methodology**, and **cross-browser compatibility**.
 
+## 📋 Quick Reference
+
+### **Current Development Status**
+- **🎯 Master Plan:** [`MASTER_DEVELOPMENT_PLAN.md`](MASTER_DEVELOPMENT_PLAN.md) - START HERE for current status and next steps
+- **⚙️ Technical Details:** [`GOAL_FIRST_DEVELOPMENT_PLAN.md`](GOAL_FIRST_DEVELOPMENT_PLAN.md) - Implementation specifics  
+- **💪 5/3/1 System:** [`FIVETHREEONE_IMPLEMENTATION_COMPLETE.md`](FIVETHREEONE_IMPLEMENTATION_COMPLETE.md) - Complete algorithm documentation
+- **🏆 Goal-First Approach:** [`GOAL_FIRST_IMPLEMENTATION_COMPLETE.md`](GOAL_FIRST_IMPLEMENTATION_COMPLETE.md) - Training goal selector system
+
+### **Active Implementation**
+- **📱 Main Program:** `tracker-ui-good/tracker-ui/src/pages/Program.jsx` - 12-step sophisticated workflow
+- **🧮 Algorithms:** `js/algorithms/` - Core training systems (5/3/1, RP, etc.)
+- **🎯 Goal Selector:** `js/utils/goalBasedSelector.js` - 7 training goals with system compatibility
+- **🎨 Design System:** `tracker-ui-good/tracker-ui/src/components/` - Centralized UI components
+
+### **Documentation Archive**
+- **📁 Historical Docs:** [`docs/archive/`](docs/archive/) - Completed implementations and old planning files
+
 ## 🎯 Latest Features (v3.0.0)
 
 ### 🎨 **Centralized Design System** ⭐ **NEW**
