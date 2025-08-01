@@ -75,6 +75,34 @@ class GoalBasedTrainingSelector {
                     'Seasonal periodization',
                     'Recovery and injury prevention'
                 ]
+            },
+
+            'motor-control': {
+                name: 'Motor Control',
+                description: 'Improve movement quality, stability, and coordination',
+                priority: 'Neural adaptation and movement pattern refinement',
+                compatibleSystems: ['linear-periodization', 'hybrid'],
+                recommendedSystem: 'linear-periodization',
+                characteristics: [
+                    'Low-moderate loads with high precision',
+                    'Movement pattern emphasis',
+                    'Stability and coordination work',
+                    'Progressive complexity increases'
+                ]
+            },
+
+            'weight-loss': {
+                name: 'Weight Loss',
+                description: 'Fat loss while preserving lean muscle mass',
+                priority: 'Caloric expenditure with muscle preservation',
+                compatibleSystems: ['hybrid', 'rp'],
+                recommendedSystem: 'hybrid',
+                characteristics: [
+                    'Higher training frequency',
+                    'Metabolic stress protocols',
+                    'Muscle preservation focus',
+                    'Sustainable deficit approach'
+                ]
             }
         };
 
@@ -92,7 +120,7 @@ class GoalBasedTrainingSelector {
                 name: 'Renaissance Periodization',
                 status: 'partial', // Exists but needs goal-specific implementation
                 methodology: 'Volume landmarks and auto-regulation',
-                bestFor: ['hypertrophy'],
+                bestFor: ['hypertrophy', 'weight-loss'],
                 implementation: 'js/algorithms/volume.js',
                 features: ['MEV/MRV tracking', 'Stimulus scoring', 'Recovery management']
             },
@@ -110,7 +138,7 @@ class GoalBasedTrainingSelector {
                 name: 'Linear Periodization',
                 status: 'not-implemented',
                 methodology: 'Progressive volume/intensity manipulation',
-                bestFor: ['strength', 'general-fitness'],
+                bestFor: ['strength', 'general-fitness', 'motor-control'],
                 implementation: null,
                 features: ['Phase progression', 'Volume/intensity waves', 'Structured blocks']
             },
@@ -119,7 +147,7 @@ class GoalBasedTrainingSelector {
                 name: 'Hybrid System',
                 status: 'future', // Build after all individual systems complete
                 methodology: 'Combines multiple approaches intelligently',
-                bestFor: ['general-fitness', 'athletic-performance'],
+                bestFor: ['general-fitness', 'athletic-performance', 'motor-control', 'weight-loss'],
                 implementation: null,
                 features: ['Goal-phase switching', 'Method combination', 'Contextual selection']
             }
