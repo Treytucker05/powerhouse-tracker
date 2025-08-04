@@ -7,7 +7,7 @@ import { useExerciseAlgorithms } from '../hooks/useExerciseAlgorithms';
 // Program state management
 const ProgramContext = createContext();
 
-// Action types
+// Action types - Enhanced for methodology-first workflow
 export const PROGRAM_ACTIONS = {
     SET_ACTIVE_TAB: 'SET_ACTIVE_TAB',
     SET_SELECTED_LEVEL: 'SET_SELECTED_LEVEL',
@@ -25,25 +25,66 @@ export const PROGRAM_ACTIONS = {
     UPDATE_BRYANT_CONFIG: 'UPDATE_BRYANT_CONFIG',
     SET_ALGORITHM_DATA: 'SET_ALGORITHM_DATA',
     UPDATE_ALGORITHM_DATA: 'UPDATE_ALGORITHM_DATA',
-    SET_ALGORITHM_CONFIG: 'SET_ALGORITHM_CONFIG'
+    SET_ALGORITHM_CONFIG: 'SET_ALGORITHM_CONFIG',
+
+    // NEW: Methodology-first workflow actions
+    SET_CURRENT_STEP: 'SET_CURRENT_STEP',
+    SET_SELECTED_SYSTEM: 'SET_SELECTED_SYSTEM',
+    SET_METHODOLOGY_CONTEXT: 'SET_METHODOLOGY_CONTEXT',
+    UPDATE_PRIMARY_GOAL: 'UPDATE_PRIMARY_GOAL',
+    UPDATE_EXPERIENCE_LEVEL: 'UPDATE_EXPERIENCE_LEVEL',
+    UPDATE_TIMELINE: 'UPDATE_TIMELINE',
+    UPDATE_METHODOLOGY_ASSESSMENT: 'UPDATE_METHODOLOGY_ASSESSMENT',
+    UPDATE_INJURY_SCREEN: 'UPDATE_INJURY_SCREEN',
+    VALIDATE_STEP_ACCESS: 'VALIDATE_STEP_ACCESS'
 };
 
-// Initial state
+// Initial state - Enhanced for methodology-first workflow
 const initialState = {
-    // UI State
-    activeTab: 'personal-profile', // Start with integrated assessment
+    // UI State - CHANGED: Start with methodology selection
+    activeTab: 'system-recommendation', // Start with Step 1: Methodology Selection
     selectedLevel: null,
     isLoading: false,
     error: null,
     showPreview: false,
 
-    // Program Data
+    // NEW: Methodology-first workflow state
+    currentStep: 1, // Start with methodology selection
+    selectedSystem: '', // Primary methodology choice (Step 1)
+    methodologyContext: null, // Enhanced methodology information
+
+    // NEW: Step validation tracking
+    stepValidation: {
+        1: false, // Methodology Selection
+        2: false, // Primary Goal
+        3: false, // Experience Level
+        4: false, // Timeline
+        5: false, // Assessment
+        6: false, // Injury Screen
+        7: false, // Periodization
+        8: false  // Implementation
+    },
+
+    // NEW: Methodology-aware state
+    primaryGoal: '',
+    methodologyAwareGoals: [], // Goals filtered by methodology
+    goalMethodologyMapping: null, // How goal relates to methodology
+    experienceLevel: null,
+    methodologyExperience: null, // Experience with specific methodology
+    timeline: null,
+    methodologyTimeline: null, // Methodology-specific timeline considerations
+    methodologyAssessment: {}, // Dynamic assessment data by methodology
+    injuryScreen: null,
+    methodologyInjuryConsiderations: null,
+
+    // Program Data - ENHANCED: Now methodology-aware
     programData: {
         name: '',
         goal: 'hypertrophy',
         duration: 12,
         trainingDays: 4,
-        selectedTemplate: null
+        selectedTemplate: null,
+        methodology: null // NEW: methodology reference
     },
 
     // Assessment Data
@@ -149,20 +190,223 @@ const initialState = {
         autoCalculate: true,
         updateFrequency: 'session', // session, weekly, manual
         enableRecommendations: true
+    },
+
+    // NEW: Methodology mapping for intelligent workflow
+    methodologyMapping: {
+        'NASM': {
+            phases: ['Phase 1: Stabilization', 'Phase 2: Strength', 'Phase 3: Power'],
+            assessmentTypes: ['Movement Screen', 'Postural Analysis'],
+            periodizationStyle: 'OPT Model',
+            goalCompatibility: ['corrective', 'general-fitness', 'weight-loss'],
+            requiredAssessments: ['movement-screen', 'postural-assessment'],
+            timelineConsiderations: {
+                minPhase1Duration: 4,
+                assessmentFrequency: 4,
+                progressionCriteria: 'movement-quality'
+            }
+        },
+        'RP': {
+            phases: ['MEV-MAV', 'MAV-MRV', 'Deload'],
+            assessmentTypes: ['Volume Landmarks', 'Recovery Capacity'],
+            periodizationStyle: 'Volume Progression',
+            goalCompatibility: ['hypertrophy', 'body-composition'],
+            requiredAssessments: ['volume-landmarks', 'recovery-assessment'],
+            timelineConsiderations: {
+                mesocycleLength: 6,
+                deloadFrequency: 4,
+                volumeProgression: 'weekly'
+            }
+        },
+        '5/3/1': {
+            phases: ['Prep', 'Competition', 'Peak'],
+            assessmentTypes: ['1RM Testing', 'Technical Analysis'],
+            periodizationStyle: 'Conjugate',
+            goalCompatibility: ['strength', 'powerlifting'],
+            requiredAssessments: ['1rm-testing', 'technical-analysis'],
+            timelineConsiderations: {
+                cycleLength: 4,
+                peakingDuration: 2,
+                deloadWeek: 4
+            }
+        },
+        'linear': {
+            phases: ['Base', 'Build', 'Peak'],
+            assessmentTypes: ['Movement Quality', 'Motor Control'],
+            periodizationStyle: 'Linear Progression',
+            goalCompatibility: ['general-fitness', 'beginner'],
+            requiredAssessments: ['movement-quality', 'fitness-baseline'],
+            timelineConsiderations: {
+                progressionRate: 'weekly',
+                plateauManagement: 'deload',
+                minDuration: 8
+            }
+        },
+        'josh-bryant': {
+            phases: ['Prep', 'Competition', 'Off-season'],
+            assessmentTypes: ['PHA Screen', 'Gainer Type'],
+            periodizationStyle: 'Block Periodization',
+            goalCompatibility: ['strength', 'tactical', 'strongman'],
+            requiredAssessments: ['pha-screen', 'gainer-assessment'],
+            timelineConsiderations: {
+                blockLength: 4,
+                intensityPhases: 3,
+                competitionPrep: 8
+            }
+        }
     }
 };
 
-// Reducer function
+// Reducer function - Enhanced for methodology-first workflow
 function programReducer(state, action) {
     switch (action.type) {
+        // NEW: Methodology-first workflow actions
+        case PROGRAM_ACTIONS.SET_CURRENT_STEP:
+            return {
+                ...state,
+                currentStep: action.payload,
+                activeTab: getTabIdFromStep(action.payload)
+            };
+
+        case PROGRAM_ACTIONS.SET_SELECTED_SYSTEM:
+            return {
+                ...state,
+                selectedSystem: action.payload,
+                methodologyContext: state.methodologyMapping[action.payload] || null,
+                // Reset dependent steps when methodology changes
+                primaryGoal: '',
+                methodologyAwareGoals: getMethodologyGoals(action.payload, state.methodologyMapping),
+                stepValidation: {
+                    ...state.stepValidation,
+                    1: !!action.payload, // Methodology selection completed
+                    // Reset subsequent validations when methodology changes
+                    2: false, 3: false, 4: false, 5: false, 6: false, 7: false, 8: false
+                },
+                // Update program data with methodology
+                programData: {
+                    ...state.programData,
+                    methodology: action.payload
+                },
+                // Auto-advance to step 2 after methodology selection
+                currentStep: action.payload ? 2 : 1
+            };
+
+        case PROGRAM_ACTIONS.SET_METHODOLOGY_CONTEXT:
+            return {
+                ...state,
+                methodologyContext: action.payload
+            };
+
+        case PROGRAM_ACTIONS.UPDATE_PRIMARY_GOAL:
+            return {
+                ...state,
+                primaryGoal: action.payload,
+                goalMethodologyMapping: getGoalMethodologyMapping(action.payload, state.selectedSystem, state.methodologyMapping),
+                stepValidation: {
+                    ...state.stepValidation,
+                    2: !!action.payload
+                },
+                programData: {
+                    ...state.programData,
+                    goal: action.payload
+                }
+            };
+
+        case PROGRAM_ACTIONS.UPDATE_EXPERIENCE_LEVEL:
+            return {
+                ...state,
+                experienceLevel: action.payload.level,
+                methodologyExperience: action.payload.methodologyExperience,
+                stepValidation: {
+                    ...state.stepValidation,
+                    3: !!action.payload.level
+                }
+            };
+
+        case PROGRAM_ACTIONS.UPDATE_TIMELINE:
+            return {
+                ...state,
+                timeline: action.payload,
+                methodologyTimeline: getMethodologyTimeline(action.payload, state.selectedSystem, state.methodologyMapping),
+                stepValidation: {
+                    ...state.stepValidation,
+                    4: !!action.payload
+                },
+                programData: {
+                    ...state.programData,
+                    duration: action.payload.duration || state.programData.duration,
+                    trainingDays: action.payload.trainingDays || state.programData.trainingDays
+                }
+            };
+
+        case PROGRAM_ACTIONS.UPDATE_METHODOLOGY_ASSESSMENT:
+            return {
+                ...state,
+                methodologyAssessment: {
+                    ...state.methodologyAssessment,
+                    [state.selectedSystem]: action.payload
+                },
+                stepValidation: {
+                    ...state.stepValidation,
+                    5: !!action.payload && Object.keys(action.payload).length > 0
+                }
+            };
+
+        case PROGRAM_ACTIONS.UPDATE_INJURY_SCREEN:
+            return {
+                ...state,
+                injuryScreen: action.payload,
+                methodologyInjuryConsiderations: getMethodologyInjuryConsiderations(
+                    action.payload,
+                    state.selectedSystem,
+                    state.methodologyMapping
+                ),
+                stepValidation: {
+                    ...state.stepValidation,
+                    6: !!action.payload
+                }
+            };
+
+        case PROGRAM_ACTIONS.VALIDATE_STEP_ACCESS:
+            // Validate if user can access a specific step
+            const { step } = action.payload;
+            if (step === 1) return state; // Step 1 always accessible
+
+            // Check if methodology is selected for steps 2+
+            if (!state.selectedSystem) {
+                return {
+                    ...state,
+                    error: 'Please select a methodology before proceeding to other steps.'
+                };
+            }
+
+            return state;
+
+        // Existing actions with methodology awareness
         case PROGRAM_ACTIONS.SET_ACTIVE_TAB:
-            return { ...state, activeTab: action.payload };
+            // Validate tab access based on methodology-first workflow
+            const tabStep = getStepFromTabId(action.payload);
+            if (tabStep > 1 && !state.selectedSystem) {
+                return {
+                    ...state,
+                    error: 'Please select a methodology first.',
+                    activeTab: 'system-recommendation'
+                };
+            }
+            return { ...state, activeTab: action.payload, error: null };
+
+        case PROGRAM_ACTIONS.SET_PROGRAM_DATA:
+            return {
+                ...state,
+                programData: {
+                    ...state.programData,
+                    ...action.payload,
+                    methodology: action.payload.methodology || state.selectedSystem
+                }
+            };
 
         case PROGRAM_ACTIONS.SET_SELECTED_LEVEL:
             return { ...state, selectedLevel: action.payload };
-
-        case PROGRAM_ACTIONS.SET_PROGRAM_DATA:
-            return { ...state, programData: { ...state.programData, ...action.payload } };
 
         case PROGRAM_ACTIONS.SET_ASSESSMENT_DATA:
             return { ...state, assessmentData: action.payload };
@@ -266,6 +510,29 @@ export const ProgramProvider = ({ children }) => {
     const setAlgorithmData = useCallback((data) => dispatch({ type: PROGRAM_ACTIONS.SET_ALGORITHM_DATA, payload: data }), []);
     const updateAlgorithmData = useCallback((updates) => dispatch({ type: PROGRAM_ACTIONS.UPDATE_ALGORITHM_DATA, payload: updates }), []);
     const setAlgorithmConfig = useCallback((config) => dispatch({ type: PROGRAM_ACTIONS.SET_ALGORITHM_CONFIG, payload: config }), []);
+
+    // NEW: Methodology-first workflow action creators
+    const setCurrentStep = useCallback((step) => dispatch({ type: PROGRAM_ACTIONS.SET_CURRENT_STEP, payload: step }), []);
+    const setSelectedSystem = useCallback((system) => dispatch({ type: PROGRAM_ACTIONS.SET_SELECTED_SYSTEM, payload: system }), []);
+    const setMethodologyContext = useCallback((context) => dispatch({ type: PROGRAM_ACTIONS.SET_METHODOLOGY_CONTEXT, payload: context }), []);
+    const updatePrimaryGoal = useCallback((goal) => dispatch({ type: PROGRAM_ACTIONS.UPDATE_PRIMARY_GOAL, payload: goal }), []);
+    const updateExperienceLevel = useCallback((level, methodologyExperience) => dispatch({
+        type: PROGRAM_ACTIONS.UPDATE_EXPERIENCE_LEVEL,
+        payload: { level, methodologyExperience }
+    }), []);
+    const updateTimeline = useCallback((timeline) => dispatch({ type: PROGRAM_ACTIONS.UPDATE_TIMELINE, payload: timeline }), []);
+    const updateMethodologyAssessment = useCallback((assessmentData) => dispatch({
+        type: PROGRAM_ACTIONS.UPDATE_METHODOLOGY_ASSESSMENT,
+        payload: assessmentData
+    }), []);
+    const updateInjuryScreen = useCallback((injuryData) => dispatch({
+        type: PROGRAM_ACTIONS.UPDATE_INJURY_SCREEN,
+        payload: injuryData
+    }), []);
+    const validateStepAccess = useCallback((step) => dispatch({
+        type: PROGRAM_ACTIONS.VALIDATE_STEP_ACCESS,
+        payload: { step }
+    }), []);
 
     // Advanced algorithm integration functions
     const calculateVolumeProgression = useCallback(async (sessionData) => {
@@ -433,6 +700,16 @@ export const ProgramProvider = ({ children }) => {
         setAlgorithmData,
         updateAlgorithmData,
         setAlgorithmConfig,
+        // NEW: Methodology-first workflow actions
+        setCurrentStep,
+        setSelectedSystem,
+        setMethodologyContext,
+        updatePrimaryGoal,
+        updateExperienceLevel,
+        updateTimeline,
+        updateMethodologyAssessment,
+        updateInjuryScreen,
+        validateStepAccess,
         // Advanced algorithm functions
         calculateVolumeProgression,
         analyzeFatigueStatus,
@@ -441,7 +718,7 @@ export const ProgramProvider = ({ children }) => {
         generateOptimizedProgram
     };
 
-    // Enhanced context value with algorithm capabilities
+    // Enhanced context value with algorithm capabilities and methodology-first helpers
     const contextValue = {
         state,
         actions,
@@ -451,6 +728,64 @@ export const ProgramProvider = ({ children }) => {
             fatigue: fatigueAlgorithms,
             intelligence: intelligenceAlgorithms,
             exercise: exerciseAlgorithms
+        },
+        // NEW: Methodology-first workflow helpers
+        helpers: {
+            // Check if methodology is selected
+            hasMethodology: () => !!state.selectedSystem,
+
+            // Get methodology-specific information
+            getMethodologyInfo: () => state.methodologyContext,
+
+            // Get available goals for current methodology
+            getAvailableGoals: () => state.methodologyAwareGoals,
+
+            // Check if current step is accessible
+            isStepAccessible: (step) => {
+                if (step === 1) return true; // Methodology selection always accessible
+                return !!state.selectedSystem; // Other steps require methodology
+            },
+
+            // Check if step is completed
+            isStepCompleted: (step) => state.stepValidation[step] || false,
+
+            // Get next incomplete step
+            getNextIncompleteStep: () => {
+                for (let i = 1; i <= 8; i++) {
+                    if (!state.stepValidation[i]) return i;
+                }
+                return 8; // All complete, return last step
+            },
+
+            // Get methodology-specific timeline considerations
+            getTimelineConsiderations: () => state.methodologyTimeline,
+
+            // Get methodology-specific injury considerations
+            getInjuryConsiderations: () => state.methodologyInjuryConsiderations,
+
+            // Check if workflow is ready for program generation
+            isWorkflowComplete: () => {
+                const requiredSteps = [1, 2, 3, 4]; // Minimum required steps
+                return requiredSteps.every(step => state.stepValidation[step]);
+            },
+
+            // Get workflow completion percentage
+            getCompletionPercentage: () => {
+                const completedSteps = Object.values(state.stepValidation).filter(Boolean).length;
+                return Math.round((completedSteps / 8) * 100);
+            },
+
+            // Get methodology-specific required assessments
+            getRequiredAssessments: () => {
+                if (!state.methodologyContext) return [];
+                return state.methodologyContext.requiredAssessments || [];
+            },
+
+            // Check if goal is compatible with methodology
+            isGoalCompatible: (goal) => {
+                if (!state.methodologyContext) return false;
+                return state.methodologyContext.goalCompatibility.includes(goal);
+            }
         }
     };
 
@@ -471,3 +806,107 @@ export const useProgramContext = () => {
 };
 
 export default ProgramProvider;
+
+// Helper functions for methodology-first workflow
+const getTabIdFromStep = (step) => {
+    const stepMapping = {
+        1: 'system-recommendation',
+        2: 'primary-goal',
+        3: 'experience-level',
+        4: 'timeline',
+        5: 'methodology-assessment',
+        6: 'injury-screening',
+        7: 'periodization',
+        8: 'implementation'
+    };
+    return stepMapping[step] || 'system-recommendation';
+};
+
+const getStepFromTabId = (tabId) => {
+    const tabMapping = {
+        'system-recommendation': 1,
+        'primary-goal': 2,
+        'experience-level': 3,
+        'timeline': 4,
+        'methodology-assessment': 5,
+        'injury-screening': 6,
+        'periodization': 7,
+        'implementation': 8
+    };
+    return tabMapping[tabId] || 1;
+};
+
+const getMethodologyGoals = (methodology, methodologyMapping) => {
+    if (!methodology || !methodologyMapping[methodology]) return [];
+    return methodologyMapping[methodology].goalCompatibility || [];
+};
+
+const getGoalMethodologyMapping = (goal, methodology, methodologyMapping) => {
+    if (!goal || !methodology || !methodologyMapping[methodology]) return null;
+
+    const methodologyInfo = methodologyMapping[methodology];
+    const isCompatible = methodologyInfo.goalCompatibility.includes(goal);
+
+    return {
+        isCompatible,
+        phases: methodologyInfo.phases,
+        periodizationStyle: methodologyInfo.periodizationStyle,
+        requiredAssessments: methodologyInfo.requiredAssessments,
+        timelineConsiderations: methodologyInfo.timelineConsiderations
+    };
+};
+
+const getMethodologyTimeline = (timeline, methodology, methodologyMapping) => {
+    if (!timeline || !methodology || !methodologyMapping[methodology]) return null;
+
+    const considerations = methodologyMapping[methodology].timelineConsiderations;
+
+    return {
+        ...considerations,
+        userTimeline: timeline,
+        adjustedDuration: Math.max(timeline.duration || 8, considerations.minDuration || 4),
+        recommendedFrequency: considerations.assessmentFrequency || 4
+    };
+};
+
+const getMethodologyInjuryConsiderations = (injuryData, methodology, methodologyMapping) => {
+    if (!injuryData || !methodology || !methodologyMapping[methodology]) return null;
+
+    const methodologyInfo = methodologyMapping[methodology];
+
+    // Methodology-specific injury considerations
+    const considerations = {
+        'NASM': {
+            assessmentRequired: true,
+            correctiveExercises: true,
+            phaseModification: 'extend-phase-1',
+            focus: 'movement-quality'
+        },
+        'RP': {
+            volumeReduction: true,
+            exerciseSubstitution: true,
+            loadManagement: 'autoregulation',
+            focus: 'volume-management'
+        },
+        '5/3/1': {
+            intensityModification: true,
+            accessoryFocus: true,
+            loadManagement: 'percentage-reduction',
+            focus: 'strength-preservation'
+        },
+        'linear': {
+            progressionSlowing: true,
+            movementModification: true,
+            loadManagement: 'conservative',
+            focus: 'gradual-adaptation'
+        },
+        'josh-bryant': {
+            tacticalModification: true,
+            strengthMaintenance: true,
+            loadManagement: 'autoregulation',
+            focus: 'readiness-optimization'
+        }
+    };
+
+    return considerations[methodology] || null;
+};
