@@ -1,33 +1,8 @@
-# Handle line endings automatically for files detected as text
-# and leave all files detected as binary untouched.
 * text=auto
-
-# Windows batch files should always be CRLF
 *.bat text eol=crlf
-*.cmd text eol=crlf
-
-# Unix shell scripts should always be LF
 *.sh text eol=lf
-
-# JavaScript, TypeScript, JSON should be LF
+*.md text eol=lf
 *.js text eol=lf
 *.jsx text eol=lf
 *.ts text eol=lf
 *.tsx text eol=lf
-*.json text eol=lf
-*.md text eol=lf
-
-# CSS should be LF
-
-# Exclude system files from Git operations
-desktop.ini export-ignore
-Thumbs.db export-ignore
-.DS_Store export-ignore
-*.tmp export-ignore
-*.css text eol=lf
-
-# HTML should be LF
-*.html text eol=lf
-
-# Don't process node_modules at all
-node_modules/** -text
