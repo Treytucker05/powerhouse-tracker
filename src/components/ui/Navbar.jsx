@@ -47,11 +47,13 @@ export default function Navbar() {
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <Link to="/" className="flex items-center">
-                                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
+                                <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center mr-3">
                                     <span className="text-white font-bold text-sm">PH</span>
                                 </div>
                                 <div>
-                                    <div className="text-white font-semibold text-lg">PowerHouse</div>
+                                    <div className="text-white font-semibold text-lg">
+                                        PowerHouse <span className="text-red-500 font-bold">ATX</span>
+                                    </div>
                                     <div className="text-gray-400 text-xs">RP Toolkit</div>
                                 </div>
                             </Link>
