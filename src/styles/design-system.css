@@ -506,3 +506,16 @@ body {
     padding-top: 2rem;
     padding-bottom: 2rem;
 }
+
+/* --- Protect brand logo from global svg fill overrides --- */
+svg.powerhouse-logo * {
+    fill: unset !important;
+}
+
+svg.powerhouse-logo rect[data-atx="1"] {
+    fill: #dc2626 !important;
+}
+
+svg.powerhouse-logo text {
+    fill: #ffffff !important;
+}
