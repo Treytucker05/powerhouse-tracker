@@ -18,6 +18,11 @@ import Step10StallingReset from './steps/Step10StallingReset';
 import Step12BoringButBig from './steps/Step12BoringButBig';
 import Step11AssistanceWork from './steps/Step11AssistanceWork';
 import Step13Triumvirate from './steps/Step13Triumvirate';
+import Step14PeriodizationBible from './steps/Step14PeriodizationBible';
+import Step15Bodyweight from './steps/Step15Bodyweight';
+import Step16JackShit from './steps/Step16JackShit';
+import Step17ConditioningRecovery from './steps/Step17ConditioningRecovery';
+import Step18ProgramCustomization from './steps/Step18ProgramCustomization';
 
 const FiveThreeOneEngine = EngineModule.default ?? EngineModule.FiveThreeOneEngine;
 
@@ -248,11 +253,46 @@ export default function FiveThreeOneWorkflow() {
             component: Step11AssistanceWork
         },
         {
+            id: 'periodization_bible',
+            title: 'Periodization Bible Template',
+            description: 'High-volume template for advanced lifters with movement pattern selections and volume controls',
+            icon: Zap,
+            component: Step14PeriodizationBible
+        },
+        {
             id: 'options',
             title: 'Program Options',
             description: 'Conditioning, warm-up, progression',
             icon: Settings,
             component: 'ProgramOptionsStep'
+        },
+        {
+            id: 'bodyweight',
+            title: 'Bodyweight Template',
+            description: 'Equipment-free assistance template with progression methods and rep schemes',
+            icon: Zap,
+            component: Step15Bodyweight
+        },
+        {
+            id: 'jack_shit',
+            title: 'Jack Shit Template',
+            description: 'Minimalist 5/3/1: main lifts only with optional brief conditioning',
+            icon: Zap,
+            component: Step16JackShit
+        },
+        {
+            id: 'conditioning_recovery',
+            title: 'Conditioning & Recovery Integration',
+            description: 'Configure conditioning frequency/methods and essential recovery protocols (sleep, stress, tissue)',
+            icon: Zap,
+            component: Step17ConditioningRecovery
+        },
+        {
+            id: 'program_customization',
+            title: 'Program Customization & Advanced',
+            description: 'Goal-based adjustments, PR tracking, auto-regulation, specialization, and visualization options',
+            icon: Settings,
+            component: Step18ProgramCustomization
         },
         {
             id: 'generate',
@@ -496,6 +536,66 @@ export default function FiveThreeOneWorkflow() {
                         }
                     />
                 );
+            case 'periodization_bible':
+                return (
+                    <Step14PeriodizationBible
+                        data={programData.step14 || { bibleConfig: {}, bibleExercises: {}, bibleVolumeLevel: 'moderate', bibleExperience: 'intermediate' }}
+                        updateData={(partial) =>
+                            setProgramData(prev => ({
+                                ...prev,
+                                step14: { ...(prev.step14 || {}), ...partial }
+                            }))
+                        }
+                    />
+                );
+            case 'bodyweight':
+                return (
+                    <Step15Bodyweight
+                        data={programData.step15 || { bodyweightConfig: { selectedExercises: { squat: [], bench: [], deadlift: [], overhead_press: [] }, progressionMethod: 'volume', repScheme: 'standard', frequency: 'daily' }, customExercises: {} }}
+                        updateData={(partial) =>
+                            setProgramData(prev => ({
+                                ...prev,
+                                step15: { ...(prev.step15 || {}), ...partial }
+                            }))
+                        }
+                    />
+                );
+            case 'jack_shit':
+                return (
+                    <Step16JackShit
+                        data={programData.step16 || { jackShitConfig: { sessionDuration: '20-30', conditioningReplacement: false, conditioningType: 'low_impact', conditioningDuration: 15, focusAreas: [], additionalNotes: '' } }}
+                        updateData={(partial) =>
+                            setProgramData(prev => ({
+                                ...prev,
+                                step16: { ...(prev.step16 || {}), ...partial }
+                            }))
+                        }
+                    />
+                );
+            case 'conditioning_recovery':
+                return (
+                    <Step17ConditioningRecovery
+                        data={programData.step17 || { conditioningConfig: {}, recoveryConfig: {} }}
+                        updateData={(partial) =>
+                            setProgramData(prev => ({
+                                ...prev,
+                                step17: { ...(prev.step17 || {}), ...partial }
+                            }))
+                        }
+                    />
+                );
+            case 'program_customization':
+                return (
+                    <Step18ProgramCustomization
+                        data={programData.step18 || { customizationConfig: {} }}
+                        updateData={(partial) =>
+                            setProgramData(prev => ({
+                                ...prev,
+                                step18: { ...(prev.step18 || {}), ...partial }
+                            }))
+                        }
+                    />
+                );
             default:
                 return <StepComponent programData={programData} setProgramData={setProgramData} />;
         }
@@ -608,6 +708,48 @@ export default function FiveThreeOneWorkflow() {
                     const dayKeys = ['press', 'deadlift', 'bench', 'squat'];
                     if (Object.keys(cfg).length !== 4) return false;
                     return dayKeys.every(d => cfg?.[d]?.supplemental && cfg?.[d]?.assistance);
+                }
+            case 'periodization_bible':
+                {
+                    const s14 = programData?.step14 || {};
+                    const ex = s14.bibleExercises || {};
+                    // Require each day to have minimum 4 exercises selected across categories
+                    const dayKeys = ['press', 'deadlift', 'bench', 'squat'];
+                    const getTotal = (day) => Object.values(ex[day] || {}).reduce((acc, arr) => acc + (Array.isArray(arr) ? arr.length : 0), 0);
+                    return dayKeys.every(day => getTotal(day) >= 4);
+                }
+            case 'bodyweight':
+                {
+                    const s15 = programData?.step15 || {};
+                    const cfg = s15.bodyweightConfig || { selectedExercises: {} };
+                    const anySelected = Object.values(cfg.selectedExercises || {}).some(arr => Array.isArray(arr) && arr.length > 0);
+                    return anySelected && !!cfg.progressionMethod && !!cfg.repScheme;
+                }
+            case 'jack_shit':
+                {
+                    const s16 = programData?.step16 || {};
+                    const cfg = s16.jackShitConfig || {};
+                    return !!cfg.sessionDuration && !!cfg.conditioningType && Array.isArray(cfg.focusAreas) && cfg.focusAreas.length > 0;
+                }
+            case 'conditioning_recovery':
+                {
+                    const s17 = programData?.step17 || {};
+                    const cond = s17.conditioningConfig || {};
+                    const rec = s17.recoveryConfig || {};
+                    const hi = cond?.highIntensity || { exercises: [] };
+                    const li = cond?.lowIntensity || { exercises: [] };
+                    const hasConditioning = (cond?.frequency ?? 0) >= 2 && !!cond?.primaryMethod && ((hi.exercises?.length || 0) > 0 || (li.exercises?.length || 0) > 0);
+                    const sleepTarget = rec?.sleep?.targetHours ?? 0;
+                    const hasRecovery = sleepTarget >= 7 && (rec?.stressManagement?.techniques?.length || 0) > 0 && (rec?.softTissue?.methods?.length || 0) > 0;
+                    return hasConditioning && hasRecovery;
+                }
+            case 'program_customization':
+                {
+                    const s18 = programData?.step18 || {};
+                    const cfg = s18.customizationConfig || {};
+                    const goalOk = typeof cfg.primaryGoal === 'string' && cfg.primaryGoal.length > 0;
+                    const trackingOk = (cfg.repRecordTracking?.enabled) || (cfg.printableSheets?.enabled) || (cfg.progressVisualization?.enabled);
+                    return !!goalOk && !!trackingOk;
                 }
             // Add validation for other steps as they are implemented
             default:

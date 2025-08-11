@@ -6,6 +6,7 @@
     "dev": "npm --prefix tracker-ui-good/tracker-ui run dev",
     "build": "npm --prefix tracker-ui-good/tracker-ui run build",
     "lint": "npm --prefix tracker-ui-good/tracker-ui run lint",
-    "test": "npm --prefix tracker-ui-good/tracker-ui run test"
+    "test": "npm --prefix tracker-ui-good/tracker-ui run test",
+    "start": "npm run dev"
   }
 }

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import BuilderCTA from '../components/program/BuilderCTA.jsx';
 import MethodologySelection from '../components/program/tabs/MethodologySelection';
 import FiveThreeOneWorkflow from '../components/program/FiveThreeOneWorkflow';
 import StreamlinedProgram from './StreamlinedProgram';
@@ -82,6 +83,7 @@ const Program = () => {
   return (
     <div className="min-h-screen bg-gray-900">
       <div className="container mx-auto px-6 py-8">
+        <BuilderCTA />
         <MethodologySelection
           onMethodologySelect={handleMethodologySelect}
           selectedMethodology={selectedMethodology}

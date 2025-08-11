@@ -4,14 +4,65 @@ import * as EngineModule from '../../../lib/engines/FiveThreeOneEngine.js';
 
 const FiveThreeOneEngine = EngineModule.default ?? EngineModule.FiveThreeOneEngine;
 
-const ScheduleSelectionStep = ({ programData, setProgramData }) => {
+const ScheduleSelectionStep = ({ programData, setProgramData, data, updateData }) => {
     const engine = new FiveThreeOneEngine();
 
+    // Support both prop shapes: { programData, setProgramData } or { data, updateData }
+    const state = programData ?? data ?? {};
+    const scheduleState = state?.schedule ?? {};
+
+    const toKey = (freq) => {
+        switch (freq) {
+            case '4day': return 'four_day';
+            case '3day': return 'three_day';
+            case '2day': return 'two_day';
+            case '1day': return 'one_day';
+            default: return undefined;
+        }
+    };
+    const toFrequency = (key) => {
+        switch (key) {
+            case 'four_day': return '4day';
+            case 'three_day': return '3day';
+            case 'two_day': return '2day';
+            case 'one_day': return '1day';
+            default: return '4day';
+        }
+    };
+
+    const selectedKey = toKey(scheduleState.frequency) ?? state.schedule; // fallback for older shape
+
     const handleScheduleSelect = (scheduleKey) => {
-        setProgramData(prev => ({
-            ...prev,
-            schedule: scheduleKey
-        }));
+        const freq = toFrequency(scheduleKey);
+        if (typeof updateData === 'function') {
+            // Wizard updater expects a partial object
+            updateData({
+                schedule: {
+                    ...scheduleState,
+                    frequency: freq
+                }
+            });
+        } else if (typeof setProgramData === 'function') {
+            // Legacy setState style (accept function form if provided by caller)
+            try {
+                setProgramData(prev => ({
+                    ...prev,
+                    schedule: {
+                        ...(prev?.schedule ?? {}),
+                        frequency: freq
+                    }
+                }));
+            } catch {
+                // Fallback to shallow merge
+                setProgramData({
+                    ...state,
+                    schedule: {
+                        ...scheduleState,
+                        frequency: freq
+                    }
+                });
+            }
+        }
     };
 
     const scheduleOptions = [
@@ -113,7 +164,7 @@ const ScheduleSelectionStep = ({ programData, setProgramData }) => {
                         onClick={() => handleScheduleSelect(option.key)}
                         className={`
                             bg-gray-800 rounded-lg p-6 border-2 cursor-pointer transition-all duration-200 hover:scale-[1.02]
-                            ${programData.schedule === option.key
+                            ${selectedKey === option.key
                                 ? 'border-red-500 bg-red-900/20'
                                 : 'border-gray-700 hover:border-gray-600'
                             }
@@ -132,7 +183,7 @@ const ScheduleSelectionStep = ({ programData, setProgramData }) => {
                                     </p>
                                 </div>
                             </div>
-                            {programData.schedule === option.key && (
+                            {selectedKey === option.key && (
                                 <CheckCircle className="w-6 h-6 text-red-500" />
                             )}
                         </div>
@@ -200,33 +251,33 @@ const ScheduleSelectionStep = ({ programData, setProgramData }) => {
             </div>
 
             {/* Selected Schedule Summary */}
-            {programData.schedule && (
+            {selectedKey && (
                 <div className="bg-gray-800 rounded-lg p-6 border border-gray-700">
                     <h4 className="text-lg font-semibold text-white mb-4">
-                        Selected Schedule: {engine.scheduleTemplates[programData.schedule].name}
+                        Selected Schedule: {engine?.scheduleTemplates?.[selectedKey]?.name ?? 'Custom'}
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="text-center">
                             <div className="text-2xl mb-2">
-                                {scheduleOptions.find(opt => opt.key === programData.schedule)?.icon}
+                                {scheduleOptions.find(opt => opt.key === selectedKey)?.icon}
                             </div>
                             <p className="text-gray-400 text-sm">Schedule Type</p>
                             <p className="text-white font-medium">
-                                {engine.scheduleTemplates[programData.schedule].name}
+                                {engine?.scheduleTemplates?.[selectedKey]?.name ?? 'Custom'}
                             </p>
                         </div>
                         <div className="text-center">
                             <div className="text-2xl mb-2">⏱️</div>
                             <p className="text-gray-400 text-sm">Time Per Session</p>
                             <p className="text-white font-medium">
-                                {scheduleOptions.find(opt => opt.key === programData.schedule)?.timeCommitment}
+                                {scheduleOptions.find(opt => opt.key === selectedKey)?.timeCommitment}
                             </p>
                         </div>
                         <div className="text-center">
                             <div className="text-2xl mb-2">📅</div>
                             <p className="text-gray-400 text-sm">Weekly Commitment</p>
                             <p className="text-white font-medium">
-                                {programData.schedule.replace('_', ' ').replace('day', ' days')}
+                                {String(selectedKey).replace('_', ' ').replace('day', ' days')}
                             </p>
                         </div>
                     </div>

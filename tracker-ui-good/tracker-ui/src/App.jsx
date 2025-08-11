@@ -20,6 +20,7 @@ const MacrocycleRedirect = lazy(() => import("./pages/MacrocycleRedirect.jsx"));
 
 // Program Design Builder Components
 const ContextAwareBuilder = lazy(() => import("./components/builder/ContextAwareBuilder.jsx"));
+const ProgramWizard531 = lazy(() => import("./components/program/ProgramWizard531.jsx"));
 
 // Placeholder components for new routes
 const ExercisesPage = lazy(() => import('./pages/Exercises.jsx'));
@@ -49,6 +50,7 @@ function App() {
                     <Program />
                   </ErrorBoundary>
                 } />
+                <Route path="program/builder/531" element={<ProgramWizard531 />} />
                 <Route path="tracking" element={<Tracking />} />
                 <Route path="analytics" element={<Analytics />} />
                 <Route path="exercises" element={<ExercisesPage />} />
