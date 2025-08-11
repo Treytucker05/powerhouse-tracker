@@ -6,8 +6,8 @@
 import React, { useState, useCallback } from 'react';
 import { ChevronRight, CheckCircle2, Info } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
-import { useProgramV2 } from "../../contexts/ProgramContextV2.jsx";
-import { buildMainSetsForLift, buildWarmupSets, roundToIncrement } from "../../lib/engines/FiveThreeOneEngine.v2.js";
+import { useProgramV2 } from "../contexts/ProgramContextV2.jsx";
+import { buildMainSetsForLift, buildWarmupSets, roundToIncrement } from "../engines/FiveThreeOneEngine.v2.js";
 import Step1Fundamentals from './steps/Step1Fundamentals.jsx';
 import Step2TemplateOrCustom from './steps/Step2TemplateOrCustom.jsx';
 import Step3DesignCustom from './steps/Step3DesignCustom.jsx';

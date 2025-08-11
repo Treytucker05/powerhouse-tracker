@@ -5,7 +5,7 @@
  */
 
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { applyTemplate } from '../lib/templates/index.js';
+import { applyTemplate } from '../../../lib/templates/index.js';
 
 // Initial program state (serializable only - exact spec)
 export const initialProgramV2 = {
@@ -52,7 +52,7 @@ export const initialProgramV2 = {
     supplemental: { strategy: 'none' },
     assistance: { 1: [], 2: [], 3: [], 4: [], mode: 'minimal' },
     deadliftRepStyle: 'dead_stop',
-    conditioning: { mode: 'simple', freq: 2, plan: [] },
+    // conditioning: { mode: 'simple', freq: 2, plan: [] },
     advanced: { autoreg: { rpeCap: 9 }, specialization: {}, prTracking: true },
     assistanceLoadMode: 'percentRules', // 'percentRules' | 'off'
     conditioning: {
@@ -96,7 +96,7 @@ function reducerV2(state, action) {
         case 'SET_WARMUPS': return { ...state, warmups: { ...state.warmups, ...action.warmups } };
         case 'SET_SUPPLEMENTAL': return { ...state, supplemental: { ...state.supplemental, ...(action.supplemental || action.payload || {}) } };
         case 'SET_ASSISTANCE': return { ...state, assistance: { ...state.assistance, ...(action.assistance || action.payload || {}) } };
-        case 'SET_CONDITIONING': return { ...state, conditioning: { ...state.conditioning, ...action.conditioning } };
+    // case 'SET_CONDITIONING': return { ...state, conditioning: { ...state.conditioning, ...action.conditioning } };
         case 'SET_ADVANCED': return { ...state, advanced: { ...state.advanced, ...action.advanced } };
         case 'APPLY_TEMPLATE':
             return applyTemplate(state, action.key);
