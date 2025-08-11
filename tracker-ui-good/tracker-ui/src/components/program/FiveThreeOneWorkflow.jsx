@@ -17,6 +17,7 @@ import Step9CycleProgression from './steps/Step9CycleProgression';
 import Step10StallingReset from './steps/Step10StallingReset';
 import Step12BoringButBig from './steps/Step12BoringButBig';
 import Step11AssistanceWork from './steps/Step11AssistanceWork';
+import Step13Triumvirate from './steps/Step13Triumvirate';
 
 const FiveThreeOneEngine = EngineModule.default ?? EngineModule.FiveThreeOneEngine;
 
@@ -231,6 +232,13 @@ export default function FiveThreeOneWorkflow() {
             description: 'Configure Boring But Big assistance (5x10 at 50-70% TM)',
             icon: Zap,
             component: Step12BoringButBig
+        },
+        {
+            id: 'triumvirate',
+            title: 'Triumvirate Template',
+            description: 'One main lift + one supplemental + one assistance per day (exact manual defaults, editable)',
+            icon: Zap,
+            component: Step13Triumvirate
         },
         {
             id: 'assistance',
@@ -464,6 +472,18 @@ export default function FiveThreeOneWorkflow() {
                         }
                     />
                 );
+            case 'triumvirate':
+                return (
+                    <Step13Triumvirate
+                        data={programData.step13 || { triumvirateConfig: {}, triumvirateCustom: {} }}
+                        updateData={(partial) =>
+                            setProgramData(prev => ({
+                                ...prev,
+                                step13: { ...(prev.step13 || {}), ...partial }
+                            }))
+                        }
+                    />
+                );
             case 'assistance':
                 return (
                     <Step11AssistanceWork
@@ -580,6 +600,14 @@ export default function FiveThreeOneWorkflow() {
                     const required = ['squat', 'bench', 'deadlift', 'overhead_press'];
                     const allPaired = required.every((k) => typeof pairs[k] === 'string' && pairs[k]);
                     return allPaired && !!intensity;
+                }
+            case 'triumvirate':
+                {
+                    const s13 = programData?.step13 || {};
+                    const cfg = s13.triumvirateConfig || {};
+                    const dayKeys = ['press', 'deadlift', 'bench', 'squat'];
+                    if (Object.keys(cfg).length !== 4) return false;
+                    return dayKeys.every(d => cfg?.[d]?.supplemental && cfg?.[d]?.assistance);
                 }
             // Add validation for other steps as they are implemented
             default:
