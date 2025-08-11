@@ -1,11 +1,11 @@
-import Program531ActiveV2 from "./pages/Program531ActiveV2.jsx";
+// removed duplicate import
 import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Suspense, lazy } from 'react';
 import AppShell from './layout/AppShell.jsx';
 import { MacrocycleBuilderProvider } from './contexts/MacrocycleBuilderContext.tsx';
-import { Navigate } from "react-router-dom";
+// removed duplicate import
 import Program531ActiveV2 from "./methods/531/components/Program531ActiveV2.jsx";
 import { ProgramProviderV2, ProgramV2Provider } from './methods/531/contexts/ProgramContextV2.jsx';
 const ProgramWizard531V2 = lazy(() => import("./methods/531/components/ProgramWizard531V2.jsx"));
