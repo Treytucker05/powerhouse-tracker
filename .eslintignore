@@ -1,0 +1,5 @@
+*
+!tracker-ui-good/
+tracker-ui-good/*
+!tracker-ui-good/tracker-ui/
+!tracker-ui-good/tracker-ui/**

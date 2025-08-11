@@ -1,3 +1,7 @@
+**ACTIVE APP:** Only `tracker-ui-good/tracker-ui` is live. Root scripts proxy to it.
+All other folders are legacy and ignored by tools (ESLint/Prettier/CI).
+
+
 # PowerHouse Tracker v3.0.0
 
 ![Vitest](https://img.shields.io/badge/tests-passing-brightgreen)
@@ -30,7 +34,7 @@ A modern React-based training tracker with **complete program design system**, *
 
 ## 🎯 Latest Features (v3.0.0)
 
-### � **Enhanced Algorithmic Injury Screening** ⭐ **LATEST - AUGUST 2025**
+###   **Enhanced Algorithmic Injury Screening** ⭐ **LATEST - AUGUST 2025**
 - **10 Structured Questions**: Radio/checkbox responses for precise algorithmic processing
 - **Multi-Injury Algorithm**: Handles multiple simultaneous injuries with compound safety protocols
 - **Injury-Exercise Matrix**: Comprehensive mapping of injuries to specific exercise modifications
@@ -52,7 +56,7 @@ A modern React-based training tracker with **complete program design system**, *
 - **Enhanced Context Management**: Advanced state management with timeline and injury screening actions
 - **Modern React Architecture**: Hooks-based components with centralized context providers
 
-### �🎨 **Centralized Design System** ⭐ **MATURE**
+###  🎨 **Centralized Design System** ⭐ **MATURE**
 - **Global Color Control**: Change one CSS variable to update ALL components across the app
 - **Red Input Fields**: All form inputs now use red backgrounds with proper contrast
 - **CSS Custom Properties**: Centralized design tokens for colors, spacing, and typography
@@ -130,7 +134,7 @@ npm run test:e2e
 npm run lint
 ```
 
-## � Design System Architecture
+##   Design System Architecture
 
 ### Centralized Styling System
 The application features a comprehensive design system that eliminates the need for manual color overrides:
@@ -239,7 +243,7 @@ export const designTokens = {
 - **Theme Switching**: Easy color scheme changes without touching components
 - **Developer Experience**: Simple classes replace complex Tailwind combinations
 
-## �🎯 Core Application Features
+##  🎯 Core Application Features
 
 ### Dashboard System
 - **Training Status Overview**: Current week, phase, and progress tracking
@@ -251,12 +255,12 @@ export const designTokens = {
 ### Program Design System (v3.0.0 - 7-Step Methodology)
 - **Horizontal Tab Navigation**: Clean tab-based interface with design system styling
   - 🎯 **Goals & Needs**: Athlete assessment, training history, and objective setting
-  - � **Macrocycle Structure**: Annual timeline with periodization model selection
+  -   **Macrocycle Structure**: Annual timeline with periodization model selection
   - 🔄 **Phase Design**: Preparatory, competitive, and transition phase planning
-  - � **Mesocycle Planning**: Training blocks with specific adaptation focuses
+  -   **Mesocycle Planning**: Training blocks with specific adaptation focuses
   - 📋 **Microcycle Design**: Weekly patterns and loading scheme development
   - 🏃 **Session & Monitoring**: Daily templates and progress tracking protocols
-  - � **Implementation**: Execution strategies and program refinement
+  -   **Implementation**: Execution strategies and program refinement
 - **Design System Integration**: All components use centralized CSS custom properties
 - **Real-Time State Management**: Seamless tab switching with preserved program state
 - **Evidence-Based Approach**: Following sports science periodization principles
@@ -344,7 +348,7 @@ The Program Design system features a horizontal navigation bar with 7 evidence-b
    - Intensity Distribution: Load management across training zones
    - Block Sequencing: Logical progression between mesocycles
 
-5. **� Microcycle Design**: Weekly training pattern development
+5. **  Microcycle Design**: Weekly training pattern development
    - Training Frequency: Sessions per week and muscle group frequency
    - Session Distribution: Training day arrangement and recovery placement
    - Weekly Loading: Volume and intensity patterns within the week
@@ -431,8 +435,8 @@ The Program Design system features a distinctive interface with centralized styl
 ┌─────────────────────────────────────────────────────────────────────┐
 │ Program Design - 7-Step Periodization                              │
 ├─────────────────────────────────────────────────────────────────────┤
-│ [🎯 Goals & Needs] [� Macrocycle] [🔄 Phase Design]               │
-│ [� Mesocycles] [� Microcycles] [🏃 Sessions] [🚀 Implementation]  │
+│ [🎯 Goals & Needs] [  Macrocycle] [🔄 Phase Design]               │
+│ [  Mesocycles] [  Microcycles] [🏃 Sessions] [🚀 Implementation]  │
 ├─────────────────────────────────────────────────────────────────────┤
 │                                                                     │
 │ Tab Content Area - Design system styled with CSS custom properties │
@@ -474,17 +478,17 @@ When in Program Design, users see a specialized horizontal tab interface with ev
 ┌─────────────────────────────────────────────────────────────────────┐
 │ Program Design - Evidence-Based Periodization                      │
 ├─────────────────────────────────────────────────────────────────────┤
-│ [🎯 Goals & Needs] [� Macrocycle] [🔄 Phase Design]               │
-│ [� Mesocycles] [� Microcycles] [🏃 Sessions] [🚀 Implementation]  │
+│ [🎯 Goals & Needs] [  Macrocycle] [🔄 Phase Design]               │
+│ [  Mesocycles] [  Microcycles] [🏃 Sessions] [🚀 Implementation]  │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
 **7-Step Program Design Tabs:**
 1. **🎯 Goals & Needs**: Athlete assessment, training history, objective setting
-2. **� Macrocycle Structure**: Annual timeline, periodization model selection
+2. **  Macrocycle Structure**: Annual timeline, periodization model selection
 3. **🔄 Phase Design**: Preparatory, competitive, and transition phase planning
-4. **� Mesocycle Planning**: 2-6 week training blocks with specific adaptations
-5. **� Microcycle Design**: Weekly patterns and loading scheme development
+4. **  Mesocycle Planning**: 2-6 week training blocks with specific adaptations
+5. **  Microcycle Design**: Weekly patterns and loading scheme development
 6. **🏃 Session & Monitoring**: Daily templates and progress tracking protocols
 7. **🚀 Implementation**: Execution strategies and program refinement
 
