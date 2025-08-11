@@ -1,9 +1,14 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Program531ActiveV2 from "./pages/Program531ActiveV2.jsx";
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Suspense, lazy } from 'react';
 import AppShell from './layout/AppShell.jsx';
 import { MacrocycleBuilderProvider } from './contexts/MacrocycleBuilderContext.tsx';
+import { Navigate } from "react-router-dom";
+import Program531ActiveV2 from "./methods/531/components/Program531ActiveV2.jsx";
+import { ProgramProviderV2, ProgramV2Provider } from './methods/531/contexts/ProgramContextV2.jsx';
+const ProgramWizard531V2 = lazy(() => import("./methods/531/components/ProgramWizard531V2.jsx"));
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import GlobalReset from './components/shared/GlobalReset.jsx';
 import './App.css';
@@ -45,16 +50,30 @@ function App() {
       <Router>
         <ErrorBoundary>
           <Suspense fallback={<LoadingSpinner />}>
+            {/* Temporary quick access nav */}
+            <div className="p-2 bg-gray-900 border-b border-gray-800 text-sm">
+              <Link to="/builder/531/v2" className="text-red-400 hover:text-red-300 underline">Open 5/3/1 Builder V2</Link>
+            </div>
             <Routes>
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/" element={<AppShell />}>
-                <Route index element={<Home />} />
+                <Route index element={<Navigate to="/builder/531/v2" replace />} />
                 <Route path="program" element={
                   <ErrorBoundary>
                     <Program />
                   </ErrorBoundary>
                 } />
-                <Route path="program/builder/531" element={<ProgramWizard531 />} />
+                <Route path="program/builder/531" element={
+                  <ProgramProviderV2>
+                    <ProgramWizard531 />
+                  </ProgramProviderV2>
+                } />
+                <Route path="/builder/531/v2" element={
+                  <ProgramV2Provider>
+                    <ProgramWizard531V2 />
+                  </ProgramV2Provider>
+                } />
+                <Route path="/program/531/active" element={<Program531ActiveV2 />} />
                 <Route path="tracking" element={<Tracking />} />
                 <Route path="analytics" element={<Analytics />} />
                 <Route path="history" element={<History />} />
