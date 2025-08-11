@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useSettings } from '../../../contexts/SettingsContext.jsx';
+import { percentOfTM, toDisplayWeight } from '../../../lib/fiveThreeOne/math.js';
 import { RefreshCw, Heart, CheckCircle, Info, AlertTriangle, Calendar, Pause } from 'lucide-react';
 
 export default function Step8DeloadWeek({ data = {}, updateData }) {
+    const { roundingIncrement } = useSettings();
     // State management with proper fallbacks
     const [deloadResults, setDeloadResults] = useState(data?.deloadResults || {});
     const [recoveryMetrics, setRecoveryMetrics] = useState(data?.recoveryMetrics || {});
@@ -18,7 +21,7 @@ export default function Step8DeloadWeek({ data = {}, updateData }) {
     // Calculate weights with proper rounding
     const calculateWeight = (tm, percentage) => {
         if (!tm) return 0;
-        return Math.ceil((tm * percentage / 100) / 5) * 5;
+        return toDisplayWeight(percentOfTM(tm, percentage, roundingIncrement));
     };
 
     // Lift names mapping
@@ -330,8 +333,8 @@ export default function Step8DeloadWeek({ data = {}, updateData }) {
                                             onClick={() => handleSessionComplete(lift)}
                                             disabled={isCompleted}
                                             className={`w-full px-4 py-2 rounded font-medium ${isCompleted
-                                                    ? 'bg-green-600 text-white cursor-not-allowed'
-                                                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                                ? 'bg-green-600 text-white cursor-not-allowed'
+                                                : 'bg-blue-600 hover:bg-blue-700 text-white'
                                                 }`}
                                         >
                                             {isCompleted ? 'Session Complete' : 'Mark Complete'}

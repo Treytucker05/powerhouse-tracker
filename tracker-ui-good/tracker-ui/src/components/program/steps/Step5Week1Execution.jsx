@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useSettings } from '../../../contexts/SettingsContext.jsx';
+import { percentOfTM, toDisplayWeight } from '../../../lib/fiveThreeOne/math.js';
 import { Target, TrendingUp, AlertTriangle, CheckCircle, Info, BarChart3, Clock, Zap } from 'lucide-react';
 
 export default function Step5Week1Execution({ data, updateData }) {
+    const { roundingIncrement } = useSettings();
     const [executionStrategy, setExecutionStrategy] = useState(data.executionStrategy || '');
     const [repTargets, setRepTargets] = useState(data.repTargets || {
         conservative: 8,
@@ -148,7 +151,7 @@ export default function Step5Week1Execution({ data, updateData }) {
 
         return percentages.map(set => ({
             ...set,
-            weight: Math.round((tm * set.percent / 100) / 5) * 5
+            weight: toDisplayWeight(percentOfTM(tm, set.percent, roundingIncrement))
         }));
     };
 

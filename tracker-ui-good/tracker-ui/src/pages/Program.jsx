@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useUnsavedChanges } from '../hooks/useUnsavedChanges.js';
 import BuilderCTA from '../components/program/BuilderCTA.jsx';
 import MethodologySelection from '../components/program/tabs/MethodologySelection';
 import FiveThreeOneWorkflow from '../components/program/FiveThreeOneWorkflow';
 import StreamlinedProgram from './StreamlinedProgram';
+import { Link } from 'react-router-dom';
 
 /**
  * Program.jsx - Updated to include 5/3/1 Training System
@@ -15,6 +17,8 @@ import StreamlinedProgram from './StreamlinedProgram';
 
 const Program = () => {
   const [selectedMethodology, setSelectedMethodology] = useState(null);
+  const [pendingChanges, setPendingChanges] = useState(false);
+  useUnsavedChanges(!!pendingChanges);
 
   const handleMethodologySelect = (methodology) => {
     console.log('Selected methodology:', methodology);
@@ -47,6 +51,11 @@ const Program = () => {
             </button>
           </div>
 
+          <div className="flex justify-end mb-4">
+            <Link to="/print-week" className="px-3 py-1.5 rounded border border-gray-600 text-gray-100 hover:bg-gray-800 text-sm">
+              Print Week
+            </Link>
+          </div>
           <FiveThreeOneWorkflow />
         </div>
       </div>
@@ -84,6 +93,11 @@ const Program = () => {
     <div className="min-h-screen bg-gray-900">
       <div className="container mx-auto px-6 py-8">
         <BuilderCTA />
+        <div className="flex justify-end mb-4">
+          <Link to="/print-week" className="px-3 py-1.5 rounded border border-gray-600 text-gray-100 hover:bg-gray-800 text-sm">
+            Print Week
+          </Link>
+        </div>
         <MethodologySelection
           onMethodologySelect={handleMethodologySelect}
           selectedMethodology={selectedMethodology}

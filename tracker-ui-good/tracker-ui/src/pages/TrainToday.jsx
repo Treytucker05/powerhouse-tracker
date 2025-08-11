@@ -2,8 +2,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Activity, CheckCircle, Clipboard, Play, SkipForward, AlertTriangle } from 'lucide-react';
 import { getToday, advanceActiveCycle } from '../lib/fiveThreeOne/persistCycle.js';
-import { addSession, estimate1RM } from '../lib/fiveThreeOne/history.js';
-import { useNavigate } from 'react-router-dom';
+import { addSession, estimate1RM, getHistory } from '../lib/fiveThreeOne/history.js';
+import { useToast } from '../components/ui/Toast.jsx';
+import { liftKey, getAmrapFromSession } from '../lib/fiveThreeOne/pr.js';
+import { useNavigate, Link } from 'react-router-dom';
 
 function Card({ title, children }) {
     return (
@@ -50,6 +52,7 @@ function SetRow({ idx, set, onChange }) {
 
 export default function TrainToday() {
     const navigate = useNavigate();
+    const { show } = useToast();
     const { active, today, weekObj } = useMemo(() => getToday(), []);
     const [warmupDone, setWarmupDone] = useState(() => (today?.warmups || []).map(() => false));
     const [mainResults, setMainResults] = useState(() => (today?.mainSets || []).map(() => ({ reps: null, done: false })));
@@ -121,9 +124,25 @@ export default function TrainToday() {
             notes,
             e1RM: amrapE1RM
         };
+        // PR check against prior history for this lift
+        const past = getHistory().filter(h => liftKey(h) === liftKey(session));
+        const amrap = getAmrapFromSession(session);
+        const didPR = amrap ? (() => {
+            const best = past.reduce((mx, h) => {
+                const a = getAmrapFromSession(h);
+                return Math.max(mx, a?.e1RM || 0);
+            }, 0);
+            return (amrap.e1RM || 0) > best;
+        })() : false;
+
         addSession(session);
         advanceActiveCycle();
         setSaved(true);
+        if (didPR) {
+            show(`PR! ${liftKey(session)} e1RM ${amrap.e1RM} — ${amrap.weight}×${amrap.reps}`, { kind: 'success', ttl: 4500 });
+        } else {
+            show('Session saved.', { kind: 'info', ttl: 2000 });
+        }
         setTimeout(() => navigate('/'), 600);
     };
 
@@ -144,11 +163,16 @@ export default function TrainToday() {
                         Week {active.currentWeek} • Day {active.currentDayIndex + 1} • <b>{today.day}</b> • {today.liftLabel}
                     </p>
                 </div>
-                {saved && (
-                    <div className="bg-green-900/20 border border-green-600 text-green-200 text-sm px-3 py-2 rounded inline-flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4" /> Session saved
-                    </div>
-                )}
+                <div className="flex items-center gap-2">
+                    <Link to="/print-week" className="px-3 py-1.5 rounded border border-gray-600 text-gray-100 hover:bg-gray-800 text-sm">
+                        Print Week
+                    </Link>
+                    {saved && (
+                        <div className="bg-green-900/20 border border-green-600 text-green-200 text-sm px-3 py-2 rounded inline-flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4" /> Session saved
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* TMs recap */}

@@ -2,7 +2,7 @@
 import React, { useMemo } from 'react';
 import { Info, AlertTriangle, CheckCircle, Calculator, Wand2, Sliders, Ruler } from 'lucide-react';
 import StepStatusPill from './_shared/StepStatusPill.jsx';
-import { STEP_IDS } from './_registry/stepRegistry';
+import { STEP_IDS } from './_registry/stepRegistry.js';
 import { estimate1RM, roundToIncrement } from '../../../lib/fiveThreeOne/compute531.js';
 
 const LIFT_ORDER = ['press', 'deadlift', 'bench', 'squat'];

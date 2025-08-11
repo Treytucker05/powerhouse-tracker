@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useSettings } from '../../../contexts/SettingsContext.jsx';
+import { roundToIncrement } from '../../../lib/fiveThreeOne/math.js';
 import { TrendingUp, Calculator, CheckCircle, Info, AlertTriangle, RotateCcw, ArrowRight } from 'lucide-react';
 
 export default function Step9CycleProgression({ data = {}, updateData }) {
+    const { roundingIncrement } = useSettings();
     // State management with proper fallbacks
     const [newTrainingMaxes, setNewTrainingMaxes] = useState(data?.newTrainingMaxes || {});
     const [progressionDecisions, setProgressionDecisions] = useState(data?.progressionDecisions || {});
@@ -22,9 +25,7 @@ export default function Step9CycleProgression({ data = {}, updateData }) {
     };
 
     // Calculate proper rounding to nearest 5 lbs
-    const roundToNearest5 = (weight) => {
-        return Math.ceil(weight / 5) * 5;
-    };
+    const roundToNearest5 = (weight) => roundToIncrement(weight, roundingIncrement);
 
     // Calculate new training max with standard increment
     const calculateNewTM = (currentTM, lift) => {

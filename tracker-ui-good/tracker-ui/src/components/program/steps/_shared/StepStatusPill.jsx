@@ -1,7 +1,7 @@
 // src/components/program/steps/_shared/StepStatusPill.jsx
 import React, { useMemo } from 'react';
 import { CheckCircle, AlertTriangle } from 'lucide-react';
-import { getStepStatuses, getStepRequirements } from '../_registry/stepRegistry';
+import { getStepStatuses, getStepRequirements } from '../_registry/stepRegistry.js';
 
 export default function StepStatusPill({ stepId, data }) {
     const statuses = useMemo(() => getStepStatuses(data), [data]);

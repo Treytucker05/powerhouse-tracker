@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useSettings } from '../../../contexts/SettingsContext.jsx';
+import { percentOfTM, toDisplayWeight } from '../../../lib/fiveThreeOne/math.js';
 import { BarChart3, Target, AlertCircle, CheckCircle, Info, Settings } from 'lucide-react';
 
 export default function Step4CycleStructure({ data, updateData }) {
+    const { roundingIncrement } = useSettings();
     const [loadingOption, setLoadingOption] = useState(data.loadingOption || 1);
     const [perLiftOptions, setPerLiftOptions] = useState(data.perLiftOptions || {
         squat: 1,
@@ -72,11 +75,10 @@ export default function Step4CycleStructure({ data, updateData }) {
         '1+': { min: 1, good: 3, excellent: 4, description: 'Week 3 - Peak intensity' }
     };
 
-    // Calculate weights with proper rounding to 5 lbs
+    // Calculate weights using shared math
     const calculateWeight = (tm, percentage) => {
         if (!tm || tm === 0) return 0;
-        const rawWeight = tm * (percentage / 100);
-        return Math.round(rawWeight / 5) * 5; // Round to nearest 5 lbs
+        return toDisplayWeight(percentOfTM(tm, percentage, roundingIncrement));
     };
 
     // Calculate all weights for a given TM and loading option
@@ -237,8 +239,8 @@ export default function Step4CycleStructure({ data, updateData }) {
                             key={option}
                             onClick={() => handleLoadingOptionChange(parseInt(option))}
                             className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${loadingOption === parseInt(option)
-                                    ? 'border-red-500 bg-red-900/20'
-                                    : 'border-gray-600 bg-gray-800 hover:border-gray-500'
+                                ? 'border-red-500 bg-red-900/20'
+                                : 'border-gray-600 bg-gray-800 hover:border-gray-500'
                                 }`}
                         >
                             <div className="flex items-start justify-between mb-3">
@@ -343,8 +345,8 @@ export default function Step4CycleStructure({ data, updateData }) {
                             key={style}
                             onClick={() => handleDeadliftStyleChange(style)}
                             className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${deadliftStyle === style
-                                    ? 'border-red-500 bg-red-900/20'
-                                    : 'border-gray-600 bg-gray-800 hover:border-gray-500'
+                                ? 'border-red-500 bg-red-900/20'
+                                : 'border-gray-600 bg-gray-800 hover:border-gray-500'
                                 }`}
                         >
                             <div className="flex items-center mb-2">

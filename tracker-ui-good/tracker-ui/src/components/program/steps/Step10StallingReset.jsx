@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useSettings } from '../../../contexts/SettingsContext.jsx';
+import { roundToIncrement } from '../../../lib/fiveThreeOne/math.js';
 import { AlertTriangle, RotateCcw, TrendingDown, CheckCircle, Info, Target, RefreshCw } from 'lucide-react';
 
 export default function Step10StallingReset({ data = {}, updateData }) {
+    const { roundingIncrement } = useSettings();
     // State management with proper fallbacks
     const [stallAnalysis, setStallAnalysis] = useState(data?.stallAnalysis || {});
     const [resetDecisions, setResetDecisions] = useState(data?.resetDecisions || {});
@@ -22,9 +25,7 @@ export default function Step10StallingReset({ data = {}, updateData }) {
     };
 
     // Calculate proper rounding to nearest 5 lbs
-    const roundToNearest5 = (weight) => {
-        return Math.ceil(weight / 5) * 5;
-    };
+    const roundToNearest5 = (weight) => roundToIncrement(weight, roundingIncrement);
 
     // Calculate reset training max
     const calculateResetTM = (currentTM, resetType = 'first_reset') => {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Info, AlertTriangle, RefreshCcw, CheckCircle } from 'lucide-react';
 import StepStatusPill from './_shared/StepStatusPill.jsx';
-import { STEP_IDS } from './_registry/stepRegistry';
+import { STEP_IDS } from './_registry/stepRegistry.js';
 import { CONDITIONING_GUIDELINES, CONDITIONING_PLACEMENT, MODALITIES, DAYS } from '../../../lib/fiveThreeOne/conditioningLibrary.js';
 import { buildConditioningPlan, deriveLiftDayMap } from '../../../lib/fiveThreeOne/conditioningPlanner.js';
 

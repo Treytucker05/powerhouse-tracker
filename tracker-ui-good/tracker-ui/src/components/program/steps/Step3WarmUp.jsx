@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { useSettings } from '../../../contexts/SettingsContext.jsx';
+import { percentOfTM, toDisplayWeight } from '../../../lib/fiveThreeOne/math.js';
 import { Timer, Activity, CheckCircle, Info, Clock } from 'lucide-react';
 
 export default function Step3WarmUp({ data, updateData }) {
+    const { roundingIncrement } = useSettings();
     const [warmUpStyle, setWarmUpStyle] = useState(data.warmUpStyle || '');
     const [customComponents, setCustomComponents] = useState(data.customComponents || {
         softTissue: false,
@@ -149,9 +152,9 @@ export default function Step3WarmUp({ data, updateData }) {
     const calculateWarmUpWeights = (tm) => {
         if (!tm || tm === 0) return null;
         return {
-            set1: { percentage: 40, weight: Math.round((tm * 0.4) / 5) * 5, reps: 5 },
-            set2: { percentage: 50, weight: Math.round((tm * 0.5) / 5) * 5, reps: 5 },
-            set3: { percentage: 60, weight: Math.round((tm * 0.6) / 5) * 5, reps: 3 }
+            set1: { percentage: 40, weight: toDisplayWeight(percentOfTM(tm, 40, roundingIncrement)), reps: 5 },
+            set2: { percentage: 50, weight: toDisplayWeight(percentOfTM(tm, 50, roundingIncrement)), reps: 5 },
+            set3: { percentage: 60, weight: toDisplayWeight(percentOfTM(tm, 60, roundingIncrement)), reps: 3 }
         };
     };
 

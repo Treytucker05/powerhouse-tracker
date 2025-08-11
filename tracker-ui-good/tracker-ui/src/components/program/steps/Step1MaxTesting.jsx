@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { useSettings } from '../../../contexts/SettingsContext.jsx';
+import { roundToIncrement } from '../../../lib/fiveThreeOne/math.js';
 import { Calculator, AlertCircle, CheckCircle, Info } from 'lucide-react';
 
 export default function Step1MaxTesting({ data, updateData }) {
+    const { roundingIncrement } = useSettings();
     const [testingMethod, setTestingMethod] = useState(data.testingMethod || 'estimate');
     const [oneRMs, setOneRMs] = useState(data.oneRMs || {
         squat: '',
@@ -36,7 +39,7 @@ export default function Step1MaxTesting({ data, updateData }) {
     // Training Max = 90% of 1RM
     const calculateTrainingMax = (oneRM) => {
         if (!oneRM) return 0;
-        return Math.round(oneRM * 0.9 / 5) * 5; // Round to nearest 5 lbs
+        return roundToIncrement(oneRM * 0.9, roundingIncrement);
     };
 
     const handleOneRMChange = (lift, value) => {
@@ -128,8 +131,8 @@ export default function Step1MaxTesting({ data, updateData }) {
                     <div
                         onClick={() => setTestingMethod('known')}
                         className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${testingMethod === 'known'
-                                ? 'border-red-500 bg-red-900/20'
-                                : 'border-gray-600 bg-gray-800 hover:border-gray-500'
+                            ? 'border-red-500 bg-red-900/20'
+                            : 'border-gray-600 bg-gray-800 hover:border-gray-500'
                             }`}
                     >
                         <div className="flex items-center mb-2">
@@ -144,8 +147,8 @@ export default function Step1MaxTesting({ data, updateData }) {
                     <div
                         onClick={() => setTestingMethod('estimate')}
                         className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${testingMethod === 'estimate'
-                                ? 'border-red-500 bg-red-900/20'
-                                : 'border-gray-600 bg-gray-800 hover:border-gray-500'
+                            ? 'border-red-500 bg-red-900/20'
+                            : 'border-gray-600 bg-gray-800 hover:border-gray-500'
                             }`}
                     >
                         <div className="flex items-center mb-2">

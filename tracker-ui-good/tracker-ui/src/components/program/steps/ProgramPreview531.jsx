@@ -5,7 +5,7 @@ import { buildProgram } from '../../../lib/fiveThreeOne/compute531.js';
 import { getWarmupsByPolicy } from '../../../lib/fiveThreeOne/warmup.js';
 import { calcMainSets } from '../../../lib/fiveThreeOne/compute531.js';
 import { getAllStepStatuses } from './_registry/stepRegistry.js';
-import { roundToIncrement } from '../../../lib/fiveThreeOne/compute531.js';
+import { percentOfTM, toDisplayWeight } from '../../../lib/fiveThreeOne/math.js';
 
 export default function ProgramPreview531({ data, updateData }) {
     const stepStatuses = useMemo(() => getAllStepStatuses(data), [data]);
@@ -126,7 +126,7 @@ export default function ProgramPreview531({ data, updateData }) {
                                                         {it?.load?.type === 'percentTM' && (
                                                             <> @ {it.load.value}% TM{Number.isFinite(Number(lifts?.[it.load.liftRef]?.tm)) ? (
                                                                 <> → <span className="font-mono">
-                                                                    {roundToIncrement(Number(lifts[it.load.liftRef].tm) * (Number(it.load.value) / 100), rounding?.increment ?? 5, rounding?.mode ?? 'nearest')}
+                                                                    {toDisplayWeight(percentOfTM(Number(lifts[it.load.liftRef].tm), Number(it.load.value), rounding?.increment ?? 5))}
                                                                 </span></>
                                                             ) : null}</>
                                                         )}

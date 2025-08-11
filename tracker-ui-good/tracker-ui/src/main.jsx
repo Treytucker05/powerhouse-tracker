@@ -5,6 +5,8 @@ import './index.css'
 import App from './App.jsx'
 import { TrainingStateProvider } from './context/TrainingStateContext.jsx'
 import { AppProvider } from './context/AppContext.jsx'
+import { ToastProvider } from './components/ui/Toast.jsx'
+import { SettingsProvider } from './contexts/SettingsContext.jsx'
 
 // Ensure dark mode is always enabled
 document.documentElement.classList.add('dark');
@@ -22,11 +24,15 @@ const queryClient = new QueryClient({
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <AppProvider>
-        <TrainingStateProvider>
-          <App />
-        </TrainingStateProvider>
-      </AppProvider>
+      <SettingsProvider>
+        <AppProvider>
+          <TrainingStateProvider>
+            <ToastProvider>
+              <App />
+            </ToastProvider>
+          </TrainingStateProvider>
+        </AppProvider>
+      </SettingsProvider>
     </QueryClientProvider>
   </StrictMode>,
 )

@@ -2,10 +2,10 @@
 import React, { useMemo } from 'react';
 import { Info, AlertTriangle, RefreshCcw, Settings, CheckCircle } from 'lucide-react';
 import StepStatusPill from './_shared/StepStatusPill.jsx';
-import { STEP_IDS } from './_registry/stepRegistry';
+import { STEP_IDS } from './_registry/stepRegistry.js';
 import { TEMPLATE_IDS } from '../../../lib/fiveThreeOne/assistanceLibrary.js';
 import { buildAssistancePlan } from '../../../lib/fiveThreeOne/assistPlanner.js';
-import { roundToIncrement } from '../../../lib/fiveThreeOne/compute531.js';
+import { percentOfTM, toDisplayWeight } from '../../../lib/fiveThreeOne/math.js';
 
 export default function Step5AssistanceRouter({ data, updateData }) {
     const st = data || {};
@@ -45,8 +45,7 @@ export default function Step5AssistanceRouter({ data, updateData }) {
     const computeBBBWeight = (liftRef) => {
         const tm = Number(lifts?.[liftRef]?.tm);
         if (!Number.isFinite(tm)) return '-';
-        const raw = tm * (bbbPercent / 100);
-        return roundToIncrement(raw, rounding?.increment ?? 5, rounding?.mode ?? 'nearest');
+        return toDisplayWeight(percentOfTM(tm, bbbPercent, rounding?.increment ?? 5));
     };
 
     const templateBadge = useMemo(() => {
@@ -177,8 +176,7 @@ export default function Step5AssistanceRouter({ data, updateData }) {
                                                                 <> → <span className="font-mono">
                                                                     {(() => {
                                                                         const tm = Number(lifts[it.load.liftRef].tm);
-                                                                        const raw = tm * (Number(it.load.value) / 100);
-                                                                        return roundToIncrement(raw, rounding?.increment ?? 5, rounding?.mode ?? 'nearest');
+                                                                        return toDisplayWeight(percentOfTM(tm, Number(it.load.value), rounding?.increment ?? 5));
                                                                     })()}
                                                                 </span></>
                                                             )}

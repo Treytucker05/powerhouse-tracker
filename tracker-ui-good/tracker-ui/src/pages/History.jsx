@@ -100,6 +100,9 @@ export default function History() {
                     <h2 className="text-2xl text-white font-semibold">History & PRs</h2>
                 </div>
                 <div className="flex items-center gap-2">
+                    <Link to="/print-week" className="inline-flex items-center gap-2 px-3 py-2 rounded border border-gray-600 text-gray-100 hover:bg-gray-800 text-sm">
+                        Print Week
+                    </Link>
                     <Link to="/train" className="inline-flex items-center gap-2 px-3 py-2 rounded bg-red-600 hover:bg-red-700 text-white text-sm">
                         <Activity className="w-4 h-4" /> Train Today
                     </Link>

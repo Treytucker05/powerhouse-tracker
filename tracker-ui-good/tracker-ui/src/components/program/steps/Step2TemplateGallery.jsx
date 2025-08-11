@@ -2,7 +2,7 @@
 import React from 'react';
 import { Info, CheckCircle, AlertTriangle, Dumbbell, Layers, Activity } from 'lucide-react';
 import StepStatusPill from './_shared/StepStatusPill.jsx';
-import { STEP_IDS } from './_registry/stepRegistry';
+import { STEP_IDS } from './_registry/stepRegistry.js';
 import { TEMPLATE_IDS } from '../../../lib/fiveThreeOne/assistanceRules.js';
 
 const TILES = [

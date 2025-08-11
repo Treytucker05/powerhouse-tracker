@@ -1,5 +1,6 @@
 // src/lib/fiveThreeOne/pr.js
 import { getHistory } from './history';
+import { e1RM as calcE1RM } from './math.js';
 
 // Normalize lift label for grouping
 export function liftKey(s) {
@@ -16,7 +17,7 @@ export function getAmrapFromSession(session) {
     const reps = Number(candidate?.loggedReps ?? 0);
     const weight = Number(candidate?.weight ?? 0);
     if (!reps || !weight) return null;
-    const e1RM = +(weight * reps * 0.0333 + weight).toFixed(1);
+    const e1RM = +(calcE1RM(weight, reps)).toFixed(1);
     return { weight, reps, e1RM };
 }
 

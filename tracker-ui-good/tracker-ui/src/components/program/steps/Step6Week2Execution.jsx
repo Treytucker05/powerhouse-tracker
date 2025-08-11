@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useSettings } from '../../../contexts/SettingsContext.jsx';
+import { percentOfTM, toDisplayWeight } from '../../../lib/fiveThreeOne/math.js';
 import { Target, TrendingUp, CheckCircle, Info, AlertTriangle, Calendar, Zap } from 'lucide-react';
 
 export default function Step6Week2Execution({ data = {}, updateData }) {
+    const { roundingIncrement } = useSettings();
     // State management with proper fallbacks
     const [week2Results, setWeek2Results] = useState(data?.week2Results || {});
     const [currentSession, setCurrentSession] = useState(data?.currentSession || null);
@@ -21,7 +24,7 @@ export default function Step6Week2Execution({ data = {}, updateData }) {
     // Calculate weights with proper rounding
     const calculateWeight = (tm, percentage) => {
         if (!tm) return 0;
-        return Math.ceil((tm * percentage / 100) / 5) * 5;
+        return toDisplayWeight(percentOfTM(tm, percentage, roundingIncrement));
     };
 
     // Lift names mapping

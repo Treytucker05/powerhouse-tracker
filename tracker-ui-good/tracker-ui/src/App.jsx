@@ -19,6 +19,8 @@ const AuthPage = lazy(() => import("./pages/AuthPage.jsx"));
 const MacrocycleRedirect = lazy(() => import("./pages/MacrocycleRedirect.jsx"));
 const TrainToday = lazy(() => import('./pages/TrainToday.jsx'));
 const History = lazy(() => import('./pages/History.jsx'));
+const Settings = lazy(() => import('./pages/Settings.jsx'));
+const PrintWeek = lazy(() => import('./pages/PrintWeek.jsx'));
 
 // Program Design Builder Components
 const ContextAwareBuilder = lazy(() => import("./components/builder/ContextAwareBuilder.jsx"));
@@ -56,6 +58,8 @@ function App() {
                 <Route path="tracking" element={<Tracking />} />
                 <Route path="analytics" element={<Analytics />} />
                 <Route path="history" element={<History />} />
+                <Route path="settings" element={<Settings />} />
+                <Route path="print-week" element={<PrintWeek />} />
                 <Route path="exercises" element={<ExercisesPage />} />
                 <Route path="profile" element={<ProfilePage />} />
                 <Route path="resources" element={<ResourcesPage />} />

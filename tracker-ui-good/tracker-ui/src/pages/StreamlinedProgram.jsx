@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useUnsavedChanges } from '../hooks/useUnsavedChanges.js';
 import {
     ProgramProvider, useProgramContext
 } from '../contexts/ProgramContext';
@@ -41,6 +42,8 @@ import NASMProgramWorkflow from '../components/program/NASMProgramWorkflow';
 // Enhanced Program Navigation with Methodology-First Workflow
 const StreamlinedProgramNavigation = () => {
     const { state, actions } = useProgramContext();
+    const [pendingChanges, setPendingChanges] = useState(false);
+    useUnsavedChanges(!!pendingChanges);
 
     // METHODOLOGY-FIRST 4-PHASE Workflow: Methodology → User Info → Assessments → Program Design
     const streamlinedTabs = [

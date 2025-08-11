@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { useSettings } from '../../../contexts/SettingsContext.jsx';
+import { percentOfTM, toDisplayWeight, e1RM as calcE1RM } from '../../../lib/fiveThreeOne/math.js';
 import { Target, CheckCircle, Info, AlertTriangle, Calendar, Zap, Trophy } from 'lucide-react';
 
 export default function Step7Week3Execution({ data = {}, updateData }) {
+    const { roundingIncrement } = useSettings();
     // Local state with safe fallbacks
     const [week3Results, setWeek3Results] = useState(data?.week3Results || {});
 
@@ -27,7 +30,7 @@ export default function Step7Week3Execution({ data = {}, updateData }) {
     // Round up to nearest 5 lbs to stay conservative on heavy week
     const calculateWeight = (tm, percentage) => {
         if (!tm) return 0;
-        return Math.ceil((tm * percentage / 100) / 5) * 5;
+        return toDisplayWeight(percentOfTM(tm, percentage, roundingIncrement));
     };
 
     const updateStepData = (updates) => {
@@ -66,14 +69,11 @@ export default function Step7Week3Execution({ data = {}, updateData }) {
     };
 
     // Estimated 1RM via Epley
-    const e1rm = (weight, reps) => {
-        if (!weight || !reps) return 0;
-        return Math.round(weight * reps * 0.0333 + weight);
-    };
+    const e1rm = (weight, reps) => calcE1RM(weight, reps);
 
     // PR if current e1RM exceeds last week's e1RM
     const isPR = (lift, week3E1RM) => {
-        const lastWeekWeight = calculateWeight(trainingMaxes[lift] || 0, (loadingOption === 1 ? 90 : 90));
+        const lastWeekWeight = calculateWeight(trainingMaxes[lift] || 0, 90);
         const lastWeekReps = week2Results?.[lift]?.amrapReps || 0;
         const lastWeekE1RM = e1rm(lastWeekWeight, lastWeekReps);
         return week3E1RM > (lastWeekE1RM || 0);
