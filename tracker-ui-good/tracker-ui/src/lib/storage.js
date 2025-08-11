@@ -1,5 +1,32 @@
 import { supabase } from './api/supabaseClient';
 
+// Lightweight key-value helpers used across the app
+export function set(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+        console.warn('storage.set failed', e);
+    }
+}
+
+export function get(key) {
+    try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+        console.warn('storage.get failed', e);
+        return null;
+    }
+}
+
+export function remove(key) {
+    try {
+        localStorage.removeItem(key);
+    } catch (e) {
+        console.warn('storage.remove failed', e);
+    }
+}
+
 /**
  * Save macrocycle data to Supabase or localStorage fallback
  * @param {Object} data - Macrocycle data to save

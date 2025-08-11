@@ -1,0 +1,102 @@
+/* src/components/program/printable/printable.css */
+.printable-wrap {
+    padding: 12px;
+    color: #e5e7eb;
+}
+
+.no-print {
+    margin-bottom: 12px;
+}
+
+.no-print .row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.no-print label {
+    color: #9ca3af;
+    font-size: 0.9rem;
+}
+
+.print-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.print-card {
+    border: 1px solid #374151;
+    border-radius: 8px;
+    padding: 10px;
+    background: #111827;
+}
+
+.print-card .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #374151;
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+}
+
+.print-card .title {
+    font-weight: 600;
+}
+
+.print-card .sub {
+    color: #9ca3af;
+    font-size: 0.85rem;
+}
+
+.print-card .empty {
+    color: #9ca3af;
+    font-size: 0.9rem;
+    padding: 6px 0;
+}
+
+.set-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #0b1220;
+}
+
+.set-table th,
+.set-table td {
+    border: 1px solid #374151;
+    padding: 4px 6px;
+    text-align: left;
+}
+
+.notes {
+    height: 40px;
+    border-top: 1px dashed #374151;
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #9ca3af;
+}
+
+/* Print tweaks */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    body {
+        background: #fff;
+        color: #000;
+    }
+
+    .print-card {
+        break-inside: avoid;
+        background: #fff;
+        color: #000;
+        border-color: #999;
+    }
+
+    .set-table {
+        background: #fff;
+    }
+}

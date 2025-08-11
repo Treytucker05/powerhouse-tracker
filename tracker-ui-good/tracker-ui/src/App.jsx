@@ -17,6 +17,8 @@ const Program = lazy(() => import("./pages/Program.jsx"));
 const Analytics = lazy(() => import("./pages/Analytics.jsx"));
 const AuthPage = lazy(() => import("./pages/AuthPage.jsx"));
 const MacrocycleRedirect = lazy(() => import("./pages/MacrocycleRedirect.jsx"));
+const TrainToday = lazy(() => import('./pages/TrainToday.jsx'));
+const History = lazy(() => import('./pages/History.jsx'));
 
 // Program Design Builder Components
 const ContextAwareBuilder = lazy(() => import("./components/builder/ContextAwareBuilder.jsx"));
@@ -53,9 +55,11 @@ function App() {
                 <Route path="program/builder/531" element={<ProgramWizard531 />} />
                 <Route path="tracking" element={<Tracking />} />
                 <Route path="analytics" element={<Analytics />} />
+                <Route path="history" element={<History />} />
                 <Route path="exercises" element={<ExercisesPage />} />
                 <Route path="profile" element={<ProfilePage />} />
                 <Route path="resources" element={<ResourcesPage />} />
+                <Route path="train" element={<TrainToday />} />
 
                 {/* Unified Builder Routes - All redirect to /program with context */}
                 <Route path="mesocycle" element={<MacrocycleRedirect />} />

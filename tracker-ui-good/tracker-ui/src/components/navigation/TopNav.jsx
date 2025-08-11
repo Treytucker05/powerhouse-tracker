@@ -23,6 +23,8 @@ export default function TopNav({ user, onSignOut }) {
     { to: "/", label: "Dashboard", icon: Home },
     { to: "/program", label: "Program Design", icon: Cog },
     { to: "/tracking", label: "Tracking", icon: Activity },
+    { to: "/train", label: "Train Today", icon: ClipboardList },
+    { to: "/history", label: "History", icon: Activity },
     { to: "/analytics", label: "Analytics", icon: BarChart3 },
     { to: "/exercises", label: "Exercises", icon: Dumbbell },
     { to: "/resources", label: "Resources", icon: BookOpen },

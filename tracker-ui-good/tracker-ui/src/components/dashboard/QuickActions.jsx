@@ -1,8 +1,11 @@
 import { useQuickActions } from '../../hooks/useQuickActions'
 import Skeleton from '../ui/Skeleton'
+import { useNavigate } from 'react-router-dom'
+import { History as HistoryIcon } from 'lucide-react'
 
 export default function QuickActions() {
   const { data: actions, isLoading, error } = useQuickActions()
+  const navigate = useNavigate()
   if (isLoading) {
     return (
       <div>
@@ -27,34 +30,41 @@ export default function QuickActions() {
         </div>
       </div>
     )
-  }  const actionButtons = [
-    { 
-      label: actions?.startTodayLabel || 'Start Today\'s Workout', 
-      icon: '🏋️', 
-      color: actions?.startTodayDisabled 
-        ? 'bg-gray-400 dark:bg-gray-600' 
+  } const actionButtons = [
+    {
+      label: actions?.startTodayLabel || 'Start Today\'s Workout',
+      icon: '🏋️',
+      color: actions?.startTodayDisabled
+        ? 'bg-gray-400 dark:bg-gray-600'
         : 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-lg hover:shadow-xl',
       onClick: actions?.startToday,
       disabled: actions?.startTodayDisabled,
       primary: true
     },
-    { 
-      label: 'Open Logger', 
-      icon: '📊', 
-      color: actions?.openLoggerDisabled 
-        ? 'bg-gray-400 dark:bg-gray-600' 
+    {
+      label: 'Open Logger',
+      icon: '📊',
+      color: actions?.openLoggerDisabled
+        ? 'bg-gray-400 dark:bg-gray-600'
         : 'bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 shadow-md hover:shadow-lg',
       onClick: actions?.openLogger,
       disabled: actions?.openLoggerDisabled
     },
-    { 
-      label: 'View Program', 
-      icon: '📈', 
-      color: actions?.viewProgramDisabled 
-        ? 'bg-gray-400 dark:bg-gray-600' 
+    {
+      label: 'View Program',
+      icon: '📈',
+      color: actions?.viewProgramDisabled
+        ? 'bg-gray-400 dark:bg-gray-600'
         : 'bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 shadow-md hover:shadow-lg',
       onClick: actions?.viewProgram,
       disabled: actions?.viewProgramDisabled
+    },
+    {
+      label: 'History',
+      icon: <HistoryIcon className="w-4 h-4" />,
+      color: 'bg-gradient-to-r from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-700 shadow-md hover:shadow-lg',
+      onClick: () => navigate('/history'),
+      disabled: false
     }
   ]
 
@@ -63,7 +73,7 @@ export default function QuickActions() {
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
         Quick Actions
       </h3>
-        {actions?.hasPlannedSession && (
+      {actions?.hasPlannedSession && (
         <div className="mb-4 p-4 bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-lg border border-red-200 dark:border-red-700">
           <div className="flex items-center justify-between">
             <div>
@@ -80,18 +90,18 @@ export default function QuickActions() {
           </div>
         </div>
       )}
-      
+
       <div className="space-y-3">
         {actionButtons.map((action, index) => (
           <button
             key={index}
             onClick={action.onClick}
-            disabled={action.disabled}            className={`
+            disabled={action.disabled} className={`
               ${action.color} text-white rounded-lg font-medium transition-all duration-300 
               flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed
               transform hover:scale-105 active:scale-95
-              ${action.primary 
-                ? 'px-4 py-3 text-base w-full hover:shadow-lg' 
+              ${action.primary
+                ? 'px-4 py-3 text-base w-full hover:shadow-lg'
                 : 'px-3 py-2 text-sm w-full'
               }
             `}

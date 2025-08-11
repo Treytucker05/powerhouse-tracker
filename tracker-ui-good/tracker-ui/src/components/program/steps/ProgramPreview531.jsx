@@ -2,7 +2,10 @@
 import React, { useMemo } from 'react';
 import { Download, Printer, Save, CheckCircle, AlertTriangle } from 'lucide-react';
 import { buildProgram } from '../../../lib/fiveThreeOne/compute531.js';
+import { getWarmupsByPolicy } from '../../../lib/fiveThreeOne/warmup.js';
+import { calcMainSets } from '../../../lib/fiveThreeOne/compute531.js';
 import { getAllStepStatuses } from './_registry/stepRegistry.js';
+import { roundToIncrement } from '../../../lib/fiveThreeOne/compute531.js';
 
 export default function ProgramPreview531({ data, updateData }) {
     const stepStatuses = useMemo(() => getAllStepStatuses(data), [data]);
@@ -53,75 +56,89 @@ export default function ProgramPreview531({ data, updateData }) {
                         <div key={dayIdx} className="bg-gray-900 border border-gray-800 rounded p-3">
                             <h5 className="font-medium text-red-400 mb-2">Day {dayIdx + 1} - {day.focus}</h5>
 
-                            {/* Main Work */}
-                            {day.mainWork && (
-                                <div className="mb-3">
-                                    <div className="text-sm font-medium text-gray-300 mb-1">Main Work</div>
-                                    <div className="text-xs text-gray-400 space-y-1">
-                                        {day.mainWork.sets?.map((set, setIdx) => (
-                                            <div key={setIdx}>
-                                                {set.weight}lb × {set.reps} {set.isAMRAP ? '(AMRAP)' : ''}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Assistance Work: prefer user's selected assistancePlan if present */}
+                            {/* Warm-up (computed from policy + TM) */}
                             {(() => {
-                                const byDay = data?.assistancePlan?.byDay || {};
                                 const scheduleDays = data?.schedule?.days || [];
-                                const dayId = scheduleDays[dayIdx]?.id;
-                                const selected = dayId ? byDay[dayId]?.plan : null;
-
-                                if (selected && (selected.blocks?.length || selected.accessories?.length)) {
-                                    return (
-                                        <div className="mb-3">
-                                            <div className="text-sm font-medium text-gray-300 mb-1">Assistance (Selected)</div>
-                                            <div className="text-xs text-gray-400 space-y-2">
-                                                {(selected.blocks || []).map((b, bi) => (
-                                                    <div key={bi}>
-                                                        <div className="text-gray-300">{b.type || b.category || 'Block'}</div>
-                                                        <ul className="ml-4 list-disc space-y-1">
-                                                            {(b.items || []).map((it, ii) => (
-                                                                <li key={ii}>
-                                                                    {it.name}
-                                                                    {it.sets ? ` — ${it.sets}×${it.reps}` : (it.targetReps ? ` — ≥${it.targetReps} reps` : '')}
-                                                                    {it.percentTM ? ` @ ${it.percentTM}% TM` : ''}
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-                                                ))}
-                                                {(selected.accessories || []).length > 0 && (
-                                                    <div>
-                                                        <div className="text-gray-300">Accessories</div>
-                                                        <ul className="ml-4 list-disc space-y-1">
-                                                            {(selected.accessories || []).map((it, i) => (
-                                                                <li key={i}>{it.name} — {it.sets}×{it.reps}</li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    );
-                                }
-
-                                // fallback to program-generated assistance if any
-                                return (day.assistance?.length > 0) ? (
+                                const dMeta = scheduleDays[dayIdx];
+                                const liftKey = dMeta?.lift; // 'press' | 'deadlift' | 'bench' | 'squat'
+                                const tm = data?.trainingMaxes?.[liftKey];
+                                const rounding = data?.rounding || { increment: 5, mode: 'nearest' };
+                                const pol = data?.warmup?.policy || 'standard';
+                                const custom = data?.warmup?.custom || [];
+                                const sets = getWarmupsByPolicy(pol, custom, Number(tm), rounding);
+                                if (!sets?.length) return null;
+                                return (
                                     <div className="mb-3">
-                                        <div className="text-sm font-medium text-gray-300 mb-1">Assistance</div>
+                                        <div className="text-sm font-medium text-gray-300 mb-1">Warm‑Up</div>
                                         <div className="text-xs text-gray-400 space-y-1">
-                                            {day.assistance.map((exercise, exIdx) => (
-                                                <div key={exIdx}>
-                                                    {exercise.name}: {exercise.sets}×{exercise.reps}
-                                                    {exercise.weight && ` @ ${exercise.weight}lb`}
+                                            {sets.map((s, i) => (
+                                                <div key={i}>{s.weight}lb × {s.reps} ({s.pct}%)</div>
+                                            ))}
+                                            {liftKey === 'deadlift' && data?.warmup?.deadliftRepStyle === 'deadstop' && (
+                                                <div className="text-gray-500">Cue: reset each rep (dead‑stop)</div>
+                                            )}
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+
+                            {/* Main Work */}
+                            {(() => {
+                                const scheduleDays = data?.schedule?.days || [];
+                                const dMeta = scheduleDays[dayIdx];
+                                const liftKey = dMeta?.lift;
+                                const tm = Number(data?.trainingMaxes?.[liftKey]);
+                                const rounding = data?.rounding || { increment: 5, mode: 'nearest' };
+                                const previewWeek = Number(data?.loading?.previewWeek) || 1;
+                                const loadingOpt = Number(data?.loading?.option) || 1;
+                                const mainSets = Number.isFinite(tm) ? calcMainSets(tm, loadingOpt, previewWeek, rounding) : [];
+                                if (!mainSets.length) return null;
+                                return (
+                                    <div className="mb-3">
+                                        <div className="text-sm font-medium text-gray-300 mb-1">Main Sets</div>
+                                        <div className="text-xs text-gray-400 space-y-1">
+                                            {mainSets.map((s) => (
+                                                <div key={s.set || `${s.pct}-${s.reps}`}>
+                                                    {s.pct}% × {s.reps}{s.amrap ? '+' : ''} → {Number.isFinite(s.weight) ? `${s.weight}lb` : '-'}
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
-                                ) : null;
+                                );
+                            })()}
+
+                            {/* Assistance Work: from Step 5 Assistance Router (per-day), else program fallback */}
+                            {(() => {
+                                const scheduleDays = data?.schedule?.days || [];
+                                const liftKey = scheduleDays[dayIdx]?.lift;
+                                const dayKey = liftKey;
+                                const items = data?.assistance?.perDay?.[dayKey] || [];
+                                const rounding = data?.rounding || { increment: 5, mode: 'nearest' };
+                                const lifts = data?.lifts || {};
+                                return (
+                                    <div className="mb-3">
+                                        <div className="text-sm font-medium text-gray-300 mb-1">Assistance</div>
+                                        {items.length ? (
+                                            <ul className="text-xs text-gray-400 space-y-1">
+                                                {items.map((it, i) => (
+                                                    <li key={i}>
+                                                        {it.name}: {it.sets}×{it.reps}
+                                                        {it?.load?.type === 'percentTM' && (
+                                                            <> @ {it.load.value}% TM{Number.isFinite(Number(lifts?.[it.load.liftRef]?.tm)) ? (
+                                                                <> → <span className="font-mono">
+                                                                    {roundToIncrement(Number(lifts[it.load.liftRef].tm) * (Number(it.load.value) / 100), rounding?.increment ?? 5, rounding?.mode ?? 'nearest')}
+                                                                </span></>
+                                                            ) : null}</>
+                                                        )}
+                                                        {it?.load?.type === 'bw' && ' @ BW'}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <div className="text-xs text-gray-500">None</div>
+                                        )}
+                                    </div>
+                                );
                             })()}
 
                             {/* Conditioning */}
@@ -229,6 +246,34 @@ export default function ProgramPreview531({ data, updateData }) {
                             </div>
                         </div>
                     </div>
+
+                    {/* Conditioning (Weekly) */}
+                    {(() => {
+                        const cond = data?.conditioning || {};
+                        const plan = cond?.weeklyPlan || [];
+                        return (
+                            <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">
+                                <div className="text-xs text-gray-400 uppercase tracking-wide mb-2">Conditioning (Weekly)</div>
+                                {plan.length ? (
+                                    <ul className="text-sm text-gray-200">
+                                        {plan.map((s, i) => (
+                                            <li key={i}>
+                                                {s.day}: {String(s.mode).toUpperCase()} — {s.modality}{' '}
+                                                {s.prescription && Object.keys(s.prescription).length ? (
+                                                    <span className="text-gray-400">
+                                                        ({Object.entries(s.prescription).map(([k, v]) => `${k}:${v}`).join(', ')})
+                                                    </span>
+                                                ) : null}
+                                                {s.notes ? <span className="text-gray-500"> — {s.notes}</span> : null}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <div className="text-gray-500 text-sm">No conditioning scheduled.</div>
+                                )}
+                            </div>
+                        );
+                    })()}
 
                     {/* Training Maxes */}
                     <div className="bg-gray-800 border border-gray-700 rounded-lg p-4">

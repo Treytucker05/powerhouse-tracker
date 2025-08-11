@@ -1,4 +1,5 @@
 import React, { lazy } from 'react';
+import { DEFAULT_CONDITIONING_OPTIONS } from '../../../../lib/fiveThreeOne/conditioningLibrary.js';
 import {
     validateFundamentals,
     validateTemplate,
@@ -31,8 +32,10 @@ export const STEP_IDS = {
     CYCLE_AND_PROGRESSION: 'CYCLE_AND_PROGRESSION',
     ASSISTANCE_ROUTER: 'ASSISTANCE_ROUTER',
     CONDITIONING_RECOVERY: 'CONDITIONING_RECOVERY',
+    ADVANCED_CUSTOMIZATION: 'ADVANCED_CUSTOMIZATION',
     ADVANCED_OPTIONS: 'ADVANCED_OPTIONS',
-    REVIEW_EXPORT: 'REVIEW_EXPORT'
+    REVIEW_EXPORT: 'REVIEW_EXPORT',
+    FINAL_REVIEW: 'FINAL_REVIEW'
 };
 
 export const DEFAULT_WIZARD_STATE = {
@@ -43,9 +46,59 @@ export const DEFAULT_WIZARD_STATE = {
     coreLiftsEnabled: { squat: true, bench: true, deadlift: true, press: true },
     template: null,
     templateConfig: { bbbPair: 'same', bbbPercent: 60, bwTarget: 75 },
-    schedule: { days: [{ id: 'D1', lift: 'press' }, { id: 'D2', lift: 'deadlift' }, { id: 'D3', lift: 'bench' }, { id: 'D4', lift: 'squat' }] },
+    loading: { option: 1, previewWeek: 1 },
+    increments: { upper: 5, lower: 10 },
+    prs: {
+        squat: { bestE1RM: null },
+        bench: { bestE1RM: null },
+        deadlift: { bestE1RM: null },
+        press: { bestE1RM: null },
+    },
+    schedule: {
+        frequency: '4day',
+        days: [
+            { id: 'D1', lift: 'press' },
+            { id: 'D2', lift: 'deadlift' },
+            { id: 'D3', lift: 'bench' },
+            { id: 'D4', lift: 'squat' }
+        ],
+        threeDayRolling: true,
+    },
+    warmup: {
+        policy: 'standard', // 'standard' | 'minimal' | 'custom'
+        custom: [{ pct: 40, reps: 5 }, { pct: 50, reps: 5 }, { pct: 60, reps: 3 }],
+        deadliftRepStyle: 'touch', // 'touch' | 'deadstop'
+    },
     loadingOption: 1,
     assistancePlan: { byDay: {} },
+    // Prompt 8 additions
+    assistance: {
+        options: {
+            bbb: { percent: 50, pairMode: 'same' },
+            bodyweight: { minRepsPerExercise: 75 }
+        },
+        perDay: {
+            press: [],
+            deadlift: [],
+            bench: [],
+            squat: []
+        }
+    },
+    caps: {
+        maxAssistanceSetsPerDay: 15,
+        superset: true
+    },
+    // Prompt 9 additions
+    conditioning: {
+        options: { ...DEFAULT_CONDITIONING_OPTIONS },
+        weeklyPlan: []
+    },
+    // Prompt 10 additions
+    advanced: {
+        autoreg: {},
+        specialization: { focus: [], volumeBiasPct: 15 },
+        history: { bench: [], overhead_press: [], squat: [], deadlift: [] }
+    }
 };
 
 const steps = [
@@ -66,7 +119,7 @@ const steps = [
         title: 'Template Selection',
         description: 'Pick BBB, Triumvirate, Periodization Bible, Bodyweight, Jack Shit, or Custom.',
         component: lazy(() => import('../Step2TemplateGallery.jsx')),
-        visibleIf: (state) => !!state?.trainingMaxes,
+        visibleIf: (state) => validateFundamentals(state).isValid,
         group: 'Template',
         validate: validateTemplate
     },
@@ -77,7 +130,10 @@ const steps = [
         title: 'Schedule & Warm‑up Overview',
         description: 'Choose 4/3/2/1‑day split & lift order; set global warm‑up policy.',
         component: lazy(() => import('../Step3ScheduleWarmup.jsx')),
-        visibleIf: (state) => !!state?.templateChoice?.id,
+        visibleIf: (state) => {
+            const t = state || {};
+            return !!(t?.templateChoice?.id || t?.template?.id || t?.template);
+        },
         group: 'Basics',
         validate: validateScheduleWarmup
     },
@@ -99,7 +155,7 @@ const steps = [
         title: 'Assistance',
         description: 'Configure BBB or build assistance by template/pattern — or skip for Jack Shit.',
         component: lazy(() => import('../Step5AssistanceRouter.jsx')),
-        visibleIf: (s) => !!s?.templateChoice?.id,
+        visibleIf: (s) => validateTemplate(s).isValid,
         group: 'Template',
         validate: validateAssistance
     },
@@ -117,10 +173,10 @@ const steps = [
 
     // 7) Advanced Customization (optional)
     {
-        id: STEP_IDS.ADVANCED_OPTIONS,
+        id: STEP_IDS.ADVANCED_CUSTOMIZATION,
         title: 'Advanced Customization',
-        description: 'AMRAP RPE caps, deadlift style, equipment flags, PR logging.',
-        component: lazy(() => import('../Step7AdvancedOptions.jsx')),
+        description: 'Auto‑regulation, specialization, PR tracking, printable week.',
+        component: lazy(() => import('../Step7AdvancedCustomization.jsx')),
         visibleIf: () => true,
         group: 'Advanced',
         validate: validateAdvanced
@@ -135,6 +191,17 @@ const steps = [
         visibleIf: () => true,
         group: 'Review',
         validate: () => ({ isValid: true }) // Always valid for review
+    }
+    ,
+    // 9) Final Review & Start (persist active cycle)
+    {
+        id: STEP_IDS.FINAL_REVIEW,
+        title: 'Review & Start',
+        description: 'Confirm settings, export JSON, and start this cycle (local save).',
+        component: lazy(() => import('../Step8ReviewAndStart.jsx')),
+        visibleIf: () => true,
+        group: 'Review',
+        validate: () => ({ isValid: true })
     }
 ];
 
@@ -226,22 +293,43 @@ export function getStepRequirements(stepId, state) {
         if (!Array.isArray(st?.schedule?.days) || st.schedule.days.length < 1) {
             req.push('Define at least one training day');
         }
+        const bad = (st?.schedule?.days || []).find(d => !d.lift);
+        if (bad) req.push('Each day must have a main lift');
+        const pol = st?.warmup?.policy;
+        if (!pol) req.push('Choose a warm-up policy');
+        if (pol === 'custom') {
+            const arr = st?.warmup?.custom || [];
+            if (!arr.length) req.push('Custom warm-up must have at least one row');
+            const invalid = arr.find(r => !(Number(r?.pct) > 0 && Number(r?.reps) > 0));
+            if (invalid) req.push('Custom warm-up rows need positive % and reps');
+        }
     }
 
     if (stepId === STEP_IDS.CYCLE_AND_PROGRESSION) {
-        if (!st.loadingOption && !st?.cycle?.loadingOption) req.push('Pick a loading option (1 or 2)');
+        if (![1, 2].includes(Number(st?.loading?.option))) req.push('Choose a loading option (1 or 2)');
+        const pw = Number(st?.loading?.previewWeek);
+        if (!(pw >= 1 && pw <= 4)) req.push('Pick a preview week 1–4');
+        if (!(Number(st?.rounding?.increment) > 0)) req.push('Rounding increment must be > 0');
+        const up = Number(st?.increments?.upper), lo = Number(st?.increments?.lower);
+        if (!(up > 0 && lo > 0)) req.push('Set valid TM increments for upper/lower lifts');
     }
 
     if (stepId === STEP_IDS.ASSISTANCE_ROUTER) {
-        const selected = st.template || st?.templateChoice?.id;
-        if (selected === 'jackShit') return req;
-        const days = st?.schedule?.days || [];
-        const plan = st?.assistancePlan?.byDay || {};
-        for (const d of days) {
-            const P = plan[d.id];
-            if (!P || !P.plan || (Array.isArray(P.plan.blocks) && P.plan.blocks.length === 0)) {
-                req.push(`Assistance not set for ${d.lift} day`);
-            }
+        // Prompt 8: only require a template selection; Jack Shit is valid (no assistance required)
+        const chosen = st?.template?.id || st?.templateChoice?.id || st?.template;
+        if (!chosen) req.push('Choose a template in Step 2');
+    }
+
+    if (stepId === STEP_IDS.CONDITIONING_RECOVERY) {
+        // Recommendation, not a hard fail
+        if ((st?.conditioning?.options?.frequency ?? 0) < 2) {
+            req.push('Wendler recommends ≥ 2 conditioning sessions/week');
+        }
+    }
+
+    if (stepId === STEP_IDS.ADVANCED_CUSTOMIZATION) {
+        if ((st?.advanced?.specialization?.volumeBiasPct ?? 15) > 20) {
+            req.push('Specialization bias >20% may hinder recovery.');
         }
     }
 

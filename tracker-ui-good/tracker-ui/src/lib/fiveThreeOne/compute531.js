@@ -1,7 +1,8 @@
 // src/lib/fiveThreeOne/compute531.js
 // Pure functions to build a 4-week 5/3/1 plan from wizard state
 
-export const LOADING_OPTIONS = {
+// Internal array form used by buildProgram/mainSetsFor
+const LOADING_OPTIONS_ARRAY = {
     1: [
         { week: 1, sets: [{ pct: 65, reps: 5 }, { pct: 75, reps: 5 }, { pct: 85, reps: 5, amrap: true }] },
         { week: 2, sets: [{ pct: 70, reps: 3 }, { pct: 80, reps: 3 }, { pct: 90, reps: 3, amrap: true }] },
@@ -14,6 +15,22 @@ export const LOADING_OPTIONS = {
         { week: 3, sets: [{ pct: 85, reps: 5 }, { pct: 90, reps: 3 }, { pct: 95, reps: 1, amrap: true }] },
         { week: 4, sets: [{ pct: 40, reps: 5 }, { pct: 50, reps: 5 }, { pct: 60, reps: 5 }] },
     ],
+};
+
+// Public percent table (per Prompt 7) used by Step 4 UI
+export const LOADING_OPTIONS = {
+    1: {
+        1: [65, 75, 85],
+        2: [70, 80, 90],
+        3: [75, 85, 95],
+        4: [40, 50, 60]
+    },
+    2: {
+        1: [75, 80, 85],
+        2: [80, 85, 90],
+        3: [85, 90, 95],
+        4: [40, 50, 60]
+    }
 };
 
 export const WARMUP_SCHEME = { jumps: [40, 50, 60], reps: [5, 5, 3] }; // Wendler: 40/50/60 x 5/5/3
@@ -73,7 +90,7 @@ function warmupsFor(tm, state) {
 }
 
 function mainSetsFor(tm, loadingOption, targetWeek, state) {
-    const table = LOADING_OPTIONS[loadingOption] || LOADING_OPTIONS[1];
+    const table = LOADING_OPTIONS_ARRAY[loadingOption] || LOADING_OPTIONS_ARRAY[1];
     const entry = table.find((w) => w.week === targetWeek);
     if (!entry) return [];
     const inc = state?.rounding?.increment ?? (state?.units === 'kg' ? 2.5 : 5);
@@ -87,13 +104,26 @@ function mainSetsFor(tm, loadingOption, targetWeek, state) {
 }
 
 // Simple set calculation using schemes; used by previews/utilities
-export function calcMainSets(tm, opts = {}) {
-    const { week = 1, option = 1, increment = 5, mode = 'nearest' } = opts;
+export function calcMainSets(tm, optionOrOpts = 1, week = 1, rounding = { increment: 5, mode: 'nearest' }) {
     if (!Number.isFinite(tm)) return [];
-    return getMainSetScheme(option, week).map(s => ({
+    // Support legacy signature: calcMainSets(tm, { week, option, increment, mode })
+    if (optionOrOpts && typeof optionOrOpts === 'object') {
+        const { week: w = 1, option: opt = 1, increment = 5, mode = 'nearest' } = optionOrOpts;
+        return getMainSetScheme(opt, w).map(s => ({
+            pct: s.pct,
+            reps: typeof s.reps === 'string' ? Number(s.reps.replace('+', '')) || Number(s.reps) || 0 : s.reps,
+            amrap: typeof s.reps === 'string' ? s.reps.includes('+') && w !== 4 : false,
+            weight: roundToIncrement(tm * (s.pct / 100), increment, mode),
+        }));
+    }
+    const opt = Number(optionOrOpts) || 1;
+    const inc = rounding?.increment ?? 5;
+    const mode = rounding?.mode ?? 'nearest';
+    return getMainSetScheme(opt, week).map(s => ({
         pct: s.pct,
-        reps: s.reps,
-        weight: roundToIncrement(tm * (s.pct / 100), increment, mode),
+        reps: typeof s.reps === 'string' ? Number(s.reps.replace('+', '')) || Number(s.reps) || 0 : s.reps,
+        amrap: typeof s.reps === 'string' ? s.reps.includes('+') && week !== 4 : false,
+        weight: roundToIncrement(tm * (s.pct / 100), inc, mode),
     }));
 }
 
@@ -254,4 +284,16 @@ export function buildProgram(state) {
 // Utility for e1RM if you log AMRAPs later
 export function estimate1RM(weight, reps) {
     return weight * reps * 0.0333 + weight;
+}
+
+// Alias for Prompt 7 naming
+export function calcE1RM(weight, reps) {
+    if (!Number.isFinite(weight) || !Number.isFinite(reps) || reps <= 0) return 0;
+    return weight * reps * 0.0333 + weight;
+}
+
+// Classify lift for increment rules
+export function classifyLift(lift) {
+    if (lift === 'bench' || lift === 'press' || lift === 'overhead_press') return 'upper';
+    return 'lower';
 }

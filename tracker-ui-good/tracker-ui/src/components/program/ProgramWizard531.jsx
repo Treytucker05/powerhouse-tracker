@@ -13,7 +13,7 @@ import {
     getStepStatuses,
     getStepRequirements,
     canAdvanceToStep
-} from './steps/_registry/stepRegistry';
+} from './steps/_registry/stepRegistry.js';
 import { loadWizardState, saveWizardState, clearWizardState } from '../../lib/wizardStore';
 
 function deepMerge(target, updates) {

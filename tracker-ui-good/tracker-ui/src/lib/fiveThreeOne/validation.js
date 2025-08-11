@@ -4,25 +4,35 @@ function isNum(x) {
     return typeof x === 'number' && isFinite(x) && x > 0;
 }
 
+function liftReady(l) {
+    if (!l || typeof l !== 'object') return false;
+    return isNum(l.tm) || isNum(l.oneRM) || (isNum(l.testWeight) && isNum(l.testReps) && l.testReps >= 1);
+}
+
 export function validateFundamentals(state) {
     const errors = [];
-    const tm = state?.trainingMaxes || {};
 
-    // Check that we have TMs for enabled lifts
-    if (!isNum(tm.squat)) errors.push('Enter training max for squat');
-    if (!isNum(tm.bench)) errors.push('Enter training max for bench press');
-    if (!isNum(tm.deadlift)) errors.push('Enter training max for deadlift');
-    if (!isNum(tm.overhead_press)) errors.push('Enter training max for overhead press');
+    // New wizard shape: lifts + per-lift data
+    const lifts = state?.lifts || {};
+    const enabled = state?.coreLiftsEnabled || { squat: true, bench: true, deadlift: true, press: true };
 
-    // Check TM percentage is reasonable
-    const tmPct = tm.tmPercent ?? 90;
+    const label = { squat: 'squat', bench: 'bench press', deadlift: 'deadlift', press: 'overhead press' };
+    for (const k of ['press', 'deadlift', 'bench', 'squat']) {
+        if (enabled[k] === false) continue;
+        if (!liftReady(lifts[k])) {
+            errors.push(`Enter 1RM or rep test (or set TM) for ${label[k]}`);
+        }
+    }
+
+    // TM percent (global) should be reasonable
+    const tmPct = state?.tmPercent ?? 90;
     if (!(tmPct >= 80 && tmPct <= 95)) {
         errors.push(`TM percentage should be 80-95% (got ${tmPct}%)`);
     }
 
-    // Check rounding increment
-    const rounding = tm.rounding ?? 5;
-    if (!isNum(rounding)) {
+    // Rounding increment
+    const roundingInc = state?.rounding?.increment ?? (state?.units === 'kg' ? 2.5 : 5);
+    if (!isNum(roundingInc)) {
         errors.push('Set a weight rounding increment (e.g., 5 lb or 2.5 kg)');
     }
 
@@ -30,16 +40,18 @@ export function validateFundamentals(state) {
 }
 
 export function validateTemplate(state) {
-    const template = state?.templateChoice?.id;
+    const template = state?.templateChoice?.id || state?.template?.id || state?.template;
     if (!template) {
         return { isValid: false, errors: ['Choose a template (BBB, Triumvirate, etc.)'] };
     }
 
-    // Template-specific validation
+    // Template-specific: BBB percent must be 50/60/70 if provided
     if (template === 'bbb') {
-        const meta = state?.templateChoice?.meta || {};
-        const pct = meta.percentage ?? 50;
-        if (![50, 60, 70].includes(pct)) {
+        const pct = state?.templateChoice?.meta?.percentage
+            ?? state?.templateConfig?.bbbPercent
+            ?? state?.assistance?.options?.bbb?.percent
+            ?? 50;
+        if (![50, 60, 70].includes(Number(pct))) {
             return { isValid: false, errors: ['BBB percentage must be 50%, 60%, or 70%'] };
         }
     }
@@ -55,14 +67,22 @@ export function validateScheduleWarmup(state) {
         errors.push('Select training frequency (1-4 days per week)');
     }
 
-    if (!schedule.liftOrder || schedule.liftOrder.length === 0) {
-        errors.push('Set lift order for your training week');
+    const days = Array.isArray(schedule.days) ? schedule.days : [];
+    if (days.length < 1) {
+        errors.push('Define at least one training day');
     }
+    const bad = days.find(d => !d?.lift);
+    if (bad) errors.push('Each day must have a main lift');
 
-    // Warmup validation (optional but check if enabled)
+    // Warmup policy
     const warmup = state?.warmup || {};
-    if (warmup.enabled && !warmup.scheme) {
-        errors.push('Configure warmup scheme');
+    const pol = warmup.policy;
+    if (!pol) errors.push('Choose a warm-up policy');
+    if (pol === 'custom') {
+        const arr = Array.isArray(warmup.custom) ? warmup.custom : [];
+        if (!arr.length) errors.push('Custom warm-up must have at least one row');
+        const invalid = arr.find(r => !(isNum(Number(r?.pct)) && isNum(Number(r?.reps))));
+        if (invalid) errors.push('Custom warm-up rows need positive % and reps');
     }
 
     return { isValid: errors.length === 0, errors };
@@ -70,62 +90,45 @@ export function validateScheduleWarmup(state) {
 
 export function validateCycleLoading(state) {
     const errors = [];
-    const cycle = state?.cycle || {};
-    const progression = state?.progression || {};
 
-    // Check loading option
-    if (!cycle.loadingOption || ![1, 2, 3, 4].includes(cycle.loadingOption)) {
-        errors.push('Select a loading option (1-4)');
-    }
+    // Loading option 1 or 2 and preview week 1-4
+    const opt = Number(state?.loading?.option);
+    if (![1, 2].includes(opt)) errors.push('Choose a loading option (1 or 2)');
 
-    // Check progression increments
-    if (!isNum(progression.upperIncrement)) {
-        errors.push('Set upper body training max increment');
-    }
+    const pw = Number(state?.loading?.previewWeek);
+    if (!(pw >= 1 && pw <= 4)) errors.push('Pick a preview week 1–4');
 
-    if (!isNum(progression.lowerIncrement)) {
-        errors.push('Set lower body training max increment');
-    }
+    // Rounding/increments
+    const inc = Number(state?.rounding?.increment);
+    if (!(inc > 0)) errors.push('Rounding increment must be > 0');
 
-    // Check deload configuration
-    if (!cycle.deload) {
-        errors.push('Configure deload week parameters');
-    }
+    const up = Number(state?.increments?.upper), lo = Number(state?.increments?.lower);
+    if (!(up > 0 && lo > 0)) errors.push('Set valid TM increments for upper/lower lifts');
 
     return { isValid: errors.length === 0, errors };
 }
 
 export function validateAssistance(state) {
-    const errors = [];
-    const template = state?.templateChoice?.id;
-    const assistance = state?.assistance || {};
-
-    // For templates that require assistance work
-    if (template === 'bbb' || template === 'triumvirate') {
-        if (!assistance.preset && (!assistance.exercises || assistance.exercises.length === 0)) {
-            errors.push('Configure assistance work for your chosen template');
-        }
+    const template = state?.templateChoice?.id || state?.template?.id || state?.template;
+    if (!template) {
+        return { isValid: false, errors: ['Choose a template in Step 2'] };
     }
-
-    // Jack Shit template should have minimal/no assistance
-    if (template === 'jackShit' && assistance.exercises?.length > 0) {
-        errors.push('Jack Shit template should have minimal assistance work');
-    }
-
-    return { isValid: errors.length === 0, errors };
+    // Assistance specifics are configured in Step 5; Jack Shit allows none.
+    return { isValid: true, errors: [] };
 }
 
 export function validateConditioning(state) {
     const errors = [];
     const conditioning = state?.conditioning || {};
 
-    // Basic validation - conditioning is somewhat optional but should be configured
-    if (conditioning.sessionsPerWeek > 7) {
+    // Keep light-touch validation to avoid blocking users unnecessarily
+    if (isNum(conditioning?.sessionsPerWeek) && conditioning.sessionsPerWeek > 7) {
         errors.push('Conditioning sessions per week should not exceed 7');
     }
-
-    if (conditioning.sessionsPerWeek > 0 && (!conditioning.methods || conditioning.methods.length === 0)) {
-        errors.push('Select conditioning methods when scheduling sessions');
+    if (isNum(conditioning?.sessionsPerWeek) && conditioning.sessionsPerWeek > 0) {
+        if (!Array.isArray(conditioning.methods) || conditioning.methods.length === 0) {
+            errors.push('Select conditioning methods when scheduling sessions');
+        }
     }
 
     return { isValid: errors.length === 0, errors };
@@ -135,11 +138,10 @@ export function validateAdvanced(state) {
     const errors = [];
     const advanced = state?.advanced || {};
 
-    // AMRAP RPE cutoff validation
-    if (advanced.amrapRPECutoff && (advanced.amrapRPECutoff < 7 || advanced.amrapRPECutoff > 10)) {
+    // AMRAP RPE cutoff validation (optional)
+    if (isNum(advanced?.amrapRPECutoff) && (advanced.amrapRPECutoff < 7 || advanced.amrapRPECutoff > 10)) {
         errors.push('AMRAP RPE cutoff should be between 7-10');
     }
 
-    // Advanced settings are generally optional, so minimal validation
     return { isValid: errors.length === 0, errors };
 }
