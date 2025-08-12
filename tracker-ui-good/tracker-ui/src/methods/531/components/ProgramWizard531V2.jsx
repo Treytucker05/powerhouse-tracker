@@ -3,7 +3,7 @@
  * Clean, minimal wizard with step navigation and V2 context integration
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { ChevronRight, CheckCircle2, Info } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { useProgramV2 } from "../contexts/ProgramContextV2.jsx";
@@ -14,6 +14,7 @@ import { applyDecisionsFromPack } from "../decisionAdapter";
 import { mapTemplateAssistance, validateAssistanceVolume } from "../assistanceMapper";
 import { buildSchedule } from "../schedule";
 import { toUiDays } from "../scheduleRender";
+import { computeWarmupsFromPack, computeMainFromPack, computeBBBFromConfig } from "../calc";
 
 // Enable packs by default; allow kill-switch via env (Vite or CRA style)
 // Avoid direct unguarded access to process.* in browser (Vite doesn't polyfill by default)
@@ -39,6 +40,7 @@ function WizardShell() {
     const [stepValidation, setStepValidation] = useState({ fundamentals: false, design: false, review: false });
     const navigate = useNavigate();
     const { state, dispatch } = useProgramV2();
+    const packRef = useRef(null);
     // Packs always on unless env kill-switch disables
 
     // Optional future pack loading (no behavior change while flag is false)
@@ -48,6 +50,7 @@ function WizardShell() {
             if (!USE_METHOD_PACKS) return; // kill-switch path
             const pack = await loadPack531BBB();
             if (!cancelled && pack) {
+                packRef.current = pack;
                 console.info("Loaded 531 BBB pack:", pack);
                 // Decision adapter (feature flagged) – translate current UI answers into state merges
                 try {
@@ -429,14 +432,58 @@ function WizardShell() {
                                                         {w.sessions.map((s, si) => (
                                                             <div key={si} className="rounded-xl border border-gray-700/60 bg-gray-900/40 p-3">
                                                                 <div className="text-xs uppercase tracking-wide text-gray-400 mb-2">{s.sessionWeekLabel}</div>
-                                                                <ul className="list-disc list-inside space-y-1 text-sm">
-                                                                    {s.lifts.map((lift, li) => (
-                                                                        <li key={li} className="capitalize text-gray-200">
-                                                                            {lift} — main + warm-ups from pack
-                                                                        </li>
-                                                                    ))}
-                                                                </ul>
-                                                                {/* Future: render actual main/warmups for each lift here */}
+                                                                {s.lifts.map((lift, li) => {
+                                                                    const units = state?.units || 'lbs';
+                                                                    // Derive training max map from state.lifts structure (oneRM to TM logic already applied elsewhere?)
+                                                                    const tms = Object.fromEntries(Object.entries(state?.lifts || {}).map(([k,v]) => [k, v.tm || 0]));
+                                                                    const roundingPref = state?.rounding === 'ceil' ? { lbs: 5, kg: 2.5 } : { lbs: 5, kg: 2.5 }; // placeholder; future: map modes
+                                                                    const pack = packRef.current;
+                                                                    const warmups = computeWarmupsFromPack({ pack, lift, tms, units, rounding: roundingPref });
+                                                                    const main = computeMainFromPack({ pack, lift, weekLabel: s.sessionWeekLabel, tms, units, rounding: roundingPref });
+                                                                    const bbb = computeBBBFromConfig({ supplemental: state?.supplemental, lift, tms, units, rounding: roundingPref, pack });
+                                                                    return (
+                                                                        <div key={li} className={li > 0 ? 'mt-4 pt-4 border-t border-gray-700/40' : ''}>
+                                                                            <div className="font-medium capitalize text-gray-200">{lift}</div>
+                                                                            {/* Warm-ups */}
+                                                                            <div className="mt-1 text-xs uppercase tracking-wide text-gray-400">Warm-up</div>
+                                                                            <ul className="text-sm mb-2 space-y-0.5">
+                                                                                {warmups.length === 0 && <li className="text-gray-500">—</li>}
+                                                                                {warmups.map((r,i) => (
+                                                                                    <li key={i} className="tabular-nums text-gray-300">{r.pct}% × {r.reps} → <span className="text-white">{r.weight}</span> {units}</li>
+                                                                                ))}
+                                                                            </ul>
+                                                                            {/* Main */}
+                                                                            <div className="text-xs uppercase tracking-wide text-gray-400">Main</div>
+                                                                            <ul className="text-sm mb-2 space-y-0.5">
+                                                                                {main.rows.length === 0 && <li className="text-gray-500">—</li>}
+                                                                                {main.rows.map((r,i) => (
+                                                                                    <li key={i} className="tabular-nums text-gray-300">
+                                                                                        {r.pct}% × {r.reps}{r.amrap?'+':''} → <span className="text-white">{r.weight}</span> {units}
+                                                                                        {r.amrap && <span className="ml-2 text-[10px] px-1 py-0.5 border border-red-500/40 rounded text-red-300">AMRAP</span>}
+                                                                                    </li>
+                                                                                ))}
+                                                                            </ul>
+                                                                            {/* BBB */}
+                                                                            {bbb && (
+                                                                                <div className="mb-2">
+                                                                                    <div className="text-xs uppercase tracking-wide text-gray-400">Supplemental (BBB)</div>
+                                                                                    <div className="text-sm tabular-nums text-gray-300">{bbb.sets}×{bbb.reps} @ {bbb.pct}% TM → <span className="text-white">{bbb.load}</span> {units}</div>
+                                                                                </div>
+                                                                            )}
+                                                                            {/* Assistance (template global list) */}
+                                                                            {Array.isArray(state?.assistance?.items) && state.assistance.items.length > 0 && (
+                                                                                <div>
+                                                                                    <div className="text-xs uppercase tracking-wide text-gray-400">Assistance</div>
+                                                                                    <ul className="text-sm space-y-0.5">
+                                                                                        {state.assistance.items.map((a,ai) => (
+                                                                                            <li key={ai} className="text-gray-300">{a.name || a.id} — {a.sets}×{a.reps}{a.load?` @ ${a.load}`:''}</li>
+                                                                                        ))}
+                                                                                    </ul>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    );
+                                                                })}
                                                             </div>
                                                         ))}
                                                     </div>
@@ -445,6 +492,7 @@ function WizardShell() {
                                         </div>
                                     );
                                 }
+                                // TODO: when USE_METHOD_PACKS is true and mode remains 4day, migrate 4-day preview to compute* helpers for parity.
                                 return renderStepContent();
                             })()}
                             {/* NOTE: If a day in schedulePreview has { combineWith }, future UI can render two main lifts in one session for deload. */}
