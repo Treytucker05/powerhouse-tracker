@@ -23,6 +23,31 @@ const viteFlag = (typeof import.meta !== 'undefined' && import.meta.env && impor
 const legacyFlag = (typeof process !== 'undefined' && process?.env?.REACT_APP_USE_METHOD_PACKS);
 const envFlag = viteFlag ?? legacyFlag;
 const USE_METHOD_PACKS = envFlag == null ? true : String(envFlag).toLowerCase() === 'true';
+
+// --- Simplified deterministic Step 1 gating (only core fundamentals) ---
+// Per spec: require 4 valid TMs, units, rounding, TM% (0.90 or 0.85). Allow dev bypass via env.
+const LIFTS = ["squat","bench","deadlift","press"];
+
+function isStep1Complete(state) {
+    if (!state) return false;
+    // Accept both 'lb' and 'lbs' plus 'kg'
+    const unitsOk = state?.units === "lbs" || state?.units === "lb" || state?.units === "kg";
+    const roundingOk = !!state?.rounding;
+    const tmPctOk = state?.tmPct === 0.9 || state?.tmPct === 0.85 || state?.tmPct === 0.90 || state?.tmPct === 0.850; // tolerate float formats
+    // Build a tms object from current lifts if not already present
+    const tmsSource = state?.tms || (() => {
+        const out = {}; LIFTS.forEach(k => { out[k] = state?.lifts?.[k]?.tm; }); return out;
+    })();
+    const tmsOk = LIFTS.every(k => Number(tmsSource[k]) > 0);
+    return unitsOk && roundingOk && tmPctOk && tmsOk;
+}
+
+function allowStep1Next(state) {
+    const bypass =
+        (typeof import.meta !== 'undefined' && import.meta?.env?.VITE_RELAX_STEP1 === "true") ||
+        (typeof process !== 'undefined' && process?.env?.REACT_APP_RELAX_STEP1 === "true");
+    return bypass || isStep1Complete(state);
+}
 import Step1Fundamentals from './steps/Step1Fundamentals.jsx';
 import Step2TemplateOrCustom from './steps/Step2TemplateOrCustom.jsx';
 import Step3DesignCustom from './steps/Step3DesignCustom.jsx';
@@ -278,9 +303,9 @@ function WizardShell() {
 
     const currentStep = STEPS[stepIndex];
     const canGoNext = (() => {
-        if (currentStep.id === 'fundamentals') return stepValidation.fundamentals;
-        if (currentStep.id === 'design') return stepValidation.design; // only when valid custom design
-        if (currentStep.id === 'review') return stepValidation.review; // enables final action
+        if (currentStep.id === 'fundamentals') return allowStep1Next(state); // new single source of truth
+        if (currentStep.id === 'design') return stepValidation.design;
+        if (currentStep.id === 'review') return stepValidation.review;
         return false;
     })() && stepIndex < STEPS.length - 1;
     const canGoBack = stepIndex > 0;
@@ -347,6 +372,15 @@ function WizardShell() {
                 return <div className="text-red-400">Unknown step</div>;
         }
     };
+
+    // One-time debug insight for Step 1 gating each render (cheap; aids troubleshooting)
+    if (currentStep.id === 'fundamentals') {
+        // eslint-disable-next-line no-console
+        console.debug("Step1 validation:", { canNext: allowStep1Next(state), stateSnapshot: {
+            units: state?.units, rounding: state?.rounding, tmPct: state?.tmPct,
+            tms: LIFTS.reduce((acc,k)=>{ acc[k]=state?.lifts?.[k]?.tm||null; return acc; }, {})
+        }});
+    }
 
     return (
         <div className="min-h-screen bg-gray-900">
@@ -436,7 +470,7 @@ function WizardShell() {
                                                                 <div className="text-xs uppercase tracking-wide text-gray-400 mb-2">{s.sessionWeekLabel}</div>
                                                                 {s.lifts.map((lift, li) => {
                                                                     const units = state?.units || 'lbs';
-                                                                    const tms = Object.fromEntries(Object.entries(state?.lifts || {}).map(([k,v]) => [k, v.tm || 0]));
+                                                                    const tms = Object.fromEntries(Object.entries(state?.lifts || {}).map(([k, v]) => [k, v.tm || 0]));
                                                                     const roundingPref = state?.rounding === 'ceil' ? { lbs: 5, kg: 2.5 } : { lbs: 5, kg: 2.5 };
                                                                     const pack = packRef.current;
                                                                     const warmups = computeWarmupsFromPack({ pack, lift, tms, units, rounding: roundingPref });
@@ -448,16 +482,16 @@ function WizardShell() {
                                                                             <div className="mt-1 text-xs uppercase tracking-wide text-gray-400">Warm-up</div>
                                                                             <ul className="text-sm mb-2 space-y-0.5">
                                                                                 {warmups.length === 0 && <li className="text-gray-500">—</li>}
-                                                                                {warmups.map((r,i) => (
+                                                                                {warmups.map((r, i) => (
                                                                                     <li key={i} className="tabular-nums text-gray-300">{r.pct}% × {r.reps} → <span className="text-white">{r.weight}</span> {units}</li>
                                                                                 ))}
                                                                             </ul>
                                                                             <div className="text-xs uppercase tracking-wide text-gray-400">Main</div>
                                                                             <ul className="text-sm mb-2 space-y-0.5">
                                                                                 {main.rows.length === 0 && <li className="text-gray-500">—</li>}
-                                                                                {main.rows.map((r,i) => (
+                                                                                {main.rows.map((r, i) => (
                                                                                     <li key={i} className="tabular-nums text-gray-300">
-                                                                                        {r.pct}% × {r.reps}{r.amrap?'+':''} → <span className="text-white">{r.weight}</span> {units}
+                                                                                        {r.pct}% × {r.reps}{r.amrap ? '+' : ''} → <span className="text-white">{r.weight}</span> {units}
                                                                                         {r.amrap && <span className="ml-2 text-[10px] px-1 py-0.5 border border-red-500/40 rounded text-red-300">AMRAP</span>}
                                                                                     </li>
                                                                                 ))}
@@ -472,8 +506,8 @@ function WizardShell() {
                                                                                 <div>
                                                                                     <div className="text-xs uppercase tracking-wide text-gray-400">Assistance</div>
                                                                                     <ul className="text-sm space-y-0.5">
-                                                                                        {state.assistance.items.map((a,ai) => (
-                                                                                            <li key={ai} className="text-gray-300">{a.name || a.id} — {a.sets}×{a.reps}{a.load?` @ ${a.load}`:''}</li>
+                                                                                        {state.assistance.items.map((a, ai) => (
+                                                                                            <li key={ai} className="text-gray-300">{a.name || a.id} — {a.sets}×{a.reps}{a.load ? ` @ ${a.load}` : ''}</li>
                                                                                         ))}
                                                                                     </ul>
                                                                                 </div>
