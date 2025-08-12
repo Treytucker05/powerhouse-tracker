@@ -11,6 +11,11 @@ All other folders are legacy and ignored by tools (ESLint/Prettier/CI).
 
 A modern React-based training tracker with **complete program design system**, **centralized design system**, **7-step periodization methodology**, and **cross-browser compatibility**.
 
+### Feature flag: method packs
+- Packs ON by default. Kill-switch:
+  - Vite: `VITE_USE_METHOD_PACKS=false`
+  - CRA:  `REACT_APP_USE_METHOD_PACKS=false`
+
 ## 📋 Quick Reference
 
 ### **Current Development Status**

@@ -12,12 +12,10 @@ import { loadPack531BBB } from "../loadPack";
 import { extractSupplementalFromPack, extractWarmups, extractWeekByLabel } from "../packAdapter";
 import { applyDecisionsFromPack } from "../decisionAdapter";
 
-// Feature flag (off by default) to switch wizard initialization to method packs.
-// Can be overridden at runtime via window.__USE_PACKS__ (dev toggle below).
-let USE_METHOD_PACKS = false;
-if (typeof window !== 'undefined' && typeof window.__USE_PACKS__ === 'boolean') {
-    USE_METHOD_PACKS = Boolean(window.__USE_PACKS__);
-}
+// Enable packs by default; allow kill-switch via env (Vite or CRA style)
+const envFlag = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_USE_METHOD_PACKS)
+    || process.env.REACT_APP_USE_METHOD_PACKS;
+const USE_METHOD_PACKS = envFlag ? String(envFlag).toLowerCase() === 'true' : true;
 import Step1Fundamentals from './steps/Step1Fundamentals.jsx';
 import Step2TemplateOrCustom from './steps/Step2TemplateOrCustom.jsx';
 import Step3DesignCustom from './steps/Step3DesignCustom.jsx';
@@ -35,15 +33,13 @@ function WizardShell() {
     const [stepValidation, setStepValidation] = useState({ fundamentals: false, design: false, review: false });
     const navigate = useNavigate();
     const { state, dispatch } = useProgramV2();
-    const showPackToggle = typeof process !== 'undefined' && process.env.NODE_ENV !== 'production';
+    // Packs always on unless env kill-switch disables
 
     // Optional future pack loading (no behavior change while flag is false)
     useEffect(() => {
         let cancelled = false;
         async function maybeLoadPack() {
-            // Re-evaluate dynamic flag (in case toggled after mount)
-            const dynFlag = (typeof window !== 'undefined' && window.__USE_PACKS__) || USE_METHOD_PACKS;
-            if (!dynFlag) return;
+            if (!USE_METHOD_PACKS) return; // kill-switch path
             const pack = await loadPack531BBB();
             if (!cancelled && pack) {
                 console.info("Loaded 531 BBB pack:", pack);
@@ -332,40 +328,7 @@ function WizardShell() {
                             <h1 className="text-3xl font-bold text-white mb-2">5/3/1 Program Builder V2</h1>
                             <p className="text-gray-400">Jim Wendler's proven strength training methodology</p>
                         </div>
-                        {showPackToggle && (
-                            <label className="text-xs inline-flex items-center gap-2 bg-gray-800/60 px-3 py-2 rounded border border-gray-700 cursor-pointer select-none">
-                                <input
-                                    type="checkbox"
-                                    defaultChecked={USE_METHOD_PACKS}
-                                    onChange={(e) => {
-                                        window.__USE_PACKS__ = e.target.checked;
-                                        // Re-run pack load quickly if enabling
-                                        if (e.target.checked) {
-                                            (async () => {
-                                                const pack = await loadPack531BBB();
-                                                if (pack) {
-                                                    const sup = extractSupplementalFromPack(pack, 'bbb60');
-                                                    if (sup) {
-                                                        dispatch({
-                                                            type: 'SET_SUPPLEMENTAL', supplemental: {
-                                                                strategy: sup.mode === 'bbb' ? 'bbb' : (sup.mode || 'none'),
-                                                                pairing: sup.pairing,
-                                                                percentOfTM: sup.intensity?.value || 60,
-                                                                sets: sup.sets,
-                                                                reps: sup.reps,
-                                                                _pack: sup._provenance
-                                                            }
-                                                        });
-                                                    }
-                                                }
-                                            })();
-                                        }
-                                    }}
-                                    className="accent-red-500"
-                                />
-                                <span>Use method packs (dev)</span>
-                            </label>
-                        )}
+                        {/* Packs enabled by default; set VITE_USE_METHOD_PACKS=false or REACT_APP_USE_METHOD_PACKS=false to disable */}
                     </div>
                 </div>
 
