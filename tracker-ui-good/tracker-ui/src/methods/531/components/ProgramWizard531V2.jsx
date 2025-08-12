@@ -11,6 +11,7 @@ import { buildMainSetsForLift, buildWarmupSets, roundToIncrement } from "../"; /
 import { loadPack531BBB } from "../loadPack";
 import { extractSupplementalFromPack, extractWarmups, extractWeekByLabel } from "../packAdapter";
 import { applyDecisionsFromPack } from "../decisionAdapter";
+import { mapTemplateAssistance, validateAssistanceVolume } from "../assistanceMapper";
 
 // Enable packs by default; allow kill-switch via env (Vite or CRA style)
 const envFlag = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_USE_METHOD_PACKS)
@@ -87,6 +88,19 @@ function WizardShell() {
                         }
                     });
                 }
+                // Assistance mapping from selected template (only if no custom assistance already)
+                try {
+                    const selectedTemplateId = state?.templateKey || state?.template || 'bbb60';
+                    const tpl = (pack.templates || []).find(t => t.id === selectedTemplateId);
+                    if (tpl?.effects?.assistance && (!state?.assistance || state.assistance.mode === 'minimal')) {
+                        const items = mapTemplateAssistance(tpl.effects.assistance);
+                        const issues = validateAssistanceVolume(items);
+                        dispatch({ type: 'SET_ASSISTANCE', assistance: { mode: 'template', templateId: selectedTemplateId, items, issues: issues.length ? issues : undefined } });
+                    }
+                } catch (e) {
+                    console.warn('Assistance mapping error', e);
+                }
+
                 // Warmups (store into schedule.warmupScheme if different)
                 const wu = extractWarmups(pack);
                 if (Array.isArray(wu)) {
