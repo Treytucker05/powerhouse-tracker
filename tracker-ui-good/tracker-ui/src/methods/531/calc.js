@@ -104,3 +104,44 @@ export function computeBBBFromConfig({ supplemental, lift, tms, units = "lbs", r
         load
     };
 }
+
+// --- Progression helpers (cycle advancement) ---
+export const LIFTS = ["squat","bench","deadlift","press"];
+
+export function roundTo(v, step) {
+    const s = Number(step || 5);
+    return Math.round(Number(v) / s) * s;
+}
+
+function incFor(lift, units) {
+    const upper = ["bench","press"].includes(lift);
+    if (units === "kg") return upper ? 2.5 : 5;
+    return upper ? 5 : 10; // lbs
+}
+
+// Week-3 AMRAP gate: default min=1, overridable per state
+export function passedAmrapWk3(reps, state) {
+    if (reps == null) return true; // treat missing data as pass
+    const min = Number(state?.amrapMinWk3 ?? 1);
+    return Number(reps) >= min;
+}
+
+// Pure TM progression (no I/O)
+export function nextTM(lift, tm, units, passed, rounding) {
+    const base = Number(tm) || 0;
+    const inc = incFor(lift, units);
+    const next = passed ? (base + inc) : Math.max(0, base - inc);
+    const step = (rounding?.lbs ?? rounding?.kg ?? 5) || 5;
+    return roundTo(next, step);
+}
+
+// Batch apply based on recorded wk3 AMRAP reps
+export function computeNextTMs({ tms, units, rounding, amrapWk3 = {}, state }) {
+    const out = {};
+    for (const lift of LIFTS) {
+        const reps = amrapWk3?.[lift];
+        const passed = passedAmrapWk3(reps, state);
+        out[lift] = nextTM(lift, Number(tms?.[lift] || 0), units, passed, rounding);
+    }
+    return out;
+}

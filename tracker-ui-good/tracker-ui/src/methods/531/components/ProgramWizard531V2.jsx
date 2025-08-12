@@ -13,6 +13,7 @@ import { extractSupplementalFromPack, extractWarmups, extractWeekByLabel } from 
 import { applyDecisionsFromPack } from "../decisionAdapter";
 import { mapTemplateAssistance, validateAssistanceVolume } from "../assistanceMapper";
 import { buildSchedule, buildSchedule4Day, SPLIT_4DAY_A } from "../schedule";
+import { advanceCycle } from "../progression";
 import { toUiDays } from "../scheduleRender";
 import { computeWarmupsFromPack, computeMainFromPack, computeBBBFromConfig } from "../calc";
 
@@ -343,6 +344,24 @@ function WizardShell() {
             setStepIndex(index);
         }
     };
+
+    // Placeholder: progression trigger (would be invoked after reviewing Week 4 / Deload completion)
+    function onAdvanceCycle(amrapWk3 = {}) {
+        const forcePass = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_PROGRESS_FORCE_PASS === 'true');
+        const repsMap = forcePass ? {} : amrapWk3; // empty map => treat all as pass
+        // We don't have direct state setter (using reducer) so dispatch an advanced patch capturing next TMs
+        const nextState = advanceCycle({
+            ...state,
+            tms: Object.fromEntries(Object.entries(state.lifts || {}).map(([k,v]) => [k, v?.tm || 0]))
+        }, { amrapWk3: repsMap });
+        // Apply updated lift TMs
+        for (const lift of Object.keys(nextState.lifts || {})) {
+            const tmVal = nextState.lifts[lift].tm;
+            dispatch({ type: 'SET_TM', lift, tm: tmVal });
+        }
+        dispatch({ type: 'SET_ADVANCED', advanced: { ...(state.advanced||{}), cycle: nextState.cycle } });
+        console.info('Cycle advanced:', { cycle: nextState.cycle, nextTms: nextState.tms });
+    }
 
     // Hoisted hook: avoid calling useCallback inside conditional render paths
     const onFundamentalsValidChange = useCallback((isValid) => handleStepValidation('fundamentals', isValid), [handleStepValidation]);

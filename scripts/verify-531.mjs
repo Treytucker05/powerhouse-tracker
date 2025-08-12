@@ -57,10 +57,10 @@ function extractMainPercents(weekObj) {
 
 function expectWeekPercents(weekLabel, percents, errs) {
     const target = {
-        "3x5": [65,75,85],
-        "3x3": [70,80,90],
-        "5/3/1": [75,85,95],
-        "deload": [40,50,60]
+        "3x5": [65, 75, 85],
+        "3x3": [70, 80, 90],
+        "5/3/1": [75, 85, 95],
+        "deload": [40, 50, 60]
     }[weekLabel.toLowerCase()];
     if (!target) return;
     if (!eq(percents, target)) {
@@ -69,7 +69,7 @@ function expectWeekPercents(weekLabel, percents, errs) {
 }
 
 function expectPackAssistance(pack, errs) {
-    const byId = Object.fromEntries((pack.templates||[]).map(t => [t.id, t]));
+    const byId = Object.fromEntries((pack.templates || []).map(t => [t.id, t]));
     const rules = {
         bbb60: { count: 1 },
         triumvirate: { count: 2 },
@@ -79,7 +79,7 @@ function expectPackAssistance(pack, errs) {
     };
     for (const [id, tpl] of Object.entries(byId)) {
         const assists = tpl.assistanceDefaults || {};
-        const lifts = ["press","deadlift","bench","squat"];
+        const lifts = ["press", "deadlift", "bench", "squat"];
         for (const lift of lifts) {
             const items = assists[lift] || [];
             const rule = rules[id];
@@ -108,22 +108,39 @@ function expectPackAssistance(pack, errs) {
 
 function expect4DayStructure(errs) {
     if (!buildSchedule) return; // skip if schedule import failed
-    const sched = buildSchedule({ mode: '4day', liftOrder: ["press","deadlift","bench","squat"] });
+    const sched = buildSchedule({ mode: '4day', liftOrder: ["press", "deadlift", "bench", "squat"] });
     if (!Array.isArray(sched.weeks) || sched.weeks.length !== 4) {
-        errs.push(`4-day schedule: expected 4 weeks, got ${(sched.weeks||[]).length}`);
+        errs.push(`4-day schedule: expected 4 weeks, got ${(sched.weeks || []).length}`);
         return;
     }
-    for (let i=0;i<sched.weeks.length;i++) {
+    for (let i = 0; i < sched.weeks.length; i++) {
         const w = sched.weeks[i];
         if (!Array.isArray(w.days) || w.days.length !== 4) {
-            errs.push(`4-day schedule week ${i+1}: expected 4 days, got ${(w.days||[]).length}`);
+            errs.push(`4-day schedule week ${i + 1}: expected 4 days, got ${(w.days || []).length}`);
             break;
         }
         for (const d of w.days) {
-            if (!['press','deadlift','bench','squat'].includes(d.lift)) {
-                errs.push(`4-day schedule: invalid lift '${d.lift}' in week ${i+1}`);
+            if (!['press', 'deadlift', 'bench', 'squat'].includes(d.lift)) {
+                errs.push(`4-day schedule: invalid lift '${d.lift}' in week ${i + 1}`);
                 break;
             }
+        }
+    }
+}
+
+// Progression increment expectation helper (not yet bound to cases)
+function expectNextTMs(prev, next, units, errs) {
+    const incs = {
+        bench: units === 'kg' ? 2.5 : 5,
+        press: units === 'kg' ? 2.5 : 5,
+        squat: units === 'kg' ? 5 : 10,
+        deadlift: units === 'kg' ? 5 : 10
+    };
+    for (const k of Object.keys(incs)) {
+        const before = Number(prev[k] || 0);
+        const after = Number(next[k] || 0);
+        if (after !== before && after !== before + incs[k] && after !== Math.max(0, before - incs[k])) {
+            errs.push(`Progression TM anomaly ${k}: before=${before} after=${after} (expected +/- ${incs[k]} or unchanged)`);
         }
     }
 }
