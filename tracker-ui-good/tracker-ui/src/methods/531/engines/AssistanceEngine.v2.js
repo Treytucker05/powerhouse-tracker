@@ -14,19 +14,19 @@ export function computeAssistanceLoad({
     if (method === 'bodyweight') return { label: 'BW', weight: null, units };
     if (method === 'percentOfBodyweight') {
         const raw = (bodyweight || 0) * percent;
-            const w = assistanceRoundToIncrement(raw, roundingIncrement, roundingMode);
+        const w = assistanceRoundToIncrement(raw, roundingIncrement, roundingMode);
         return { label: `${w} ${units}`, weight: w, units };
     }
     // percentOfTM
     const tm = sourceLift ? tms?.[sourceLift] || 0 : 0;
     if (!tm || tm <= 0) return { label: '—', weight: null, units };
     const raw = tm * percent;
-        const w = assistanceRoundToIncrement(raw, roundingIncrement, roundingMode);
+    const w = assistanceRoundToIncrement(raw, roundingIncrement, roundingMode);
     return { label: `${w} ${units}`, weight: w, units };
 }
 
-     // Local rounding helper (intentionally not exported to avoid name collision with main engine)
-     function assistanceRoundToIncrement(value, increment = 5, mode = 'nearest') {
+// Local rounding helper (intentionally not exported to avoid name collision with main engine)
+function assistanceRoundToIncrement(value, increment = 5, mode = 'nearest') {
     if (!value || increment <= 0) return 0;
     const f = value / increment;
     if (mode === 'floor') return Math.floor(f) * increment;

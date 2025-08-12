@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useProgramV2, setSchedule, setSupplemental, setAssistance } from '../../../contexts/ProgramContextV2.jsx';
+import { useProgramV2, setSchedule, setSupplemental, setAssistance } from '../../contexts/ProgramContextV2.jsx';
 import { Info, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 const CORE_LIFTS = ['Press', 'Deadlift', 'Bench', 'Squat'];

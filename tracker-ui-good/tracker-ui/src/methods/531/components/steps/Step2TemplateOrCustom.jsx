@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { useProgramV2 } from '../../../contexts/ProgramContextV2.jsx';
-import { TEMPLATE_KEYS, getTemplatePreset } from '../../../lib/templates/531.presets.v2.js';
+import { useProgramV2 } from '../../contexts/ProgramContextV2.jsx';
+import { TEMPLATE_KEYS, getTemplatePreset } from '../../../../lib/templates/531.presets.v2.js';
 import { CheckCircle2, ChevronRight, Info, AlertTriangle } from 'lucide-react';
 
 /**

@@ -1,33 +1,115 @@
 {
-  "$schema": "// Core Schema v1 (JSONC)",
-  "coreVersion": "1.0.0",
-  "unitsDefault": { "lbs": 5, "kg": 2.5 },
-  "intensityKinds": ["percent_of", "rpe", "zone", "fixed_load"],
-  "segmentKinds": ["straight", "amrap", "emom", "ladder", "wave"],
-  "program": {
-    "meta": {
-      "method": "",
-      "variant": "",
-      "compatibility": { "minCoreVersion": "1.0.0", "maxCoreVersion": "1.x.x" }
+    "$schema": "// Core Schema v1 (JSONC)",
+    "coreVersion": "1.0.0",
+    "unitsDefault": {
+        "lbs": 5,
+        "kg": 2.5
     },
-    "defaults": { "rounding": { "lbs": 5, "kg": 2.5 } },
-    "exerciseCatalog": [
-      { "id": "barbell.squat.back", "name": "Back Squat", "tags": ["main","lower"] },
-      { "id": "barbell.press.ohp", "name": "Overhead Press", "tags": ["main","upper"] },
-      { "id": "barbell.bench.flat", "name": "Bench Press", "tags": ["main","upper"] },
-      { "id": "barbell.deadlift.conv", "name": "Deadlift", "tags": ["main","lower"] },
-      { "id": "bw.pullup", "name": "Pull-up", "tags": ["assist","pull","upper"] },
-      { "id": "core.ab_wheel", "name": "Ab Wheel", "tags": ["assist","core"] }
+    "intensityKinds": [
+        "percent_of",
+        "rpe",
+        "zone",
+        "fixed_load"
     ],
-    "templates": [],
-    "decisionTree": { "questions": [] },
-    "phases": [
-      { "name": "Cycle 1", "weeks": [
-        { "label": "3x5", "days": [] },
-        { "label": "3x3", "days": [] },
-        { "label": "5/3/1", "days": [] },
-        { "label": "Deload", "days": [] }
-      ] }
-    ]
-  }
+    "segmentKinds": [
+        "straight",
+        "amrap",
+        "emom",
+        "ladder",
+        "wave"
+    ],
+    "program": {
+        "meta": {
+            "method": "",
+            "variant": "",
+            "compatibility": {
+                "minCoreVersion": "1.0.0",
+                "maxCoreVersion": "1.x.x"
+            }
+        },
+        "defaults": {
+            "rounding": {
+                "lbs": 5,
+                "kg": 2.5
+            }
+        },
+        "exerciseCatalog": [
+            {
+                "id": "barbell.squat.back",
+                "name": "Back Squat",
+                "tags": [
+                    "main",
+                    "lower"
+                ]
+            },
+            {
+                "id": "barbell.press.ohp",
+                "name": "Overhead Press",
+                "tags": [
+                    "main",
+                    "upper"
+                ]
+            },
+            {
+                "id": "barbell.bench.flat",
+                "name": "Bench Press",
+                "tags": [
+                    "main",
+                    "upper"
+                ]
+            },
+            {
+                "id": "barbell.deadlift.conv",
+                "name": "Deadlift",
+                "tags": [
+                    "main",
+                    "lower"
+                ]
+            },
+            {
+                "id": "bw.pullup",
+                "name": "Pull-up",
+                "tags": [
+                    "assist",
+                    "pull",
+                    "upper"
+                ]
+            },
+            {
+                "id": "core.ab_wheel",
+                "name": "Ab Wheel",
+                "tags": [
+                    "assist",
+                    "core"
+                ]
+            }
+        ],
+        "templates": [],
+        "decisionTree": {
+            "questions": []
+        },
+        "phases": [
+            {
+                "name": "Cycle 1",
+                "weeks": [
+                    {
+                        "label": "3x5",
+                        "days": []
+                    },
+                    {
+                        "label": "3x3",
+                        "days": []
+                    },
+                    {
+                        "label": "5/3/1",
+                        "days": []
+                    },
+                    {
+                        "label": "Deload",
+                        "days": []
+                    }
+                ]
+            }
+        ]
+    }
 }

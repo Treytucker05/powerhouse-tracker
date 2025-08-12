@@ -4,46 +4,94 @@
         "variant": "bbb",
         "cases": 2
     },
-        "cases": [
-            {
-                "name": "Week1 Press — 3x5 AMRAP",
-                "label": "3x5",
-                "inputs": { "press1RM": 130, "tmPct": 0.9, "units": "lbs" },
-                "expect": {
-                    "warmups": ["40%x5","50%x5","60%x3"],
-                    "main": ["65%x5","75%x5","85%x5+"],
-                    "amrapLast": true
-                }
+    "cases": [
+        {
+            "name": "Week1 Press — 3x5 AMRAP",
+            "label": "3x5",
+            "inputs": {
+                "press1RM": 130,
+                "tmPct": 0.9,
+                "units": "lbs"
             },
-            {
-                "name": "Week2 Press — 3x3 AMRAP",
-                "label": "3x3",
-                "inputs": { "press1RM": 130, "tmPct": 0.9, "units": "lbs" },
-                "expect": {
-                    "warmups": ["40%x5","50%x5","60%x3"],
-                    "main": ["70%x3","80%x3","90%x3+"],
-                    "amrapLast": true
-                }
-            },
-            {
-                "name": "Week3 Press — 5/3/1 AMRAP",
-                "label": "5/3/1",
-                "inputs": { "press1RM": 130, "tmPct": 0.9, "units": "lbs" },
-                "expect": {
-                    "warmups": ["40%x5","50%x5","60%x3"],
-                    "main": ["75%x5","85%x3","95%x1+"],
-                    "amrapLast": true
-                }
-            },
-            {
-                "name": "Week4 Press — Deload (no AMRAP)",
-                "label": "Deload",
-                "inputs": { "press1RM": 130, "tmPct": 0.9, "units": "lbs" },
-                "expect": {
-                    "warmups": ["40%x5","50%x5","60%x3"],
-                    "main": ["40%x5","50%x5","60%x5"],
-                    "amrapLast": false
-                }
+            "expect": {
+                "warmups": [
+                    "40%x5",
+                    "50%x5",
+                    "60%x3"
+                ],
+                "main": [
+                    "65%x5",
+                    "75%x5",
+                    "85%x5+"
+                ],
+                "amrapLast": true
             }
-        ]
+        },
+        {
+            "name": "Week2 Press — 3x3 AMRAP",
+            "label": "3x3",
+            "inputs": {
+                "press1RM": 130,
+                "tmPct": 0.9,
+                "units": "lbs"
+            },
+            "expect": {
+                "warmups": [
+                    "40%x5",
+                    "50%x5",
+                    "60%x3"
+                ],
+                "main": [
+                    "70%x3",
+                    "80%x3",
+                    "90%x3+"
+                ],
+                "amrapLast": true
+            }
+        },
+        {
+            "name": "Week3 Press — 5/3/1 AMRAP",
+            "label": "5/3/1",
+            "inputs": {
+                "press1RM": 130,
+                "tmPct": 0.9,
+                "units": "lbs"
+            },
+            "expect": {
+                "warmups": [
+                    "40%x5",
+                    "50%x5",
+                    "60%x3"
+                ],
+                "main": [
+                    "75%x5",
+                    "85%x3",
+                    "95%x1+"
+                ],
+                "amrapLast": true
+            }
+        },
+        {
+            "name": "Week4 Press — Deload (no AMRAP)",
+            "label": "Deload",
+            "inputs": {
+                "press1RM": 130,
+                "tmPct": 0.9,
+                "units": "lbs"
+            },
+            "expect": {
+                "warmups": [
+                    "40%x5",
+                    "50%x5",
+                    "60%x3"
+                ],
+                "main": [
+                    "40%x5",
+                    "50%x5",
+                    "60%x5"
+                ],
+                "amrapLast": false
+            }
+        }
+    ]
 }

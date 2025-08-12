@@ -75,13 +75,23 @@
                 "supplemental": {
                     "mode": "bbb",
                     "pairing": "same",
-                    "intensity": { "kind": "percent_of", "of": "TM", "value": 60 },
+                    "intensity": {
+                        "kind": "percent_of",
+                        "of": "TM",
+                        "value": 60
+                    },
                     "sets": 5,
                     "reps": 10,
-                    "provenance": { "source": "book", "note": "Wendler 5/3/1: percentages and assistance templates" }
+                    "provenance": {
+                        "source": "book",
+                        "note": "Wendler 5/3/1: percentages and assistance templates"
+                    }
                 }
             },
-            "provenance": { "source": "book", "note": "BBB base 60%" }
+            "provenance": {
+                "source": "book",
+                "note": "BBB base 60%"
+            }
         },
         {
             "id": "triumvirate",
@@ -89,13 +99,27 @@
             "effects": {
                 "assistance": {
                     "slots": [
-                        { "id": "assist_a", "sets": 5, "reps": "10-15" },
-                        { "id": "assist_b", "sets": 5, "reps": "10-15" }
+                        {
+                            "id": "assist_a",
+                            "sets": 5,
+                            "reps": "10-15"
+                        },
+                        {
+                            "id": "assist_b",
+                            "sets": 5,
+                            "reps": "10-15"
+                        }
                     ],
-                    "provenance": { "source": "book", "note": "Two focused assistance movements" }
+                    "provenance": {
+                        "source": "book",
+                        "note": "Two focused assistance movements"
+                    }
                 }
             },
-            "provenance": { "source": "book", "note": "Triumvirate assistance volume" }
+            "provenance": {
+                "source": "book",
+                "note": "Triumvirate assistance volume"
+            }
         },
         {
             "id": "jack_shit",
@@ -103,10 +127,16 @@
             "effects": {
                 "assistance": {
                     "slots": [],
-                    "provenance": { "source": "book", "note": "No assistance" }
+                    "provenance": {
+                        "source": "book",
+                        "note": "No assistance"
+                    }
                 }
             },
-            "provenance": { "source": "book", "note": "Minimalist variant" }
+            "provenance": {
+                "source": "book",
+                "note": "Minimalist variant"
+            }
         },
         {
             "id": "periodization_bible",
@@ -114,14 +144,32 @@
             "effects": {
                 "assistance": {
                     "slots": [
-                        { "category": "push", "sets": 5, "reps": "10-20" },
-                        { "category": "pull", "sets": 5, "reps": "10-20" },
-                        { "category": "single_leg_or_core", "sets": 5, "reps": "10-20" }
+                        {
+                            "category": "push",
+                            "sets": 5,
+                            "reps": "10-20"
+                        },
+                        {
+                            "category": "pull",
+                            "sets": 5,
+                            "reps": "10-20"
+                        },
+                        {
+                            "category": "single_leg_or_core",
+                            "sets": 5,
+                            "reps": "10-20"
+                        }
                     ],
-                    "provenance": { "source": "book", "note": "Balanced pattern coverage" }
+                    "provenance": {
+                        "source": "book",
+                        "note": "Balanced pattern coverage"
+                    }
                 }
             },
-            "provenance": { "source": "book", "note": "Periodization Bible template" }
+            "provenance": {
+                "source": "book",
+                "note": "Periodization Bible template"
+            }
         },
         {
             "id": "bodyweight",
@@ -129,14 +177,32 @@
             "effects": {
                 "assistance": {
                     "slots": [
-                        { "category": "upper_pull_bw", "sets": 5, "reps": "AMRAP" },
-                        { "category": "pushup_or_dip", "sets": 5, "reps": "AMRAP" },
-                        { "category": "core_bw", "sets": 5, "reps": "10-20" }
+                        {
+                            "category": "upper_pull_bw",
+                            "sets": 5,
+                            "reps": "AMRAP"
+                        },
+                        {
+                            "category": "pushup_or_dip",
+                            "sets": 5,
+                            "reps": "AMRAP"
+                        },
+                        {
+                            "category": "core_bw",
+                            "sets": 5,
+                            "reps": "10-20"
+                        }
                     ],
-                    "provenance": { "source": "book", "note": "Bodyweight emphasis" }
+                    "provenance": {
+                        "source": "book",
+                        "note": "Bodyweight emphasis"
+                    }
                 }
             },
-            "provenance": { "source": "book", "note": "Bodyweight assistance variant" }
+            "provenance": {
+                "source": "book",
+                "note": "Bodyweight assistance variant"
+            }
         }
     ],
     "progressions": {
@@ -269,33 +335,109 @@
                 "id": "days_per_week",
                 "prompt": "How many training days per week?",
                 "options": [
-                    { "value": 4, "effects": { "schedule": { "frequency": 4 } } },
-                    { "value": 3, "effects": { "schedule": { "frequency": 3 } } },
-                    { "value": 2, "effects": { "schedule": { "frequency": 2 } } },
-                    { "value": 1, "effects": { "schedule": { "frequency": 1 } } }
+                    {
+                        "value": 4,
+                        "effects": {
+                            "schedule": {
+                                "frequency": 4
+                            }
+                        }
+                    },
+                    {
+                        "value": 3,
+                        "effects": {
+                            "schedule": {
+                                "frequency": 3
+                            }
+                        }
+                    },
+                    {
+                        "value": 2,
+                        "effects": {
+                            "schedule": {
+                                "frequency": 2
+                            }
+                        }
+                    },
+                    {
+                        "value": 1,
+                        "effects": {
+                            "schedule": {
+                                "frequency": 1
+                            }
+                        }
+                    }
                 ],
-                "provenance": { "source": "book", "note": "Common frequency variants" }
+                "provenance": {
+                    "source": "book",
+                    "note": "Common frequency variants"
+                }
             },
             {
                 "id": "assistance_volume",
                 "prompt": "Select assistance / supplemental emphasis",
                 "options": [
-                    { "value": "bbb60", "effects": { "templateKey": "bbb60" } },
-                    { "value": "triumvirate", "effects": { "templateKey": "triumvirate" } },
-                    { "value": "jack_shit", "effects": { "templateKey": "jack_shit" } },
-                    { "value": "periodization_bible", "effects": { "templateKey": "periodization_bible" } },
-                    { "value": "bodyweight", "effects": { "templateKey": "bodyweight" } }
+                    {
+                        "value": "bbb60",
+                        "effects": {
+                            "templateKey": "bbb60"
+                        }
+                    },
+                    {
+                        "value": "triumvirate",
+                        "effects": {
+                            "templateKey": "triumvirate"
+                        }
+                    },
+                    {
+                        "value": "jack_shit",
+                        "effects": {
+                            "templateKey": "jack_shit"
+                        }
+                    },
+                    {
+                        "value": "periodization_bible",
+                        "effects": {
+                            "templateKey": "periodization_bible"
+                        }
+                    },
+                    {
+                        "value": "bodyweight",
+                        "effects": {
+                            "templateKey": "bodyweight"
+                        }
+                    }
                 ],
-                "provenance": { "source": "book", "note": "Template selection" }
+                "provenance": {
+                    "source": "book",
+                    "note": "Template selection"
+                }
             },
             {
                 "id": "tm_method",
                 "prompt": "How will you set Training Max (TM)?",
                 "options": [
-                    { "value": "direct_1rm", "effects": { "tm": { "method": "direct" } } },
-                    { "value": "rep_estimate", "effects": { "tm": { "method": "estimate" } } }
+                    {
+                        "value": "direct_1rm",
+                        "effects": {
+                            "tm": {
+                                "method": "direct"
+                            }
+                        }
+                    },
+                    {
+                        "value": "rep_estimate",
+                        "effects": {
+                            "tm": {
+                                "method": "estimate"
+                            }
+                        }
+                    }
                 ],
-                "provenance": { "source": "book", "note": "TM determination" }
+                "provenance": {
+                    "source": "book",
+                    "note": "TM determination"
+                }
             }
         ]
     },
