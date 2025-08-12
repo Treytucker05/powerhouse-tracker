@@ -12,7 +12,7 @@ import { loadPack531BBB } from "../loadPack";
 import { extractSupplementalFromPack, extractWarmups, extractWeekByLabel } from "../packAdapter";
 import { applyDecisionsFromPack } from "../decisionAdapter";
 import { mapTemplateAssistance, validateAssistanceVolume } from "../assistanceMapper";
-import { buildSchedule } from "../schedule";
+import { buildSchedule, buildSchedule4Day, SPLIT_4DAY_A } from "../schedule";
 import { toUiDays } from "../scheduleRender";
 import { computeWarmupsFromPack, computeMainFromPack, computeBBBFromConfig } from "../calc";
 
@@ -38,7 +38,10 @@ function isStep1Complete(state) {
     const tmsSource = state?.tms || (() => {
         const out = {}; LIFTS.forEach(k => { out[k] = state?.lifts?.[k]?.tm; }); return out;
     })();
-    const tmsOk = LIFTS.every(k => Number(tmsSource[k]) > 0);
+    const tmsOk = LIFTS.every(k => {
+        const v = Number(tmsSource[k]);
+        return Number.isFinite(v) && v > 0;
+    });
     return unitsOk && roundingOk && tmPctOk && tmsOk;
 }
 
@@ -95,12 +98,16 @@ function WizardShell() {
                                 dispatch({ type: 'SET_SCHEDULE', schedule: { ...(state?.schedule || {}), frequency: nextFreq } });
                             }
                             // Build schedule preview whenever we have a scheduleMode we recognize (3day|4day)
-                            if (['3day', '4day'].includes(decision.scheduleMode)) {
+                            if (decision.scheduleMode === '3day') {
                                 const liftOrder = ["press", "deadlift", "bench", "squat"]; // canonical order
-                                const sched = buildSchedule({ mode: decision.scheduleMode, liftOrder });
-                                // Store schedule preview in advanced to avoid schema churn
+                                const sched = buildSchedule({ mode: '3day', liftOrder });
                                 dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), schedulePreview: sched } });
-                                console.info("531 schedule preview:", sched);
+                                console.info("531 schedule preview (3day):", sched);
+                            } else if (decision.scheduleMode === '4day') {
+                                // Build lightweight 4-day current-week preview (week1 by default)
+                                const sched4 = buildSchedule4Day({ state, pack, split: SPLIT_4DAY_A, weekLabel: '3x5' });
+                                dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), schedulePreview: sched4 } });
+                                console.info("531 schedule preview (4day):", sched4);
                             }
                         }
                         // Template id capture (non-destructive)
@@ -460,6 +467,7 @@ function WizardShell() {
                             {/* 3-day schedule preview appended (does not replace step content) */}
                             {(() => {
                                 const preview = state?.advanced?.schedulePreview;
+                                // 3-day legacy path (weeks array)
                                 if (preview?.mode === '3day' && Array.isArray(preview?.weeks) && preview.weeks.length) {
                                     const weeks = toUiDays(preview);
                                     return (
@@ -523,6 +531,54 @@ function WizardShell() {
                                                     </div>
                                                 </div>
                                             ))}
+                                        </div>
+                                    );
+                                }
+                                // 4-day live preview path (flat days array)
+                                if (preview?.mode === '4day_live' && Array.isArray(preview?.days) && preview.days.length === 4) {
+                                    return (
+                                        <div className="space-y-6 mt-10">
+                                            <div className="rounded-2xl border border-gray-700 bg-gray-800/40 p-4">
+                                                <div className="text-lg font-semibold mb-3 text-white">Week 1 (Preview)</div>
+                                                <div className="grid md:grid-cols-4 gap-4">
+                                                    {preview.days.map((d, di) => (
+                                                        <div key={di} className="rounded-xl border border-gray-700/60 bg-gray-900/40 p-3">
+                                                            <div className="text-xs uppercase tracking-wide text-gray-400 mb-2">Day {di + 1}</div>
+                                                            <div className="font-medium capitalize text-gray-200 mb-2">{d.lift}</div>
+                                                            <div className="text-xs uppercase tracking-wide text-gray-400">Warm-up</div>
+                                                            <ul className="text-sm mb-2 space-y-0.5">
+                                                                {d.warmups?.length === 0 && <li className="text-gray-500">—</li>}
+                                                                {d.warmups?.map((r, i) => (
+                                                                    <li key={i} className="tabular-nums text-gray-300">{r.pct}% × {r.reps} → <span className="text-white">{r.weight}</span> {state?.units || 'lbs'}</li>
+                                                                ))}
+                                                            </ul>
+                                                            <div className="text-xs uppercase tracking-wide text-gray-400">Main</div>
+                                                            <ul className="text-sm mb-2 space-y-0.5">
+                                                                {d.main?.rows?.length === 0 && <li className="text-gray-500">—</li>}
+                                                                {d.main?.rows?.map((r, i) => (
+                                                                    <li key={i} className="tabular-nums text-gray-300">{r.pct}% × {r.reps}{r.amrap ? '+' : ''} → <span className="text-white">{r.weight}</span> {state?.units || 'lbs'}{r.amrap && <span className="ml-2 text-[10px] px-1 py-0.5 border border-red-500/40 rounded text-red-300">AMRAP</span>}</li>
+                                                                ))}
+                                                            </ul>
+                                                            {d.supplemental && (
+                                                                <div className="mb-2">
+                                                                    <div className="text-xs uppercase tracking-wide text-gray-400">Supplemental</div>
+                                                                    <div className="text-sm tabular-nums text-gray-300">{d.supplemental.sets}×{d.supplemental.reps} @ {d.supplemental.pct}% TM → <span className="text-white">{d.supplemental.load}</span> {state?.units || 'lbs'}</div>
+                                                                </div>
+                                                            )}
+                                                            {Array.isArray(d.assistance) && d.assistance.length > 0 && (
+                                                                <div>
+                                                                    <div className="text-xs uppercase tracking-wide text-gray-400">Assistance</div>
+                                                                    <ul className="text-sm space-y-0.5">
+                                                                        {d.assistance.map((a, ai) => (
+                                                                            <li key={ai} className="text-gray-300">{a.name || a.id} — {a.sets ?? '?'}×{a.reps ?? '?'}</li>
+                                                                        ))}
+                                                                    </ul>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         </div>
                                     );
                                 }
