@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useProgramV2 } from "../contexts/ProgramContextV2.jsx";
 import { buildMainSetsForLift, buildWarmupSets, roundToIncrement } from "../"; // barrel export
 import { loadPack531BBB } from "../loadPack";
-import { extractSupplementalFromPack } from "../packAdapter";
+import { extractSupplementalFromPack, extractWarmups, extractWeekByLabel } from "../packAdapter";
 
 // Feature flag (off by default) to switch wizard initialization to method packs.
 // Can be overridden at runtime via window.__USE_PACKS__ (dev toggle below).
@@ -49,14 +49,40 @@ function WizardShell() {
                 const sup = extractSupplementalFromPack(pack, "bbb60");
                 if (sup) {
                     // Dispatch only supplemental fields (non-destructive)
-                    dispatch({ type: 'SET_SUPPLEMENTAL', supplemental: {
-                        strategy: sup.mode === 'bbb' ? 'bbb' : (sup.mode || 'none'),
-                        pairing: sup.pairing,
-                        percentOfTM: sup.intensity?.value || 60,
-                        sets: sup.sets,
-                        reps: sup.reps,
-                        _pack: sup._provenance
-                    }});
+                    dispatch({
+                        type: 'SET_SUPPLEMENTAL', supplemental: {
+                            strategy: sup.mode === 'bbb' ? 'bbb' : (sup.mode || 'none'),
+                            pairing: sup.pairing,
+                            percentOfTM: sup.intensity?.value || 60,
+                            sets: sup.sets,
+                            reps: sup.reps,
+                            _pack: sup._provenance
+                        }
+                    });
+                }
+                // Warmups (store into schedule.warmupScheme if different)
+                const wu = extractWarmups(pack);
+                if (Array.isArray(wu)) {
+                    const currentWU = state?.schedule?.warmupScheme;
+                    const nextWU = { percentages: wu.map(w => w.value), reps: wu.map(w => w.reps) };
+                    const sameWU = currentWU && JSON.stringify(currentWU) === JSON.stringify(nextWU);
+                    if (!sameWU) {
+                        dispatch({ type: 'SET_SCHEDULE', schedule: { ...(state?.schedule || {}), warmupScheme: nextWU, includeWarmups: true } });
+                    }
+                }
+                // Main sets percent table for current active week label (derive from stepIndex for simplicity)
+                const weekLabelMap = ['3x5','3x3','5/3/1','Deload'];
+                const currentWeekLabel = weekLabelMap[0]; // default for config; detailed preview uses engine still
+                const wk = extractWeekByLabel(pack, currentWeekLabel);
+                if (wk?.main && Array.isArray(wk.main)) {
+                    // Store a lightweight capture for potential future use (e.g., state.previewWeekMain)
+                    const existing = state?.previewWeekMain;
+                    const asSimple = wk.main.map(m => ({ value: m.value, reps: m.reps, amrap: !!m.amrap }));
+                    if (!existing || JSON.stringify(existing) !== JSON.stringify(asSimple)) {
+                        dispatch({ type: 'SET_LOADING_OPTION', option: state?.loadingOption || state?.loading?.option || 1 }); // noop preserve
+                        // Attach via a generic advanced field to avoid schema churn
+                        dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), packMainWeek0: asSimple } });
+                    }
                 }
             }
         }
@@ -289,14 +315,16 @@ function WizardShell() {
                                                 if (pack) {
                                                     const sup = extractSupplementalFromPack(pack, 'bbb60');
                                                     if (sup) {
-                                                        dispatch({ type: 'SET_SUPPLEMENTAL', supplemental: {
-                                                            strategy: sup.mode === 'bbb' ? 'bbb' : (sup.mode || 'none'),
-                                                            pairing: sup.pairing,
-                                                            percentOfTM: sup.intensity?.value || 60,
-                                                            sets: sup.sets,
-                                                            reps: sup.reps,
-                                                            _pack: sup._provenance
-                                                        }});
+                                                        dispatch({
+                                                            type: 'SET_SUPPLEMENTAL', supplemental: {
+                                                                strategy: sup.mode === 'bbb' ? 'bbb' : (sup.mode || 'none'),
+                                                                pairing: sup.pairing,
+                                                                percentOfTM: sup.intensity?.value || 60,
+                                                                sets: sup.sets,
+                                                                reps: sup.reps,
+                                                                _pack: sup._provenance
+                                                            }
+                                                        });
                                                     }
                                                 }
                                             })();
