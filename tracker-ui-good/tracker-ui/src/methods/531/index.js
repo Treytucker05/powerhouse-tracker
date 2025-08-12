@@ -9,5 +9,9 @@ export { default as Program531ActiveV2 } from './components/Program531ActiveV2.j
 export { ProgramProviderV2, ProgramV2Provider } from './contexts/ProgramContextV2.jsx';
 export * from './contexts/ProgramContextV2.jsx'; // includes hooks/utilities if any
 
-// Engines
+// Engines (named)
 export * from './engines/FiveThreeOneEngine.v2.js';
+export * from './engines/AssistanceEngine.v2.js';
+
+// Optional default-style aliases (if consumers want explicit names)
+// (Note: underlying engine files export only functions; no default export provided.)

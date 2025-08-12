@@ -1,7 +1,7 @@
-import { buildAssistanceForDay } from "../../../lib/engines/AssistanceEngine.v2.js";
+import { buildAssistanceForDay } from "../.."; // barrel export
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { useProgramV2 } from '../../../contexts/ProgramContextV2.jsx';
-import { buildMainSetsForLift, buildWarmupSets, roundToIncrement, getWeekScheme } from '../../../lib/engines/FiveThreeOneEngine.v2.js';
+import { useProgramV2 } from '../../contexts/ProgramContextV2.jsx';
+import { buildMainSetsForLift, buildWarmupSets, roundToIncrement, getWeekScheme } from '../..'; // barrel export
 import { Info, AlertTriangle, Download, Copy, Printer, CheckCircle2 } from 'lucide-react';
 
 const LIFT_KEY_MAP = {

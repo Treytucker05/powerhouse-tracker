@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Info, AlertTriangle, Calculator, Copy } from 'lucide-react';
 import { useProgramV2 } from '../../contexts/ProgramContextV2.jsx';
-import { roundToIncrement } from '../../engines/FiveThreeOneEngine.v2.js';
+import { roundToIncrement } from '../..'; // barrel export
 
 // Wendler e1RM formula: e1RM = weight * (1 + 0.0333 * reps)
 const calculateE1RM = (weight, reps) => {
