@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "method": "531",
+    "variant": "bbb",
+    "author": "Trey",
+    "compatibility": { "minCoreVersion": "1.0.0", "maxCoreVersion": "1.x.x" }
+  },
+  "defaults": { "units": "lbs", "rounding": { "lbs": 5, "kg": 2.5 } },
+  "exerciseCatalog": [
+    { "id": "barbell.press.ohp", "name": "Overhead Press", "tags": ["main","upper"] },
+    { "id": "barbell.deadlift.conv", "name": "Deadlift", "tags": ["main","lower"] },
+    { "id": "barbell.bench.flat", "name": "Bench Press", "tags": ["main","upper"] },
+    { "id": "barbell.squat.back", "name": "Back Squat", "tags": ["main","lower"] },
+    { "id": "bw.pullup", "name": "Pull-up", "tags": ["assist","pull","upper"] },
+    { "id": "core.ab_wheel", "name": "Ab Wheel", "tags": ["assist","core"] }
+  ],
+  "templates": [
+    {
+      "id": "bbb60",
+      "name": "Boring But Big 60%",
+      "effects": {
+        "supplemental": {
+          "mode": "bbb",
+          "pairing": "same",
+          "intensity": { "kind": "percent_of", "value": 60, "of": "TM" },
+          "sets": 5, "reps": 10,
+          "provenance": { "source": "template", "note": "BBB 60%" }
+        }
+      }
+    }
+  ],
+  "decisionTree": { "questions": [] },
+  "program": { "phases": [] },
+  "provenance": { "source": "book" }
+}

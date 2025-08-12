@@ -1,0 +1,15 @@
+{
+  "meta": { "method": "531", "variant": "bbb", "cases": 2 },
+  "cases": [
+    {
+      "name": "Week1 Press — 3x5 AMRAP",
+      "inputs": { "press1RM": 130, "tmPct": 0.9, "units": "lbs" },
+      "expect": { "warmups": ["40%x5","50%x5","60%x3"], "main": ["65%x5","75%x5","85%x5+"], "bbb": "60%x10x5" }
+    },
+    {
+      "name": "Week4 Press — Deload",
+      "inputs": { "press1RM": 130, "tmPct": 0.9, "units": "lbs" },
+      "expect": { "warmups": ["40%x5","50%x5","60%x3"], "main": ["40%x5","50%x5","60%x5"], "bbb": null }
+    }
+  ]
+}
