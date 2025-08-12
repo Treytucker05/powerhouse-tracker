@@ -2,7 +2,8 @@
     "meta": {
         "method": "531",
         "variant": "bbb",
-        "cases": 2
+        // Updated to reflect total number of verification cases present
+        "cases": 4
     },
     "cases": [
         {
@@ -11,7 +12,8 @@
             "inputs": {
                 "press1RM": 130,
                 "tmPct": 0.9,
-                "units": "lbs"
+                "units": "lbs",
+                "templateId": "bbb60"
             },
             "expect": {
                 "warmups": [
@@ -24,7 +26,14 @@
                     "75%x5",
                     "85%x5+"
                 ],
-                "amrapLast": true
+                "amrapLast": true,
+                "assist": {
+                    "mode": "template",
+                    "templateId": "bbb60",
+                    "minItems": 1,
+                    "maxItems": 2,
+                    "volumeRange": [20, 80]
+                }
             }
         },
         {
@@ -77,7 +86,8 @@
             "inputs": {
                 "press1RM": 130,
                 "tmPct": 0.9,
-                "units": "lbs"
+                "units": "lbs",
+                "templateId": "bbb60"
             },
             "expect": {
                 "warmups": [
@@ -90,7 +100,14 @@
                     "50%x5",
                     "60%x5"
                 ],
-                "amrapLast": false
+                "amrapLast": false,
+                "assist": {
+                    "mode": "template",
+                    "templateId": "bbb60",
+                    "minItems": 0,
+                    "maxItems": 2,
+                    "volumeRange": [0, 80]
+                }
             }
         }
     ]
