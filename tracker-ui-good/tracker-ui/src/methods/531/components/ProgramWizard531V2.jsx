@@ -13,6 +13,7 @@ import { extractSupplementalFromPack, extractWarmups, extractWeekByLabel } from 
 import { applyDecisionsFromPack } from "../decisionAdapter";
 import { mapTemplateAssistance, validateAssistanceVolume } from "../assistanceMapper";
 import { buildSchedule } from "../schedule";
+import { toUiDays } from "../scheduleRender";
 
 // Enable packs by default; allow kill-switch via env (Vite or CRA style)
 // Avoid direct unguarded access to process.* in browser (Vite doesn't polyfill by default)
@@ -66,8 +67,8 @@ function WizardShell() {
                                 dispatch({ type: 'SET_SCHEDULE', schedule: { ...(state?.schedule || {}), frequency: nextFreq } });
                             }
                             // Build schedule preview whenever we have a scheduleMode we recognize (3day|4day)
-                            if (['3day','4day'].includes(decision.scheduleMode)) {
-                                const liftOrder = ["press","deadlift","bench","squat"]; // canonical order
+                            if (['3day', '4day'].includes(decision.scheduleMode)) {
+                                const liftOrder = ["press", "deadlift", "bench", "squat"]; // canonical order
                                 const sched = buildSchedule({ mode: decision.scheduleMode, liftOrder });
                                 // Store schedule preview in advanced to avoid schema churn
                                 dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), schedulePreview: sched } });
@@ -351,7 +352,14 @@ function WizardShell() {
                 <div className="mb-8 space-y-2">
                     <div className="flex items-start justify-between flex-wrap gap-4">
                         <div>
-                            <h1 className="text-3xl font-bold text-white mb-2">5/3/1 Program Builder V2</h1>
+                            <h1 className="text-3xl font-bold text-white mb-2 flex items-center">
+                                5/3/1 Program Builder V2
+                                {state?.advanced?.schedulePreview?.mode === '3day' && (
+                                    <span className="ml-3 inline-flex items-center rounded-full border border-red-500/40 bg-red-600/10 px-2 py-0.5 text-xs text-red-300">
+                                        3-day rotation (5 weeks)
+                                    </span>
+                                )}
+                            </h1>
                             <p className="text-gray-400">Jim Wendler's proven strength training methodology</p>
                         </div>
                         {/* Packs enabled by default; set VITE_USE_METHOD_PACKS=false or REACT_APP_USE_METHOD_PACKS=false to disable */}
@@ -408,7 +416,37 @@ function WizardShell() {
                     <main className="lg:col-span-9">
                         <div className="space-y-6">
                             {/* Step Content */}
-                            {renderStepContent()}
+                            {(() => {
+                                const preview = state?.advanced?.schedulePreview;
+                                if (preview?.mode === '3day' && Array.isArray(preview?.weeks) && preview.weeks.length) {
+                                    const weeks = toUiDays(preview);
+                                    return (
+                                        <div className="space-y-6">
+                                            {weeks.map((w, wi) => (
+                                                <div key={wi} className="rounded-2xl border border-gray-700 bg-gray-800/40 p-4">
+                                                    <div className="text-lg font-semibold mb-3 text-white">{w.label}</div>
+                                                    <div className="grid md:grid-cols-3 gap-4">
+                                                        {w.sessions.map((s, si) => (
+                                                            <div key={si} className="rounded-xl border border-gray-700/60 bg-gray-900/40 p-3">
+                                                                <div className="text-xs uppercase tracking-wide text-gray-400 mb-2">{s.sessionWeekLabel}</div>
+                                                                <ul className="list-disc list-inside space-y-1 text-sm">
+                                                                    {s.lifts.map((lift, li) => (
+                                                                        <li key={li} className="capitalize text-gray-200">
+                                                                            {lift} — main + warm-ups from pack
+                                                                        </li>
+                                                                    ))}
+                                                                </ul>
+                                                                {/* Future: render actual main/warmups for each lift here */}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    );
+                                }
+                                return renderStepContent();
+                            })()}
                             {/* NOTE: If a day in schedulePreview has { combineWith }, future UI can render two main lifts in one session for deload. */}
 
                             {/* Navigation Buttons */}
