@@ -3,11 +3,15 @@
  * Clean, minimal wizard with step navigation and V2 context integration
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { ChevronRight, CheckCircle2, Info } from 'lucide-react';
 import { useNavigate } from "react-router-dom";
 import { useProgramV2 } from "../contexts/ProgramContextV2.jsx";
 import { buildMainSetsForLift, buildWarmupSets, roundToIncrement } from "../"; // barrel export
+import { loadPack531BBB } from "../loadPack";
+
+// Feature flag (off by default) to switch wizard initialization to method packs.
+const USE_METHOD_PACKS = false; // flip to true later
 import Step1Fundamentals from './steps/Step1Fundamentals.jsx';
 import Step2TemplateOrCustom from './steps/Step2TemplateOrCustom.jsx';
 import Step3DesignCustom from './steps/Step3DesignCustom.jsx';
@@ -25,6 +29,21 @@ function WizardShell() {
     const [stepValidation, setStepValidation] = useState({ fundamentals: false, design: false, review: false });
     const navigate = useNavigate();
     const { state } = useProgramV2();
+
+    // Optional future pack loading (no behavior change while flag is false)
+    useEffect(() => {
+        let cancelled = false;
+        async function maybeLoadPack() {
+            if (!USE_METHOD_PACKS) return;
+            const pack = await loadPack531BBB();
+            if (!cancelled && pack) {
+                console.info("Loaded 531 BBB pack:", pack);
+                // TODO: map pack -> context state (future block)
+            }
+        }
+        maybeLoadPack();
+        return () => { cancelled = true; };
+    }, []);
     function humanLiftName(key) {
         return key === "overhead_press" ? "Press" : key[0].toUpperCase() + key.slice(1);
     }
