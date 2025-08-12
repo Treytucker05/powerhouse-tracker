@@ -12,11 +12,15 @@ import { loadPack531BBB } from "../loadPack";
 import { extractSupplementalFromPack, extractWarmups, extractWeekByLabel } from "../packAdapter";
 import { applyDecisionsFromPack } from "../decisionAdapter";
 import { mapTemplateAssistance, validateAssistanceVolume } from "../assistanceMapper";
+import { buildSchedule } from "../schedule";
 
 // Enable packs by default; allow kill-switch via env (Vite or CRA style)
-const envFlag = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_USE_METHOD_PACKS)
-    || process.env.REACT_APP_USE_METHOD_PACKS;
-const USE_METHOD_PACKS = envFlag ? String(envFlag).toLowerCase() === 'true' : true;
+// Avoid direct unguarded access to process.* in browser (Vite doesn't polyfill by default)
+const viteFlag = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_USE_METHOD_PACKS);
+// Support legacy CRA-style var only if process object exists (SSR or test env)
+const legacyFlag = (typeof process !== 'undefined' && process?.env?.REACT_APP_USE_METHOD_PACKS);
+const envFlag = viteFlag ?? legacyFlag;
+const USE_METHOD_PACKS = envFlag == null ? true : String(envFlag).toLowerCase() === 'true';
 import Step1Fundamentals from './steps/Step1Fundamentals.jsx';
 import Step2TemplateOrCustom from './steps/Step2TemplateOrCustom.jsx';
 import Step3DesignCustom from './steps/Step3DesignCustom.jsx';
@@ -60,6 +64,14 @@ function WizardShell() {
                             const nextFreq = nextFreqMap[decision.scheduleMode];
                             if (nextFreq && nextFreq !== currentFreq) {
                                 dispatch({ type: 'SET_SCHEDULE', schedule: { ...(state?.schedule || {}), frequency: nextFreq } });
+                            }
+                            // Build schedule preview whenever we have a scheduleMode we recognize (3day|4day)
+                            if (['3day','4day'].includes(decision.scheduleMode)) {
+                                const liftOrder = ["press","deadlift","bench","squat"]; // canonical order
+                                const sched = buildSchedule({ mode: decision.scheduleMode, liftOrder });
+                                // Store schedule preview in advanced to avoid schema churn
+                                dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), schedulePreview: sched } });
+                                console.info("531 schedule preview:", sched);
                             }
                         }
                         // Template id capture (non-destructive)
@@ -397,6 +409,7 @@ function WizardShell() {
                         <div className="space-y-6">
                             {/* Step Content */}
                             {renderStepContent()}
+                            {/* NOTE: If a day in schedulePreview has { combineWith }, future UI can render two main lifts in one session for deload. */}
 
                             {/* Navigation Buttons */}
                             <div className="flex items-center justify-between pt-6 border-t border-gray-700">
