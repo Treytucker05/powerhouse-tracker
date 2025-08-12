@@ -12,7 +12,7 @@ Successfully implemented safe-merge V2 context and engine for 5/3/1 program with
    - Exact specification compliance
    - Template integration via `applyTemplate`
 
-2. **`src/lib/engines/FiveThreeOneEngine.v2.js`** - Pure 5/3/1 math engine
+2. **`src/methods/531/engines/FiveThreeOneEngine.v2.js`** - Pure 5/3/1 math engine (consolidated from previous lib/engines location)
    - `roundToIncrement(value, units, mode)` - 5lb/2.5kg rounding
    - `getWeekScheme(option, weekIndex)` - Option 1/2 percentage schemes
    - `getWarmupSets(program, liftTM)` - 40/50/60% warmup generation

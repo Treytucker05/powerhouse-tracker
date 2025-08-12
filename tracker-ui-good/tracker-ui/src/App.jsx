@@ -6,9 +6,9 @@ import { Suspense, lazy } from 'react';
 import AppShell from './layout/AppShell.jsx';
 import { MacrocycleBuilderProvider } from './contexts/MacrocycleBuilderContext.tsx';
 // removed duplicate import
-import Program531ActiveV2 from "./methods/531/components/Program531ActiveV2.jsx";
-import { ProgramProviderV2, ProgramV2Provider } from './methods/531/contexts/ProgramContextV2.jsx';
-const ProgramWizard531V2 = lazy(() => import("./methods/531/components/ProgramWizard531V2.jsx"));
+// 5/3/1 V2 barrel imports
+import { Program531ActiveV2, ProgramV2Provider } from "./methods/531";
+const ProgramWizard531V2 = lazy(() => import("./methods/531/components/ProgramWizard531V2.jsx")); // kept dynamic for code-splitting
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import GlobalReset from './components/shared/GlobalReset.jsx';
 import './App.css';

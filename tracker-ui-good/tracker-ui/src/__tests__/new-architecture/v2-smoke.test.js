@@ -4,7 +4,7 @@
  */
 
 import { initialProgramV2 } from '../../contexts/ProgramContextV2.jsx';
-import { generateCycle, getWeekScheme, roundToIncrement, calcSetWeight } from '../../lib/engines/FiveThreeOneEngine.v2.js';
+import { generateCycle, getWeekScheme, roundToIncrement, calcSetWeight } from '../../methods/531';
 
 describe('5/3/1 V2 Architecture Smoke Test', () => {
     test('initialProgramV2 has correct structure', () => {
