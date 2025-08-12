@@ -96,8 +96,9 @@ function reducerV2(state, action) {
         case 'SET_WARMUPS': return { ...state, warmups: { ...state.warmups, ...action.warmups } };
         case 'SET_SUPPLEMENTAL': return { ...state, supplemental: { ...state.supplemental, ...(action.supplemental || action.payload || {}) } };
         case 'SET_ASSISTANCE': return { ...state, assistance: { ...state.assistance, ...(action.assistance || action.payload || {}) } };
-    // case 'SET_CONDITIONING': return { ...state, conditioning: { ...state.conditioning, ...action.conditioning } };
+        // case 'SET_CONDITIONING': return { ...state, conditioning: { ...state.conditioning, ...action.conditioning } };
         case 'SET_ADVANCED': return { ...state, advanced: { ...state.advanced, ...action.advanced } };
+    case 'SET_TEMPLATE': return { ...state, templateKey: action.template, template: action.template };
         case 'APPLY_TEMPLATE':
             return applyTemplate(state, action.key);
         case 'APPLY_TEMPLATE_CONFIG': {

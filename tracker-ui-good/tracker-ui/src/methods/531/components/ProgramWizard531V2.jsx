@@ -10,6 +10,7 @@ import { useProgramV2 } from "../contexts/ProgramContextV2.jsx";
 import { buildMainSetsForLift, buildWarmupSets, roundToIncrement } from "../"; // barrel export
 import { loadPack531BBB } from "../loadPack";
 import { extractSupplementalFromPack, extractWarmups, extractWeekByLabel } from "../packAdapter";
+import { applyDecisionsFromPack } from "../decisionAdapter";
 
 // Feature flag (off by default) to switch wizard initialization to method packs.
 // Can be overridden at runtime via window.__USE_PACKS__ (dev toggle below).
@@ -46,6 +47,36 @@ function WizardShell() {
             const pack = await loadPack531BBB();
             if (!cancelled && pack) {
                 console.info("Loaded 531 BBB pack:", pack);
+                // Decision adapter (feature flagged) – translate current UI answers into state merges
+                try {
+                    const answers = {
+                        daysPerWeek: state?.schedule?.frequency || state?.daysPerWeek || 4,
+                        assistanceChoice: state?.assistanceTemplate || state?.templateKey || 'BBB',
+                        tmMethod: state?.tmMethod || 'known_1rm'
+                    };
+                    const decision = applyDecisionsFromPack({ pack, answers });
+                    if (decision) {
+                        // Schedule mode -> update schedule.frequency if changed
+                        if (decision.scheduleMode) {
+                            const currentFreq = state?.schedule?.frequency;
+                            const nextFreqMap = { '4day': 4, '3day': 3, '2day': 2, '1day': 1 };
+                            const nextFreq = nextFreqMap[decision.scheduleMode];
+                            if (nextFreq && nextFreq !== currentFreq) {
+                                dispatch({ type: 'SET_SCHEDULE', schedule: { ...(state?.schedule || {}), frequency: nextFreq } });
+                            }
+                        }
+                        // Template id capture (non-destructive)
+                        if (decision.templateId && decision.templateId !== state?.templateId) {
+                            dispatch({ type: 'SET_TEMPLATE', template: decision.templateId });
+                        }
+                        // TM method future use (store in advanced)
+                        if (decision.tmMethod && decision.tmMethod !== state?.advanced?.tmMethod) {
+                            dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), tmMethod: decision.tmMethod } });
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Decision adapter error', e);
+                }
                 const sup = extractSupplementalFromPack(pack, "bbb60");
                 if (sup) {
                     // Dispatch only supplemental fields (non-destructive)
@@ -71,7 +102,7 @@ function WizardShell() {
                     }
                 }
                 // Main sets percent table for current active week label (derive from stepIndex for simplicity)
-                const weekLabelMap = ['3x5','3x3','5/3/1','Deload'];
+                const weekLabelMap = ['3x5', '3x3', '5/3/1', 'Deload'];
                 const currentWeekLabel = weekLabelMap[0]; // default for config; detailed preview uses engine still
                 const wk = extractWeekByLabel(pack, currentWeekLabel);
                 if (wk?.main && Array.isArray(wk.main)) {
