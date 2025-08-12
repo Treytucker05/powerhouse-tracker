@@ -17,7 +17,8 @@ import './styles/GlobalNASMStyles.css';
 
 // Lazy load page components for better code splitting
 const Tracking = lazy(() => import("./pages/Tracking.jsx"));
-const Home = lazy(() => import("./pages/Home.jsx"));
+const Home = lazy(() => import("./pages/Home.jsx")); // Dashboard
+import MethodologySelection from './components/program/tabs/MethodologySelection.jsx';
 const Program = lazy(() => import("./pages/Program.jsx"));
 const Analytics = lazy(() => import("./pages/Analytics.jsx"));
 const AuthPage = lazy(() => import("./pages/AuthPage.jsx"));
@@ -50,30 +51,32 @@ function App() {
       <Router>
         <ErrorBoundary>
           <Suspense fallback={<LoadingSpinner />}>
-            {/* Temporary quick access nav */}
-            <div className="p-2 bg-gray-900 border-b border-gray-800 text-sm">
-              <Link to="/builder/531/v2" className="text-red-400 hover:text-red-300 underline">Open 5/3/1 Builder V2</Link>
-            </div>
+            {/* Temporary helper link removed to keep Dashboard clean */}
             <Routes>
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/" element={<AppShell />}>
-                <Route index element={<Navigate to="/builder/531/v2" replace />} />
-                <Route path="program" element={
-                  <ErrorBoundary>
-                    <Program />
-                  </ErrorBoundary>
-                } />
-                <Route path="program/builder/531" element={
-                  <ProgramProviderV2>
-                    <ProgramWizard531 />
-                  </ProgramProviderV2>
-                } />
-                <Route path="/builder/531/v2" element={
+                {/* Dashboard at root */}
+                <Route index element={<Home />} />
+
+                {/* Program Design entry menu */}
+                <Route path="program-design" element={<MethodologySelection />} />
+
+                {/* Legacy program route (kept temporarily) */}
+                <Route path="program" element={<Program />} />
+
+                {/* 5/3/1 canonical */}
+                <Route path="builder/531" element={<Navigate to="/builder/531/v2" replace />} />
+                <Route path="builder/531/v2" element={
                   <ProgramV2Provider>
                     <ProgramWizard531V2 />
                   </ProgramV2Provider>
                 } />
-                <Route path="/program/531/active" element={<Program531ActiveV2 />} />
+                <Route path="program/531/active" element={<Program531ActiveV2 />} />
+
+                {/* NASM placeholder */}
+                <Route path="builder/nasm" element={<div className='text-gray-300 p-8'>NASM Builder (stub)</div>} />
+
+                {/* Other existing routes */}
                 <Route path="tracking" element={<Tracking />} />
                 <Route path="analytics" element={<Analytics />} />
                 <Route path="history" element={<History />} />
@@ -84,20 +87,15 @@ function App() {
                 <Route path="resources" element={<ResourcesPage />} />
                 <Route path="train" element={<TrainToday />} />
 
-                {/* Unified Builder Routes - All redirect to /program with context */}
+                {/* Redirect legacy builder paths */}
                 <Route path="mesocycle" element={<MacrocycleRedirect />} />
                 <Route path="microcycle" element={<MacrocycleRedirect />} />
                 <Route path="macrocycle" element={<MacrocycleRedirect />} />
                 <Route path="macrocycle/:id" element={<MacrocycleRedirect />} />
                 <Route path="builder" element={<MacrocycleRedirect />} />
-
-                {/* Program Design Builder Routes */}
-                <Route path="program-design" element={
-                  <MacrocycleBuilderProvider>
-                    <ContextAwareBuilder />
-                  </MacrocycleBuilderProvider>
-                } />
               </Route>
+              {/* Fallback */}
+              <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </Suspense>
         </ErrorBoundary>
