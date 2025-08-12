@@ -165,7 +165,11 @@ function WizardShell() {
     const canGoBack = stepIndex > 0;
 
     const handleStepValidation = useCallback((stepId, isValid) => {
-        setStepValidation(prev => ({ ...prev, [stepId]: isValid }));
+        setStepValidation(prev => {
+            const prevVal = prev[stepId];
+            if (prevVal === isValid) return prev; // guard: no state update if unchanged
+            return { ...prev, [stepId]: isValid };
+        });
     }, []);
 
     const handleNext = () => {
@@ -192,7 +196,7 @@ function WizardShell() {
             case 0:
                 return (
                     <Step1Fundamentals
-                        onValidChange={(isValid) => handleStepValidation('fundamentals', isValid)}
+                        onValidChange={useCallback((isValid) => handleStepValidation('fundamentals', isValid), [handleStepValidation])}
                     />
                 );
             case 1:

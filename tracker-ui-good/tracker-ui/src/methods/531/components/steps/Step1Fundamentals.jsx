@@ -3,10 +3,10 @@
  * Units, rounding, TM%, 1RM/rep tests with real-time calculation and validation
  */
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Info, AlertTriangle, Calculator, Copy } from 'lucide-react';
-import { useProgramV2 } from '../../../contexts/ProgramContextV2.jsx';
-import { roundToIncrement } from '../../../lib/engines/FiveThreeOneEngine.v2.js';
+import { useProgramV2 } from '../../contexts/ProgramContextV2.jsx';
+import { roundToIncrement } from '../../engines/FiveThreeOneEngine.v2.js';
 
 // Wendler e1RM formula: e1RM = weight * (1 + 0.0333 * reps)
 const calculateE1RM = (weight, reps) => {
@@ -100,8 +100,12 @@ export default function Step1Fundamentals({ onValidChange }) {
         });
     }, [localState.lifts]);
 
+    const prevValidRef = useRef(isValid);
     useEffect(() => {
-        onValidChange(isValid);
+        if (prevValidRef.current !== isValid) {
+            onValidChange?.(isValid);
+            prevValidRef.current = isValid;
+        }
     }, [isValid, onValidChange]);
 
     const updateLocalState = useCallback((updates) => {
@@ -289,8 +293,8 @@ export default function Step1Fundamentals({ onValidChange }) {
                                     key={unit}
                                     onClick={() => updateLocalState({ units: unit })}
                                     className={`px-4 py-2 rounded border text-sm font-medium transition-colors ${localState.units === unit
-                                            ? 'border-red-500 bg-red-600/20 text-red-400'
-                                            : 'border-gray-600 text-gray-300 hover:border-gray-500'
+                                        ? 'border-red-500 bg-red-600/20 text-red-400'
+                                        : 'border-gray-600 text-gray-300 hover:border-gray-500'
                                         }`}
                                 >
                                     {unit.toUpperCase()}
@@ -322,8 +326,8 @@ export default function Step1Fundamentals({ onValidChange }) {
                                     key={pct}
                                     onClick={() => updateLocalState({ tmPct: pct })}
                                     className={`px-4 py-2 rounded border text-sm font-medium transition-colors ${localState.tmPct === pct
-                                            ? 'border-red-500 bg-red-600/20 text-red-400'
-                                            : 'border-gray-600 text-gray-300 hover:border-gray-500'
+                                        ? 'border-red-500 bg-red-600/20 text-red-400'
+                                        : 'border-gray-600 text-gray-300 hover:border-gray-500'
                                         }`}
                                 >
                                     {Math.round(pct * 100)}%
