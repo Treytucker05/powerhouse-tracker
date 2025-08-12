@@ -418,13 +418,15 @@ function WizardShell() {
                     {/* Main Content */}
                     <main className="lg:col-span-9">
                         <div className="space-y-6">
-                            {/* Step Content */}
+                            {/* Step content always rendered so validation can update */}
+                            {renderStepContent()}
+                            {/* 3-day schedule preview appended (does not replace step content) */}
                             {(() => {
                                 const preview = state?.advanced?.schedulePreview;
                                 if (preview?.mode === '3day' && Array.isArray(preview?.weeks) && preview.weeks.length) {
                                     const weeks = toUiDays(preview);
                                     return (
-                                        <div className="space-y-6">
+                                        <div className="space-y-6 mt-10">
                                             {weeks.map((w, wi) => (
                                                 <div key={wi} className="rounded-2xl border border-gray-700 bg-gray-800/40 p-4">
                                                     <div className="text-lg font-semibold mb-3 text-white">{w.label}</div>
@@ -434,9 +436,8 @@ function WizardShell() {
                                                                 <div className="text-xs uppercase tracking-wide text-gray-400 mb-2">{s.sessionWeekLabel}</div>
                                                                 {s.lifts.map((lift, li) => {
                                                                     const units = state?.units || 'lbs';
-                                                                    // Derive training max map from state.lifts structure (oneRM to TM logic already applied elsewhere?)
                                                                     const tms = Object.fromEntries(Object.entries(state?.lifts || {}).map(([k,v]) => [k, v.tm || 0]));
-                                                                    const roundingPref = state?.rounding === 'ceil' ? { lbs: 5, kg: 2.5 } : { lbs: 5, kg: 2.5 }; // placeholder; future: map modes
+                                                                    const roundingPref = state?.rounding === 'ceil' ? { lbs: 5, kg: 2.5 } : { lbs: 5, kg: 2.5 };
                                                                     const pack = packRef.current;
                                                                     const warmups = computeWarmupsFromPack({ pack, lift, tms, units, rounding: roundingPref });
                                                                     const main = computeMainFromPack({ pack, lift, weekLabel: s.sessionWeekLabel, tms, units, rounding: roundingPref });
@@ -444,7 +445,6 @@ function WizardShell() {
                                                                     return (
                                                                         <div key={li} className={li > 0 ? 'mt-4 pt-4 border-t border-gray-700/40' : ''}>
                                                                             <div className="font-medium capitalize text-gray-200">{lift}</div>
-                                                                            {/* Warm-ups */}
                                                                             <div className="mt-1 text-xs uppercase tracking-wide text-gray-400">Warm-up</div>
                                                                             <ul className="text-sm mb-2 space-y-0.5">
                                                                                 {warmups.length === 0 && <li className="text-gray-500">—</li>}
@@ -452,7 +452,6 @@ function WizardShell() {
                                                                                     <li key={i} className="tabular-nums text-gray-300">{r.pct}% × {r.reps} → <span className="text-white">{r.weight}</span> {units}</li>
                                                                                 ))}
                                                                             </ul>
-                                                                            {/* Main */}
                                                                             <div className="text-xs uppercase tracking-wide text-gray-400">Main</div>
                                                                             <ul className="text-sm mb-2 space-y-0.5">
                                                                                 {main.rows.length === 0 && <li className="text-gray-500">—</li>}
@@ -463,14 +462,12 @@ function WizardShell() {
                                                                                     </li>
                                                                                 ))}
                                                                             </ul>
-                                                                            {/* BBB */}
                                                                             {bbb && (
                                                                                 <div className="mb-2">
                                                                                     <div className="text-xs uppercase tracking-wide text-gray-400">Supplemental (BBB)</div>
                                                                                     <div className="text-sm tabular-nums text-gray-300">{bbb.sets}×{bbb.reps} @ {bbb.pct}% TM → <span className="text-white">{bbb.load}</span> {units}</div>
                                                                                 </div>
                                                                             )}
-                                                                            {/* Assistance (template global list) */}
                                                                             {Array.isArray(state?.assistance?.items) && state.assistance.items.length > 0 && (
                                                                                 <div>
                                                                                     <div className="text-xs uppercase tracking-wide text-gray-400">Assistance</div>
@@ -492,8 +489,7 @@ function WizardShell() {
                                         </div>
                                     );
                                 }
-                                // TODO: when USE_METHOD_PACKS is true and mode remains 4day, migrate 4-day preview to compute* helpers for parity.
-                                return renderStepContent();
+                                return null;
                             })()}
                             {/* NOTE: If a day in schedulePreview has { combineWith }, future UI can render two main lifts in one session for deload. */}
 
