@@ -26,7 +26,7 @@ const USE_METHOD_PACKS = envFlag == null ? true : String(envFlag).toLowerCase() 
 
 // --- Simplified deterministic Step 1 gating (only core fundamentals) ---
 // Per spec: require 4 valid TMs, units, rounding, TM% (0.90 or 0.85). Allow dev bypass via env.
-const LIFTS = ["squat","bench","deadlift","press"];
+const LIFTS = ["squat", "bench", "deadlift", "press"];
 
 function isStep1Complete(state) {
     if (!state) return false;
@@ -337,13 +337,14 @@ function WizardShell() {
         }
     };
 
+    // Hoisted hook: avoid calling useCallback inside conditional render paths
+    const onFundamentalsValidChange = useCallback((isValid) => handleStepValidation('fundamentals', isValid), [handleStepValidation]);
+
     const renderStepContent = () => {
         switch (stepIndex) {
             case 0:
                 return (
-                    <Step1Fundamentals
-                        onValidChange={useCallback((isValid) => handleStepValidation('fundamentals', isValid), [handleStepValidation])}
-                    />
+                    <Step1Fundamentals onValidChange={onFundamentalsValidChange} />
                 );
             case 1:
                 return (
@@ -376,10 +377,12 @@ function WizardShell() {
     // One-time debug insight for Step 1 gating each render (cheap; aids troubleshooting)
     if (currentStep.id === 'fundamentals') {
         // eslint-disable-next-line no-console
-        console.debug("Step1 validation:", { canNext: allowStep1Next(state), stateSnapshot: {
-            units: state?.units, rounding: state?.rounding, tmPct: state?.tmPct,
-            tms: LIFTS.reduce((acc,k)=>{ acc[k]=state?.lifts?.[k]?.tm||null; return acc; }, {})
-        }});
+        console.debug("Step1 validation:", {
+            canNext: allowStep1Next(state), stateSnapshot: {
+                units: state?.units, rounding: state?.rounding, tmPct: state?.tmPct,
+                tms: LIFTS.reduce((acc, k) => { acc[k] = state?.lifts?.[k]?.tm || null; return acc; }, {})
+            }
+        });
     }
 
     return (
