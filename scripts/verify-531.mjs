@@ -1,0 +1,68 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { loadJsonc } from "./jsonc.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const packPath = path.resolve(__dirname, "../methodology/packs/531.bbb.v1.jsonc");
+const casesPath = path.resolve(__dirname, "../methodology/verification/531.v1.verifier.jsonc");
+
+function fmtSet(s) {
+  if (!s) return "";
+  const pct = s.value ?? s.percentage ?? s.pct ?? s.percent ?? (typeof s.kind === 'percent_of' ? s.value : s.value);
+  const repsBase = s.reps ?? (s.rep ? s.rep : "");
+  const reps = s.amrap ? `${repsBase}+` : repsBase;
+  return `${pct}%x${reps}`.trim();
+}
+
+function eq(a, b) {
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+function assertEqual(label, got, exp, errs) {
+  if (!eq(got, exp)) {
+    errs.push(`${label} mismatch:\n  expected: ${JSON.stringify(exp)}\n  got:      ${JSON.stringify(got)}`);
+  }
+}
+
+try {
+  const pack = loadJsonc(packPath);
+  const tests = loadJsonc(casesPath);
+
+  const warmups = (pack.progressions?.warmups || []).map(fmtSet);
+  const weekByLabel = Object.fromEntries(
+    (pack.progressions?.weeks || []).map(w => [String(w.label).toLowerCase(), w])
+  );
+
+  const errs = [];
+  for (const c of tests.cases || []) {
+    const expWarm = c.expect?.warmups || null;
+    const expMain  = c.expect?.main || null;
+
+    if (expWarm) assertEqual(`${c.name} warmups`, warmups, expWarm, errs);
+
+    const label = c.name.toLowerCase().includes("deload") ? "deload"
+                 : c.name.toLowerCase().includes("week1") ? "3x5"
+                 : c.name.toLowerCase().includes("week 1") ? "3x5"
+                 : c.name.toLowerCase().includes("3x5") ? "3x5"
+                 : c.name.toLowerCase().includes("3x3") ? "3x3"
+                 : c.name.toLowerCase().includes("5/3/1") ? "5/3/1"
+                 : "3x5";
+
+    const lookupKey = label.replace(/\s+/g, "").toLowerCase();
+    const wk = weekByLabel[lookupKey] || weekByLabel[label.toLowerCase()] || weekByLabel["3x5"];
+    const gotMain = (wk?.main || []).map(fmtSet);
+
+    if (expMain) assertEqual(`${c.name} main`, gotMain, expMain, errs);
+  }
+
+  if (errs.length) {
+    console.error(`\u274c 5/3/1 verifier FAILED (${errs.length} issue${errs.length>1?"s":""})`);
+    for (const e of errs) console.error(" - " + e.replace(/\n/g, "\n   "));
+    process.exit(1);
+  } else {
+    console.log("\u2705 5/3/1 verifier passed (warm-ups & main % tables match).");
+  }
+} catch (e) {
+  console.error("\u274c Verifier crashed:", e);
+  process.exit(1);
+}
