@@ -9,9 +9,14 @@ import { useNavigate } from "react-router-dom";
 import { useProgramV2 } from "../contexts/ProgramContextV2.jsx";
 import { buildMainSetsForLift, buildWarmupSets, roundToIncrement } from "../"; // barrel export
 import { loadPack531BBB } from "../loadPack";
+import { extractSupplementalFromPack } from "../packAdapter";
 
 // Feature flag (off by default) to switch wizard initialization to method packs.
-const USE_METHOD_PACKS = false; // flip to true later
+// Can be overridden at runtime via window.__USE_PACKS__ (dev toggle below).
+let USE_METHOD_PACKS = false;
+if (typeof window !== 'undefined' && typeof window.__USE_PACKS__ === 'boolean') {
+    USE_METHOD_PACKS = Boolean(window.__USE_PACKS__);
+}
 import Step1Fundamentals from './steps/Step1Fundamentals.jsx';
 import Step2TemplateOrCustom from './steps/Step2TemplateOrCustom.jsx';
 import Step3DesignCustom from './steps/Step3DesignCustom.jsx';
@@ -28,17 +33,31 @@ function WizardShell() {
     const [stepIndex, setStepIndex] = useState(0);
     const [stepValidation, setStepValidation] = useState({ fundamentals: false, design: false, review: false });
     const navigate = useNavigate();
-    const { state } = useProgramV2();
+    const { state, dispatch } = useProgramV2();
+    const showPackToggle = typeof process !== 'undefined' && process.env.NODE_ENV !== 'production';
 
     // Optional future pack loading (no behavior change while flag is false)
     useEffect(() => {
         let cancelled = false;
         async function maybeLoadPack() {
-            if (!USE_METHOD_PACKS) return;
+            // Re-evaluate dynamic flag (in case toggled after mount)
+            const dynFlag = (typeof window !== 'undefined' && window.__USE_PACKS__) || USE_METHOD_PACKS;
+            if (!dynFlag) return;
             const pack = await loadPack531BBB();
             if (!cancelled && pack) {
                 console.info("Loaded 531 BBB pack:", pack);
-                // TODO: map pack -> context state (future block)
+                const sup = extractSupplementalFromPack(pack, "bbb60");
+                if (sup) {
+                    // Dispatch only supplemental fields (non-destructive)
+                    dispatch({ type: 'SET_SUPPLEMENTAL', supplemental: {
+                        strategy: sup.mode === 'bbb' ? 'bbb' : (sup.mode || 'none'),
+                        pairing: sup.pairing,
+                        percentOfTM: sup.intensity?.value || 60,
+                        sets: sup.sets,
+                        reps: sup.reps,
+                        _pack: sup._provenance
+                    }});
+                }
             }
         }
         maybeLoadPack();
@@ -250,9 +269,45 @@ function WizardShell() {
         <div className="min-h-screen bg-gray-900">
             <div className="container mx-auto px-6 py-8">
                 {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-white mb-2">5/3/1 Program Builder V2</h1>
-                    <p className="text-gray-400">Jim Wendler's proven strength training methodology</p>
+                <div className="mb-8 space-y-2">
+                    <div className="flex items-start justify-between flex-wrap gap-4">
+                        <div>
+                            <h1 className="text-3xl font-bold text-white mb-2">5/3/1 Program Builder V2</h1>
+                            <p className="text-gray-400">Jim Wendler's proven strength training methodology</p>
+                        </div>
+                        {showPackToggle && (
+                            <label className="text-xs inline-flex items-center gap-2 bg-gray-800/60 px-3 py-2 rounded border border-gray-700 cursor-pointer select-none">
+                                <input
+                                    type="checkbox"
+                                    defaultChecked={USE_METHOD_PACKS}
+                                    onChange={(e) => {
+                                        window.__USE_PACKS__ = e.target.checked;
+                                        // Re-run pack load quickly if enabling
+                                        if (e.target.checked) {
+                                            (async () => {
+                                                const pack = await loadPack531BBB();
+                                                if (pack) {
+                                                    const sup = extractSupplementalFromPack(pack, 'bbb60');
+                                                    if (sup) {
+                                                        dispatch({ type: 'SET_SUPPLEMENTAL', supplemental: {
+                                                            strategy: sup.mode === 'bbb' ? 'bbb' : (sup.mode || 'none'),
+                                                            pairing: sup.pairing,
+                                                            percentOfTM: sup.intensity?.value || 60,
+                                                            sets: sup.sets,
+                                                            reps: sup.reps,
+                                                            _pack: sup._provenance
+                                                        }});
+                                                    }
+                                                }
+                                            })();
+                                        }
+                                    }}
+                                    className="accent-red-500"
+                                />
+                                <span>Use method packs (dev)</span>
+                            </label>
+                        )}
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
