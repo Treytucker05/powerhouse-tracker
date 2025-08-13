@@ -12,7 +12,7 @@ import { loadPack531BBB } from "../loadPack";
 import { extractSupplementalFromPack, extractWarmups, extractWeekByLabel } from "../packAdapter";
 import { applyDecisionsFromPack } from "../decisionAdapter";
 import { mapTemplateAssistance, validateAssistanceVolume } from "../assistanceMapper";
-import { buildSchedule, buildSchedule4Day, SPLIT_4DAY_A } from "../schedule";
+import { buildSchedule, buildSchedule4Day, buildSchedule2Day, buildSchedule1Day, SPLIT_4DAY_A, SPLIT_4DAY_B } from "../schedule";
 import { advanceCycle } from "../progression";
 import { toUiDays } from "../scheduleRender";
 import { computeWarmupsFromPack, computeMainFromPack, computeBBBFromConfig } from "../calc";
@@ -352,14 +352,14 @@ function WizardShell() {
         // We don't have direct state setter (using reducer) so dispatch an advanced patch capturing next TMs
         const nextState = advanceCycle({
             ...state,
-            tms: Object.fromEntries(Object.entries(state.lifts || {}).map(([k,v]) => [k, v?.tm || 0]))
+            tms: Object.fromEntries(Object.entries(state.lifts || {}).map(([k, v]) => [k, v?.tm || 0]))
         }, { amrapWk3: repsMap });
         // Apply updated lift TMs
         for (const lift of Object.keys(nextState.lifts || {})) {
             const tmVal = nextState.lifts[lift].tm;
             dispatch({ type: 'SET_TM', lift, tm: tmVal });
         }
-        dispatch({ type: 'SET_ADVANCED', advanced: { ...(state.advanced||{}), cycle: nextState.cycle } });
+        dispatch({ type: 'SET_ADVANCED', advanced: { ...(state.advanced || {}), cycle: nextState.cycle } });
         console.info('Cycle advanced:', { cycle: nextState.cycle, nextTms: nextState.tms });
     }
 
@@ -385,6 +385,52 @@ function WizardShell() {
                             // Jump straight to review (index 3)
                             setStepIndex(3);
                         }}
+                        extraControls={<div className="mt-4">
+                            <label className="block text-xs uppercase tracking-wide text-gray-400 mb-1">Days per week</label>
+                            <select
+                                value={state?.daysPerWeek || 3}
+                                onChange={(e) => {
+                                    const val = Number(e.target.value);
+                                    dispatch({ type: 'SET_DAYS_PER_WEEK', payload: val });
+                                    // Build/refresh preview immediately
+                                    const split = state?.split4 === 'B' ? SPLIT_4DAY_B : SPLIT_4DAY_A;
+                                    const pack = packRef.current;
+                                    let sched;
+                                    if (val === 4) sched = buildSchedule4Day({ state: { ...state, daysPerWeek: val }, pack, split, weekLabel: '3x5' });
+                                    else if (val === 3) sched = buildSchedule({ mode: '3day', liftOrder: ["press", "deadlift", "bench", "squat"] });
+                                    else if (val === 2) sched = buildSchedule2Day({ state: { ...state, daysPerWeek: val }, pack, split, weekLabel: '3x5' });
+                                    else sched = buildSchedule1Day({ state: { ...state, daysPerWeek: val }, pack, split, weekLabel: '3x5' });
+                                    dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), schedulePreview: sched } });
+                                }}
+                                className="bg-gray-900/60 border border-gray-700 focus:border-red-500 focus:outline-none rounded px-2 py-1 text-sm text-gray-200"
+                            >
+                                <option value={1}>1</option>
+                                <option value={2}>2</option>
+                                <option value={3}>3</option>
+                                <option value={4}>4</option>
+                            </select>
+                            <label className="block text-xs uppercase tracking-wide text-gray-400 mt-4 mb-1">4-day Split</label>
+                            <select
+                                value={state?.split4 || 'A'}
+                                onChange={(e) => {
+                                    const splitVal = e.target.value === 'B' ? 'B' : 'A';
+                                    dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), split4: splitVal } });
+                                    const split = splitVal === 'B' ? SPLIT_4DAY_B : SPLIT_4DAY_A;
+                                    const val = Number(state?.daysPerWeek || 3);
+                                    const pack = packRef.current;
+                                    let sched;
+                                    if (val === 4) sched = buildSchedule4Day({ state: { ...state }, pack, split, weekLabel: '3x5' });
+                                    else if (val === 3) sched = buildSchedule({ mode: '3day', liftOrder: ["press", "deadlift", "bench", "squat"] });
+                                    else if (val === 2) sched = buildSchedule2Day({ state: { ...state }, pack, split, weekLabel: '3x5' });
+                                    else sched = buildSchedule1Day({ state: { ...state }, pack, split, weekLabel: '3x5' });
+                                    dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), split4: splitVal, schedulePreview: sched } });
+                                }}
+                                className="bg-gray-900/60 border border-gray-700 focus:border-red-500 focus:outline-none rounded px-2 py-1 text-sm text-gray-200"
+                            >
+                                <option value='A'>A (Press / Deadlift / Bench / Squat)</option>
+                                <option value='B'>B (Bench / Squat / Press / Deadlift)</option>
+                            </select>
+                        </div>}
                     />
                 );
             case 2:
@@ -542,6 +588,14 @@ function WizardShell() {
                                                                                     </ul>
                                                                                 </div>
                                                                             )}
+                                                                            {s.conditioning && (
+                                                                                <div className="mt-2">
+                                                                                    <div className="text-xs uppercase tracking-wide text-gray-400">Conditioning</div>
+                                                                                    <div className="text-xs text-gray-300">
+                                                                                        {s.conditioning.type} {s.conditioning.minutes ? `${s.conditioning.minutes}m` : ''}{s.conditioning.intensity ? ` · ${s.conditioning.intensity}` : ''}
+                                                                                    </div>
+                                                                                </div>
+                                                                            )}
                                                                         </div>
                                                                     );
                                                                 })}
@@ -594,8 +648,115 @@ function WizardShell() {
                                                                     </ul>
                                                                 </div>
                                                             )}
+                                                            {d.conditioning && (
+                                                                <div className="mt-2">
+                                                                    <div className="text-xs uppercase tracking-wide text-gray-400">Conditioning</div>
+                                                                    <div className="text-xs text-gray-300">
+                                                                        {d.conditioning.type} {d.conditioning.minutes ? `${d.conditioning.minutes}m` : ''}{d.conditioning.intensity ? ` · ${d.conditioning.intensity}` : ''}
+                                                                    </div>
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                                // 2-day live preview
+                                if (preview?.mode === '2day_live' && Array.isArray(preview?.days) && preview.days.length === 2) {
+                                    return (
+                                        <div className="space-y-6 mt-10">
+                                            <div className="rounded-2xl border border-gray-700 bg-gray-800/40 p-4">
+                                                <div className="text-lg font-semibold mb-3 text-white">Week 1 (2-Day Preview)</div>
+                                                <div className="grid md:grid-cols-2 gap-4">
+                                                    {preview.days.map((d, di) => (
+                                                        <div key={di} className="rounded-xl border border-gray-700/60 bg-gray-900/40 p-3">
+                                                            <div className="text-xs uppercase tracking-wide text-gray-400 mb-2">Day {di + 1}</div>
+                                                            <div className="font-medium capitalize text-gray-200 mb-2">{d.lift}</div>
+                                                            <div className="text-xs uppercase tracking-wide text-gray-400">Warm-up</div>
+                                                            <ul className="text-sm mb-2 space-y-0.5">
+                                                                {d.warmups?.length === 0 && <li className="text-gray-500">—</li>}
+                                                                {d.warmups?.map((r, i) => (
+                                                                    <li key={i} className="tabular-nums text-gray-300">{r.pct}% × {r.reps} → <span className="text-white">{r.weight}</span> {state?.units || 'lbs'}</li>
+                                                                ))}
+                                                            </ul>
+                                                            <div className="text-xs uppercase tracking-wide text-gray-400">Main</div>
+                                                            <ul className="text-sm mb-2 space-y-0.5">
+                                                                {d.main?.rows?.length === 0 && <li className="text-gray-500">—</li>}
+                                                                {d.main?.rows?.map((r, i) => (
+                                                                    <li key={i} className="tabular-nums text-gray-300">{r.pct}% × {r.reps}{r.amrap ? '+' : ''} → <span className="text-white">{r.weight}</span> {state?.units || 'lbs'}{r.amrap && <span className="ml-2 text-[10px] px-1 py-0.5 border border-red-500/40 rounded text-red-300">AMRAP</span>}</li>
+                                                                ))}
+                                                            </ul>
+                                                            {Array.isArray(d.assistance) && d.assistance.length > 0 && (
+                                                                <div>
+                                                                    <div className="text-xs uppercase tracking-wide text-gray-400">Assistance</div>
+                                                                    <ul className="text-sm space-y-0.5">
+                                                                        {d.assistance.map((a, ai) => (
+                                                                            <li key={ai} className="text-gray-300">{a.name || a.id} — {a.sets ?? '?'}×{a.reps ?? '?'}</li>
+                                                                        ))}
+                                                                    </ul>
+                                                                </div>
+                                                            )}
+                                                            {d.conditioning && (
+                                                                <div className="mt-2">
+                                                                    <div className="text-xs uppercase tracking-wide text-gray-400">Conditioning</div>
+                                                                    <div className="text-xs text-gray-300">
+                                                                        {d.conditioning.type} {d.conditioning.minutes ? `${d.conditioning.minutes}m` : ''}{d.conditioning.intensity ? ` · ${d.conditioning.intensity}` : ''}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                }
+                                // 1-day live preview
+                                if (preview?.mode === '1day_live' && Array.isArray(preview?.days) && preview.days.length === 1) {
+                                    const d = preview.days[0];
+                                    return (
+                                        <div className="space-y-6 mt-10">
+                                            <div className="rounded-2xl border border-gray-700 bg-gray-800/40 p-4">
+                                                <div className="text-lg font-semibold mb-3 text-white">Week 1 (1-Day Preview)</div>
+                                                <div className="grid md:grid-cols-1 gap-4">
+                                                    <div className="rounded-xl border border-gray-700/60 bg-gray-900/40 p-3">
+                                                        <div className="text-xs uppercase tracking-wide text-gray-400 mb-2">Day 1</div>
+                                                        <div className="font-medium capitalize text-gray-200 mb-2">{d.lift}</div>
+                                                        <div className="text-xs uppercase tracking-wide text-gray-400">Warm-up</div>
+                                                        <ul className="text-sm mb-2 space-y-0.5">
+                                                            {d.warmups?.length === 0 && <li className="text-gray-500">—</li>}
+                                                            {d.warmups?.map((r, i) => (
+                                                                <li key={i} className="tabular-nums text-gray-300">{r.pct}% × {r.reps} → <span className="text-white">{r.weight}</span> {state?.units || 'lbs'}</li>
+                                                            ))}
+                                                        </ul>
+                                                        <div className="text-xs uppercase tracking-wide text-gray-400">Main</div>
+                                                        <ul className="text-sm mb-2 space-y-0.5">
+                                                            {d.main?.rows?.length === 0 && <li className="text-gray-500">—</li>}
+                                                            {d.main?.rows?.map((r, i) => (
+                                                                <li key={i} className="tabular-nums text-gray-300">{r.pct}% × {r.reps}{r.amrap ? '+' : ''} → <span className="text-white">{r.weight}</span> {state?.units || 'lbs'}{r.amrap && <span className="ml-2 text-[10px] px-1 py-0.5 border border-red-500/40 rounded text-red-300">AMRAP</span>}</li>
+                                                            ))}
+                                                        </ul>
+                                                        {Array.isArray(d.assistance) && d.assistance.length > 0 && (
+                                                            <div>
+                                                                <div className="text-xs uppercase tracking-wide text-gray-400">Assistance</div>
+                                                                <ul className="text-sm space-y-0.5">
+                                                                    {d.assistance.map((a, ai) => (
+                                                                        <li key={ai} className="text-gray-300">{a.name || a.id} — {a.sets ?? '?'}×{a.reps ?? '?'}</li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                        )}
+                                                        {d.conditioning && (
+                                                            <div className="mt-2">
+                                                                <div className="text-xs uppercase tracking-wide text-gray-400">Conditioning</div>
+                                                                <div className="text-xs text-gray-300">
+                                                                    {d.conditioning.type} {d.conditioning.minutes ? `${d.conditioning.minutes}m` : ''}{d.conditioning.intensity ? ` · ${d.conditioning.intensity}` : ''}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -604,6 +765,54 @@ function WizardShell() {
                                 return null;
                             })()}
                             {/* NOTE: If a day in schedulePreview has { combineWith }, future UI can render two main lifts in one session for deload. */}
+
+                            {/* Week 3 AMRAP capture + progression trigger */}
+                            {stepIndex === 3 && (typeof import.meta !== 'undefined' && import.meta.env?.VITE_ENABLE_PROGRESS === 'true') && (
+                                <div className="mt-10 rounded-2xl border border-gray-700 bg-gray-800/40 p-4">
+                                    <div className="flex items-start justify-between flex-wrap gap-4 mb-4">
+                                        <div>
+                                            <h3 className="text-lg font-semibold text-white">Week 3 AMRAP Results</h3>
+                                            <p className="text-xs text-gray-400 mt-1 max-w-xl">Enter the reps you achieved on the final AMRAP set of Week 3 for each main lift. Leave blank if not performed. Progression will increase TMs only for lifts that met or exceeded the baseline (auto-pass when FORCE_PASS env flag set).</p>
+                                        </div>
+                                        <div className="text-xs text-gray-500">Cycle: <span className="text-gray-300">{state?.cycle || 1}</span></div>
+                                    </div>
+                                    <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
+                                        {LIFTS.map(lift => {
+                                            const val = state?.amrapWk3?.[lift] ?? '';
+                                            return (
+                                                <div key={lift} className="flex flex-col">
+                                                    <label className="text-xs uppercase tracking-wide text-gray-400 mb-1">{lift}</label>
+                                                    <input
+                                                        type="number"
+                                                        min={0}
+                                                        value={val === null ? '' : val}
+                                                        onChange={e => {
+                                                            const raw = e.target.value;
+                                                            const num = raw === '' ? null : Math.max(0, parseInt(raw, 10) || 0);
+                                                            dispatch({ type: 'SET_AMRAP_WK3', payload: { [lift]: num } });
+                                                        }}
+                                                        className="bg-gray-900/60 border border-gray-700 focus:border-red-500 focus:outline-none rounded px-2 py-1 text-sm text-gray-200"
+                                                        placeholder="Reps"
+                                                    />
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                    <div className="flex items-center justify-end mt-6 space-x-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                // Trigger progression using captured reps
+                                                onAdvanceCycle(state?.amrapWk3 || {});
+                                                // Persist reps into context (already there) – optionally could clear after
+                                            }}
+                                            className="px-5 py-2 rounded-lg border font-medium transition-colors border-blue-500 bg-blue-600/10 text-blue-300 hover:bg-blue-600/20"
+                                        >
+                                            Advance Cycle
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Navigation Buttons */}
                             <div className="flex items-center justify-between pt-6 border-t border-gray-700">

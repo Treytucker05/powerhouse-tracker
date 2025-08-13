@@ -74,102 +74,309 @@
                 "supplemental": {
                     "mode": "bbb",
                     "pairing": "same",
-                    "intensity": { "kind": "percent_of", "of": "TM", "value": 60 },
-                    "sets": 5, "reps": 10
+                    "intensity": {
+                        "kind": "percent_of",
+                        "of": "TM",
+                        "value": 60
+                    },
+                    "sets": 5,
+                    "reps": 10
                 }
             },
             "assistanceDefaults": {
-                "press":   [{ "id": "bw.pullup", "name": "Chin-up", "sets": 5, "reps": 10 }],
-                "deadlift":[{ "id": "core.hlr",  "name": "Hanging Leg Raise", "sets": 5, "reps": 15 }],
-                "bench":   [{ "id": "db.row",    "name": "DB Row", "sets": 5, "reps": 10 }],
-                "squat":   [{ "id": "mach.legcurl", "name": "Leg Curl", "sets": 5, "reps": 10 }]
+                "press": [
+                    {
+                        "id": "bw.pullup",
+                        "name": "Chin-up",
+                        "sets": 5,
+                        "reps": 10
+                    }
+                ],
+                "deadlift": [
+                    {
+                        "id": "core.hlr",
+                        "name": "Hanging Leg Raise",
+                        "sets": 5,
+                        "reps": 15
+                    }
+                ],
+                "bench": [
+                    {
+                        "id": "db.row",
+                        "name": "DB Row",
+                        "sets": 5,
+                        "reps": 10
+                    }
+                ],
+                "squat": [
+                    {
+                        "id": "mach.legcurl",
+                        "name": "Leg Curl",
+                        "sets": 5,
+                        "reps": 10
+                    }
+                ]
             },
-            "provenance": { "source": "book", "note": "BBB: main 5x10 + one accessory 5x10-15" }
+            "provenance": {
+                "source": "book",
+                "note": "BBB: main 5x10 + one accessory 5x10-15"
+            }
         },
         {
             "id": "triumvirate",
             "name": "Triumvirate",
-            "effects": { "supplemental": { "mode": "none" } },
+            "effects": {
+                "supplemental": {
+                    "mode": "none"
+                }
+            },
             "assistanceDefaults": {
                 "press": [
-                    { "id": "bw.dip", "name": "Dips", "sets": 5, "reps": 15 },
-                    { "id": "bw.pullup", "name": "Chin-up", "sets": 5, "reps": 10 }
+                    {
+                        "id": "bw.dip",
+                        "name": "Dips",
+                        "sets": 5,
+                        "reps": 15
+                    },
+                    {
+                        "id": "bw.pullup",
+                        "name": "Chin-up",
+                        "sets": 5,
+                        "reps": 10
+                    }
                 ],
                 "deadlift": [
-                    { "id": "bb.goodmorning", "name": "Good Morning", "sets": 5, "reps": 12 },
-                    { "id": "core.hlr", "name": "Hanging Leg Raise", "sets": 5, "reps": 15 }
+                    {
+                        "id": "bb.goodmorning",
+                        "name": "Good Morning",
+                        "sets": 5,
+                        "reps": 12
+                    },
+                    {
+                        "id": "core.hlr",
+                        "name": "Hanging Leg Raise",
+                        "sets": 5,
+                        "reps": 15
+                    }
                 ],
                 "bench": [
-                    { "id": "db.bench.flat", "name": "DB Bench Press", "sets": 5, "reps": 15 },
-                    { "id": "db.row", "name": "DB Row", "sets": 5, "reps": 10 }
+                    {
+                        "id": "db.bench.flat",
+                        "name": "DB Bench Press",
+                        "sets": 5,
+                        "reps": 15
+                    },
+                    {
+                        "id": "db.row",
+                        "name": "DB Row",
+                        "sets": 5,
+                        "reps": 10
+                    }
                 ],
                 "squat": [
-                    { "id": "mach.legpress", "name": "Leg Press", "sets": 5, "reps": 15 },
-                    { "id": "mach.legcurl", "name": "Leg Curl", "sets": 5, "reps": 10 }
+                    {
+                        "id": "mach.legpress",
+                        "name": "Leg Press",
+                        "sets": 5,
+                        "reps": 15
+                    },
+                    {
+                        "id": "mach.legcurl",
+                        "name": "Leg Curl",
+                        "sets": 5,
+                        "reps": 10
+                    }
                 ]
             },
-            "provenance": { "source": "book", "note": "Triumvirate: 2 key assistance moves, 5 sets each" }
+            "provenance": {
+                "source": "book",
+                "note": "Triumvirate: 2 key assistance moves, 5 sets each"
+            }
         },
         {
             "id": "jack_shit",
             "name": "I’m Not Doing Jack Shit",
-            "effects": { "supplemental": { "mode": "none" } },
-            "assistanceDefaults": {
-                "press": [], "deadlift": [], "bench": [], "squat": []
+            "effects": {
+                "supplemental": {
+                    "mode": "none"
+                }
             },
-            "provenance": { "source": "book", "note": "No assistance" }
+            "assistanceDefaults": {
+                "press": [],
+                "deadlift": [],
+                "bench": [],
+                "squat": []
+            },
+            "provenance": {
+                "source": "book",
+                "note": "No assistance"
+            }
         },
         {
             "id": "periodization_bible",
             "name": "Periodization Bible",
-            "effects": { "supplemental": { "mode": "none" } },
+            "effects": {
+                "supplemental": {
+                    "mode": "none"
+                }
+            },
             "assistanceDefaults": {
                 "press": [
-                    { "id": "db.bench.incline", "name": "Incline DB Bench", "sets": 5, "reps": 12 },
-                    { "id": "lat.pulldown", "name": "Lat Pulldown", "sets": 5, "reps": 12 },
-                    { "id": "tri.pushdown", "name": "Triceps Pushdown", "sets": 5, "reps": 12 }
+                    {
+                        "id": "db.bench.incline",
+                        "name": "Incline DB Bench",
+                        "sets": 5,
+                        "reps": 12
+                    },
+                    {
+                        "id": "lat.pulldown",
+                        "name": "Lat Pulldown",
+                        "sets": 5,
+                        "reps": 12
+                    },
+                    {
+                        "id": "tri.pushdown",
+                        "name": "Triceps Pushdown",
+                        "sets": 5,
+                        "reps": 12
+                    }
                 ],
                 "deadlift": [
-                    { "id": "mach.legcurl", "name": "Leg Curl", "sets": 5, "reps": 12 },
-                    { "id": "mach.legpress", "name": "Leg Press", "sets": 5, "reps": 15 },
-                    { "id": "core.hlr", "name": "Hanging Leg Raise", "sets": 5, "reps": 15 }
+                    {
+                        "id": "mach.legcurl",
+                        "name": "Leg Curl",
+                        "sets": 5,
+                        "reps": 12
+                    },
+                    {
+                        "id": "mach.legpress",
+                        "name": "Leg Press",
+                        "sets": 5,
+                        "reps": 15
+                    },
+                    {
+                        "id": "core.hlr",
+                        "name": "Hanging Leg Raise",
+                        "sets": 5,
+                        "reps": 15
+                    }
                 ],
                 "bench": [
-                    { "id": "db.bench.flat", "name": "DB Bench Press", "sets": 5, "reps": 12 },
-                    { "id": "facepull", "name": "Face Pull", "sets": 5, "reps": 15 },
-                    { "id": "tri.pushdown", "name": "Triceps Pushdown", "sets": 5, "reps": 12 }
+                    {
+                        "id": "db.bench.flat",
+                        "name": "DB Bench Press",
+                        "sets": 5,
+                        "reps": 12
+                    },
+                    {
+                        "id": "facepull",
+                        "name": "Face Pull",
+                        "sets": 5,
+                        "reps": 15
+                    },
+                    {
+                        "id": "tri.pushdown",
+                        "name": "Triceps Pushdown",
+                        "sets": 5,
+                        "reps": 12
+                    }
                 ],
                 "squat": [
-                    { "id": "rev.hyper", "name": "Reverse Hyper/Back Raise", "sets": 5, "reps": 12 },
-                    { "id": "mach.legpress", "name": "Leg Press/Lunge", "sets": 5, "reps": 15 },
-                    { "id": "core.ab_wheel", "name": "Ab Wheel", "sets": 5, "reps": 12 }
+                    {
+                        "id": "rev.hyper",
+                        "name": "Reverse Hyper/Back Raise",
+                        "sets": 5,
+                        "reps": 12
+                    },
+                    {
+                        "id": "mach.legpress",
+                        "name": "Leg Press/Lunge",
+                        "sets": 5,
+                        "reps": 15
+                    },
+                    {
+                        "id": "core.ab_wheel",
+                        "name": "Ab Wheel",
+                        "sets": 5,
+                        "reps": 12
+                    }
                 ]
             },
-            "provenance": { "source": "book", "note": "3 categories x 5 sets (10–20 reps each)" }
+            "provenance": {
+                "source": "book",
+                "note": "3 categories x 5 sets (10–20 reps each)"
+            }
         },
         {
             "id": "bodyweight",
             "name": "Bodyweight Assistance",
-            "effects": { "supplemental": { "mode": "none" } },
+            "effects": {
+                "supplemental": {
+                    "mode": "none"
+                }
+            },
             "assistanceDefaults": {
                 "press": [
-                    { "id": "bw.pushup", "name": "Push-ups", "sets": 5, "reps": 20 },
-                    { "id": "bw.pullup", "name": "Pull-ups/Chins", "sets": 5, "reps": 10 }
+                    {
+                        "id": "bw.pushup",
+                        "name": "Push-ups",
+                        "sets": 5,
+                        "reps": 20
+                    },
+                    {
+                        "id": "bw.pullup",
+                        "name": "Pull-ups/Chins",
+                        "sets": 5,
+                        "reps": 10
+                    }
                 ],
                 "deadlift": [
-                    { "id": "bw.lunge", "name": "BW Lunges", "sets": 5, "reps": 15 },
-                    { "id": "core.hlr", "name": "Hanging Leg Raise", "sets": 5, "reps": 15 }
+                    {
+                        "id": "bw.lunge",
+                        "name": "BW Lunges",
+                        "sets": 5,
+                        "reps": 15
+                    },
+                    {
+                        "id": "core.hlr",
+                        "name": "Hanging Leg Raise",
+                        "sets": 5,
+                        "reps": 15
+                    }
                 ],
                 "bench": [
-                    { "id": "bw.dip", "name": "Dips", "sets": 5, "reps": 12 },
-                    { "id": "bw.row.inverted", "name": "Inverted Rows", "sets": 5, "reps": 12 }
+                    {
+                        "id": "bw.dip",
+                        "name": "Dips",
+                        "sets": 5,
+                        "reps": 12
+                    },
+                    {
+                        "id": "bw.row.inverted",
+                        "name": "Inverted Rows",
+                        "sets": 5,
+                        "reps": 12
+                    }
                 ],
                 "squat": [
-                    { "id": "bw.stepup", "name": "Step-ups", "sets": 5, "reps": 15 },
-                    { "id": "core.ab_wheel", "name": "Ab Wheel", "sets": 5, "reps": 12 }
+                    {
+                        "id": "bw.stepup",
+                        "name": "Step-ups",
+                        "sets": 5,
+                        "reps": 15
+                    },
+                    {
+                        "id": "core.ab_wheel",
+                        "name": "Ab Wheel",
+                        "sets": 5,
+                        "reps": 12
+                    }
                 ]
             },
-            "provenance": { "source": "book", "note": "All assistance is calisthenics; moderate-to-high reps" }
+            "provenance": {
+                "source": "book",
+                "note": "All assistance is calisthenics; moderate-to-high reps"
+            }
         }
     ],
     "progressions": {
@@ -303,39 +510,117 @@
                     "id": "q_days",
                     "prompt": "How many days per week will you lift?",
                     "kind": "single",
-                    "options": [1,2,3,4],
-                    "effects": [
-                        { "when": 4, "set": { "scheduleMode": "4day" } },
-                        { "when": 3, "set": { "scheduleMode": "3day" } },
-                        { "when": 2, "set": { "scheduleMode": "2day" } },
-                        { "when": 1, "set": { "scheduleMode": "1day" } }
+                    "options": [
+                        1,
+                        2,
+                        3,
+                        4
                     ],
-                    "provenance": { "source": "book", "note": "Wendler variants for 1–4 days/week" }
+                    "effects": [
+                        {
+                            "when": 4,
+                            "set": {
+                                "scheduleMode": "4day"
+                            }
+                        },
+                        {
+                            "when": 3,
+                            "set": {
+                                "scheduleMode": "3day"
+                            }
+                        },
+                        {
+                            "when": 2,
+                            "set": {
+                                "scheduleMode": "2day"
+                            }
+                        },
+                        {
+                            "when": 1,
+                            "set": {
+                                "scheduleMode": "1day"
+                            }
+                        }
+                    ],
+                    "provenance": {
+                        "source": "book",
+                        "note": "Wendler variants for 1–4 days/week"
+                    }
                 },
                 {
                     "id": "q_assist",
                     "prompt": "How much assistance work do you want?",
                     "kind": "single",
-                    "options": ["None (Jack Shit)","Minimal (Triumvirate)","Moderate (Periodization Bible)","High Volume (BBB)","Bodyweight"],
-                    "effects": [
-                        { "when": "None (Jack Shit)", "set": { "templateId": "jack_shit" } },
-                        { "when": "Minimal (Triumvirate)", "set": { "templateId": "triumvirate" } },
-                        { "when": "Moderate (Periodization Bible)", "set": { "templateId": "periodization_bible" } },
-                        { "when": "High Volume (BBB)", "set": { "templateId": "bbb60" } },
-                        { "when": "Bodyweight", "set": { "templateId": "bodyweight" } }
+                    "options": [
+                        "None (Jack Shit)",
+                        "Minimal (Triumvirate)",
+                        "Moderate (Periodization Bible)",
+                        "High Volume (BBB)",
+                        "Bodyweight"
                     ],
-                    "provenance": { "source": "book", "note": "Five standard assistance templates" }
+                    "effects": [
+                        {
+                            "when": "None (Jack Shit)",
+                            "set": {
+                                "templateId": "jack_shit"
+                            }
+                        },
+                        {
+                            "when": "Minimal (Triumvirate)",
+                            "set": {
+                                "templateId": "triumvirate"
+                            }
+                        },
+                        {
+                            "when": "Moderate (Periodization Bible)",
+                            "set": {
+                                "templateId": "periodization_bible"
+                            }
+                        },
+                        {
+                            "when": "High Volume (BBB)",
+                            "set": {
+                                "templateId": "bbb60"
+                            }
+                        },
+                        {
+                            "when": "Bodyweight",
+                            "set": {
+                                "templateId": "bodyweight"
+                            }
+                        }
+                    ],
+                    "provenance": {
+                        "source": "book",
+                        "note": "Five standard assistance templates"
+                    }
                 },
                 {
                     "id": "q_tm",
                     "prompt": "Training max sourcing?",
                     "kind": "single",
-                    "options": ["I know my 1RMs","Estimate from reps"],
-                    "effects": [
-                        { "when": "I know my 1RMs", "set": { "tmMethod": "known_1rm" } },
-                        { "when": "Estimate from reps", "set": { "tmMethod": "estimate" } }
+                    "options": [
+                        "I know my 1RMs",
+                        "Estimate from reps"
                     ],
-                    "provenance": { "source": "book", "note": "TM = 90% of 1RM; estimate via reps formula if needed" }
+                    "effects": [
+                        {
+                            "when": "I know my 1RMs",
+                            "set": {
+                                "tmMethod": "known_1rm"
+                            }
+                        },
+                        {
+                            "when": "Estimate from reps",
+                            "set": {
+                                "tmMethod": "estimate"
+                            }
+                        }
+                    ],
+                    "provenance": {
+                        "source": "book",
+                        "note": "TM = 90% of 1RM; estimate via reps formula if needed"
+                    }
                 }
             ]
         },

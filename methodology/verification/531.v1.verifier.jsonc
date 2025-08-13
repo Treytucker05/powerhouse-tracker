@@ -32,7 +32,10 @@
                     "templateId": "bbb60",
                     "minItems": 1,
                     "maxItems": 2,
-                    "volumeRange": [20, 80]
+                    "volumeRange": [
+                        20,
+                        80
+                    ]
                 }
             }
         },
@@ -106,7 +109,10 @@
                     "templateId": "bbb60",
                     "minItems": 0,
                     "maxItems": 2,
-                    "volumeRange": [0, 80]
+                    "volumeRange": [
+                        0,
+                        80
+                    ]
                 }
             }
         }

@@ -1,4 +1,4 @@
-import { extractWarmups, extractWeekByLabel } from "./packAdapter";
+import { extractWarmups, extractWeekByLabel } from "./packAdapter.js";
 
 // Shared compute helpers (lift + TM + week context). These unify 3-day and 4-day previews.
 // Signatures kept simple & stable for plug-and-play usage across schedule builders.
@@ -46,9 +46,15 @@ export function computeSupplemental(pack, lift, tm, state) {
 }
 
 export function computeAssistance(pack, lift, state) {
-    // For now rely on already derived assistance.items array in state.
-    // Future: derive per-lift assistance groups. Return items union filtered by lift if we encode categories.
-    return state?.assistance?.items || [];
+    // MVP: derive pack-driven assistance list per lift using rules
+    try {
+        const tplId = state?.templateKey || state?.template || (pack?.program?.id) || 'custom';
+        const { assistanceFor } = require('./assistanceRules.js');
+        const items = assistanceFor(tplId, lift) || [];
+        return items;
+    } catch (e) {
+        return [];
+    }
 }
 
 export function roundLoad(x, units = "lbs", rounding = { lbs: 5, kg: 2.5 }) {
@@ -106,7 +112,7 @@ export function computeBBBFromConfig({ supplemental, lift, tms, units = "lbs", r
 }
 
 // --- Progression helpers (cycle advancement) ---
-export const LIFTS = ["squat","bench","deadlift","press"];
+export const LIFTS = ["squat", "bench", "deadlift", "press"];
 
 export function roundTo(v, step) {
     const s = Number(step || 5);
@@ -114,7 +120,7 @@ export function roundTo(v, step) {
 }
 
 function incFor(lift, units) {
-    const upper = ["bench","press"].includes(lift);
+    const upper = ["bench", "press"].includes(lift);
     if (units === "kg") return upper ? 2.5 : 5;
     return upper ? 5 : 10; // lbs
 }
@@ -131,7 +137,8 @@ export function nextTM(lift, tm, units, passed, rounding) {
     const base = Number(tm) || 0;
     const inc = incFor(lift, units);
     const next = passed ? (base + inc) : Math.max(0, base - inc);
-    const step = (rounding?.lbs ?? rounding?.kg ?? 5) || 5;
+    // Use unit-appropriate rounding step (previously always preferred lbs key which broke kg increments)
+    const step = units === 'kg' ? (rounding?.kg ?? 2.5) : (rounding?.lbs ?? 5);
     return roundTo(next, step);
 }
 

@@ -4,13 +4,27 @@ import { loadJsonc } from "./jsonc.js";
 
 // Optional schedule import (4-day structure verification)
 let buildSchedule = null;
+let schedExtra = {};
+let computeNextTMs = null;
 try {
     const schedFsPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../tracker-ui-good/tracker-ui/src/methods/531/schedule.js");
     const schedUrl = new URL(`file://${schedFsPath.replace(/\\/g, '/')}`);
     const schedMod = await import(schedUrl.href);
     buildSchedule = schedMod.buildSchedule;
+    schedExtra.buildSchedule4Day = schedMod.buildSchedule4Day;
+    schedExtra.buildSchedule2Day = schedMod.buildSchedule2Day;
+    schedExtra.buildSchedule1Day = schedMod.buildSchedule1Day;
+    schedExtra.buildSchedule3Day = schedMod.buildSchedule3Day; // newly added 3-day live builder
 } catch (e) {
     console.warn("[verify-531] schedule.js import failed, skipping 4-day structural check:", e.message);
+}
+try {
+    const calcFsPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../tracker-ui-good/tracker-ui/src/methods/531/calc.js");
+    const calcUrl = new URL(`file://${calcFsPath.replace(/\\/g, '/')}`);
+    const calcMod = await import(calcUrl.href);
+    computeNextTMs = calcMod.computeNextTMs;
+} catch (e) {
+    console.warn("[verify-531] calc.js import failed, skipping progression TM delta checks:", e.message);
 }
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -106,6 +120,33 @@ function expectPackAssistance(pack, errs) {
     }
 }
 
+// New: verify assistance counts derived by rules (synthetic quick check)
+async function checkAssistanceRules(errs) {
+    try {
+        const { assistanceFor } = await import(new URL(`file://${path.resolve(__dirname, '../tracker-ui-good/tracker-ui/src/methods/531/assistanceRules.js').replace(/\\/g, '/')}`).href);
+        const templates = ['triumvirate', 'periodization_bible', 'bodyweight', 'jack_shit', 'bbb60'];
+        const lifts = ['press', 'deadlift', 'bench', 'squat'];
+        const expected = {
+            triumvirate: 2,
+            periodization_bible: 3,
+            bodyweight: 3,
+            jack_shit: 0,
+            bbb60: v => v === 1 || v === 2
+        };
+        for (const tpl of templates) {
+            for (const lift of lifts) {
+                const items = assistanceFor(tpl, lift) || [];
+                const rule = expected[tpl];
+                const ok = typeof rule === 'function' ? rule(items.length) : items.length === rule;
+                if (!ok) errs.push(`Assistance rules: template ${tpl} lift ${lift} expected ${rule.toString()} got ${items.length}`);
+                if (items.some(it => !it || !it.name)) errs.push(`Assistance rules: template ${tpl} lift ${lift} contains invalid item`);
+            }
+        }
+    } catch (e) {
+        errs.push('Assistance rules check failed: ' + e.message);
+    }
+}
+
 function expect4DayStructure(errs) {
     if (!buildSchedule) return; // skip if schedule import failed
     const sched = buildSchedule({ mode: '4day', liftOrder: ["press", "deadlift", "bench", "squat"] });
@@ -123,6 +164,105 @@ function expect4DayStructure(errs) {
             if (!['press', 'deadlift', 'bench', 'squat'].includes(d.lift)) {
                 errs.push(`4-day schedule: invalid lift '${d.lift}' in week ${i + 1}`);
                 break;
+            }
+            if (!d.conditioning) {
+                errs.push(`4-day schedule week ${i + 1} day ${d.lift}: missing conditioning`);
+            } else if (!d.conditioning.type || (d.conditioning.type === 'LISS' && !d.conditioning.minutes)) {
+                errs.push(`4-day schedule week ${i + 1} day ${d.lift}: invalid conditioning object`);
+            }
+        }
+    }
+}
+
+function expect1And2DayStructures(errs) {
+    const { buildSchedule2Day, buildSchedule1Day } = schedExtra;
+    if (!buildSchedule2Day || !buildSchedule1Day) return; // skip gracefully
+    const dummyState = { units: 'lbs', week: 1, cycle: 1 };
+    const pack = {}; // not needed for structural shape
+    // 2-day
+    try {
+        const two = buildSchedule2Day({ state: dummyState, pack });
+        if (!two || two.daysPerWeek !== 2 || !Array.isArray(two.days) || two.days.length !== 2) {
+            errs.push('2-day builder: invalid shape');
+        } else {
+            const lifts = two.days.map(d => d.lift);
+            if (new Set(lifts).size !== 2) errs.push('2-day builder: lifts not unique for week snapshot');
+            for (const d of two.days) {
+                if (!d.conditioning) errs.push('2-day builder: missing conditioning');
+            }
+        }
+    } catch (e) {
+        errs.push('2-day builder threw: ' + e.message);
+    }
+    // 1-day
+    try {
+        const one = buildSchedule1Day({ state: dummyState, pack });
+        if (!one || one.daysPerWeek !== 1 || !Array.isArray(one.days) || one.days.length !== 1) {
+            errs.push('1-day builder: invalid shape');
+        } else {
+            const d = one.days[0];
+            if (!d.conditioning) errs.push('1-day builder: missing conditioning');
+        }
+    } catch (e) {
+        errs.push('1-day builder threw: ' + e.message);
+    }
+}
+
+// Progression scenario checks (Week 3 AMRAP → next cycle TMs)
+function testProgression(errs) {
+    if (!computeNextTMs) return; // gracefully skip
+    const rounding = { lbs: 5, kg: 2.5 };
+    // LBS scenarios
+    const baseLbs = { bench: 200, press: 120, squat: 300, deadlift: 400 };
+    const casesLbs = [
+        {
+            name: 'progression lbs – all pass',
+            reps: { bench: 3, press: 4, squat: 2, deadlift: 2 },
+            expect: { bench: 205, press: 125, squat: 310, deadlift: 410 }
+        },
+        {
+            name: 'progression lbs – mixed fail',
+            reps: { bench: 0, press: 2, squat: 0, deadlift: 3 },
+            expect: { bench: 195, press: 125, squat: 290, deadlift: 410 }
+        },
+        {
+            name: 'progression lbs – empty reps treated as pass',
+            reps: {},
+            expect: { bench: 205, press: 125, squat: 310, deadlift: 410 }
+        }
+    ];
+    for (const c of casesLbs) {
+        const got = computeNextTMs({ tms: baseLbs, units: 'lbs', rounding, amrapWk3: c.reps, state: {} });
+        for (const k of Object.keys(c.expect)) {
+            if (got[k] !== c.expect[k]) {
+                errs.push(`${c.name}: ${k} expected ${c.expect[k]} got ${got[k]}`);
+            }
+        }
+    }
+    // KG scenarios
+    const baseKg = { bench: 100, press: 60, squat: 140, deadlift: 180 };
+    const casesKg = [
+        {
+            name: 'progression kg – all pass',
+            reps: { bench: 2, press: 3, squat: 1, deadlift: 1 },
+            expect: { bench: 102.5, press: 62.5, squat: 145, deadlift: 185 }
+        },
+        {
+            name: 'progression kg – mixed fail',
+            reps: { bench: 0, press: 2, squat: 0, deadlift: 3 },
+            expect: { bench: 97.5, press: 62.5, squat: 135, deadlift: 185 }
+        },
+        {
+            name: 'progression kg – empty reps treated as pass',
+            reps: {},
+            expect: { bench: 102.5, press: 62.5, squat: 145, deadlift: 185 }
+        }
+    ];
+    for (const c of casesKg) {
+        const got = computeNextTMs({ tms: baseKg, units: 'kg', rounding, amrapWk3: c.reps, state: {} });
+        for (const k of Object.keys(c.expect)) {
+            if (got[k] !== c.expect[k]) {
+                errs.push(`${c.name}: ${k} expected ${c.expect[k]} got ${got[k]}`);
             }
         }
     }
@@ -248,13 +388,47 @@ try {
 
     // 3. 4-day schedule structural sanity
     expect4DayStructure(errs);
+    expect1And2DayStructures(errs);
+    // 3-day structure (5-week preview and live snapshot conditioning)
+    try {
+        if (buildSchedule) {
+            const preview3 = buildSchedule({ mode: '3day', liftOrder: ['press','deadlift','bench','squat'], state: {} });
+            const weeks3 = preview3.weeks || [];
+            if (weeks3.length !== 5) errs.push(`3-day preview: expected 5 weeks, got ${weeks3.length}`);
+            weeks3.forEach((w, wi) => {
+                if (!Array.isArray(w.days) || w.days.length !== 3) errs.push(`3-day preview week ${wi+1}: expected 3 days, got ${(w.days||[]).length}`);
+                (w.days||[]).forEach(d => {
+                    if (!d.conditioning) errs.push(`3-day preview week ${wi+1} day ${d.lift}: missing conditioning`);
+                    else if (!d.conditioning.type || (d.conditioning.type === 'LISS' && !d.conditioning.minutes)) {
+                        errs.push(`3-day preview week ${wi+1} day ${d.lift}: invalid conditioning object`);
+                    }
+                });
+            });
+        }
+        if (schedExtra.buildSchedule3Day) {
+            const live3 = schedExtra.buildSchedule3Day({ state: { week:1, cycle:1 }, pack: {} });
+            if (!live3 || live3.daysPerWeek !== 3 || !Array.isArray(live3.days) || live3.days.length !== 3) {
+                errs.push('3-day live builder: invalid shape');
+            } else {
+                live3.days.forEach(d => { if (!d.conditioning) errs.push('3-day live builder: missing conditioning'); });
+            }
+        }
+    } catch (e) {
+        errs.push('3-day structure check failed: '+ e.message);
+    }
+
+    // 3b. Assistance rules synthesis
+    await checkAssistanceRules(errs);
+
+    // 4. Progression TM delta scenarios
+    testProgression(errs);
 
     if (errs.length) {
         console.error(`\u274c 5/3/1 verifier FAILED (${errs.length} issue${errs.length > 1 ? "s" : ""})`);
         for (const e of errs) console.error(" - " + e.replace(/\n/g, "\n   "));
         process.exit(1);
     } else {
-        console.log("\u2705 5/3/1 verifier passed (warm-ups, main %, w2-w3 rounding, assistance, 4-day structure).");
+        console.log("\u2705 5/3/1 verifier passed (warm-ups, main %, w2-w3 rounding, assistance, 4-day structure, progression deltas).");
     }
 } catch (e) {
     console.error("\u274c Verifier crashed:", e);

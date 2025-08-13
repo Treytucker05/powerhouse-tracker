@@ -7,6 +7,21 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { applyTemplate } from '../../../lib/templates/index.js';
 
+// Local template application helper (dedupes historical dual SET_TEMPLATE branches)
+function applyTemplateLocal(state, template) {
+    const next = { ...state };
+    next.template = template;
+    next.templateKey = template; // keep both aligned
+    // Reset progression-volatile fields
+    next.week = 1;
+    next.amrapWk3 = {};
+    // Clear any cached preview so UI rebuilds with new template context
+    if (next.advanced?.schedulePreview) {
+        next.advanced = { ...next.advanced, schedulePreview: null };
+    }
+    return next;
+}
+
 // Initial program state (serializable only - exact spec)
 export const initialProgramV2 = {
     units: 'lb',
@@ -60,7 +75,9 @@ export const initialProgramV2 = {
         hiitPerWeek: 1,
         modalities: { hiit: ['Prowler Pushes'], liss: ['Walking'] },
         note: 'Do 2–3 sessions/week as tolerated.'
-    }
+    },
+    amrapWk3: {},
+    cycle: 1
 };
 
 const ProgramContextV2 = createContext();
@@ -85,8 +102,9 @@ function reducerV2(state, action) {
             ...state,
             lifts: { ...state.lifts, [action.lift]: { ...state.lifts[action.lift], tm: action.tm } }
         };
+        case 'SET_DAYS_PER_WEEK': return { ...state, daysPerWeek: Number(action.payload) };
         case 'BULK_SET_LIFTS': return { ...state, lifts: { ...state.lifts, ...action.lifts } };
-        case 'SET_TEMPLATE': return { ...state, template: action.template };
+        case 'SET_TEMPLATE': return applyTemplateLocal(state, action.template); // unified template application action (deduped)
         case 'SET_TEMPLATE_LOCK': return { ...state, templateLock: !!action.lock };
         case 'SET_SCHEDULE': return { ...state, schedule: { ...state.schedule, ...(action.schedule || action.payload || {}) } };
         case 'SET_WARMUP_SCHEME': return { ...state, schedule: { ...state.schedule, warmupScheme: { ...action.payload } } };
@@ -96,9 +114,9 @@ function reducerV2(state, action) {
         case 'SET_WARMUPS': return { ...state, warmups: { ...state.warmups, ...action.warmups } };
         case 'SET_SUPPLEMENTAL': return { ...state, supplemental: { ...state.supplemental, ...(action.supplemental || action.payload || {}) } };
         case 'SET_ASSISTANCE': return { ...state, assistance: { ...state.assistance, ...(action.assistance || action.payload || {}) } };
-        // case 'SET_CONDITIONING': return { ...state, conditioning: { ...state.conditioning, ...action.conditioning } };
         case 'SET_ADVANCED': return { ...state, advanced: { ...state.advanced, ...action.advanced } };
-        case 'SET_TEMPLATE': return { ...state, templateKey: action.template, template: action.template };
+        case 'SET_AMRAP_WK3': return { ...state, amrapWk3: { ...(state.amrapWk3 || {}), ...(action.payload || {}) } };
+        case 'SET_CYCLE': return { ...state, cycle: action.payload };
         case 'APPLY_TEMPLATE':
             return applyTemplate(state, action.key);
         case 'APPLY_TEMPLATE_CONFIG': {
