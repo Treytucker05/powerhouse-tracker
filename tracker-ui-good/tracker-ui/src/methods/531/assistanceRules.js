@@ -1,39 +1,59 @@
-import { AssistanceCatalog } from './assistanceCatalog.js';
+import { AssistanceCatalog as C } from "./assistanceCatalog.js";
 
 const byLift = {
-    squat: ["singleLeg", "core", "posterior"],
-    bench: ["push", "pull", "core"],
-    deadlift: ["posterior", "core", "singleLeg"],
-    press: ["push", "pull", "core"],
+    squat:    ["posterior","core","singleLeg"],
+    bench:    ["pull","core","push"],
+    deadlift: ["posterior","core","singleLeg"],
+    press:    ["pull","core","push"],
 };
 
-export function pickFrom(catArr) {
-    return catArr && catArr.length ? { ...catArr[0] } : null; // MVP: first entry clone
+function firstAvailable(list, equipSet) {
+    const pref = ["bw","db","bb","cable","band","machine","kb","landmine","plate","dip","rings","box","bench","abwheel"]; // priority order
+    const score = (item) => Math.min(...(item.equip||[]).map(t => {
+        const idx = pref.indexOf(t);
+        return idx === -1 ? 99 : idx;
+    }));
+    const filtered = list.filter(it => (it.equip||[]).some(t => equipSet.has(t)));
+    const pool = filtered.length ? filtered : list; // fallback if none match equipment
+    return pool.slice().sort((a,b)=>score(a)-score(b))[0];
 }
 
-export function assistanceFor(packId, lift) {
-    const wants = {
-        triumvirate: () => byLift[lift].slice(0, 2), // exactly 2
-        periodization_bible: () => byLift[lift].slice(0, 3), // 3
-        bodyweight: () => ["pull", "core", "singleLeg"], // 3 (bodyweight bias)
-        jack_shit: () => [], // none
-        bbb60: () => ["pull", "core"], // light after supplemental
-        bbb: () => ["pull", "core"],
-    }[packId] || (() => byLift[lift].slice(0, 2));
+export function assistanceFor(pack, lift, state = {}) {
+    const equipSet = new Set(state?.equipment ?? ["bw","db","bb","machine","cable","band","kb","bar","bench","box","rings"]);
+    const cats = [];
+    if (pack === "jack_shit") return [];
 
-    return wants()
-        .map((cat) => pickFrom(AssistanceCatalog[cat]))
-        .filter(Boolean)
-        .map(it => ({ ...it, _cat: it._cat || undefined }));
+    if (pack === "bbb") {
+        const pickCats = lift === "squat" ? ["posterior","core"] :
+                                         lift === "deadlift" ? ["core","singleLeg"] :
+                                         ["pull","core"]; // bench/press
+        cats.push(...pickCats);
+    } else if (pack === "triumvirate") {
+        cats.push(...byLift[lift].slice(0,2));
+    } else if (pack === "periodization_bible") {
+        cats.push(...(lift === "squat" || lift === "deadlift"
+            ? ["posterior","singleLeg","core"]
+            : ["push","pull","core"]));
+    } else if (pack === "bodyweight") {
+        equipSet.clear(); equipSet.add("bw");
+        cats.push(...(lift === "squat" || lift === "deadlift"
+            ? ["singleLeg","core","posterior"]
+            : ["pull","push","core"]));
+    } else if (pack === "bbb60") {
+        cats.push("pull","core");
+    } else {
+        cats.push(...byLift[lift].slice(0,2));
+    }
+    return cats.map(cat => firstAvailable(C[cat], equipSet)).filter(Boolean);
 }
 
-export function expectedAssistanceCount(packId) {
+export function expectedAssistanceCount(pack) {
     return {
         triumvirate: 2,
         periodization_bible: 3,
-        bodyweight: 3, // allow 2-3 later
+        bodyweight: 3,
         jack_shit: 0,
-        bbb60: 1, // allow 1-2; we pick 2 categories but catalog may supply 1 each; using >=1 check
-        bbb: 1,
-    }[packId];
+        bbb60: v => v === 1 || v === 2,
+        bbb: v => v === 1 || v === 2,
+    }[pack];
 }

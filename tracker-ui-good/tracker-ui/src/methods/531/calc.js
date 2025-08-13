@@ -46,13 +46,12 @@ export function computeSupplemental(pack, lift, tm, state) {
 }
 
 export function computeAssistance(pack, lift, state) {
-    // MVP: derive pack-driven assistance list per lift using rules
+    // Derive assistance list using equipment-aware rules.
     try {
-        const tplId = state?.templateKey || state?.template || (pack?.program?.id) || 'custom';
+        const tplId = state?.templateKey || state?.template || (typeof pack === 'string' ? pack : pack?.program?.id) || 'custom';
         const { assistanceFor } = require('./assistanceRules.js');
-        const items = assistanceFor(tplId, lift) || [];
-        return items;
-    } catch (e) {
+        return assistanceFor(tplId, lift, state) || [];
+    } catch {
         return [];
     }
 }

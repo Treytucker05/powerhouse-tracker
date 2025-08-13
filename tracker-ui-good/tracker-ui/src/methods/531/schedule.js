@@ -140,7 +140,7 @@ export function buildSchedule3Day({ state, pack, split = SPLIT_4DAY_A, weekLabel
     const week = state?.week ?? 1;
     const cycle = state?.cycle ?? 1;
     const baseIndex = (cycle + week) % 4; // rotate starting lift
-    const lifts = [0,1,2].map(i => split[(baseIndex + i) % 4]);
+    const lifts = [0, 1, 2].map(i => split[(baseIndex + i) % 4]);
     const days = lifts.map(lift => makeDay({ lift, weekLabel, state, pack, roundingPref, units }));
     return { mode: '3day_live', daysPerWeek: 3, days, meta: { split, weekLabel, rotationIndex: baseIndex } };
 }

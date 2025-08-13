@@ -424,14 +424,14 @@ try {
 
     // --- New: 2-day & 1-day rotation coverage / conditioning / assistance presence ---
     function expectConditioning(container, labelPrefix) {
-        (container.days||[]).forEach((d,i) => {
-            if (!d.conditioning) errs.push(`${labelPrefix} day ${i+1} (${d.lift||'?'}) missing conditioning`);
-            else if (!d.conditioning.type) errs.push(`${labelPrefix} day ${i+1} invalid conditioning object`);
+        (container.days || []).forEach((d, i) => {
+            if (!d.conditioning) errs.push(`${labelPrefix} day ${i + 1} (${d.lift || '?'}) missing conditioning`);
+            else if (!d.conditioning.type) errs.push(`${labelPrefix} day ${i + 1} invalid conditioning object`);
         });
     }
     function expectAssistance(container, labelPrefix) {
-        (container.days||[]).forEach((d,i) => {
-            if (!Array.isArray(d.assistance)) errs.push(`${labelPrefix} day ${i+1} (${d.lift||'?'}) assistance not array`);
+        (container.days || []).forEach((d, i) => {
+            if (!Array.isArray(d.assistance)) errs.push(`${labelPrefix} day ${i + 1} (${d.lift || '?'}) assistance not array`);
         });
     }
     async function testTwoDay() {
@@ -447,16 +447,16 @@ try {
             errs.push('2-day rotation builder threw: ' + e.message);
             return;
         }
-        if (!w1 || w1.daysPerWeek !== 2 || (w1.days||[]).length !== 2) errs.push('2-day rotation week1 invalid shape');
-        if (!w2 || w2.daysPerWeek !== 2 || (w2.days||[]).length !== 2) errs.push('2-day rotation week2 invalid shape');
+        if (!w1 || w1.daysPerWeek !== 2 || (w1.days || []).length !== 2) errs.push('2-day rotation week1 invalid shape');
+        if (!w2 || w2.daysPerWeek !== 2 || (w2.days || []).length !== 2) errs.push('2-day rotation week2 invalid shape');
         if (w1 && w2) {
-            const lifts1 = (w1.days||[]).map(d=>d.lift);
-            const lifts2 = (w2.days||[]).map(d=>d.lift);
+            const lifts1 = (w1.days || []).map(d => d.lift);
+            const lifts2 = (w2.days || []).map(d => d.lift);
             if (new Set(lifts1).size !== 2) errs.push('2-day rotation week1 lifts not distinct');
             if (new Set(lifts2).size !== 2) errs.push('2-day rotation week2 lifts not distinct');
             const union = new Set([...lifts1, ...lifts2]);
-            if (union.size !== 4) errs.push('2-day rotation two-week coverage expected 4 unique lifts got '+union.size);
-            for (const L of union) if (!SPLIT_4DAY_A.includes(L)) errs.push('2-day rotation split mismatch lift '+L);
+            if (union.size !== 4) errs.push('2-day rotation two-week coverage expected 4 unique lifts got ' + union.size);
+            for (const L of union) if (!SPLIT_4DAY_A.includes(L)) errs.push('2-day rotation split mismatch lift ' + L);
             expectConditioning(w1, '2-day week1');
             expectConditioning(w2, '2-day week2');
             expectAssistance(w1, '2-day week1');
@@ -468,33 +468,69 @@ try {
         if (!buildSchedule1Day || !SPLIT_4DAY_B) return; // graceful skip
         const stateBase = { units: 'lbs', cycle: 1, roundingPref: { lbs: 5, kg: 2.5 }, templateKey: 'bbb60' };
         const seen = [];
-        for (let w=1; w<=4; w++) {
+        for (let w = 1; w <= 4; w++) {
             let snap;
             try {
-                snap = buildSchedule1Day({ state: { ...stateBase, daysPerWeek:1, week: w, split4: 'B' }, pack: {}, split: SPLIT_4DAY_B });
+                snap = buildSchedule1Day({ state: { ...stateBase, daysPerWeek: 1, week: w, split4: 'B' }, pack: {}, split: SPLIT_4DAY_B });
             } catch (e) {
-                errs.push('1-day rotation builder threw (week '+w+'): '+e.message);
+                errs.push('1-day rotation builder threw (week ' + w + '): ' + e.message);
                 continue;
             }
-            if (!snap || snap.daysPerWeek !== 1 || (snap.days||[]).length !== 1) {
-                errs.push('1-day rotation invalid shape week '+w);
+            if (!snap || snap.daysPerWeek !== 1 || (snap.days || []).length !== 1) {
+                errs.push('1-day rotation invalid shape week ' + w);
                 continue;
             }
             const L = snap.days[0].lift;
             seen.push(L);
-            expectConditioning(snap, '1-day week'+w);
-            expectAssistance(snap, '1-day week'+w);
+            expectConditioning(snap, '1-day week' + w);
+            expectAssistance(snap, '1-day week' + w);
         }
         if (seen.length === 4) {
             const uniq = new Set(seen);
-            if (uniq.size !== 4) errs.push('1-day rotation expected 4 unique lifts across 4 weeks got '+uniq.size);
-            for (const L of uniq) if (!SPLIT_4DAY_B.includes(L)) errs.push('1-day rotation split mismatch lift '+L);
+            if (uniq.size !== 4) errs.push('1-day rotation expected 4 unique lifts across 4 weeks got ' + uniq.size);
+            for (const L of uniq) if (!SPLIT_4DAY_B.includes(L)) errs.push('1-day rotation split mismatch lift ' + L);
         }
     }
     await testTwoDay();
     await testOneDay();
 
     if (!errs.length) console.log('1/2-day rotation, assistance, conditioning \u2705');
+
+    // Assistance catalog depth & equipment-aware picks
+    async function testAssistanceCatalogDepth() {
+        try {
+            const schedFsPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../tracker-ui-good/tracker-ui/src/methods/531/assistanceRules.js");
+            const schedUrl = new URL(`file://${schedFsPath.replace(/\\/g, '/')}`);
+            const { assistanceFor } = await import(schedUrl.href);
+            const packs = ["bbb","triumvirate","periodization_bible","bodyweight","jack_shit","bbb60"];
+            const lifts = ["press","deadlift","bench","squat"];
+            function assertUniqueNames(list, label){
+                const names = list.map(a=>a.name);
+                if (new Set(names).size !== names.length) errs.push(`assistance duplicate name in ${label}`);
+            }
+            function assertAllBW(list,label){
+                for (const a of list) if (!((a?.equip)||[]).includes('bw')) { errs.push(`non-BW move in bodyweight pack ${label}: ${a?.name}`); break; }
+            }
+            for (const pack of packs) {
+                for (const lift of lifts) {
+                    let res = [];
+                    try { res = assistanceFor(pack, lift, {}); } catch (e) { errs.push(`assistanceFor threw ${pack}:${lift} ${e.message}`); continue; }
+                    if (pack === 'jack_shit') { if (res.length !== 0) errs.push('Jack Shit expected 0 assistance'); continue; }
+                    if (pack === 'triumvirate' && res.length !== 2) errs.push('Triumvirate must return 2 items');
+                    if (pack === 'periodization_bible' && res.length < 2) errs.push('Periodization Bible min 2');
+                    if (pack === 'bbb' && (res.length < 1 || res.length > 2)) errs.push('BBB expects 1-2');
+                    if (pack === 'bbb60' && (res.length < 1 || res.length > 2)) errs.push('BBB60 expects 1-2');
+                    assertUniqueNames(res, `${pack}:${lift}`);
+                    if (pack === 'bodyweight') assertAllBW(res, `${pack}:${lift}`);
+                    for (const a of res) if (!a?.name) errs.push(`assistance item missing name ${pack}:${lift}`);
+                }
+            }
+            if (!errs.length) console.log('Assistance catalog depth, equipment-aware picks, BW-only \u2705');
+        } catch (e) {
+            errs.push('assistance catalog depth check failed: '+e.message);
+        }
+    }
+    await testAssistanceCatalogDepth();
 
     // 4. Progression TM delta scenarios
     testProgression(errs);
