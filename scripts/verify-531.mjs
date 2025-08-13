@@ -502,14 +502,14 @@ try {
             const schedFsPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../tracker-ui-good/tracker-ui/src/methods/531/assistanceRules.js");
             const schedUrl = new URL(`file://${schedFsPath.replace(/\\/g, '/')}`);
             const { assistanceFor } = await import(schedUrl.href);
-            const packs = ["bbb","triumvirate","periodization_bible","bodyweight","jack_shit","bbb60"];
-            const lifts = ["press","deadlift","bench","squat"];
-            function assertUniqueNames(list, label){
-                const names = list.map(a=>a.name);
+            const packs = ["bbb", "triumvirate", "periodization_bible", "bodyweight", "jack_shit", "bbb60"];
+            const lifts = ["press", "deadlift", "bench", "squat"];
+            function assertUniqueNames(list, label) {
+                const names = list.map(a => a.name);
                 if (new Set(names).size !== names.length) errs.push(`assistance duplicate name in ${label}`);
             }
-            function assertAllBW(list,label){
-                for (const a of list) if (!((a?.equip)||[]).includes('bw')) { errs.push(`non-BW move in bodyweight pack ${label}: ${a?.name}`); break; }
+            function assertAllBW(list, label) {
+                for (const a of list) if (!((a?.equip) || []).includes('bw')) { errs.push(`non-BW move in bodyweight pack ${label}: ${a?.name}`); break; }
             }
             for (const pack of packs) {
                 for (const lift of lifts) {
@@ -527,10 +527,56 @@ try {
             }
             if (!errs.length) console.log('Assistance catalog depth, equipment-aware picks, BW-only \u2705');
         } catch (e) {
-            errs.push('assistance catalog depth check failed: '+e.message);
+            errs.push('assistance catalog depth check failed: ' + e.message);
         }
     }
     await testAssistanceCatalogDepth();
+
+    // --- Export JSON shape smoke test (uses schedule builders + synthetic state) ---
+    try {
+        const fakeState = {
+            units: 'lbs',
+            rounding: { increment: 5, mode: 'nearest' },
+            schedule: { frequency: '4day', order: ['Press', 'Deadlift', 'Bench', 'Squat'], includeWarmups: true, warmupScheme: { percentages: [40, 50, 60], reps: [5, 5, 3] }, split4: 'A' },
+            supplemental: { strategy: 'none' },
+            assistance: { mode: 'triumvirate' },
+            equipment: ['bw', 'db', 'bb'],
+            templateKey: 'triumvirate',
+            lifts: { squat: { tm: 300 }, bench: { tm: 200 }, deadlift: { tm: 400 }, press: { tm: 120 } }
+        };
+        // Lightweight mimic of exportJson weeks shape by invoking buildSchedule4Day for structure then asserting conditioning & assistance arrays exist
+        if (schedExtra.buildSchedule4Day) {
+            const sched = schedExtra.buildSchedule4Day({ state: fakeState, pack: {}, split: schedExtra.SPLIT_4DAY_A, weekLabel: '3x5' });
+            if (!sched || !Array.isArray(sched.days) || sched.days.length !== 4) {
+                errs.push('export shape: 4day live builder failed basic shape');
+            } else {
+                sched.days.forEach((d, i) => {
+                    if (!Array.isArray(d.assistance)) errs.push('export shape: day ' + (i + 1) + ' assistance missing/invalid array');
+                    if (!d.conditioning) errs.push('export shape: day ' + (i + 1) + ' missing conditioning');
+                });
+            }
+        }
+        // 3-day snapshot
+        if (schedExtra.buildSchedule3Day) {
+            const snap3 = schedExtra.buildSchedule3Day({ state: { ...fakeState, week: 1, daysPerWeek: 3 }, pack: {}, split: schedExtra.SPLIT_4DAY_A, weekLabel: '3x5' });
+            if (!snap3 || snap3.daysPerWeek !== 3 || !Array.isArray(snap3.days)) errs.push('export shape: 3day snapshot invalid');
+            else snap3.days.forEach((d, i) => { if (!Array.isArray(d.assistance)) errs.push('export shape: 3day d' + (i + 1) + ' assistance missing'); if (!d.conditioning) errs.push('export shape: 3day d' + (i + 1) + ' conditioning missing'); });
+        }
+        // 2-day snapshot
+        if (schedExtra.buildSchedule2Day) {
+            const snap2 = schedExtra.buildSchedule2Day({ state: { ...fakeState, week: 1, daysPerWeek: 2 }, pack: {}, split: schedExtra.SPLIT_4DAY_A, weekLabel: '3x5' });
+            if (!snap2 || snap2.daysPerWeek !== 2 || !Array.isArray(snap2.days)) errs.push('export shape: 2day snapshot invalid');
+            else snap2.days.forEach((d, i) => { if (!Array.isArray(d.assistance)) errs.push('export shape: 2day d' + (i + 1) + ' assistance missing'); if (!d.conditioning) errs.push('export shape: 2day d' + (i + 1) + ' conditioning missing'); });
+        }
+        // 1-day snapshot
+        if (schedExtra.buildSchedule1Day) {
+            const snap1 = schedExtra.buildSchedule1Day({ state: { ...fakeState, week: 1, daysPerWeek: 1 }, pack: {}, split: schedExtra.SPLIT_4DAY_A, weekLabel: '3x5' });
+            if (!snap1 || snap1.daysPerWeek !== 1 || !Array.isArray(snap1.days)) errs.push('export shape: 1day snapshot invalid');
+            else snap1.days.forEach((d, i) => { if (!Array.isArray(d.assistance)) errs.push('export shape: 1day d' + (i + 1) + ' assistance missing'); if (!d.conditioning) errs.push('export shape: 1day d' + (i + 1) + ' conditioning missing'); });
+        }
+    } catch (e) {
+        errs.push('export JSON shape check failed: ' + e.message);
+    }
 
     // 4. Progression TM delta scenarios
     testProgression(errs);

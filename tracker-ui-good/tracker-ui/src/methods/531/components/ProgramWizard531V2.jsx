@@ -56,6 +56,7 @@ import Step1Fundamentals from './steps/Step1Fundamentals.jsx';
 import Step2TemplateOrCustom from './steps/Step2TemplateOrCustom.jsx';
 import Step3DesignCustom from './steps/Step3DesignCustom.jsx';
 import Step4ReviewExport from './steps/Step4ReviewExport.jsx';
+import ToggleButton from './ToggleButton.jsx';
 
 const STEPS = [
     { id: 'fundamentals', title: 'Fundamentals', description: 'Units, rounding, TM%, 1RM/rep tests' },
@@ -179,6 +180,31 @@ function WizardShell() {
         maybeLoadPack();
         return () => { cancelled = true; };
     }, []);
+    // Auto rebuild schedulePreview whenever core dependencies change (daysPerWeek, split4, equipment, week, cycle, units, rounding, tmPct, tms, templateKey)
+    useEffect(() => {
+        const daysPerWeek = Number(state?.daysPerWeek || state?.schedule?.frequency || 4);
+        const splitVal = state?.advanced?.split4 || state?.schedule?.split4 || 'A';
+        const split = splitVal === 'B' ? SPLIT_4DAY_B : SPLIT_4DAY_A;
+        const pack = packRef.current;
+        // Assistance pack default fallback (avoid empty assistance unless explicitly jack_shit)
+        if (!state?.templateKey && (!state?.assistance || state.assistance.mode === 'minimal')) {
+            // Set a default templateKey (triumvirate) silently once
+            dispatch({ type: 'SET_TEMPLATE_KEY', payload: 'triumvirate' });
+        }
+        let sched;
+        try {
+            if (daysPerWeek === 4) sched = buildSchedule4Day({ state, pack, split, weekLabel: '3x5' });
+            else if (daysPerWeek === 3) sched = buildSchedule({ mode: '3day', liftOrder: ["press", "deadlift", "bench", "squat"], state });
+            else if (daysPerWeek === 2) sched = buildSchedule2Day({ state, pack, split, weekLabel: '3x5' });
+            else if (daysPerWeek === 1) sched = buildSchedule1Day({ state, pack, split, weekLabel: '3x5' });
+        } catch (e) {
+            console.warn('schedulePreview rebuild failed', e);
+        }
+        if (sched) {
+            dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), split4: splitVal, schedulePreview: sched } });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [state.daysPerWeek, state.advanced?.split4, state.schedule?.split4, state.week, state.cycle, state.units, state.rounding, state.tmPct, state.lifts?.squat?.tm, state.lifts?.bench?.tm, state.lifts?.deadlift?.tm, state.lifts?.press?.tm, state.equipment, state.templateKey, state.assistance?.mode, state.assistance?.templateId]);
     function humanLiftName(key) {
         return key === "overhead_press" ? "Press" : key[0].toUpperCase() + key.slice(1);
     }
@@ -385,51 +411,62 @@ function WizardShell() {
                             // Jump straight to review (index 3)
                             setStepIndex(3);
                         }}
-                        extraControls={<div className="mt-4">
-                            <label className="block text-xs uppercase tracking-wide text-gray-400 mb-1">Days per week</label>
-                            <select
-                                value={state?.daysPerWeek || 3}
-                                onChange={(e) => {
-                                    const val = Number(e.target.value);
-                                    dispatch({ type: 'SET_DAYS_PER_WEEK', payload: val });
-                                    // Build/refresh preview immediately
-                                    const split = state?.split4 === 'B' ? SPLIT_4DAY_B : SPLIT_4DAY_A;
-                                    const pack = packRef.current;
-                                    let sched;
-                                    if (val === 4) sched = buildSchedule4Day({ state: { ...state, daysPerWeek: val }, pack, split, weekLabel: '3x5' });
-                                    else if (val === 3) sched = buildSchedule({ mode: '3day', liftOrder: ["press", "deadlift", "bench", "squat"] });
-                                    else if (val === 2) sched = buildSchedule2Day({ state: { ...state, daysPerWeek: val }, pack, split, weekLabel: '3x5' });
-                                    else sched = buildSchedule1Day({ state: { ...state, daysPerWeek: val }, pack, split, weekLabel: '3x5' });
-                                    dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), schedulePreview: sched } });
-                                }}
-                                className="bg-gray-900/60 border border-gray-700 focus:border-red-500 focus:outline-none rounded px-2 py-1 text-sm text-gray-200"
-                            >
-                                <option value={1}>1</option>
-                                <option value={2}>2</option>
-                                <option value={3}>3</option>
-                                <option value={4}>4</option>
-                            </select>
-                            <label className="block text-xs uppercase tracking-wide text-gray-400 mt-4 mb-1">4-day Split</label>
-                            <select
-                                value={state?.split4 || 'A'}
-                                onChange={(e) => {
-                                    const splitVal = e.target.value === 'B' ? 'B' : 'A';
-                                    dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), split4: splitVal } });
-                                    const split = splitVal === 'B' ? SPLIT_4DAY_B : SPLIT_4DAY_A;
-                                    const val = Number(state?.daysPerWeek || 3);
-                                    const pack = packRef.current;
-                                    let sched;
-                                    if (val === 4) sched = buildSchedule4Day({ state: { ...state }, pack, split, weekLabel: '3x5' });
-                                    else if (val === 3) sched = buildSchedule({ mode: '3day', liftOrder: ["press", "deadlift", "bench", "squat"] });
-                                    else if (val === 2) sched = buildSchedule2Day({ state: { ...state }, pack, split, weekLabel: '3x5' });
-                                    else sched = buildSchedule1Day({ state: { ...state }, pack, split, weekLabel: '3x5' });
-                                    dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), split4: splitVal, schedulePreview: sched } });
-                                }}
-                                className="bg-gray-900/60 border border-gray-700 focus:border-red-500 focus:outline-none rounded px-2 py-1 text-sm text-gray-200"
-                            >
-                                <option value='A'>A (Press / Deadlift / Bench / Squat)</option>
-                                <option value='B'>B (Bench / Squat / Press / Deadlift)</option>
-                            </select>
+                        extraControls={<div className="mt-4 space-y-4">
+                            <div>
+                                <div className="flex items-center justify-between mb-1">
+                                    <label className="block text-xs uppercase tracking-wide text-gray-400">Days per week</label>
+                                    <span className="text-[10px] text-gray-500">Choose 1-4</span>
+                                </div>
+                                <div className="flex gap-2 flex-wrap" role="group" aria-label="Days per week">
+                                    {[1, 2, 3, 4].map(d => (
+                                        <ToggleButton
+                                            key={d}
+                                            on={Number(state?.daysPerWeek || 3) === d}
+                                            aria-label={`${d} day${d > 1 ? 's' : ''}`}
+                                            onClick={() => {
+                                                const val = d;
+                                                dispatch({ type: 'SET_DAYS_PER_WEEK', payload: val });
+                                                const split = state?.split4 === 'B' ? SPLIT_4DAY_B : SPLIT_4DAY_A;
+                                                const pack = packRef.current;
+                                                let sched;
+                                                if (val === 4) sched = buildSchedule4Day({ state: { ...state, daysPerWeek: val }, pack, split, weekLabel: '3x5' });
+                                                else if (val === 3) sched = buildSchedule({ mode: '3day', liftOrder: ["press", "deadlift", "bench", "squat"] });
+                                                else if (val === 2) sched = buildSchedule2Day({ state: { ...state, daysPerWeek: val }, pack, split, weekLabel: '3x5' });
+                                                else sched = buildSchedule1Day({ state: { ...state, daysPerWeek: val }, pack, split, weekLabel: '3x5' });
+                                                dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), schedulePreview: sched } });
+                                            }}
+                                        >{d}</ToggleButton>
+                                    ))}
+                                </div>
+                            </div>
+                            <div>
+                                <div className="flex items-center justify-between mb-1">
+                                    <label className="block text-xs uppercase tracking-wide text-gray-400">4-day Split</label>
+                                    <span className="text-[10px] text-gray-500">For 4-day</span>
+                                </div>
+                                <div className="flex gap-2 flex-wrap" role="group" aria-label="4-day split">
+                                    {['A', 'B'].map(code => (
+                                        <ToggleButton
+                                            key={code}
+                                            on={(state?.split4 || 'A') === code}
+                                            aria-label={`Split ${code}`}
+                                            onClick={() => {
+                                                const splitVal = code;
+                                                dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), split4: splitVal } });
+                                                const split = splitVal === 'B' ? SPLIT_4DAY_B : SPLIT_4DAY_A;
+                                                const val = Number(state?.daysPerWeek || 3);
+                                                const pack = packRef.current;
+                                                let sched;
+                                                if (val === 4) sched = buildSchedule4Day({ state: { ...state }, pack, split, weekLabel: '3x5' });
+                                                else if (val === 3) sched = buildSchedule({ mode: '3day', liftOrder: ["press", "deadlift", "bench", "squat"] });
+                                                else if (val === 2) sched = buildSchedule2Day({ state: { ...state }, pack, split, weekLabel: '3x5' });
+                                                else sched = buildSchedule1Day({ state: { ...state }, pack, split, weekLabel: '3x5' });
+                                                dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), split4: splitVal, schedulePreview: sched } });
+                                            }}
+                                        >{code === 'A' ? 'A: P/D/B/S' : 'B: B/S/P/D'}</ToggleButton>
+                                    ))}
+                                </div>
+                            </div>
                         </div>}
                     />
                 );

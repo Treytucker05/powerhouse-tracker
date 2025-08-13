@@ -128,6 +128,8 @@ export default function Step4ReviewExport({ onReadyChange }) {
 
     // Build weeks JSON for export (4 weeks always include deload per spec preview)
     const weeksData = useMemo(() => {
+        // Assistance pack fallback: if no template chosen, prefer 'triumvirate' (never empty except Jack Shit)
+        const assistancePack = state.templateKey || state.assistance?.templateId || (assistance.mode === 'jack_shit' ? 'jack_shit' : 'triumvirate');
         const weeks = [0, 1, 2, 3].map(wi => {
             const daysData = order.map((displayLift) => {
                 const tm = getTMForDisplayLift(displayLift);
@@ -144,7 +146,7 @@ export default function Step4ReviewExport({ onReadyChange }) {
                         weight: bbbWeight, units
                     };
                 }
-                // Assistance computation
+                // Assistance source normalization (custom/template/bodyweight variants)
                 let assistanceItems = [];
                 if (assistance.mode === 'triumvirate' && assistance.patternPerDay) {
                     assistanceItems = assistance.patternPerDay[displayLift.toLowerCase()] || [];
@@ -154,6 +156,8 @@ export default function Step4ReviewExport({ onReadyChange }) {
                     assistanceItems = assistance.blocks;
                 } else if (assistance.mode === 'bodyweight' && assistance.menu) {
                     assistanceItems = assistance.menu.map(name => ({ name, sets: 3, reps: 10, rule: { method: 'bodyweight' } }));
+                } else if (assistance.mode === 'jack_shit') {
+                    assistanceItems = [];
                 }
                 const assistanceComputed = buildAssistanceForDay({
                     items: assistanceItems,
@@ -163,40 +167,57 @@ export default function Step4ReviewExport({ onReadyChange }) {
                     roundingMode,
                     bodyweight: state?.bodyweight || 0
                 });
+                // Conditioning: mimic schedule.js strategy (single pickCardio id reused across days)
+                let conditioning = null;
+                try {
+                    // eslint-disable-next-line no-undef
+                    const { CardioTemplates, pickCardio } = require('../../cardioTemplates.js');
+                    const cardioId = pickCardio(frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2, state || {});
+                    conditioning = CardioTemplates[cardioId];
+                } catch {
+                    conditioning = { type: 'LISS', minutes: 30 };
+                }
                 return {
                     lift: displayLift,
                     warmups,
                     main,
                     supplemental: supplementalBlock,
-                    assistance: {
-                        items: assistanceComputed
-                    }
+                    assistance: assistanceComputed, // plain array for UI/export
+                    conditioning
                 };
             });
             return { week: wi + 1, days: daysData };
         });
         return weeks;
-    }, [order, includeWarmups, warmupScheme, roundingIncrement, roundingMode, units, supplemental, assistance, loadingOption, trainingMaxes, state?.bodyweight]);
+    }, [order, includeWarmups, warmupScheme, roundingIncrement, roundingMode, units, supplemental, assistance, loadingOption, trainingMaxes, state?.bodyweight, state.templateKey, frequency]);
 
-    const exportJson = useMemo(() => ({
-        meta: {
-            createdAt: new Date().toISOString(),
-            templateKey: state.flowMode === 'template' ? state.templateKey : null,
-            units,
-            loadingOption
-        },
-        trainingMaxes,
-        rounding: typeof state.rounding === 'object' ? state.rounding : { increment: roundingIncrement, mode: roundingMode },
-        schedule: {
-            frequency: frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2,
-            days: order,
-            includeWarmups,
-            warmupScheme
-        },
-        supplemental,
-        assistance,
-        weeks: weeksData
-    }), [state.flowMode, state.templateKey, units, loadingOption, trainingMaxes, state.rounding, roundingIncrement, roundingMode, frequency, order, includeWarmups, warmupScheme, supplemental, assistance, weeksData]);
+    const exportJson = useMemo(() => {
+        const freqNum = frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2;
+        const assistancePack = state.templateKey || state.assistance?.templateId || (assistance.mode === 'jack_shit' ? 'jack_shit' : 'triumvirate');
+        return {
+            meta: {
+                createdAt: new Date().toISOString(),
+                templateKey: state.flowMode === 'template' ? state.templateKey : null,
+                pack: assistancePack,
+                units,
+                loadingOption,
+                daysPerWeek: freqNum,
+                split4: freqNum === 4 ? (state.schedule?.split4 || state.advanced?.split4 || 'A') : undefined,
+                equipment: state.equipment || []
+            },
+            trainingMaxes,
+            rounding: typeof state.rounding === 'object' ? state.rounding : { increment: roundingIncrement, mode: roundingMode },
+            schedule: {
+                frequency: freqNum,
+                days: order,
+                includeWarmups,
+                warmupScheme
+            },
+            supplemental,
+            assistance,
+            weeks: weeksData
+        };
+    }, [state.flowMode, state.templateKey, state.assistance?.templateId, state.schedule?.split4, state.advanced?.split4, state.equipment, units, loadingOption, trainingMaxes, state.rounding, roundingIncrement, roundingMode, frequency, order, includeWarmups, warmupScheme, supplemental, assistance, weeksData]);
 
     const handleDownload = useCallback(() => {
         try {
@@ -235,8 +256,8 @@ export default function Step4ReviewExport({ onReadyChange }) {
                     <p className="text-gray-400 text-sm">Preview the full 4-week cycle, confirm details, then export or print.</p>
                     {/* Context badge */}
                     <div className="text-xs uppercase tracking-wide opacity-70 mt-2">
-                        {frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2}-day • {String(state.templateKey || 'custom').toUpperCase()}
-                        {frequency === '4day' && state.schedule?.split4 && ` • Split ${state.schedule.split4}`}
+                        {frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2}-day • {String((state.templateKey || state.assistance?.templateId || (assistance.mode === 'jack_shit' ? 'jack_shit' : 'triumvirate'))).toUpperCase()}
+                        {frequency === '4day' && (state.schedule?.split4 || state.advanced?.split4) && ` • Split ${(state.schedule?.split4 || state.advanced?.split4)}`}
                     </div>
                 </div>
                 {state.flowMode === 'template' && state.templateKey && (
@@ -408,7 +429,7 @@ function DevInspector({ effective, exportJson }) {
     const [open, setOpen] = useState(false);
     return (
         <div className="bg-gray-800/30 border border-gray-700 rounded-lg p-4 space-y-3 text-xs">
-            <button onClick={() => setOpen(o => !o)} className="px-3 py-1.5 rounded border border-gray-600 text-gray-300 hover:border-red-500">{open ? 'Hide' : 'Show'} Inspector</button>
+            <button title="Debug: inspect generated config & weeks (dev only)" onClick={() => setOpen(o => !o)} className="px-3 py-1.5 rounded border border-gray-600 text-gray-300 hover:border-red-500">{open ? 'Hide' : 'Show'} Program JSON (Debug)</button>
             {open && (
                 <div className="space-y-4">
                     <div>

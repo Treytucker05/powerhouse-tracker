@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useProgramV2, setSchedule, setSupplemental, setAssistance } from '../../contexts/ProgramContextV2.jsx';
 import { Info, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import ToggleButton from '../ToggleButton.jsx';
 
 const CORE_LIFTS = ['Press', 'Deadlift', 'Bench', 'Squat'];
 
@@ -31,8 +32,8 @@ export default function Step3DesignCustom({ onValidChange }) {
     const [customPlan, setCustomPlan] = useState(initialCustomPlan);
 
     // Equipment selector (drives automatic assistance filtering)
-    const ALL_EQUIP = ["bw","db","bb","machine","cable","band","kb","dip","rings","bench","box","landmine","plate","abwheel","bar"];
-    const [equip, setEquip] = useState(state.equipment || ['bw','db','bb']);
+    const ALL_EQUIP = ["bw", "db", "bb", "machine", "cable", "band", "kb", "dip", "rings", "bench", "box", "landmine", "plate", "abwheel", "bar"];
+    const [equip, setEquip] = useState(state.equipment || ['bw', 'db', 'bb']);
     function toggleEquip(key) {
         setEquip(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
     }
@@ -174,17 +175,14 @@ export default function Step3DesignCustom({ onValidChange }) {
                 <div className="flex items-center justify-between">
                     <h3 className="text-lg font-semibold text-white">A) Schedule</h3>
                     <div className="flex space-x-2">
-                        <button onClick={setCanonical} className="px-3 py-1.5 text-xs rounded border border-gray-600 text-gray-300 hover:border-red-500">Canonical Order</button>
-                        <button onClick={resetOrder} className="px-3 py-1.5 text-xs rounded border border-gray-600 text-gray-300 hover:border-red-500">Reset Order</button>
+                        <ToggleButton on={false} onClick={setCanonical} className="text-xs">Canonical Order</ToggleButton>
+                        <ToggleButton on={false} onClick={resetOrder} className="text-xs">Reset Order</ToggleButton>
                     </div>
                 </div>
                 <div className="space-y-4">
-                    <div className="flex flex-wrap gap-4 items-center">
+                    <div className="flex flex-wrap gap-2 items-center">
                         {['4day', '3day', '2day'].map(f => (
-                            <label key={f} className={`flex items-center space-x-2 px-3 py-2 rounded border text-sm cursor-pointer ${frequency === f ? 'border-red-500 bg-red-600/10 text-red-300' : 'border-gray-600 text-gray-300 hover:border-gray-500'}`}>
-                                <input type="radio" className="hidden" checked={frequency === f} onChange={() => setFrequency(f)} />
-                                <span>{f.replace('day', '-day')}</span>
-                            </label>
+                            <ToggleButton key={f} on={frequency === f} onClick={() => setFrequency(f)}>{f.replace('day', '-day')}</ToggleButton>
                         ))}
                     </div>
                     <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
@@ -216,15 +214,44 @@ export default function Step3DesignCustom({ onValidChange }) {
                     </label>
                     {includeWarmups && (
                         <div className="flex space-x-2">
-                            <button onClick={() => { setWarmPctCsv('40,50,60'); setWarmRepsCsv('5,5,3'); }} className="px-3 py-1.5 text-xs rounded border border-gray-600 text-gray-300 hover:border-red-500">Standard</button>
-                            <button onClick={() => { setWarmPctCsv('40,50'); setWarmRepsCsv('5,5'); }} className="px-3 py-1.5 text-xs rounded border border-gray-600 text-gray-300 hover:border-red-500">Minimal</button>
+                            {(() => {
+                                const pct = warmPctCsv.replace(/\s/g, '');
+                                const reps = warmRepsCsv.replace(/\s/g, '');
+                                const isStandard = pct === '40,50,60' && reps === '5,5,3';
+                                const isMinimal = pct === '40,55' && reps === '5,3';
+                                return (
+                                    <>
+                                        <ToggleButton
+                                            on={isStandard}
+                                            className="text-xs"
+                                            title="Classic Wendler 3-set ramp"
+                                            onClick={() => { setWarmPctCsv('40,50,60'); setWarmRepsCsv('5,5,3'); }}
+                                        >Standard (3 sets)</ToggleButton>
+                                        <ToggleButton
+                                            on={isMinimal}
+                                            className="text-xs"
+                                            title="Fast ramp: first two sets only"
+                                            onClick={() => { setWarmPctCsv('40,55'); setWarmRepsCsv('5,3'); }}
+                                        >Minimal (2 quick)</ToggleButton>
+                                    </>
+                                );
+                            })()}
                         </div>
                     )}
                 </div>
-                <div className="bg-blue-900/20 border border-blue-700/40 rounded p-3 text-xs text-blue-100 flex space-x-2">
-                    <Info className="w-4 h-4 mt-0.5" />
-                    <span>Standard Wendler warm-up: 40/50/60% x 5/5/3 prepares joints & primes pattern.</span>
-                </div>
+                {includeWarmups ? (
+                    <div className="bg-blue-900/20 border border-blue-700/40 rounded p-3 text-[11px] text-blue-100 flex space-x-2 leading-snug">
+                        <Info className="w-4 h-4 mt-0.5" />
+                        <span>
+                            Choose a ramp that wakes tissues without stealing performance. Standard (40/50/60 x 5/5/3) gives more gradual practice; Minimal (40/55 x 5/3) is a faster primer for time‑crunched sessions. Adjust percentages or reps if bar speed feels off.
+                        </span>
+                    </div>
+                ) : (
+                    <div className="bg-gray-800/40 border border-gray-700/60 rounded p-3 text-[11px] text-gray-400 flex space-x-2 leading-snug">
+                        <Info className="w-4 h-4 mt-0.5" />
+                        <span>Warm-ups skipped. Make sure you still perform a few empty bar / light acclimation sets before main work.</span>
+                    </div>
+                )}
                 {includeWarmups && (
                     <div className="grid md:grid-cols-2 gap-4">
                         <div>
@@ -248,12 +275,9 @@ export default function Step3DesignCustom({ onValidChange }) {
             {/* Deadlift Rep Style */}
             <section className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 space-y-4">
                 <h3 className="text-lg font-semibold text-white">C) Deadlift Rep Style</h3>
-                <div className="flex space-x-4 text-sm">
+                <div className="flex flex-wrap gap-2 text-sm">
                     {['dead_stop', 'touch_and_go'].map(style => (
-                        <label key={style} className={`px-3 py-2 rounded border cursor-pointer ${deadliftRepStyle === style ? 'border-red-500 bg-red-600/10 text-red-300' : 'border-gray-600 text-gray-300 hover:border-gray-500'}`}>
-                            <input type="radio" className="hidden" checked={deadliftRepStyle === style} onChange={() => setDeadliftRepStyle(style)} />
-                            {style.replace('_', ' ')}
-                        </label>
+                        <ToggleButton key={style} on={deadliftRepStyle === style} onClick={() => setDeadliftRepStyle(style)}>{style.replace('_', ' ')}</ToggleButton>
                     ))}
                 </div>
                 <div className="bg-blue-900/20 border border-blue-700/40 rounded p-3 text-xs text-blue-100 flex space-x-2">
@@ -265,12 +289,9 @@ export default function Step3DesignCustom({ onValidChange }) {
             {/* Supplemental */}
             <section className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 space-y-5">
                 <h3 className="text-lg font-semibold text-white">D) Supplemental (Optional BBB)</h3>
-                <div className="flex flex-wrap gap-3 text-sm">
+                <div className="flex flex-wrap gap-2 text-sm">
                     {['none', 'bbb'].map(s => (
-                        <label key={s} className={`px-3 py-2 rounded border cursor-pointer ${suppStrategy === s ? 'border-red-500 bg-red-600/10 text-red-300' : 'border-gray-600 text-gray-300 hover:border-gray-500'}`}>
-                            <input type="radio" className="hidden" checked={suppStrategy === s} onChange={() => setSuppStrategy(s)} />
-                            {s === 'none' ? 'None' : 'Boring But Big'}
-                        </label>
+                        <ToggleButton key={s} on={suppStrategy === s} onClick={() => setSuppStrategy(s)}>{s === 'none' ? 'None' : 'Boring But Big'}</ToggleButton>
                     ))}
                 </div>
                 {suppStrategy === 'bbb' && (
@@ -300,14 +321,14 @@ export default function Step3DesignCustom({ onValidChange }) {
             <section className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 space-y-5">
                 <h3 className="text-lg font-semibold text-white">F) Equipment</h3>
                 <p className="text-xs text-gray-400">Select all equipment you have available. Assistance auto-picks will favor earlier listed categories you can perform.</p>
+                <div className="flex gap-2 mb-2 flex-wrap">
+                    <ToggleButton on={equip.length === ALL_EQUIP.length} onClick={() => setEquip([...ALL_EQUIP])}>All</ToggleButton>
+                    <ToggleButton on={equip.length === 0} onClick={() => setEquip([])}>None</ToggleButton>
+                </div>
                 <div className="flex flex-wrap gap-2">
-                    {ALL_EQUIP.map(k => {
-                        const active = equip.includes(k);
-                        return (
-                            <button key={k} type="button" onClick={() => toggleEquip(k)}
-                                className={`px-2 py-1.5 text-xs rounded border capitalize ${active ? 'bg-red-600/20 border-red-500 text-red-300' : 'border-gray-600 text-gray-300 hover:border-gray-500'}`}>{k}</button>
-                        );
-                    })}
+                    {ALL_EQUIP.map(k => (
+                        <ToggleButton key={k} on={equip.includes(k)} onClick={() => toggleEquip(k)} className="capitalize text-xs px-2 py-1.5">{k}</ToggleButton>
+                    ))}
                 </div>
                 {equip.length === 0 && <div className="text-xs text-yellow-300">Select at least bodyweight (bw) or another implement.</div>}
             </section>
@@ -326,11 +347,12 @@ export default function Step3DesignCustom({ onValidChange }) {
                             <option value="custom">Custom</option>
                         </select>
                         {assistMode !== 'custom' && (
-                            <div className="text-xs text-gray-400 bg-gray-800/60 border border-gray-700 rounded p-3 leading-snug">
-                                {assistMode === 'minimal' && 'Low accessory volume focusing on core lifts recovery.'}
-                                {assistMode === 'triumvirate' && 'Two focused assistance movements per day.'}
-                                {assistMode === 'periodization_bible' && 'Layered volume blocks targeting multiple patterns.'}
-                                {assistMode === 'bodyweight' && 'Accessory emphasis on bodyweight movements.'}
+                            <div className="text-[11px] text-gray-300 bg-gray-800/60 border border-gray-700 rounded p-3 leading-snug space-y-1">
+                                {assistMode === 'minimal' && <p>Lowest volume: pick recovery over fatigue. Great while dialing main lift progress.</p>}
+                                {assistMode === 'triumvirate' && <p>Core lift + 2 targeted movements per day. Balanced stimulus without bloat.</p>}
+                                {assistMode === 'periodization_bible' && <p>Higher total accessory volume rotating emphases (push / pull / single‑leg / core).</p>}
+                                {assistMode === 'bodyweight' && <p>Focuses on push‑ups, chins, dips, core. Good when equipment limited.</p>}
+                                <p className="text-gray-500">Switching modes later will override previous auto-picked items.</p>
                             </div>
                         )}
                     </div>
@@ -377,6 +399,17 @@ export default function Step3DesignCustom({ onValidChange }) {
                         <span>Custom assistance invalid: ensure names & reps/sets within allowed ranges.</span>
                     </div>
                 )}
+                {assistMode !== 'custom' && state.assistance?.items?.length > 0 && (
+                    <div className="text-[11px] text-gray-400 bg-gray-800/40 border border-gray-700 rounded p-3 leading-snug space-y-2">
+                        <div className="font-semibold text-gray-300 text-xs">Selected Assistance (Preview)</div>
+                        <ul className="grid sm:grid-cols-2 gap-x-4 gap-y-1 list-disc list-inside">
+                            {state.assistance.items.slice(0, 8).map((it, i) => (
+                                <li key={i} className="truncate"><span className="text-gray-200">{it.name}</span>{it.sets && it.reps ? ` — ${it.sets} x ${it.reps}` : ''}</li>
+                            ))}
+                        </ul>
+                        {state.assistance.items.length > 8 && <div className="text-[10px] text-gray-500">+ {state.assistance.items.length - 8} more…</div>}
+                    </div>
+                )}
             </section>
 
             {/* Validation Summary */}
@@ -387,10 +420,10 @@ export default function Step3DesignCustom({ onValidChange }) {
                 <div className={`flex items-center space-x-2 ${validation.assistanceOk ? 'text-green-400' : 'text-yellow-300'}`}><CheckCircle2 className="w-4 h-4" /><span>Assistance</span></div>
             </section>
 
-            {/* Dev Inspector */}
+            {/* Dev / Debug JSON Inspector */}
             {import.meta.env.MODE !== 'production' && (
                 <section className="bg-gray-800/40 border border-gray-700 rounded-lg p-4 space-y-3 text-xs">
-                    <button onClick={() => setShowInspector(s => !s)} className="px-3 py-1.5 rounded border border-gray-600 text-gray-300 hover:border-red-500">{showInspector ? 'Hide' : 'Show'} Inspector</button>
+                    <button title="Debug: view in-progress design JSON (dev only)" onClick={() => setShowInspector(s => !s)} className="px-3 py-1.5 rounded border border-gray-600 text-gray-300 hover:border-red-500">{showInspector ? 'Hide' : 'Show'} Program JSON (Debug)</button>
                     {showInspector && (
                         <>
                             <pre className="max-h-64 overflow-auto bg-black/40 p-3 rounded text-[11px] leading-snug text-gray-200">{JSON.stringify({ frequency, order, includeWarmups, warmPctCsv, warmRepsCsv, suppStrategy, suppPairing, suppPct, assistMode, customPlan, deadliftRepStyle }, null, 2)}</pre>

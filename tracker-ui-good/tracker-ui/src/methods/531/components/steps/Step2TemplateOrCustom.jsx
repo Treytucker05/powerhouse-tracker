@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useProgramV2 } from '../../contexts/ProgramContextV2.jsx';
 import { TEMPLATE_KEYS, getTemplatePreset } from '../../../../lib/templates/531.presets.v2.js';
 import { CheckCircle2, ChevronRight, Info, AlertTriangle } from 'lucide-react';
+import ToggleButton from '../ToggleButton.jsx';
 
 /**
  * Step2TemplateOrCustom.jsx
@@ -92,8 +93,15 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                                 return (
                                     <div
                                         key={card.key}
-                                        className={`relative rounded-lg border cursor-pointer group transition-colors p-4 flex flex-col justify-between ${active ? 'border-red-500 bg-red-600/10' : 'border-gray-700 bg-gray-800/40 hover:border-gray-500'}`}
+                                        role="button"
+                                        tabIndex={0}
+                                        aria-pressed={active}
                                         onClick={() => handleSelectTemplate(card.key)}
+                                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSelectTemplate(card.key); } }}
+                                        className={[
+                                            'relative rounded-lg border cursor-pointer group transition p-4 flex flex-col justify-between outline-none',
+                                            active ? 'border-indigo-500 bg-indigo-600/10 ring-2 ring-indigo-400' : 'border-gray-700 bg-gray-800/40 hover:border-gray-500'
+                                        ].join(' ')}
                                     >
                                         <div>
                                             <div className="flex items-start justify-between mb-2">
@@ -102,12 +110,7 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                                             </div>
                                             <p className="text-xs text-gray-400 leading-snug mb-3">{card.blurb}</p>
                                         </div>
-                                        <button
-                                            className={`mt-auto text-xs font-medium px-3 py-1.5 rounded border ${active ? 'border-red-500 text-red-300 bg-red-600/20' : 'border-gray-600 text-gray-300 hover:border-gray-500'}`}
-                                            type="button"
-                                        >
-                                            {active ? 'Selected' : 'Select'}
-                                        </button>
+                                        <ToggleButton on={active} className="mt-auto self-start text-xs">{active ? 'Selected' : 'Select'}</ToggleButton>
                                     </div>
                                 );
                             })}
