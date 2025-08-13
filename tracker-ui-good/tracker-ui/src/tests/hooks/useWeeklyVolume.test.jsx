@@ -81,10 +81,10 @@ describe('useWeeklyVolume', () => {
     expect(firstWeek.volumes).toHaveProperty('Back')
   })
 
-  it('handles authentication error gracefully', async () => {    // Mock authentication failure
-    vi.doMock('../../lib/api/supabaseClient', () => ({
-      getCurrentUserId: vi.fn(() => Promise.resolve(null))
-    }))
+  it('handles authentication error gracefully', async () => {
+    // Obtain the mocked module and force auth failure for this invocation
+    const supabaseModule = await import('../../lib/api/supabaseClient')
+    supabaseModule.getCurrentUserId.mockResolvedValueOnce(null)
 
     const { result } = renderHook(() => useWeeklyVolume(), { wrapper })
 

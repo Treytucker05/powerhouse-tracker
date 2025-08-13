@@ -3,7 +3,8 @@
  * Tests basic functionality of the new 5/3/1 context and engine
  */
 
-import { initialProgramV2 } from '../../contexts/ProgramContextV2.jsx';
+import { describe, test, expect } from 'vitest';
+import { initialProgramV2 } from '../../methods/531/contexts/ProgramContextV2.jsx';
 import { generateCycle, getWeekScheme, roundToIncrement, calcSetWeight } from '../../methods/531';
 
 describe('5/3/1 V2 Architecture Smoke Test', () => {

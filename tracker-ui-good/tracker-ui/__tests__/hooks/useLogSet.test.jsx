@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { renderHook, waitFor } from '@testing-library/react'
+import { renderHook, waitFor, act } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useLogSet } from '../../src/hooks/useLogSet'
 
@@ -95,7 +95,9 @@ describe('useLogSet', () => {
       rpe: 8
     }
 
-    await result.current.logSet(setData)
+    await act(async () => {
+      await result.current.logSet(setData)
+    })
 
     await waitFor(() => {
       expect(mockDispatchEvent).toHaveBeenCalledWith(
@@ -118,7 +120,7 @@ describe('useLogSet', () => {
   it('should finish session when all planned sets are completed', async () => {
     const { useActiveSession } = await import('../../src/hooks/useActiveSession')
     const mockFinishSession = vi.fn(() => Promise.resolve())
-    
+
     // Mock a session that's about to be completed
     useActiveSession.mockReturnValue({
       activeSession: {
@@ -148,7 +150,9 @@ describe('useLogSet', () => {
       rpe: 9
     }
 
-    await result.current.logSet(setData)
+    await act(async () => {
+      await result.current.logSet(setData)
+    })
 
     await waitFor(() => {
       expect(mockFinishSession).toHaveBeenCalled()
@@ -170,7 +174,7 @@ describe('useLogSet', () => {
   it('should not finish session when planned sets are not complete', async () => {
     const { useActiveSession } = await import('../../src/hooks/useActiveSession')
     const mockFinishSession = vi.fn(() => Promise.resolve())
-    
+
     // Mock a session with incomplete sets
     useActiveSession.mockReturnValue({
       activeSession: {
@@ -215,7 +219,9 @@ describe('useLogSet', () => {
       rpe: 8
     }
 
-    await result.current.logSet(setData)
+    await act(async () => {
+      await result.current.logSet(setData)
+    })
 
     // Should emit volume:updated but not finish session
     await waitFor(() => {
@@ -231,7 +237,7 @@ describe('useLogSet', () => {
 
   it('should handle errors gracefully', async () => {
     const { useActiveSession } = await import('../../src/hooks/useActiveSession')
-    
+
     useActiveSession.mockReturnValue({
       activeSession: {
         id: 'session-123',
@@ -250,13 +256,17 @@ describe('useLogSet', () => {
       rpe: 8
     }
 
-    await expect(result.current.logSet(setData)).rejects.toThrow('Failed to add set')
+    await expect(async () => {
+      await act(async () => {
+        await result.current.logSet(setData)
+      })
+    }).rejects.toThrow('Failed to add set')
   })
 
   it('should handle session without planned sets', async () => {
     const { useActiveSession } = await import('../../src/hooks/useActiveSession')
     const mockFinishSession = vi.fn(() => Promise.resolve())
-    
+
     useActiveSession.mockReturnValue({
       activeSession: {
         id: 'session-123',
@@ -281,7 +291,9 @@ describe('useLogSet', () => {
       rpe: 8
     }
 
-    await result.current.logSet(setData)
+    await act(async () => {
+      await result.current.logSet(setData)
+    })
 
     // Should emit volume:updated but not attempt to finish session
     await waitFor(() => {

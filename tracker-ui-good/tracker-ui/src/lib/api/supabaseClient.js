@@ -7,7 +7,26 @@ if (!supabaseUrl || !supabaseAnonKey) {
     console.warn('Missing Supabase environment variables. Using fallback values.')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+// Lightweight in-memory mock for test environment to avoid any network/filesystem flakiness
+export const supabase = (process.env.NODE_ENV === 'test') ? {
+    from() {
+        return {
+            select: () => ({
+                eq: () => Promise.resolve({ data: [], error: null })
+            })
+        };
+    },
+    auth: {
+        getUser: () => ({ data: { user: { id: 'test-user-id' } } }),
+        getSession: () => Promise.resolve({ data: { session: null } }),
+        onAuthStateChange: (cb) => {
+            // Immediately invoke callback once with signed_out to keep logic paths deterministic
+            try { cb?.('SIGNED_OUT', { user: null }); } catch { /* noop */ }
+            return { data: { subscription: { unsubscribe: () => { } } } };
+        },
+        signOut: () => Promise.resolve({ error: null })
+    }
+} : createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
         autoRefreshToken: true,
         persistSession: true

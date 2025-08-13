@@ -204,15 +204,22 @@ function reducerV2(state, action) {
 function useProgramReducerV2() {
     const [state, dispatch] = useReducer(reducerV2, initialProgramV2, (init) => {
         try {
-            const raw = localStorage.getItem('ph_program_v2');
-            return raw ? { ...init, ...JSON.parse(raw) } : init;
+            if (typeof window !== 'undefined' && window.localStorage) {
+                const raw = window.localStorage.getItem('ph_program_v2');
+                return raw ? { ...init, ...JSON.parse(raw) } : init;
+            }
+            return init;
         } catch { return init; }
     });
 
     // Throttled localStorage persistence
     useEffect(() => {
         const id = setTimeout(() => {
-            localStorage.setItem('ph_program_v2', JSON.stringify(state));
+            try {
+                if (typeof window !== 'undefined' && window.localStorage) {
+                    window.localStorage.setItem('ph_program_v2', JSON.stringify(state));
+                }
+            } catch { /* ignore persistence errors in test/jsdom */ }
         }, 250);
         return () => clearTimeout(id);
     }, [state]);

@@ -7,7 +7,7 @@ import TemplateExplainerModal from '../../components/TemplateExplainerModal.jsx'
 import { getTemplateSpec, TEMPLATE_SPECS } from '../../../../lib/templates/531.templateSpecs.js';
 import { getTemplatePreset } from '../../../../lib/templates/531.presets.v2.js';
 // Static imports (avoid dynamic require duplication during build)
-import { normalizeAssistance } from '../../assistance/index.js';
+import { normalizeAssistance, CATALOG_VERSION } from '../../assistance/index.js';
 // Volume & stress helpers
 import { estimateTonnage, sumRepsByBlock } from '../../calc.js';
 import AssistanceCatalogData, { AssistanceCatalog } from '../../assistanceCatalog.js';
@@ -215,6 +215,8 @@ export default function Step4ReviewExport({ onReadyChange }) {
         const assistancePack = state.templateKey || state.assistance?.templateId || (assistance.mode === 'jack_shit' ? 'jack_shit' : 'triumvirate');
         return {
             meta: {
+                schemaVersion: '1.0.0',
+                catalogVersion: CATALOG_VERSION,
                 createdAt: new Date().toISOString(),
                 templateKey: state.flowMode === 'template' ? state.templateKey : null,
                 templateName: state.templateSpec?.name || null,

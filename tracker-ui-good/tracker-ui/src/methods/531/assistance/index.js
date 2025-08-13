@@ -25,6 +25,8 @@ const FLAT = Object.entries(CatalogByCategory).flatMap(([cat, arr]) =>
 
 // The public unified flattened catalog
 export const ASSISTANCE_CATALOG = FLAT;
+// Simple catalog version (increment when catalog structure/notes meaningfully change)
+export const CATALOG_VERSION = 'assistance-v1';
 
 // Short exercise cue notes (book-derived / coaching emphasis). Keep terse (≤60 chars each).
 export const EXERCISE_NOTES = {
@@ -137,7 +139,7 @@ export function normalizeAssistance(templateKey, mainLift, state) {
     // Map canonicalLift back to display capitalized (keys stored capitalized in TEMPLATE_DEFAULTS values)
     const displayKey = Object.keys(templateEntry).find(k => k.toLowerCase() === canonicalLift) || liftDisplay;
     const ids = templateEntry[displayKey] || [];
-    return ids.map(id => {
+    let items = ids.map(id => {
         const meta = getExerciseMeta(id);
         if (!meta) return { id, name: id.replace(/_/g, ' ') };
         return {
@@ -150,6 +152,17 @@ export function normalizeAssistance(templateKey, mainLift, state) {
             note: meta.note
         };
     }).filter(Boolean);
+    // Equipment filtering (state.equipment array). If provided & non-empty, keep items whose equipment subset is satisfied.
+    const userEquip = Array.isArray(state?.equipment) ? state.equipment.map(e => String(e).toLowerCase()) : [];
+    if (userEquip.length) {
+        const filtered = items.filter(it => {
+            const eq = Array.isArray(it.equipment) ? it.equipment : [];
+            if (!eq.length) return true; // universal
+            return eq.every(tag => userEquip.includes(String(tag).toLowerCase()));
+        });
+        if (filtered.length) items = filtered; // fallback to unfiltered if everything got filtered out
+    }
+    return items;
 }
 
 export function blocksFor(templateKey, mainLift) {
