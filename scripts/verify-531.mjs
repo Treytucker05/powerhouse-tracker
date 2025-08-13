@@ -15,6 +15,8 @@ try {
     schedExtra.buildSchedule2Day = schedMod.buildSchedule2Day;
     schedExtra.buildSchedule1Day = schedMod.buildSchedule1Day;
     schedExtra.buildSchedule3Day = schedMod.buildSchedule3Day; // newly added 3-day live builder
+    schedExtra.SPLIT_4DAY_A = schedMod.SPLIT_4DAY_A;
+    schedExtra.SPLIT_4DAY_B = schedMod.SPLIT_4DAY_B;
 } catch (e) {
     console.warn("[verify-531] schedule.js import failed, skipping 4-day structural check:", e.message);
 }
@@ -392,21 +394,21 @@ try {
     // 3-day structure (5-week preview and live snapshot conditioning)
     try {
         if (buildSchedule) {
-            const preview3 = buildSchedule({ mode: '3day', liftOrder: ['press','deadlift','bench','squat'], state: {} });
+            const preview3 = buildSchedule({ mode: '3day', liftOrder: ['press', 'deadlift', 'bench', 'squat'], state: {} });
             const weeks3 = preview3.weeks || [];
             if (weeks3.length !== 5) errs.push(`3-day preview: expected 5 weeks, got ${weeks3.length}`);
             weeks3.forEach((w, wi) => {
-                if (!Array.isArray(w.days) || w.days.length !== 3) errs.push(`3-day preview week ${wi+1}: expected 3 days, got ${(w.days||[]).length}`);
-                (w.days||[]).forEach(d => {
-                    if (!d.conditioning) errs.push(`3-day preview week ${wi+1} day ${d.lift}: missing conditioning`);
+                if (!Array.isArray(w.days) || w.days.length !== 3) errs.push(`3-day preview week ${wi + 1}: expected 3 days, got ${(w.days || []).length}`);
+                (w.days || []).forEach(d => {
+                    if (!d.conditioning) errs.push(`3-day preview week ${wi + 1} day ${d.lift}: missing conditioning`);
                     else if (!d.conditioning.type || (d.conditioning.type === 'LISS' && !d.conditioning.minutes)) {
-                        errs.push(`3-day preview week ${wi+1} day ${d.lift}: invalid conditioning object`);
+                        errs.push(`3-day preview week ${wi + 1} day ${d.lift}: invalid conditioning object`);
                     }
                 });
             });
         }
         if (schedExtra.buildSchedule3Day) {
-            const live3 = schedExtra.buildSchedule3Day({ state: { week:1, cycle:1 }, pack: {} });
+            const live3 = schedExtra.buildSchedule3Day({ state: { week: 1, cycle: 1 }, pack: {} });
             if (!live3 || live3.daysPerWeek !== 3 || !Array.isArray(live3.days) || live3.days.length !== 3) {
                 errs.push('3-day live builder: invalid shape');
             } else {
@@ -414,11 +416,85 @@ try {
             }
         }
     } catch (e) {
-        errs.push('3-day structure check failed: '+ e.message);
+        errs.push('3-day structure check failed: ' + e.message);
     }
 
     // 3b. Assistance rules synthesis
     await checkAssistanceRules(errs);
+
+    // --- New: 2-day & 1-day rotation coverage / conditioning / assistance presence ---
+    function expectConditioning(container, labelPrefix) {
+        (container.days||[]).forEach((d,i) => {
+            if (!d.conditioning) errs.push(`${labelPrefix} day ${i+1} (${d.lift||'?'}) missing conditioning`);
+            else if (!d.conditioning.type) errs.push(`${labelPrefix} day ${i+1} invalid conditioning object`);
+        });
+    }
+    function expectAssistance(container, labelPrefix) {
+        (container.days||[]).forEach((d,i) => {
+            if (!Array.isArray(d.assistance)) errs.push(`${labelPrefix} day ${i+1} (${d.lift||'?'}) assistance not array`);
+        });
+    }
+    async function testTwoDay() {
+        const { buildSchedule2Day, SPLIT_4DAY_A } = schedExtra;
+        if (!buildSchedule2Day || !SPLIT_4DAY_A) return; // graceful skip
+        const stateBase = { units: 'lbs', cycle: 1, roundingPref: { lbs: 5, kg: 2.5 }, templateKey: 'triumvirate' };
+        const s0 = { ...stateBase, daysPerWeek: 2, week: 1, split4: 'A' };
+        let w1, w2;
+        try {
+            w1 = buildSchedule2Day({ state: s0, pack: {}, split: SPLIT_4DAY_A });
+            w2 = buildSchedule2Day({ state: { ...s0, week: 2 }, pack: {}, split: SPLIT_4DAY_A });
+        } catch (e) {
+            errs.push('2-day rotation builder threw: ' + e.message);
+            return;
+        }
+        if (!w1 || w1.daysPerWeek !== 2 || (w1.days||[]).length !== 2) errs.push('2-day rotation week1 invalid shape');
+        if (!w2 || w2.daysPerWeek !== 2 || (w2.days||[]).length !== 2) errs.push('2-day rotation week2 invalid shape');
+        if (w1 && w2) {
+            const lifts1 = (w1.days||[]).map(d=>d.lift);
+            const lifts2 = (w2.days||[]).map(d=>d.lift);
+            if (new Set(lifts1).size !== 2) errs.push('2-day rotation week1 lifts not distinct');
+            if (new Set(lifts2).size !== 2) errs.push('2-day rotation week2 lifts not distinct');
+            const union = new Set([...lifts1, ...lifts2]);
+            if (union.size !== 4) errs.push('2-day rotation two-week coverage expected 4 unique lifts got '+union.size);
+            for (const L of union) if (!SPLIT_4DAY_A.includes(L)) errs.push('2-day rotation split mismatch lift '+L);
+            expectConditioning(w1, '2-day week1');
+            expectConditioning(w2, '2-day week2');
+            expectAssistance(w1, '2-day week1');
+            expectAssistance(w2, '2-day week2');
+        }
+    }
+    async function testOneDay() {
+        const { buildSchedule1Day, SPLIT_4DAY_B } = schedExtra;
+        if (!buildSchedule1Day || !SPLIT_4DAY_B) return; // graceful skip
+        const stateBase = { units: 'lbs', cycle: 1, roundingPref: { lbs: 5, kg: 2.5 }, templateKey: 'bbb60' };
+        const seen = [];
+        for (let w=1; w<=4; w++) {
+            let snap;
+            try {
+                snap = buildSchedule1Day({ state: { ...stateBase, daysPerWeek:1, week: w, split4: 'B' }, pack: {}, split: SPLIT_4DAY_B });
+            } catch (e) {
+                errs.push('1-day rotation builder threw (week '+w+'): '+e.message);
+                continue;
+            }
+            if (!snap || snap.daysPerWeek !== 1 || (snap.days||[]).length !== 1) {
+                errs.push('1-day rotation invalid shape week '+w);
+                continue;
+            }
+            const L = snap.days[0].lift;
+            seen.push(L);
+            expectConditioning(snap, '1-day week'+w);
+            expectAssistance(snap, '1-day week'+w);
+        }
+        if (seen.length === 4) {
+            const uniq = new Set(seen);
+            if (uniq.size !== 4) errs.push('1-day rotation expected 4 unique lifts across 4 weeks got '+uniq.size);
+            for (const L of uniq) if (!SPLIT_4DAY_B.includes(L)) errs.push('1-day rotation split mismatch lift '+L);
+        }
+    }
+    await testTwoDay();
+    await testOneDay();
+
+    if (!errs.length) console.log('1/2-day rotation, assistance, conditioning \u2705');
 
     // 4. Progression TM delta scenarios
     testProgression(errs);
