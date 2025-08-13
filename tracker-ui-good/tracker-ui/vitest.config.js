@@ -9,8 +9,8 @@ export default defineConfig({
     plugins: [react()],
     test: {
         environment: 'jsdom',
-    testTimeout: 15000,
-    hookTimeout: 15000,
+        testTimeout: 15000,
+        hookTimeout: 15000,
         include: [
             'src/**/*.{test,spec}.{js,jsx,ts,tsx}',
             'src/**/__tests__/**/*.{js,jsx,ts,tsx}',
@@ -32,7 +32,7 @@ export default defineConfig({
         restoreMocks: true,
         css: false,
         reporters: [
-            [ 'default', { summary: false } ]
+            ['default', { summary: false }]
         ],
         coverage: {
             provider: 'v8',
@@ -54,15 +54,12 @@ export default defineConfig({
                 ,
                 // Additional Phase 1 temporary exclusions for low coverage modules (will be targeted in Phase 2)
                 'src/components/navigation/TopNav.jsx',
-                'src/hooks/useRecentWorkouts.js',
-                'src/hooks/useWeekStatus.js',
                 'src/layout/AppShell.jsx'
                 ,
                 // Temp exclusions (low function coverage) to achieve Phase 1 green; will add targeted tests later
-                'src/components/dashboard/QuickActions.jsx',
-                'src/components/dashboard/SimpleVolumeChart.jsx',
-                'src/components/dashboard/PowerHouseVolumeChart.jsx',
-                'src/hooks/useQuickActions.js'
+                // 'src/components/dashboard/SimpleVolumeChart.jsx', // reinstated for coverage in Step 8
+                // 'src/components/dashboard/PowerHouseVolumeChart.jsx', // reinstated for coverage in Step 9
+                // 'src/hooks/useQuickActions.js' // reinstated for coverage in Step 7
             ],
             all: false,
             thresholds: {

@@ -1,8 +1,10 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine, ResponsiveContainer } from 'recharts';
+import { getVolumeStatus } from '@/components/charts/helpers/volumeStatus';
+import { buildChartData } from '@/components/charts/helpers/buildChartData';
+import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine, ResponsiveContainer } from 'recharts';
 
 const PowerHouseVolumeChart = ({ className = '' }) => {  // Sample data - replace with real data from context/props
-  const data = [
+  const baseData = [
     { muscle: 'Chest', volume: 12, mev: 8, mrv: 22 },
     { muscle: 'Back', volume: 16, mev: 10, mrv: 25 },
     { muscle: 'Shoulders', volume: 10, mev: 6, mrv: 20 },
@@ -12,10 +14,8 @@ const PowerHouseVolumeChart = ({ className = '' }) => {  // Sample data - replac
     { muscle: 'Hamstrings', volume: 12, mev: 8, mrv: 20 },
     { muscle: 'Glutes', volume: 14, mev: 8, mrv: 16 },
   ];
-  const _getBarColor = (volume, mev, mrv) => {
-    if (volume < mev || volume > mrv) return '#c50505'; // accent red
-    return '#22c55e'; // green
-  };
+  // Build enriched chart data via helper (pure & unit-tested)
+  const chartData = buildChartData(baseData);
 
   // Custom tooltip component
   const CustomTooltip = ({ active, payload, label }) => {
@@ -24,17 +24,18 @@ const PowerHouseVolumeChart = ({ className = '' }) => {  // Sample data - replac
       const volume = data.volume;
       const mev = data.mev;
       const mrv = data.mrv;
-      
-      let status = 'Optimal';
-      if (volume < mev) status = 'Below MEV';
-      else if (volume > mrv) status = 'Above MRV';      return (
+
+      const { status } = getVolumeStatus({ volume, mev, mrv });
+      const labelMap = { below_mev: 'Below MEV', above_mrv: 'Above MRV', within: 'Optimal', unknown: 'Unknown' };
+      const pretty = labelMap[status] || 'Unknown';
+      return (
         <div className="bg-gray-950 border border-accent p-3 rounded-lg shadow-lg">
           <p className="text-offwhite font-medium">{label}</p>
           <p className="text-green-400">Volume: {volume} sets</p>
           <p className="text-yellow-400">MEV: {mev} sets</p>
           <p className="text-primary">MRV: {mrv} sets</p>
-          <p className={`font-bold ${status === 'Optimal' ? 'text-green-400' : 'text-accent'}`}>
-            Status: {status}
+          <p className={`font-bold ${status === 'within' ? 'text-green-400' : 'text-accent'}`}>
+            Status: {pretty}
           </p>
         </div>
       );
@@ -70,35 +71,34 @@ const PowerHouseVolumeChart = ({ className = '' }) => {  // Sample data - replac
           </div>
         </div>
       </div><ResponsiveContainer width="100%" height={500}>
-        <BarChart data={data} margin={{ top: 20, right: 30, left: 40, bottom: 80 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />          <XAxis 
-            dataKey="muscle" 
-            stroke="#f2f2f2" 
+        <BarChart data={chartData} margin={{ top: 20, right: 30, left: 40, bottom: 80 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />          <XAxis
+            dataKey="muscle"
+            stroke="#f2f2f2"
             tick={{ fill: '#f2f2f2', fontSize: 12 }}
             angle={-45}
             textAnchor="end"
             height={80}
           />
-          <YAxis 
-            stroke="#f2f2f2" 
+          <YAxis
+            stroke="#f2f2f2"
             tick={{ fill: '#f2f2f2', fontSize: 12 }}
             label={{ value: 'Sets', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle', fill: '#f2f2f2' } }}
           />
           <Tooltip content={<CustomTooltip />} />
-          
+
           {/* Volume bars */}
-          <Bar 
-            dataKey="volume" 
-            fill="#22c55e"
-            stroke="#22c55e"
-            strokeWidth={2}
-          />
-            {/* Reference lines */}
+          <Bar dataKey="volume" strokeWidth={2}>
+            {chartData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.__color} stroke={entry.__color} />
+            ))}
+          </Bar>
+          {/* Reference lines */}
           <ReferenceLine y={8} stroke="#eab308" strokeDasharray="5 5" strokeWidth={2} label={{ value: "MEV", position: "insideTopLeft" }} />
           <ReferenceLine y={22} stroke="#ff1a1a" strokeDasharray="10 5" strokeWidth={2} label={{ value: "MRV", position: "insideTopLeft" }} />
         </BarChart>
       </ResponsiveContainer>
-        <div className="mt-6 text-sm text-gray-400 space-y-1">
+      <div className="mt-6 text-sm text-gray-400 space-y-1">
         <p>• <span className="text-green-400">Green bars</span>: Optimal training volume (between MEV and MRV)</p>
         <p>• <span className="text-accent">Red bars</span>: Sub-optimal volume (below MEV or above MRV)</p>
         <p>• <span className="text-yellow-400">Yellow lines</span>: Minimum Effective Volume (MEV)</p>

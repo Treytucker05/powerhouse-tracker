@@ -91,10 +91,10 @@ describe('useRecentWorkouts', () => {
     expect(Array.isArray(result.current.data)).toBe(true)
     expect(result.current.data).toHaveLength(2)
 
-  const firstWorkout = result.current.data[0]
-  // Accept either real transformed workout or fallback seed
-  const acceptableIds = ['1','fw1']
-  expect(acceptableIds).toContain(firstWorkout.id)
+    const firstWorkout = result.current.data[0]
+    // Accept either real transformed workout or fallback seed
+    const acceptableIds = ['1', 'fw1']
+    expect(acceptableIds).toContain(firstWorkout.id)
   })
 
   it('handles Supabase errors gracefully', async () => {

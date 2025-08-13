@@ -44,11 +44,11 @@ const AppShell = memo(function AppShell() {
     const authListenerResult = supabase.auth.onAuthStateChange?.(handleAuthStateChange);
     const subscription = authListenerResult && authListenerResult.data && authListenerResult.data.subscription
       ? authListenerResult.data.subscription
-      : { unsubscribe: () => {} };
+      : { unsubscribe: () => { } };
 
     return () => {
       mounted = false;
-  try { subscription.unsubscribe?.(); } catch { /* noop */ }
+      try { subscription.unsubscribe?.(); } catch { /* noop */ }
     };
   }, [handleAuthStateChange]);
 

@@ -39,12 +39,12 @@ describe('<AppShell />', () => {
         <AppShell />
       </BrowserRouter>
     );
-  const dashboardLinks = await screen.findAllByText('Dashboard');
-  expect(dashboardLinks.length).toBeGreaterThan(0);
-  const programLinks = await screen.findAllByText(/Program/i);
-  expect(programLinks.length).toBeGreaterThan(0);
-  const trackingLinks = await screen.findAllByText(/Tracking/i);
-  expect(trackingLinks.length).toBeGreaterThan(0);
+    const dashboardLinks = await screen.findAllByText('Dashboard');
+    expect(dashboardLinks.length).toBeGreaterThan(0);
+    const programLinks = await screen.findAllByText(/Program/i);
+    expect(programLinks.length).toBeGreaterThan(0);
+    const trackingLinks = await screen.findAllByText(/Tracking/i);
+    expect(trackingLinks.length).toBeGreaterThan(0);
   });
 
   it('renders with dark theme background', () => {

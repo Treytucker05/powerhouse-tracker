@@ -3,15 +3,15 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for components/ui/HeroHeader.jsx</title>
+    <title>Code coverage report for components/charts/helpers/buildChartData.js</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../../prettify.css" />
-    <link rel="stylesheet" href="../../base.css" />
-    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../../favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style type='text/css'>
         .coverage-summary .sorter {
-            background-image: url(../../sort-arrow-sprite.png);
+            background-image: url(../../../sort-arrow-sprite.png);
         }
     </style>
 </head>
@@ -19,7 +19,7 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">components/ui</a> HeroHeader.jsx</h1>
+        <h1><a href="../../../index.html">All files</a> / <a href="index.html">components/charts/helpers</a> buildChartData.js</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
@@ -32,7 +32,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
@@ -78,38 +78,35 @@
 <a name='L13'></a><a href='#L13'>13</a>
 <a name='L14'></a><a href='#L14'>14</a>
 <a name='L15'></a><a href='#L15'>15</a>
-<a name='L16'></a><a href='#L16'>16</a>
-<a name='L17'></a><a href='#L17'>17</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L16'></a><a href='#L16'>16</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">export default function HeroHeader() {
-  return (
-    &lt;div className="pt-6 text-center"&gt;
-      &lt;h1 className="text-4xl md:text-5xl font-extrabold text-white/90 tracking-tight" style={{
-        background: 'linear-gradient(135deg, #FFF 0%, #FAFAFA 100%)',
-        WebkitBackgroundClip: 'text',
-        WebkitTextFillColor: 'transparent',
-        backgroundClip: 'text'
-      }}&gt;
-        Welcome back, &lt;span className="text-accent-red" style={{ textShadow: '0 0 10px rgba(239, 68, 68, 0.3)' }}&gt;Trey&lt;/span&gt;! 💪
-      &lt;/h1&gt;
-      &lt;p className="text-gray-400 opacity-80 text-lg"&gt;Ready to crush your training goals today?&lt;/p&gt;
-      &lt;div className="mt-6 w-32 h-px bg-gradient-to-r from-transparent via-accent-red to-transparent mx-auto opacity-50"&gt;&lt;/div&gt;
-    &lt;/div&gt;
-  );
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">37x</span>
+<span class="cline-any cline-yes">37x</span>
+<span class="cline-any cline-yes">37x</span>
+<span class="cline-any cline-yes">37x</span>
+<span class="cline-any cline-yes">37x</span>
+<span class="cline-any cline-yes">37x</span>
+<span class="cline-any cline-yes">37x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { getVolumeStatus } from './volumeStatus';
+&nbsp;
+// Returns a new array with per-item status/color attached (no side effects)
+// Supports both `total` and legacy `volume` keys for compatibility.
+export function buildChartData(data = []) {
+  return data.map(d =&gt; {
+    const volumeValue = Object.prototype.hasOwnProperty.call(d, 'total') ? d.total : d.volume;
+    const { status, color } = getVolumeStatus({
+      volume: volumeValue,
+      mev: d.mev,
+      mrv: d.mrv,
+    });
+    return { ...d, __status: status, __color: color };
+  });
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -120,14 +117,14 @@
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
                 at 2025-08-13T23:35:02.872Z
             </div>
-        <script src="../../prettify.js"></script>
+        <script src="../../../prettify.js"></script>
         <script>
             window.onload = function () {
                 prettyPrint();
             };
         </script>
-        <script src="../../sorter.js"></script>
-        <script src="../../block-navigation.js"></script>
+        <script src="../../../sorter.js"></script>
+        <script src="../../../block-navigation.js"></script>
     </body>
 </html>
     

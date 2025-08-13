@@ -72,7 +72,7 @@ describe('useWeeklyVolume', () => {
     expect(result.current.data).toBeDefined()
     expect(Array.isArray(result.current.data)).toBe(true)
     expect(result.current.data.length).toBe(4) // 4 weeks
-    
+
     // Check structure of first week
     const firstWeek = result.current.data[0]
     expect(firstWeek).toHaveProperty('weekLabel')
@@ -99,7 +99,7 @@ describe('useWeeklyVolume', () => {
 
   it('refetches data when volume:updated event is fired', async () => {
     const invalidateQueriesSpy = vi.spyOn(queryClient, 'invalidateQueries')
-    
+
     const { result } = renderHook(() => useWeeklyVolume(), { wrapper })
 
     await waitFor(() => {
@@ -110,8 +110,8 @@ describe('useWeeklyVolume', () => {
     invalidateQueriesSpy.mockClear()
 
     // Fire the volume:updated event
-    window.dispatchEvent(new CustomEvent('volume:updated', { 
-      detail: { setData: { exercise: 'Bench Press', weight: 100, reps: 10 } } 
+    window.dispatchEvent(new CustomEvent('volume:updated', {
+      detail: { setData: { exercise: 'Bench Press', weight: 100, reps: 10 } }
     }))
 
     // Verify invalidateQueries was called with the correct query key
