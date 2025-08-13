@@ -30,6 +30,13 @@ export default function Step3DesignCustom({ onValidChange }) {
     const initialCustomPlan = state.assistance?.customPlan || {};
     const [customPlan, setCustomPlan] = useState(initialCustomPlan);
 
+    // Equipment selector (drives automatic assistance filtering)
+    const ALL_EQUIP = ["bw","db","bb","machine","cable","band","kb","dip","rings","bench","box","landmine","plate","abwheel","bar"];
+    const [equip, setEquip] = useState(state.equipment || ['bw','db','bb']);
+    function toggleEquip(key) {
+        setEquip(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
+    }
+
     // Dev inspector toggle
     const [showInspector, setShowInspector] = useState(false);
 
@@ -148,6 +155,12 @@ export default function Step3DesignCustom({ onValidChange }) {
         }, 250);
         return () => clearTimeout(id);
     }, [frequency, order, includeWarmups, warmPctCsv, warmRepsCsv, deadliftRepStyle, suppStrategy, suppPairing, suppPct, assistMode, customPlan, dispatch]);
+
+    // Persist equipment selection (separate effect to avoid coupling with other debounce)
+    useEffect(() => {
+        const id = setTimeout(() => dispatch({ type: 'SET_EQUIPMENT', payload: equip }), 200);
+        return () => clearTimeout(id);
+    }, [equip, dispatch]);
 
     return (
         <div className="space-y-8">
@@ -281,6 +294,22 @@ export default function Step3DesignCustom({ onValidChange }) {
                         </div>
                     </div>
                 )}
+            </section>
+
+            {/* Equipment */}
+            <section className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 space-y-5">
+                <h3 className="text-lg font-semibold text-white">F) Equipment</h3>
+                <p className="text-xs text-gray-400">Select all equipment you have available. Assistance auto-picks will favor earlier listed categories you can perform.</p>
+                <div className="flex flex-wrap gap-2">
+                    {ALL_EQUIP.map(k => {
+                        const active = equip.includes(k);
+                        return (
+                            <button key={k} type="button" onClick={() => toggleEquip(k)}
+                                className={`px-2 py-1.5 text-xs rounded border capitalize ${active ? 'bg-red-600/20 border-red-500 text-red-300' : 'border-gray-600 text-gray-300 hover:border-gray-500'}`}>{k}</button>
+                        );
+                    })}
+                </div>
+                {equip.length === 0 && <div className="text-xs text-yellow-300">Select at least bodyweight (bw) or another implement.</div>}
             </section>
 
             {/* Assistance */}

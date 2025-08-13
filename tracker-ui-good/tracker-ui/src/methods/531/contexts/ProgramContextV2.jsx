@@ -66,6 +66,8 @@ export const initialProgramV2 = {
     templateLock: false,
     supplemental: { strategy: 'none' },
     assistance: { 1: [], 2: [], 3: [], 4: [], mode: 'minimal' },
+    // User equipment availability (drives assistance selection). Keys align with assistanceCatalog equip tags.
+    equipment: ['bw','db','bb'],
     deadliftRepStyle: 'dead_stop',
     // conditioning: { mode: 'simple', freq: 2, plan: [] },
     advanced: { autoreg: { rpeCap: 9 }, specialization: {}, prTracking: true },
@@ -114,6 +116,7 @@ function reducerV2(state, action) {
         case 'SET_WARMUPS': return { ...state, warmups: { ...state.warmups, ...action.warmups } };
         case 'SET_SUPPLEMENTAL': return { ...state, supplemental: { ...state.supplemental, ...(action.supplemental || action.payload || {}) } };
         case 'SET_ASSISTANCE': return { ...state, assistance: { ...state.assistance, ...(action.assistance || action.payload || {}) } };
+    case 'SET_EQUIPMENT': return { ...state, equipment: Array.isArray(action.payload) ? action.payload : state.equipment };
         case 'SET_ADVANCED': return { ...state, advanced: { ...state.advanced, ...action.advanced } };
         case 'SET_AMRAP_WK3': return { ...state, amrapWk3: { ...(state.amrapWk3 || {}), ...(action.payload || {}) } };
         case 'SET_CYCLE': return { ...state, cycle: action.payload };

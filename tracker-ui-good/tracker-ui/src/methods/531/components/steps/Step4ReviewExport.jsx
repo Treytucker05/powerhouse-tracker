@@ -233,6 +233,11 @@ export default function Step4ReviewExport({ onReadyChange }) {
                 <div>
                     <h2 className="text-2xl font-bold text-white mb-1">Step 4 — Review & Export</h2>
                     <p className="text-gray-400 text-sm">Preview the full 4-week cycle, confirm details, then export or print.</p>
+                    {/* Context badge */}
+                    <div className="text-xs uppercase tracking-wide opacity-70 mt-2">
+                        {frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2}-day • {String(state.templateKey || 'custom').toUpperCase()}
+                        {frequency === '4day' && state.schedule?.split4 && ` • Split ${state.schedule.split4}`}
+                    </div>
                 </div>
                 {state.flowMode === 'template' && state.templateKey && (
                     <div className="px-3 py-1 text-xs rounded-full bg-red-600/20 text-red-300 border border-red-500 uppercase tracking-wide self-start md:self-auto">Template: {state.templateKey}</div>
@@ -325,20 +330,24 @@ export default function Step4ReviewExport({ onReadyChange }) {
                                         </div>
                                     )}
                                     {/* Assistance */}
-                                    {day.assistance && (
-                                        <div className="text-xs text-gray-300 space-y-1">
-                                            {Array.isArray(day.assistance) ? (
-                                                <div>
-                                                    <div className="text-gray-400 mb-1 uppercase tracking-wide">Assistance</div>
-                                                    <ul className="space-y-0.5">
-                                                        {day.assistance.map((a, i4) => (
-                                                            <li key={i4} className="font-mono">{a.name} {a.sets}x{a.reps}</li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            ) : (
-                                                <div className="text-gray-400">Assistance mode: {day.assistance.mode}</div>
-                                            )}
+                                    {/* Assistance (inline condensed) */}
+                                    <div className="mt-2">
+                                        <div className="font-medium text-xs text-gray-300">Assistance</div>
+                                        <div className="text-[11px] opacity-80 text-gray-400">
+                                            {(Array.isArray(day.assistance) && day.assistance.length)
+                                                ? day.assistance.map(a => `${a.name} ${a.sets}x${a.reps}`).join(' • ')
+                                                : 'None'}
+                                        </div>
+                                    </div>
+                                    {/* Conditioning (if available on day) */}
+                                    {day.conditioning && (
+                                        <div className="mt-2">
+                                            <div className="font-medium text-xs text-gray-300">Conditioning</div>
+                                            <div className="text-[11px] opacity-80 text-gray-400">
+                                                {day.conditioning.type}
+                                                {day.conditioning.minutes ? ` • ${day.conditioning.minutes} min` : ''}
+                                                {day.conditioning.intensity ? ` • ${day.conditioning.intensity}` : ''}
+                                            </div>
                                         </div>
                                     )}
                                 </div>
