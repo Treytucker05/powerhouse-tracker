@@ -75,7 +75,8 @@ describe('<Dashboard />', () => {
 
   it("invokes start today's workout action", () => {
     renderWithProviders(<Dashboard />)
-    fireEvent.click(screen.getByText(/Start Today's Workout/i))
+    const buttons = screen.getAllByText(/Start Today's Workout/i)
+    fireEvent.click(buttons[0])
     expect(startTodaySpy).toHaveBeenCalled()
   })
 });
