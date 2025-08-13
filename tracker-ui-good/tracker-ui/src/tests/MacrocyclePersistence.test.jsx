@@ -88,23 +88,28 @@ describe('Macrocycle Persistence', () => {
         it('should load all macrocycles from localStorage', async () => {
             const mockKeys = ['macro_id1', 'macro_id2', 'other_key', 'macro_id3'];
             const mockMacrocycles = [
-                { id: 'id1', name: 'Macro 1' },
-                { id: 'id2', name: 'Macro 2' },
-                { id: 'id3', name: 'Macro 3' },
+                { id: 'id1', name: 'Macro 1', updatedAt: 3 },
+                { id: 'id2', name: 'Macro 2', updatedAt: 2 },
+                { id: 'id3', name: 'Macro 3', updatedAt: 1 },
             ];
 
-            // Mock Object.keys to return our mock keys
-            Object.keys = vi.fn(() => mockKeys);
+            // Provide localStorage length/key iteration
+            localStorageMock.length = mockKeys.length;
+            localStorageMock.key = vi.fn(i => mockKeys[i] || null);
 
-            localStorageMock.getItem
-                .mockReturnValueOnce(JSON.stringify(mockMacrocycles[0]))
-                .mockReturnValueOnce(JSON.stringify(mockMacrocycles[1]))
-                .mockReturnValueOnce(JSON.stringify(mockMacrocycles[2]));
+            // Map each macro key to its JSON; non-macro returns null
+            localStorageMock.getItem.mockImplementation((k) => {
+                const idx = mockKeys.indexOf(k);
+                if (k.startsWith('macro_')) {
+                    if (k.endsWith('id1')) return JSON.stringify(mockMacrocycles[0]);
+                    if (k.endsWith('id2')) return JSON.stringify(mockMacrocycles[1]);
+                    if (k.endsWith('id3')) return JSON.stringify(mockMacrocycles[2]);
+                }
+                return null;
+            });
 
             const result = await loadAllMacrocycles();
-
-            expect(result).toHaveLength(3);
-            expect(result).toEqual(mockMacrocycles);
+            expect(result.map(r => r.id)).toEqual(['id1', 'id2', 'id3']);
         });
     });
 

@@ -8,6 +8,8 @@
     "build": "npm --prefix tracker-ui-good/tracker-ui run build",
     "lint": "npm --prefix tracker-ui-good/tracker-ui run lint",
     "test": "npm --prefix tracker-ui-good/tracker-ui run test",
+    "test:ci": "npm --prefix tracker-ui-good/tracker-ui run test:ci",
+    "prepush": "npm run lint && npm run test:ci",
     "verify:531": "node scripts/verify-531.mjs",
     "start": "npm run dev"
   }

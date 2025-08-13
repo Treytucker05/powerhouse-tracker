@@ -1,4 +1,6 @@
-import { supabase } from './api/supabaseClient';
+import { supabase as realSupabase } from './api/supabaseClient';
+// In test environment, skip Supabase network usage to avoid hanging / OOM
+const supabase = (typeof process !== 'undefined' && process.env?.NODE_ENV === 'test') ? null : realSupabase;
 
 // Lightweight key-value helpers used across the app
 export function set(key, value) {

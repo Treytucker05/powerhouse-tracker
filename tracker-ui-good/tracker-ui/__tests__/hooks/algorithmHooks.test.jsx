@@ -6,10 +6,10 @@
 import { describe, it, expect } from 'vitest';
 import React from 'react';
 import { renderHook } from '@testing-library/react';
-import { useVolumeAlgorithms } from '../../../../src/hooks/useVolumeAlgorithms';
-import { useFatigueAlgorithms } from '../../../../src/hooks/useFatigueAlgorithms';
-import { useIntelligenceAlgorithms } from '../../../../src/hooks/useIntelligenceAlgorithms';
-import { useExerciseAlgorithms } from '../../../../src/hooks/useExerciseAlgorithms';
+import { useVolumeAlgorithms } from '@/hooks/useVolumeAlgorithms';
+import { useFatigueAlgorithms } from '@/hooks/useFatigueAlgorithms';
+import { useIntelligenceAlgorithms } from '@/hooks/useIntelligenceAlgorithms';
+import { useExerciseAlgorithms } from '@/hooks/useExerciseAlgorithms';
 
 describe('Algorithm Hooks Migration Validation', () => {
     describe('useVolumeAlgorithms', () => {

@@ -1,4 +1,6 @@
 import { extractWarmups, extractWeekByLabel } from "./packAdapter.js";
+// Static import of assistance rules (was inline require) to avoid duplicate module instantiation
+import { assistanceFor } from './assistanceRules.js';
 
 // Shared compute helpers (lift + TM + week context). These unify 3-day and 4-day previews.
 // Signatures kept simple & stable for plug-and-play usage across schedule builders.
@@ -46,14 +48,8 @@ export function computeSupplemental(pack, lift, tm, state) {
 }
 
 export function computeAssistance(pack, lift, state) {
-    // Derive assistance list using equipment-aware rules.
-    try {
-        const tplId = state?.templateKey || state?.template || (typeof pack === 'string' ? pack : pack?.program?.id) || 'custom';
-        const { assistanceFor } = require('./assistanceRules.js');
-        return assistanceFor(tplId, lift, state) || [];
-    } catch {
-        return [];
-    }
+    const tplId = state?.templateKey || state?.template || (typeof pack === 'string' ? pack : pack?.program?.id) || 'custom';
+    return assistanceFor ? (assistanceFor(tplId, lift, state) || []) : [];
 }
 
 export function roundLoad(x, units = "lbs", rounding = { lbs: 5, kg: 2.5 }) {
@@ -108,6 +104,42 @@ export function computeBBBFromConfig({ supplemental, lift, tms, units = "lbs", r
         pct: value,
         load
     };
+}
+
+// --- Volume & Stress helpers (for Step 4 mini-panel) ---
+// estimateTonnage(sets): expects array of objects each with numeric weight & reps.
+// Returns sum(weight * reps); silently skips invalid rows.
+export function estimateTonnage(sets) {
+    if (!Array.isArray(sets) || sets.length === 0) return 0;
+    return sets.reduce((acc, s) => {
+        const w = Number(s.weight);
+        const r = Number(s.reps);
+        if (Number.isFinite(w) && Number.isFinite(r)) return acc + (w * r);
+        return acc;
+    }, 0);
+}
+
+// sumRepsByBlock(day): given a day object with assistance: [{block, sets, reps}]
+// Returns { blockName: totalEstimatedReps }
+export function sumRepsByBlock(day) {
+    const out = {};
+    if (!day || !Array.isArray(day.assistance)) return out;
+    for (const it of day.assistance) {
+        const sets = Number(it.sets) || 0;
+        let reps = 0;
+        if (typeof it.reps === 'number') reps = it.reps;
+        else if (typeof it.reps === 'string') {
+            if (/^\d+-\d+/.test(it.reps)) {
+                const [a, b] = it.reps.split('-').map(n => Number(n));
+                if (Number.isFinite(a) && Number.isFinite(b)) reps = Math.round((a + b) / 2);
+            } else if (/^\d+/.test(it.reps)) reps = Number(it.reps);
+            else reps = 12; // heuristic fallback
+        }
+        const total = sets * reps;
+        const block = it.block || 'general';
+        out[block] = (out[block] || 0) + total;
+    }
+    return out;
 }
 
 // --- Progression helpers (cycle advancement) ---

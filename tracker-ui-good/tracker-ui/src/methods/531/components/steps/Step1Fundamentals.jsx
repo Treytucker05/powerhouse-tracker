@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import ToggleButton from '../ToggleButton.jsx';
 import { Info, AlertTriangle, Calculator, Copy } from 'lucide-react';
 import { useProgramV2 } from '../../contexts/ProgramContextV2.jsx';
 import { roundToIncrement } from '../..'; // barrel export
@@ -287,18 +288,14 @@ export default function Step1Fundamentals({ onValidChange }) {
                     {/* Units */}
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">Units</label>
-                        <div className="flex space-x-2">
+                        <div className="flex gap-2">
                             {['lb', 'kg'].map(unit => (
-                                <button
+                                <ToggleButton
                                     key={unit}
+                                    on={localState.units === unit}
                                     onClick={() => updateLocalState({ units: unit })}
-                                    className={`px-4 py-2 rounded border text-sm font-medium transition-colors ${localState.units === unit
-                                        ? 'border-red-500 bg-red-600/20 text-red-400'
-                                        : 'border-gray-600 text-gray-300 hover:border-gray-500'
-                                        }`}
-                                >
-                                    {unit.toUpperCase()}
-                                </button>
+                                    className="text-xs px-4"
+                                >{unit.toUpperCase()}</ToggleButton>
                             ))}
                         </div>
                     </div>
@@ -320,18 +317,14 @@ export default function Step1Fundamentals({ onValidChange }) {
                     {/* TM Percentage */}
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">Training Max %</label>
-                        <div className="flex space-x-2">
+                        <div className="flex gap-2">
                             {[0.90, 0.85].map(pct => (
-                                <button
+                                <ToggleButton
                                     key={pct}
+                                    on={localState.tmPct === pct}
                                     onClick={() => updateLocalState({ tmPct: pct })}
-                                    className={`px-4 py-2 rounded border text-sm font-medium transition-colors ${localState.tmPct === pct
-                                        ? 'border-red-500 bg-red-600/20 text-red-400'
-                                        : 'border-gray-600 text-gray-300 hover:border-gray-500'
-                                        }`}
-                                >
-                                    {Math.round(pct * 100)}%
-                                </button>
+                                    className="text-xs px-4"
+                                >{Math.round(pct * 100)}%</ToggleButton>
                             ))}
                         </div>
                     </div>

@@ -40,7 +40,10 @@ export default function TopNav({ user, onSignOut }) {
           <div className="text-xl font-bold">
             <span className="text-red-500">Power</span>
             <span className="text-white mx-1">House</span>
-            <span className="bg-white text-black px-2 py-1 rounded text-sm">ATX</span>
+            <span
+              className="inline-block bg-white !text-black px-2 py-0.5 rounded text-sm font-semibold tracking-wide select-none leading-none border border-black/10"
+              style={{ color: '#000', WebkitTextStroke: '0', textShadow: 'none' }}
+            >ATX</span>
           </div>
         </div>
 

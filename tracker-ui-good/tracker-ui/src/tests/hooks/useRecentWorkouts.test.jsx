@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { useRecentWorkouts } from '../../hooks/useRecentWorkouts'
+import { useRecentWorkouts } from '../../hooks/useRecentWorkouts.js'
 
 // Mock the entire module
 vi.mock('../../lib/api/supabaseClient', () => {
@@ -90,7 +90,7 @@ describe('useRecentWorkouts', () => {
     expect(result.current.data).toBeDefined()
     expect(Array.isArray(result.current.data)).toBe(true)
     expect(result.current.data).toHaveLength(2)
-    
+
     const firstWorkout = result.current.data[0]
     expect(firstWorkout).toEqual({
       id: '1',
@@ -106,7 +106,7 @@ describe('useRecentWorkouts', () => {
 
   it('handles Supabase errors gracefully', async () => {
     const mockError = new Error('Database connection failed')
-    
+
     mockSupabaseModule.__mockLimit.mockResolvedValue({
       data: null,
       error: mockError
@@ -151,7 +151,7 @@ describe('useRecentWorkouts', () => {
     expect(result.current.data).toBeDefined()
     expect(Array.isArray(result.current.data)).toBe(true)
     expect(result.current.isError).toBe(false)
-    
+
     // Note: Due to mock complexity, this test validates that the hook returns
     // some data (either empty array or fallback) without throwing errors
     // The key is that isError is false, indicating no query failure

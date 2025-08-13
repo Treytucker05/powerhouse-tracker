@@ -1,8 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { useProgramV2 } from '../../contexts/ProgramContextV2.jsx';
 import { TEMPLATE_KEYS, getTemplatePreset } from '../../../../lib/templates/531.presets.v2.js';
+import { getTemplateSpec, TEMPLATE_SPECS } from '../../../../lib/templates/531.templateSpecs.js';
 import { CheckCircle2, ChevronRight, Info, AlertTriangle } from 'lucide-react';
 import ToggleButton from '../ToggleButton.jsx';
+import TemplateExplainerModal from '../../components/TemplateExplainerModal.jsx';
 
 /**
  * Step2TemplateOrCustom.jsx
@@ -12,55 +14,37 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
     const ctx = useProgramV2();
     const { state, dispatch } = ctx;
     const [selectedTemplate, setSelectedTemplate] = useState(null);
-    const [showTemplatePanel, setShowTemplatePanel] = useState(false);
+    const [showTemplatePanel, setShowTemplatePanel] = useState(false); // legacy side panel flag (kept for minimal diff)
+    const [explainerOpen, setExplainerOpen] = useState(false);
 
-    const templateCards = useMemo(() => ([
-        {
-            key: TEMPLATE_KEYS.BBB,
-            title: 'Boring But Big (BBB)',
-            blurb: 'Main lift + 5x10 at 50% TM (can adjust later). Minimal accessories.',
-            detail: 'Classic hypertrophy supplemental. Volume block after main sets. Start at 50% TM.'
-        },
-        {
-            key: TEMPLATE_KEYS.TRIUMVIRATE,
-            title: 'Triumvirate',
-            blurb: 'Main lift + two assistance movements (5 sets each).',
-            detail: 'Keeps workouts focused. Two targeted assistance moves per day support the main lift.'
-        },
-        {
-            key: TEMPLATE_KEYS.PERIODIZATION_BIBLE,
-            title: 'Periodization Bible',
-            blurb: 'Higher assistance volume across 4–5 blocks.',
-            detail: 'Layered assistance progression emphasizing multiple movement patterns and rep ranges.'
-        },
-        {
-            key: TEMPLATE_KEYS.BODYWEIGHT,
-            title: 'Bodyweight',
-            blurb: 'Emphasis on bodyweight accessory work (pulls, pushes, core).',
-            detail: 'Great for minimal equipment phases. Focuses on movement quality and relative strength.'
-        },
-        {
-            key: TEMPLATE_KEYS.JACK_SHIT,
-            title: 'Jack Shit',
-            blurb: 'Main lifts only. No supplemental or assistance.',
-            detail: 'Ultra-minimalist phase. Ideal for busy weeks or recovery phases.'
-        }
-    ]), []);
+    const templateCards = useMemo(() => Object.values(TEMPLATE_SPECS).map(spec => ({
+        key: spec.key,
+        title: spec.name,
+        blurb: spec.blurb,
+        detail: spec.recovery,
+        spec
+    })), []);
 
     function handleSelectTemplate(key) {
         setSelectedTemplate(key);
-        setShowTemplatePanel(true);
+        setExplainerOpen(true);
     }
 
     function applyTemplate() {
         if (!selectedTemplate) return;
         const preset = getTemplatePreset(selectedTemplate, ctx);
         if (!preset) return;
+        const spec = getTemplateSpec(selectedTemplate);
         dispatch({ type: 'SET_TEMPLATE_KEY', payload: preset.key });
         dispatch({ type: 'APPLY_TEMPLATE_CONFIG', payload: preset });
+        if (spec) {
+            dispatch({ type: 'SET_TEMPLATE_SPEC', payload: spec });
+            if (spec.assistanceHint) dispatch({ type: 'SET_ASSISTANCE_HINT', payload: spec.assistanceHint });
+        }
         dispatch({ type: 'SET_FLOW_MODE', payload: 'template' });
         onChoose && onChoose('template');
         onAutoNext && onAutoNext();
+        setExplainerOpen(false);
     }
 
     function chooseCustom() {
@@ -82,9 +66,9 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
             </div>
 
             {/* Mode selection */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-6">
                 {/* Template selection area */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="space-y-6">
                     <div>
                         <h3 className="text-lg font-semibold text-white mb-3">Templates</h3>
                         <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -103,14 +87,14 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                                             active ? 'border-indigo-500 bg-indigo-600/10 ring-2 ring-indigo-400' : 'border-gray-700 bg-gray-800/40 hover:border-gray-500'
                                         ].join(' ')}
                                     >
-                                        <div>
+                                        <div className="flex flex-col flex-1">
                                             <div className="flex items-start justify-between mb-2">
                                                 <h4 className="font-semibold text-white text-sm leading-snug pr-6">{card.title}</h4>
                                                 {active && <CheckCircle2 className="w-5 h-5 text-green-400" />}
                                             </div>
-                                            <p className="text-xs text-gray-400 leading-snug mb-3">{card.blurb}</p>
+                                            <p className="text-xs text-gray-400 leading-snug mb-3 flex-1">{card.blurb}</p>
+                                            <ToggleButton on={active} className="mt-auto self-start text-xs">{active ? 'Selected' : 'Select'}</ToggleButton>
                                         </div>
-                                        <ToggleButton on={active} className="mt-auto self-start text-xs">{active ? 'Selected' : 'Select'}</ToggleButton>
                                     </div>
                                 );
                             })}
@@ -121,54 +105,18 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                     <div className="bg-gray-800/40 border border-gray-700 rounded-lg p-6">
                         <h3 className="text-lg font-semibold text-white mb-2">Want Full Control?</h3>
                         <p className="text-sm text-gray-400 mb-4">Skip presets and design every layer yourself: supplemental strategy, assistance volume, conditioning, and advanced options.</p>
-                        <button
-                            onClick={chooseCustom}
-                            className="px-5 py-2 rounded-lg border border-gray-600 text-gray-200 hover:border-red-500 hover:text-red-300 transition-colors text-sm font-medium"
-                            type="button"
-                        >
-                            Customize Manually →
-                        </button>
+                        <ToggleButton on={false} onClick={chooseCustom} className="text-xs px-5">Customize Manually →</ToggleButton>
                     </div>
                 </div>
 
-                {/* Detail side panel */}
-                <div className="lg:col-span-1">
-                    {showTemplatePanel && selectedTemplate ? (
-                        <div className="sticky top-4 bg-gray-800/60 border border-gray-700 rounded-lg p-5 space-y-4">
-                            {(() => {
-                                const card = templateCards.find(c => c.key === selectedTemplate);
-                                if (!card) return null;
-                                return (
-                                    <>
-                                        <h4 className="text-white font-semibold text-sm mb-1">{card.title}</h4>
-                                        <p className="text-xs text-gray-400 leading-snug mb-2">{card.detail}</p>
-                                        <div className="text-xs text-gray-500 mb-4">This will set schedule order, supplemental configuration and assistance mode automatically.</div>
-                                        <button
-                                            onClick={applyTemplate}
-                                            className="w-full px-4 py-2 rounded-lg bg-red-600/20 border border-red-500 text-red-300 text-sm font-medium hover:bg-red-600/30 transition-colors flex items-center justify-center space-x-2"
-                                            type="button"
-                                        >
-                                            <span>Apply Template & Skip to Review</span>
-                                            <ChevronRight className="w-4 h-4" />
-                                        </button>
-                                        <button
-                                            onClick={() => setShowTemplatePanel(false)}
-                                            className="w-full mt-2 text-xs text-gray-500 hover:text-gray-300"
-                                            type="button"
-                                        >
-                                            Cancel
-                                        </button>
-                                    </>
-                                );
-                            })()}
-                        </div>
-                    ) : (
-                        <div className="bg-gray-800/30 border border-dashed border-gray-700 rounded-lg p-5 text-center text-sm text-gray-500">
-                            <p>Select a template to view details & apply.</p>
-                        </div>
-                    )}
-                </div>
             </div>
+            <TemplateExplainerModal
+                spec={selectedTemplate ? getTemplateSpec(selectedTemplate) : null}
+                state={state}
+                open={explainerOpen}
+                onClose={() => setExplainerOpen(false)}
+                onApply={applyTemplate}
+            />
         </div>
     );
 }

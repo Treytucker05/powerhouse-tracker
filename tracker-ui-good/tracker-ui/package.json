@@ -10,10 +10,12 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest",
+    "test:ci": "vitest run --coverage --reporter=basic",
     "test:unit": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:progressive": "node test-runner.mjs",
     "test:quick": "node test-checker.mjs",
+    "clean": "rimraf node_modules/.vite .vite && echo 'vite cache cleared'",
     "lint": "eslint \"src/**/*.{js,jsx}\"",
     "lint:ci": "eslint \"src/**/*.{js,jsx}\" --max-warnings 0"
   },

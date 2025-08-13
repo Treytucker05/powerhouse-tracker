@@ -5,17 +5,16 @@ import path from 'path';
 export default defineConfig({
     test: {
         environment: 'jsdom',
-        setupFiles: './vitest.setup.js',
-        testTimeout: 15000, // 15 seconds max per test
-        hookTimeout: 10000, // 10 seconds for hooks
-        teardownTimeout: 5000, // 5 seconds for cleanup
+        setupFiles: ['./vitest.setup.js'],
+        exclude: ['**/node_modules/**', '**/dist/**', '**/.{idea,git,cache,output,temp}/**', '**/*.e2e.*', 'e2e/**'],
+        testTimeout: 15000,
+        hookTimeout: 10000,
+        teardownTimeout: 5000,
         reporter: ['verbose', 'hanging-process'],
-        pool: 'forks', // Better isolation
+        pool: 'forks',
         logHeapUsage: true,
-        maxConcurrency: 1, // Run tests one at a time for better debugging
-        sequence: {
-            shuffle: false // Keep consistent order
-        }
+        maxConcurrency: 1,
+        sequence: { shuffle: false }
     },
     resolve: {
         alias: {

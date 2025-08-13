@@ -6,6 +6,8 @@
 
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { applyTemplate } from '../../../lib/templates/index.js';
+// Assistance normalization (used for convert-to-custom action)
+import { normalizeAssistance } from '../assistance/index.js';
 
 // Local template application helper (dedupes historical dual SET_TEMPLATE branches)
 function applyTemplateLocal(state, template) {
@@ -24,12 +26,15 @@ function applyTemplateLocal(state, template) {
 
 // Initial program state (serializable only - exact spec)
 export const initialProgramV2 = {
+    pack: null, // active assistance/template pack key (mirrors templateKey when in template mode)
     units: 'lb',
     rounding: 'ceil',
     tmPct: 0.90,
     // Flow / template selection additions
     flowMode: 'custom', // 'custom' | 'template'
     templateKey: null,  // one of TEMPLATE_KEYS or null
+    templateSpec: null, // enriched descriptor (from TEMPLATE_SPECS)
+    assistanceHint: null, // stored assistance guidance from spec (examples/intent)
     loadingOption: 1,   // global loading scheme (1|2)
     lifts: {
         squat: { name: 'squat', oneRM: null, tm: null },
@@ -66,6 +71,9 @@ export const initialProgramV2 = {
     templateLock: false,
     supplemental: { strategy: 'none' },
     assistance: { 1: [], 2: [], 3: [], 4: [], mode: 'minimal' },
+    // Assistance customization flags
+    assistMode: 'template', // 'template' | 'custom'
+    assistCustom: null, // when custom: { days: { Press: [...], Deadlift: [...], ... } }
     // User equipment availability (drives assistance selection). Keys align with assistanceCatalog equip tags.
     equipment: ['bw', 'db', 'bb'],
     deadliftRepStyle: 'dead_stop',
@@ -95,6 +103,8 @@ function reducerV2(state, action) {
         case 'SET_TM_PCT': return { ...state, tmPct: action.tmPct };
         case 'SET_FLOW_MODE': return { ...state, flowMode: action.payload };
         case 'SET_TEMPLATE_KEY': return { ...state, templateKey: action.payload };
+        case 'SET_TEMPLATE_SPEC': return { ...state, templateSpec: action.payload };
+        case 'SET_ASSISTANCE_HINT': return { ...state, assistanceHint: action.payload };
         case 'SET_LOADING_OPTION': return { ...state, loadingOption: action.payload };
         case 'SET_ONE_RM': return {
             ...state,
@@ -106,8 +116,39 @@ function reducerV2(state, action) {
         };
         case 'SET_DAYS_PER_WEEK': return { ...state, daysPerWeek: Number(action.payload) };
         case 'BULK_SET_LIFTS': return { ...state, lifts: { ...state.lifts, ...action.lifts } };
-        case 'SET_TEMPLATE': return applyTemplateLocal(state, action.template); // unified template application action (deduped)
+        case 'SET_TEMPLATE': { // unified template application + assistance reset
+            const next = applyTemplateLocal(state, action.template);
+            next.pack = action.template;
+            next.assistMode = 'template';
+            next.assistCustom = null;
+            return next;
+        }
+        case 'CONVERT_ASSIST_TO_CUSTOM': { // derive per-day assistance arrays from current template normalization
+            const templateKey = action.templateKey || state.templateKey || state.pack || 'triumvirate';
+            // Order of days (display names). Prefer explicit provided order -> schedule.order -> fallback canonical
+            const order = action.order || state.schedule?.order || ['Press', 'Deadlift', 'Bench', 'Squat'];
+            const assistCustom = {};
+            order.forEach((displayLift, idx) => {
+                try {
+                    const items = normalizeAssistance(templateKey, displayLift, state) || [];
+                    assistCustom[idx + 1] = items.map(it => ({
+                        id: it.id || it.name,
+                        name: it.name,
+                        sets: it.sets,
+                        reps: it.reps,
+                        block: it.block
+                    }));
+                } catch { /* noop */ }
+            });
+            return { ...state, assistMode: 'custom', assistCustom };
+        }
         case 'SET_TEMPLATE_LOCK': return { ...state, templateLock: !!action.lock };
+        case 'SET_TEMPLATE_AND_RESET_ASSIST': {
+            const next = applyTemplateLocal(state, action.template);
+            next.assistMode = 'template';
+            next.assistCustom = null;
+            return next;
+        }
         case 'SET_SCHEDULE': return { ...state, schedule: { ...state.schedule, ...(action.schedule || action.payload || {}) } };
         case 'SET_WARMUP_SCHEME': return { ...state, schedule: { ...state.schedule, warmupScheme: { ...action.payload } } };
         case 'SET_INCLUDE_WARMUPS': return { ...state, schedule: { ...state.schedule, includeWarmups: !!action.payload } };
@@ -117,6 +158,25 @@ function reducerV2(state, action) {
         case 'SET_SUPPLEMENTAL': return { ...state, supplemental: { ...state.supplemental, ...(action.supplemental || action.payload || {}) } };
         case 'SET_ASSISTANCE': return { ...state, assistance: { ...state.assistance, ...(action.assistance || action.payload || {}) } };
         case 'SET_EQUIPMENT': return { ...state, equipment: Array.isArray(action.payload) ? action.payload : state.equipment };
+        case 'SET_ASSIST_MODE': return { ...state, assistMode: action.payload };
+        case 'SET_ASSIST_CUSTOM': {
+            // Overloaded: full replace or day-level patch when dayId provided
+            if (action.dayId != null) {
+                const dayId = action.dayId;
+                const items = Array.isArray(action.items) ? action.items : [];
+                const next = { ...(state.assistCustom || {}) }; // ensure object
+                next[dayId] = items;
+                return { ...state, assistCustom: next };
+            }
+            return { ...state, assistCustom: action.payload };
+        }
+        case 'RESET_ASSIST_DAY': {
+            // Expect payload: { dayId, items }
+            if (action.dayId == null) return state;
+            const next = { ...(state.assistCustom || {}) };
+            next[action.dayId] = Array.isArray(action.items) ? action.items : [];
+            return { ...state, assistCustom: next };
+        }
         case 'SET_ADVANCED': return { ...state, advanced: { ...state.advanced, ...action.advanced } };
         case 'SET_AMRAP_WK3': return { ...state, amrapWk3: { ...(state.amrapWk3 || {}), ...(action.payload || {}) } };
         case 'SET_CYCLE': return { ...state, cycle: action.payload };
@@ -199,3 +259,9 @@ export const setAssistanceLoadMode = (dispatch, mode) =>
     dispatch({ type: 'SET_ASSISTANCE_LOAD_MODE', payload: mode });
 export const setConditioning = (dispatch, payload) =>
     dispatch({ type: 'SET_CONDITIONING', payload });
+
+// --- Custom assistance day-level helpers ---
+export const setAssistCustomDay = (dispatch, dayId, items) =>
+    dispatch({ type: 'SET_ASSIST_CUSTOM', dayId, items });
+export const resetAssistDay = (dispatch, dayId, items) =>
+    dispatch({ type: 'RESET_ASSIST_DAY', dayId, items });

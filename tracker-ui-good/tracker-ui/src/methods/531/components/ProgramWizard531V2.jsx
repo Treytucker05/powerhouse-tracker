@@ -5,6 +5,7 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { ChevronRight, CheckCircle2, Info } from 'lucide-react';
+import ToggleButton from './ToggleButton.jsx';
 import { useNavigate } from "react-router-dom";
 import { useProgramV2 } from "../contexts/ProgramContextV2.jsx";
 import { buildMainSetsForLift, buildWarmupSets, roundToIncrement } from "../"; // barrel export
@@ -56,7 +57,6 @@ import Step1Fundamentals from './steps/Step1Fundamentals.jsx';
 import Step2TemplateOrCustom from './steps/Step2TemplateOrCustom.jsx';
 import Step3DesignCustom from './steps/Step3DesignCustom.jsx';
 import Step4ReviewExport from './steps/Step4ReviewExport.jsx';
-import ToggleButton from './ToggleButton.jsx';
 
 const STEPS = [
     { id: 'fundamentals', title: 'Fundamentals', description: 'Units, rounding, TM%, 1RM/rep tests' },
@@ -853,56 +853,40 @@ function WizardShell() {
 
                             {/* Navigation Buttons */}
                             <div className="flex items-center justify-between pt-6 border-t border-gray-700">
-                                <button
-                                    onClick={handleBack}
+                                <ToggleButton
+                                    on={false}
                                     disabled={!canGoBack}
-                                    className={`px-6 py-2 rounded-lg border font-medium transition-colors ${canGoBack ? 'border-gray-600 text-gray-300 hover:border-gray-500 hover:text-white' : 'border-gray-800 text-gray-600 cursor-not-allowed'}`}
-                                >
-                                    ← Back
-                                </button>
+                                    onClick={handleBack}
+                                    className={`text-sm px-5 ${!canGoBack ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                >← Back</ToggleButton>
 
                                 <div className="flex items-center space-x-2 text-sm text-gray-400">
                                     <span>Step {stepIndex + 1} of {STEPS.length}</span>
                                 </div>
 
                                 {stepIndex === 0 && (
-                                    <button
-                                        onClick={handleNext}
+                                    <ToggleButton
+                                        on={canGoNext}
                                         disabled={!canGoNext}
-                                        className={`px-6 py-2 rounded-lg border font-medium transition-colors flex items-center space-x-2 ${canGoNext
-                                            ? 'border-red-500 bg-red-600/10 text-red-400 hover:bg-red-600/20'
-                                            : 'border-gray-800 text-gray-600 cursor-not-allowed'
-                                            }`}
-                                    >
-                                        <span>Next</span>
-                                        <ChevronRight className="w-4 h-4" />
-                                    </button>
+                                        onClick={handleNext}
+                                        className={`flex items-center gap-2 text-sm px-5 ${!canGoNext ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    >Next <ChevronRight className="w-4 h-4" /></ToggleButton>
                                 )}
                                 {stepIndex === 2 && (
-                                    <button
-                                        onClick={handleNext}
+                                    <ToggleButton
+                                        on={canGoNext}
                                         disabled={!canGoNext}
-                                        className={`px-6 py-2 rounded-lg border font-medium transition-colors flex items-center space-x-2 ${canGoNext
-                                            ? 'border-red-500 bg-red-600/10 text-red-400 hover:bg-red-600/20'
-                                            : 'border-gray-800 text-gray-600 cursor-not-allowed'
-                                            }`}
-                                    >
-                                        <span>Next</span>
-                                        <ChevronRight className="w-4 h-4" />
-                                    </button>
+                                        onClick={handleNext}
+                                        className={`flex items-center gap-2 text-sm px-5 ${!canGoNext ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    >Next <ChevronRight className="w-4 h-4" /></ToggleButton>
                                 )}
                                 {stepIndex === 3 && (
-                                    <button
-                                        onClick={handleStartCycle}
+                                    <ToggleButton
+                                        on={stepValidation.review}
                                         disabled={!stepValidation.review}
-                                        className={`px-6 py-2 rounded-lg border font-medium transition-colors flex items-center space-x-2 ${stepValidation.review
-                                            ? 'border-green-500 bg-green-600/10 text-green-400 hover:bg-green-600/20'
-                                            : 'border-gray-800 text-gray-600 cursor-not-allowed'
-                                            }`}
-                                    >
-                                        <span>Start Cycle</span>
-                                        <ChevronRight className="w-4 h-4" />
-                                    </button>
+                                        onClick={handleStartCycle}
+                                        className={`flex items-center gap-2 text-sm px-5 ${!stepValidation.review ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    >Start Cycle <ChevronRight className="w-4 h-4" /></ToggleButton>
                                 )}
                                 {!(stepIndex === 0 || stepIndex === 2 || stepIndex === 3) && <div className="w-[96px]" />}
                             </div>
