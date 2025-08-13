@@ -41,11 +41,14 @@ const AppShell = memo(function AppShell() {
     getSession();
 
     // Listen for auth changes with the memoized handler
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthStateChange);
+    const authListenerResult = supabase.auth.onAuthStateChange?.(handleAuthStateChange);
+    const subscription = authListenerResult && authListenerResult.data && authListenerResult.data.subscription
+      ? authListenerResult.data.subscription
+      : { unsubscribe: () => {} };
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
+  try { subscription.unsubscribe?.(); } catch { /* noop */ }
     };
   }, [handleAuthStateChange]);
 
