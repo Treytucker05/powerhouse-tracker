@@ -35,7 +35,6 @@ export default function Step3DesignCustom({ onValidChange }) {
     const [showDayPicker, setShowDayPicker] = useState(null); // day lift name or null
     const [swapTarget, setSwapTarget] = useState(null); // { lift, rowIdx }
     const flatCatalog = useMemo(() => {
-        // Flatten catalog (object keyed by category) to array for preview browsing in Step 3
         if (!ASSISTANCE_CATALOG) return [];
         if (Array.isArray(ASSISTANCE_CATALOG)) return ASSISTANCE_CATALOG;
         return Object.entries(ASSISTANCE_CATALOG).flatMap(([cat, arr]) => (arr || []).map(item => ({
@@ -54,8 +53,7 @@ export default function Step3DesignCustom({ onValidChange }) {
         setEquip(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
     }
 
-    // Dev inspector toggle
-    const [showInspector, setShowInspector] = useState(false);
+    // Removed debug JSON inspector (was showInspector)
 
     // Frequency change resets order length
     useEffect(() => {
@@ -534,18 +532,7 @@ export default function Step3DesignCustom({ onValidChange }) {
                 <div className={`flex items-center space-x-2 ${validation.assistanceOk ? 'text-green-400' : 'text-yellow-300'}`}><CheckCircle2 className="w-4 h-4" /><span>Assistance</span></div>
             </section>
 
-            {/* Dev / Debug JSON Inspector */}
-            {import.meta.env.MODE !== 'production' && (
-                <section className="bg-gray-800/40 border border-gray-700 rounded-lg p-4 space-y-3 text-xs">
-                    <ToggleButton title="Debug: view in-progress design JSON (dev only)" on={showInspector} onClick={() => setShowInspector(s => !s)} className="text-xs">{showInspector ? 'Hide' : 'Show'} Program JSON (Debug)</ToggleButton>
-                    {showInspector && (
-                        <>
-                            <pre className="max-h-64 overflow-auto bg-black/40 p-3 rounded text-[11px] leading-snug text-gray-200">{JSON.stringify({ frequency, order, includeWarmups, warmPctCsv, warmRepsCsv, suppStrategy, suppPairing, suppPct, assistMode, customPlan, deadliftRepStyle }, null, 2)}</pre>
-                            <ToggleButton on={false} className="text-xs" onClick={() => navigator.clipboard.writeText(JSON.stringify({ frequency, order, includeWarmups, warmPctCsv, warmRepsCsv, suppStrategy, suppPairing, suppPct, assistMode, customPlan, deadliftRepStyle }, null, 2))}>Copy JSON</ToggleButton>
-                        </>
-                    )}
-                </section>
-            )}
+            {/* Debug JSON inspector removed */}
         </div>
     );
 }
