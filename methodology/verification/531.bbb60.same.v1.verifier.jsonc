@@ -1,0 +1,288 @@
+{
+    // Verifier cases for 5/3/1 — BBB 60% (Same-Lift), Core v1
+    "meta": {
+        "method": "531",
+        "variant": "bbb60.same",
+        "title": "Verifier — 5/3/1 BBB 60% (Same-Lift)",
+        "pack": "methodology/packs/531.bbb60.same.v1.jsonc",
+        "version": "1.0.0"
+    },
+    "cases": [
+        {
+            "name": "Week 1 — Press (AMRAP on last set)",
+            "input": {
+                "units": "lbs",
+                "rounding": {
+                    "lbs": 5,
+                    "kg": 2.5
+                },
+                "tmPercent": 0.90,
+                "templateId": "tpl.531.bbb60.same",
+                "oneRM": {
+                    "press": 150,
+                    "deadlift": 0,
+                    "bench": 0,
+                    "squat": 0
+                },
+                "week": 1,
+                "day": "press",
+                "warmupsEnabled": true
+            },
+            "expect": {
+                "mainLift": "barbell.press.ohp",
+                "warmups": [
+                    {
+                        "pct": 40,
+                        "reps": 5,
+                        "weight": 55
+                    },
+                    {
+                        "pct": 50,
+                        "reps": 5,
+                        "weight": 70
+                    },
+                    {
+                        "pct": 60,
+                        "reps": 3,
+                        "weight": 80
+                    }
+                ],
+                "main": [
+                    {
+                        "pct": 65,
+                        "reps": 5,
+                        "weight": 90,
+                        "amrap": false
+                    },
+                    {
+                        "pct": 75,
+                        "reps": 5,
+                        "weight": 100,
+                        "amrap": false
+                    },
+                    {
+                        "pct": 85,
+                        "reps": 5,
+                        "weight": 115,
+                        "amrap": true
+                    }
+                ],
+                "supplemental": {
+                    "mode": "bbb",
+                    "pairing": "same",
+                    "sets": 5,
+                    "reps": 10,
+                    "intensity": {
+                        "kind": "percent_of",
+                        "value": 60,
+                        "of": "TM"
+                    },
+                    "weight": 80
+                },
+                "assistance": [
+                    {
+                        "id": "bw.pullup",
+                        "targetRepsTotal": {
+                            "min": 25,
+                            "max": 50
+                        }
+                    },
+                    {
+                        "id": "tool.ab_wheel",
+                        "targetRepsTotal": {
+                            "min": 25,
+                            "max": 50
+                        }
+                    }
+                ],
+                "notes": [
+                    "2× LISS sessions/week"
+                ]
+            }
+        },
+        {
+            "name": "Week 4 — Press Deload (no AMRAP)",
+            "input": {
+                "units": "lbs",
+                "rounding": {
+                    "lbs": 5,
+                    "kg": 2.5
+                },
+                "tmPercent": 0.90,
+                "templateId": "tpl.531.bbb60.same",
+                "oneRM": {
+                    "press": 150,
+                    "deadlift": 0,
+                    "bench": 0,
+                    "squat": 0
+                },
+                "week": 4,
+                "day": "press",
+                "warmupsEnabled": true
+            },
+            "expect": {
+                "mainLift": "barbell.press.ohp",
+                "warmups": [
+                    {
+                        "pct": 40,
+                        "reps": 5,
+                        "weight": 55
+                    },
+                    {
+                        "pct": 50,
+                        "reps": 5,
+                        "weight": 70
+                    },
+                    {
+                        "pct": 60,
+                        "reps": 3,
+                        "weight": 80
+                    }
+                ],
+                "main": [
+                    {
+                        "pct": 40,
+                        "reps": 5,
+                        "weight": 55,
+                        "amrap": false
+                    },
+                    {
+                        "pct": 50,
+                        "reps": 5,
+                        "weight": 70,
+                        "amrap": false
+                    },
+                    {
+                        "pct": 60,
+                        "reps": 5,
+                        "weight": 80,
+                        "amrap": false
+                    }
+                ],
+                "supplemental": {
+                    "mode": "bbb",
+                    "pairing": "same",
+                    "sets": 5,
+                    "reps": 10,
+                    "intensity": {
+                        "kind": "percent_of",
+                        "value": 60,
+                        "of": "TM"
+                    },
+                    "weight": 80
+                },
+                "assistance": [
+                    {
+                        "id": "bw.pullup",
+                        "targetRepsTotal": {
+                            "min": 25,
+                            "max": 50
+                        }
+                    },
+                    {
+                        "id": "tool.ab_wheel",
+                        "targetRepsTotal": {
+                            "min": 25,
+                            "max": 50
+                        }
+                    }
+                ],
+                "notes": [
+                    "2× LISS sessions/week"
+                ]
+            }
+        },
+        {
+            "name": "Week 2 — Deadlift 3×3 (AMRAP on last set)",
+            "input": {
+                "units": "lbs",
+                "rounding": {
+                    "lbs": 5,
+                    "kg": 2.5
+                },
+                "tmPercent": 0.90,
+                "templateId": "tpl.531.bbb60.same",
+                "oneRM": {
+                    "press": 0,
+                    "deadlift": 405, // TM = 405 * 0.90 = 364.5 → round to 365
+                    "bench": 0,
+                    "squat": 0
+                },
+                "week": 2,
+                "day": "deadlift",
+                "warmupsEnabled": true
+            },
+            "expect": {
+                "mainLift": "barbell.deadlift.conventional",
+                "warmups": [
+                    {
+                        "pct": 40,
+                        "reps": 5,
+                        "weight": 145
+                    }, // 0.40 * 365 = 146 → 145
+                    {
+                        "pct": 50,
+                        "reps": 5,
+                        "weight": 185
+                    }, // 0.50 * 365 = 182.5 → 185
+                    {
+                        "pct": 60,
+                        "reps": 3,
+                        "weight": 220
+                    } // 0.60 * 365 = 219 → 220
+                ],
+                "main": [
+                    {
+                        "pct": 70,
+                        "reps": 3,
+                        "weight": 260,
+                        "amrap": false
+                    }, // 0.70 * 365 = 255.5 → 260
+                    {
+                        "pct": 80,
+                        "reps": 3,
+                        "weight": 290,
+                        "amrap": false
+                    }, // 0.80 * 365 = 292   → 290
+                    {
+                        "pct": 90,
+                        "reps": 3,
+                        "weight": 330,
+                        "amrap": true
+                    } // 0.90 * 365 = 328.5 → 330
+                ],
+                "supplemental": {
+                    "mode": "bbb",
+                    "pairing": "same",
+                    "sets": 5,
+                    "reps": 10,
+                    "intensity": {
+                        "kind": "percent_of",
+                        "value": 60,
+                        "of": "TM"
+                    },
+                    "weight": 220 // 0.60 * 365 = 219 → 220
+                },
+                "assistance": [
+                    {
+                        "id": "db.lunge.forward",
+                        "targetRepsTotal": {
+                            "min": 25,
+                            "max": 50
+                        }
+                    },
+                    {
+                        "id": "machine.leg_curl",
+                        "targetRepsTotal": {
+                            "min": 25,
+                            "max": 50
+                        }
+                    }
+                ],
+                "notes": [
+                    "2× LISS sessions/week"
+                ]
+            }
+        }
+    ]
+}

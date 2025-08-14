@@ -46,12 +46,25 @@ export default defineConfig({
                 '**/*.stories.*',
                 '**/e2e/**',
                 // Phase 1: exclude large domain/template modules slated for later dedicated coverage
-                'src/methods/531/**',
+                // Reintroducing progression.js for coverage; explicitly exclude other 5/3/1 modules
+                'src/methods/531/cardioTemplates.js',
+                'src/methods/531/scheduleRender.js',
+                // 'src/methods/531/schedule.js',
+                'src/methods/531/packAdapter.js',
+                'src/methods/531/loadPack.js',
+                'src/methods/531/index.js',
+                'src/methods/531/decisionAdapter.js',
+                'src/methods/531/assistanceRules.js',
+                'src/methods/531/assistanceMapper.js',
+                'src/methods/531/assistanceCatalog.js',
+                // Reintroducing assistance/index.js for coverage; keep deeper assistance subdirs excluded if any
+                // 'src/methods/531/assistance/**',
+                'src/methods/531/components/**',
+                'src/methods/531/contexts/**',
+                'src/methods/531/engines/**',
                 'src/lib/templates/**',
                 'src/lib/api/**',
-                // Skip pure UI skin / placeholder components with minimal logic (will add later targeted tests)
-                'src/components/ui/Skeleton.jsx'
-                ,
+                // (Reinstated) Skeleton now covered by dedicated test
                 // Additional Phase 1 temporary exclusions for low coverage modules (will be targeted in Phase 2)
                 'src/components/navigation/TopNav.jsx',
                 'src/layout/AppShell.jsx'

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import PowerHouseVolumeChart from '@/components/dashboard/PowerHouseVolumeChart';
 
@@ -9,31 +9,43 @@ beforeAll(() => {
     Element.prototype.getBoundingClientRect = () => ({ x: 0, y: 0, width: 640, height: 320, top: 0, left: 0, right: 640, bottom: 320 });
 });
 afterAll(() => { Element.prototype.getBoundingClientRect = origGBCR; });
+afterEach(() => {
+    // Always return timers to real to avoid bleed into later suites
+    vi.useRealTimers();
+});
 
 describe('PowerHouseVolumeChart (coverage)', () => {
     it('renders with default internal data', () => {
-        render(<PowerHouseVolumeChart />);
-        // Heading text or svg presence
+        vi.useFakeTimers();
+        const { unmount } = render(<PowerHouseVolumeChart />);
         const heading = screen.queryAllByText(/Weekly Volume by Muscle Group/i)[0];
         expect(heading || document.querySelector('svg')).toBeTruthy();
+        unmount();
+        vi.runOnlyPendingTimers();
     });
 
     it('renders again without crashing (idempotent smoke)', () => {
-        render(<PowerHouseVolumeChart />);
+        vi.useFakeTimers();
+        const { unmount } = render(<PowerHouseVolumeChart />);
         expect(document.querySelectorAll('svg').length).toBeGreaterThan(0);
+        unmount();
+        vi.runOnlyPendingTimers();
     });
 
     it('shows tooltip on bar hover (legend toggle tolerated)', async () => {
-        render(<PowerHouseVolumeChart />);
+        vi.useFakeTimers();
+        const { unmount } = render(<PowerHouseVolumeChart />);
         const svg = document.querySelector('svg');
         expect(svg).toBeTruthy();
-        // Attempt to locate first bar rectangle
         let barRect = svg.querySelector('rect');
         if (!barRect) barRect = svg; // fallback
         fireEvent.mouseOver(barRect);
         fireEvent.mouseMove(barRect);
-        await new Promise(r => setTimeout(r, 0));
+        // Flush any microtasks/animation timers
+        vi.runAllTimers();
         const tooltip = document.querySelector('.recharts-tooltip-wrapper');
         expect(tooltip).toBeTruthy();
+        unmount();
+        vi.runOnlyPendingTimers();
     });
 });

@@ -107,7 +107,8 @@ export async function loadAllMacrocycles() {
                 .order('updatedAt', { ascending: false });
 
             if (error) throw error;
-            return data || [];
+            // Filter out any malformed rows (missing id) just in case
+            return (data || []).filter(r => r && r.id);
         }
     } catch (error) {
         console.error('Error loading all macrocycles from Supabase:', error);
@@ -120,7 +121,15 @@ export async function loadAllMacrocycles() {
         if (key && key.startsWith('macro_')) {
             try {
                 const data = JSON.parse(localStorage.getItem(key));
-                macrocycles.push(data);
+                // Only accept objects with an id to avoid polluting the overview list
+                if (data && data.id) {
+                    // Normalise updatedAt to number for consistent sorting
+                    if (data.updatedAt && typeof data.updatedAt === 'string') {
+                        const ts = Number(data.updatedAt);
+                        data.updatedAt = Number.isFinite(ts) ? ts : Date.parse(data.updatedAt) || 0;
+                    }
+                    macrocycles.push(data);
+                }
             } catch (error) {
                 console.error('Error parsing localStorage macrocycle:', error);
             }
@@ -137,21 +146,25 @@ export async function loadAllMacrocycles() {
  * @returns {Promise<boolean>} - Success status
  */
 export async function deleteMacrocycle(id) {
+    let remoteSuccess = false;
     try {
         if (supabase) {
             const { error } = await supabase
                 .from('macrocycles')
                 .delete()
                 .eq('id', id);
-
             if (error) throw error;
+            remoteSuccess = true;
+        } else {
+            // In test / no-supabase mode we consider delete implicitly successful remotely
+            remoteSuccess = true;
         }
-
-        // Also remove from localStorage
-        localStorage.removeItem(`macro_${id}`);
-        return true;
     } catch (error) {
         console.error('Error deleting macrocycle:', error);
-        return false;
+    } finally {
+        // Always attempt local cleanup so UI stays consistent
+        try { localStorage.removeItem(`macro_${id}`); } catch (e) { /* ignore */ }
     }
+    // Return remote success flag so callers can distinguish a fallback path
+    return remoteSuccess;
 }
