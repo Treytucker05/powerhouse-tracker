@@ -22,6 +22,7 @@ export default function Step3DesignCustom({ onValidChange }) {
     const [warmRepsCsv, setWarmRepsCsv] = useState((sched.warmupScheme?.reps || [5, 5, 3]).join(','));
 
     const [deadliftRepStyle, setDeadliftRepStyle] = useState(state.deadliftRepStyle || 'dead_stop');
+    const [activeLift, setActiveLift] = useState((sched.order && sched.order[0]) || 'Press');
 
     // Supplemental (custom path)
     const [suppStrategy, setSuppStrategy] = useState(state.supplemental?.strategy || 'none');
@@ -67,6 +68,16 @@ export default function Step3DesignCustom({ onValidChange }) {
 
     function updateOrder(idx, val) {
         setOrder(o => o.map((v, i) => i === idx ? val : v));
+        if (val === 'Deadlift') setActiveLift('Deadlift');
+        else if (activeLift === 'Deadlift' && !oIncludesDeadliftExceptIdx(idx, val)) {
+            // if we replaced the only deadlift slot, switch active lift to first
+            setActiveLift(val);
+        }
+    }
+
+    function oIncludesDeadliftExceptIdx(changeIdx, newVal) {
+        // helper to know if Deadlift still present after change
+        return order.some((l, i) => (i === changeIdx ? newVal : l) === 'Deadlift');
     }
 
     function setCanonical() {
@@ -210,9 +221,42 @@ export default function Step3DesignCustom({ onValidChange }) {
                         {order.map((lift, idx) => (
                             <div key={idx} className="space-y-1">
                                 <label className="text-xs uppercase tracking-wide text-gray-400">Slot {idx + 1}</label>
-                                <select value={lift} onChange={(e) => updateOrder(idx, e.target.value)} className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-2 text-sm text-white focus:border-red-500">
+                                <select
+                                    value={lift}
+                                    onFocus={() => setActiveLift(lift)}
+                                    onChange={(e) => { updateOrder(idx, e.target.value); setActiveLift(e.target.value); }}
+                                    className={`w-full bg-gray-800 border rounded px-2 py-2 text-sm text-white focus:border-red-500 ${activeLift === lift ? 'border-red-500' : 'border-gray-600'}`}
+                                >
                                     {CORE_LIFTS.map(l => <option key={l} value={l}>{l}</option>)}
                                 </select>
+                                {activeLift === 'Deadlift' && lift === 'Deadlift' && (
+                                    <div className="mt-2 bg-gray-800/60 border border-gray-700 rounded p-2 space-y-1">
+                                        <label className="text-[11px] font-medium text-gray-200">Deadlift rep style</label>
+                                        <p className="text-[10px] text-gray-500">Affects how reps are performed.</p>
+                                        <div className="flex items-center gap-3 text-[11px]" role="radiogroup" aria-label="Deadlift rep style">
+                                            <label className="inline-flex items-center gap-1">
+                                                <input
+                                                    type="radio"
+                                                    name="dlRepStyle"
+                                                    value="dead_stop"
+                                                    checked={deadliftRepStyle === 'dead_stop'}
+                                                    onChange={() => setDeadliftRepStyle('dead_stop')}
+                                                />
+                                                <span>Reset each rep</span>
+                                            </label>
+                                            <label className="inline-flex items-center gap-1">
+                                                <input
+                                                    type="radio"
+                                                    name="dlRepStyle"
+                                                    value="touch_and_go"
+                                                    checked={deadliftRepStyle === 'touch_and_go'}
+                                                    onChange={() => setDeadliftRepStyle('touch_and_go')}
+                                                />
+                                                <span>Touch-and-go</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
@@ -293,69 +337,90 @@ export default function Step3DesignCustom({ onValidChange }) {
                 )}
             </section>
 
-            {/* Deadlift Rep Style */}
-            <section className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 space-y-4">
-                <h3 className="text-lg font-semibold text-white">C) Deadlift Rep Style</h3>
-                <div className="flex flex-wrap gap-2 text-sm">
-                    {['dead_stop', 'touch_and_go'].map(style => (
-                        <ToggleButton key={style} on={deadliftRepStyle === style} onClick={() => setDeadliftRepStyle(style)}>{style.replace('_', ' ')}</ToggleButton>
-                    ))}
-                </div>
-                <div className="bg-blue-900/20 border border-blue-700/40 rounded p-3 text-xs text-blue-100 flex space-x-2">
-                    <Info className="w-4 h-4 mt-0.5" />
-                    <span>Dead-stop means resetting each rep (recommended for power & consistency). Touch-and-go can increase time under tension but requires control.</span>
-                </div>
-            </section>
+            {/* Deadlift rep style moved inline with schedule (above) */}
 
             {/* Supplemental */}
             <section className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 space-y-5">
-                <h3 className="text-lg font-semibold text-white">D) Supplemental (Optional BBB)</h3>
+                <h3 className="text-lg font-semibold text-white">D) Supplemental</h3>
                 <div className="flex flex-wrap gap-2 text-sm">
                     {['none', 'bbb'].map(s => (
                         <ToggleButton key={s} on={suppStrategy === s} onClick={() => setSuppStrategy(s)}>{s === 'none' ? 'None' : 'Boring But Big'}</ToggleButton>
                     ))}
                 </div>
                 {suppStrategy === 'bbb' && (
-                    <div className="grid md:grid-cols-4 gap-4 text-sm">
-                        <div className="md:col-span-2 space-y-2">
-                            <label className="block text-xs uppercase text-gray-400 mb-1">Pairing</label>
-                            <div className="flex space-x-2">
-                                {['same', 'opposite'].map(p => (
-                                    <ToggleButton key={p} on={suppPairing === p} onClick={() => setSuppPairing(p)} className="text-xs px-3 py-2 capitalize">{p}</ToggleButton>
-                                ))}
+                    <div className="space-y-4 text-sm">
+                        <div>
+                            <label className="text-sm font-medium text-gray-200">Supplemental pairing</label>
+                            <p className="text-xs text-gray-500 mb-2">Choose how BBB is paired after your main lift.</p>
+                            <div className="flex flex-wrap items-center gap-4" role="radiogroup" aria-label="Supplemental pairing">
+                                <label className="inline-flex items-center gap-2 text-xs">
+                                    <input
+                                        type="radio"
+                                        name="suppPairing"
+                                        value="same"
+                                        checked={suppPairing === 'same'}
+                                        onChange={() => setSuppPairing('same')}
+                                    />
+                                    <span>Same lift (BBB 5×10 @ 60% TM)</span>
+                                </label>
+                                <label className="inline-flex items-center gap-2 text-xs">
+                                    <input
+                                        type="radio"
+                                        name="suppPairing"
+                                        value="opposite"
+                                        checked={suppPairing === 'opposite'}
+                                        onChange={() => setSuppPairing('opposite')}
+                                    />
+                                    <span>Opposite lift (paired)</span>
+                                </label>
                             </div>
                         </div>
-                        <div className="space-y-2">
-                            <label className="block text-xs uppercase text-gray-400 mb-1">% of TM</label>
-                            <input type="number" value={suppPct} min={50} max={70} onChange={e => setSuppPct(Number(e.target.value))} className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-2 text-sm text-white focus:border-red-500" />
-                            {!validation.supplementalOk && <p className="text-xs text-yellow-300">Range 50-70</p>}
-                        </div>
-                        <div className="space-y-2">
-                            <label className="block text-xs uppercase text-gray-400 mb-1">Sets x Reps</label>
-                            <div className="text-gray-300 text-sm font-mono">5 x 10</div>
+                        <div className="grid sm:grid-cols-3 gap-4">
+                            <div className="space-y-1">
+                                <label className="block text-xs uppercase text-gray-400">% of TM</label>
+                                <input type="number" value={suppPct} min={50} max={70} onChange={e => setSuppPct(Number(e.target.value))} className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-2 text-sm text-white focus:border-red-500" />
+                                {!validation.supplementalOk && <p className="text-xs text-yellow-300">Range 50-70</p>}
+                            </div>
+                            <div className="space-y-1">
+                                <label className="block text-xs uppercase text-gray-400">Sets × Reps</label>
+                                <div className="text-gray-300 text-sm font-mono">5 × 10</div>
+                            </div>
                         </div>
                     </div>
                 )}
             </section>
 
-            {/* Equipment */}
-            <section className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 space-y-5">
-                <h3 className="text-lg font-semibold text-white">F) Equipment</h3>
-                <p className="text-xs text-gray-400">Select equipment you truly have. Auto-picked assistance filters by availability. Use All / None for quick toggles.</p>
-                <div className="flex gap-2 mb-2 flex-wrap items-center">
-                    <ToggleButton
-                        on={equip.length === ALL_EQUIP.length}
-                        onClick={() => setEquip(equip.length === ALL_EQUIP.length ? [] : [...ALL_EQUIP])}
-                        className="text-xs"
-                        title="Toggle all equipment"
-                    >{equip.length === ALL_EQUIP.length ? 'All (On)' : 'All'}</ToggleButton>
-                    <ToggleButton on={equip.length === 0} onClick={() => setEquip([])} className="text-xs">None</ToggleButton>
-                    <span className="text-[10px] text-gray-500">{equip.length}/{ALL_EQUIP.length} selected</span>
+            {/* Equipment (polished chips) */}
+            <section className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 space-y-4">
+                <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-white">F) Equipment</h3>
+                </div>
+                <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-medium text-gray-200">Equipment <span className="text-gray-500">({equip.length}/{ALL_EQUIP.length})</span></span>
+                    <div className="text-xs text-gray-400">
+                        <button type="button" className="underline mr-3" onClick={() => setEquip([...ALL_EQUIP])}>All</button>
+                        <button type="button" className="underline" onClick={() => setEquip([])}>None</button>
+                    </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                    {ALL_EQUIP.map(k => (
-                        <ToggleButton key={k} on={equip.includes(k)} onClick={() => toggleEquip(k)} className="capitalize text-xs px-2 py-1.5">{k}</ToggleButton>
-                    ))}
+                    {ALL_EQUIP.map(id => {
+                        const active = equip.includes(id);
+                        const equipmentLabelMap = { bw: 'Bodyweight', db: 'Dumbbells', bb: 'Barbell', kb: 'Kettlebell' };
+                        const ambiguous = ['ghr', 'reverse_hyper'].includes(id);
+                        const label = equipmentLabelMap[id] || id;
+                        return (
+                            <button
+                                key={id}
+                                type="button"
+                                className={`px-2 py-1 rounded text-[11px] border transition-colors ${active ? 'bg-red-600/70 border-red-500 text-white' : 'bg-gray-800 border-gray-600 text-gray-300 hover:border-gray-500'}`}
+                                onClick={() => toggleEquip(id)}
+                                title={ambiguous ? (id === 'ghr' ? 'Glute-Ham Raise machine' : 'Reverse hyperextension machine') : undefined}
+                                aria-pressed={active}
+                            >
+                                {label}
+                            </button>
+                        );
+                    })}
                 </div>
                 {equip.length === 0 && <div className="text-xs text-yellow-300">Select at least bodyweight (bw) or another implement.</div>}
             </section>
