@@ -47,10 +47,10 @@ export default function Step1Fundamentals({ onValidChange }) {
         rounding: state.rounding,
         tmPct: state.tmPct,
         lifts: {
-            squat: { oneRM: state.lifts.squat.oneRM || '', repWeight: '', repCount: '', tmOverride: '', activeMethod: 'oneRM' },
-            bench: { oneRM: state.lifts.bench.oneRM || '', repWeight: '', repCount: '', tmOverride: '', activeMethod: 'oneRM' },
-            deadlift: { oneRM: state.lifts.deadlift.oneRM || '', repWeight: '', repCount: '', tmOverride: '', activeMethod: 'oneRM' },
-            press: { oneRM: state.lifts.press.oneRM || '', repWeight: '', repCount: '', tmOverride: '', activeMethod: 'oneRM' }
+            squat: { oneRM: state.lifts.squat.oneRM || '', repWeight: '', repCount: '', tmOverride: '', activeMethod: 'oneRM', applied: false },
+            bench: { oneRM: state.lifts.bench.oneRM || '', repWeight: '', repCount: '', tmOverride: '', activeMethod: 'oneRM', applied: false },
+            deadlift: { oneRM: state.lifts.deadlift.oneRM || '', repWeight: '', repCount: '', tmOverride: '', activeMethod: 'oneRM', applied: false },
+            press: { oneRM: state.lifts.press.oneRM || '', repWeight: '', repCount: '', tmOverride: '', activeMethod: 'oneRM', applied: false }
         }
     });
 
@@ -168,27 +168,37 @@ export default function Step1Fundamentals({ onValidChange }) {
             override: hasOverride
         };
 
-        const cardBase = 'method-card rounded-md border-2 bg-gray-900/60 transition-all cursor-pointer';
+        const cardBase = 'method-card rounded-lg border bg-gray-900/70 transition-all cursor-pointer px-4 py-3';
         const cardState = (m) => [
-            isActive(m) ? 'border-red-500/80 shadow-red-500/20' : 'border-gray-700',
+            isActive(m) ? 'border-red-500 ring-1 ring-red-500/40 shadow-sm' : 'border-gray-700',
             methodCompleted[m] && !isActive(m) ? 'border-green-600/70' : '',
             'hover:border-red-400/70'
         ].join(' ');
 
+        const applyDisabled = !finalTM; // must have a TM to apply
+        const handleApply = () => {
+            if (applyDisabled) return;
+            // Mark applied (and if override method not selected, do not force override; just flag)
+            updateLift(liftKey, { applied: true });
+        };
+
         return (
-            <div key={liftKey} className="p-5 rounded-xl bg-gray-800/40 border border-gray-700/60">
-                <div className="flex items-start justify-between mb-4 flex-wrap gap-3">
-                    <div>
-                        <h4 className="text-lg font-semibold text-white">{LIFT_LABELS[liftKey]}</h4>
-                        <div className="text-[11px] text-gray-500 mt-1">
-                            {e1rm ? <>e1RM <span className="text-gray-300 font-mono">{Math.round(e1rm)}</span></> : 'Choose a method below'}
-                            {finalTM && <><span className="mx-1">•</span>TM <span className="text-gray-200 font-mono">{finalTM}</span></>}
+            <div key={liftKey} className="p-6 rounded-xl bg-gray-800/40 border border-gray-700/60">
+                <div className="flex items-start justify-between mb-5 flex-wrap gap-3">
+                    <div className="min-w-[160px]">
+                        <h4 className="text-base font-semibold text-white tracking-tight">{LIFT_LABELS[liftKey]}</h4>
+                        <div className="text-[11px] text-gray-500 mt-1 flex flex-wrap items-center gap-1">
+                            {e1rm ? <><span>e1RM</span><span className="text-gray-300 font-mono">{Math.round(e1rm)}</span></> : <span>Choose a method below</span>}
+                            {finalTM && <><span className="text-gray-600">•</span><span>TM</span><span className="text-gray-200 font-mono">{finalTM}</span></>}
                         </div>
                     </div>
-                    <div className="flex items-center gap-2 text-[10px] text-gray-400">
-                        {validation.level === 'success' && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-green-500" />In Range</span>}
-                        {validation.level === 'warning' && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-yellow-500" />Low</span>}
-                        {validation.level === 'danger' && <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-500" />High</span>}
+                    <div className="flex items-center gap-2">
+                        <span className={`px-3 py-1 rounded-md text-[11px] font-medium flex items-center gap-1 bg-gray-900 border ${finalTM ? 'border-gray-600 text-gray-200' : 'border-gray-700 text-gray-500'}`}>
+                            Current TM: <span className={`${finalTM ? 'text-green-400' : 'text-gray-500'}`}>{finalTM || '—'}</span>
+                        </span>
+                        {validation.level !== 'neutral' && (
+                            <span className={`px-2 py-1 rounded text-[10px] font-medium border ${validation.level === 'success' ? 'bg-green-500/15 text-green-400 border-green-600/40' : validation.level === 'warning' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-600/40' : 'bg-red-500/15 text-red-400 border-red-600/40'}`}>{validation.level === 'success' ? 'In Range' : validation.level === 'warning' ? 'Low' : 'High'}</span>
+                        )}
                     </div>
                 </div>
 
@@ -199,22 +209,23 @@ export default function Step1Fundamentals({ onValidChange }) {
                             <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-semibold ${isActive('oneRM') ? 'bg-red-500 text-white' : methodCompleted.oneRM ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-300'}`}>1</div>
                             <div className="flex-1">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-sm font-medium text-white">Tested 1RM</span>
+                                    <span className="text-[13px] font-semibold text-white">Tested 1RM</span>
                                     {methodCompleted.oneRM && <span className="text-green-500 text-xs">✓</span>}
                                 </div>
-                                <p className="text-[11px] text-gray-500 mt-0.5">Enter an actual recent max attempt.</p>
+                                <p className="text-[11px] text-gray-500 mt-0.5">Enter your actual one-rep max.</p>
                                 {isActive('oneRM') && (
-                                    <div className="mt-3">
+                                    <div className="mt-4">
+                                        <label className="block text-[10px] uppercase tracking-wide text-gray-500 mb-1">Weight</label>
                                         <input
                                             type="number"
                                             value={lift.oneRM}
-                                            onChange={(e) => updateLift(liftKey, { oneRM: e.target.value, repWeight: '', repCount: '', tmOverride: '' })}
+                                            onChange={(e) => updateLift(liftKey, { oneRM: e.target.value, repWeight: '', repCount: '', tmOverride: '', applied: false })}
                                             className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
-                                            placeholder="Enter 1RM"
+                                            placeholder="e.g. 280"
                                         />
                                         {suggestedTM && hasOneRM && (
-                                            <div className="mt-2 text-[11px] bg-gray-800/70 border border-red-500/40 rounded p-2">
-                                                <span className="text-gray-400">Training Max ({Math.round(localState.tmPct * 100)}%): </span>
+                                            <div className="mt-3 text-[11px] bg-gray-800/70 border border-red-500/40 rounded p-2 flex justify-between items-center">
+                                                <span className="text-gray-400">TM ({Math.round(localState.tmPct * 100)}%)</span>
                                                 <span className="text-red-400 font-semibold">{suggestedTM}</span>
                                             </div>
                                         )}
@@ -224,9 +235,9 @@ export default function Step1Fundamentals({ onValidChange }) {
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-center text-[10px] uppercase tracking-wider text-gray-600 relative">
-                        <span className="px-3">OR</span>
-                        <div className="absolute left-0 right-0 h-px bg-gray-700/60" />
+                    <div className="relative flex items-center justify-center h-8">
+                        <div className="absolute inset-x-0 h-px bg-gray-700/60" />
+                        <span className="relative z-10 px-4 text-[10px] font-semibold tracking-wider text-gray-600 bg-gray-800/40 rounded-full">OR</span>
                     </div>
 
                     {/* Method 2: Rep Calculator */}
@@ -235,10 +246,10 @@ export default function Step1Fundamentals({ onValidChange }) {
                             <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-semibold ${isActive('reps') ? 'bg-red-500 text-white' : methodCompleted.reps ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-300'}`}>2</div>
                             <div className="flex-1">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-sm font-medium text-white">Rep Calculator</span>
+                                    <span className="text-[13px] font-semibold text-white">Rep Calculator</span>
                                     {methodCompleted.reps && <span className="text-green-500 text-xs">✓</span>}
                                 </div>
-                                <p className="text-[11px] text-gray-500 mt-0.5">Estimate from a recent set (3–10 reps).</p>
+                                <p className="text-[11px] text-gray-500 mt-0.5">Calculate from a recent rep test (3–10 reps).</p>
                                 {isActive('reps') && (
                                     <div className="mt-3 flex flex-col gap-3">
                                         <div className="flex gap-2 flex-wrap">
@@ -281,9 +292,9 @@ export default function Step1Fundamentals({ onValidChange }) {
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-center text-[10px] uppercase tracking-wider text-gray-600 relative">
-                        <span className="px-3">OR</span>
-                        <div className="absolute left-0 right-0 h-px bg-gray-700/60" />
+                    <div className="relative flex items-center justify-center h-8">
+                        <div className="absolute inset-x-0 h-px bg-gray-700/60" />
+                        <span className="relative z-10 px-4 text-[10px] font-semibold tracking-wider text-gray-600 bg-gray-800/40 rounded-full">OR</span>
                     </div>
 
                     {/* Method 3: Manual Override */}
@@ -292,24 +303,37 @@ export default function Step1Fundamentals({ onValidChange }) {
                             <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-semibold ${isActive('override') ? 'bg-red-500 text-white' : methodCompleted.override ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-300'}`}>3</div>
                             <div className="flex-1">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-sm font-medium text-white">Manual Override</span>
+                                    <span className="text-[13px] font-semibold text-white">Manual Override</span>
                                     {methodCompleted.override && <span className="text-green-500 text-xs">✓</span>}
                                 </div>
-                                <p className="text-[11px] text-gray-500 mt-0.5">Set a custom TM directly.</p>
+                                <p className="text-[11px] text-gray-500 mt-0.5">Set a custom training max directly.</p>
                                 {isActive('override') && (
-                                    <div className="mt-3">
+                                    <div className="mt-4">
+                                        <label className="block text-[10px] uppercase tracking-wide text-gray-500 mb-1">Training Max</label>
                                         <input
                                             type="number"
                                             value={lift.tmOverride}
-                                            onChange={(e) => updateLift(liftKey, { tmOverride: e.target.value, oneRM: '', repWeight: '', repCount: '' })}
+                                            onChange={(e) => updateLift(liftKey, { tmOverride: e.target.value, oneRM: '', repWeight: '', repCount: '', applied: false })}
                                             className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
-                                            placeholder="Enter TM"
+                                            placeholder="e.g. 250"
                                         />
                                     </div>
                                 )}
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {/* Apply Button */}
+                <div className="mt-6">
+                    <button
+                        type="button"
+                        disabled={applyDisabled}
+                        onClick={handleApply}
+                        className={`w-full text-sm font-semibold rounded-md px-4 py-3 border transition-colors ${applyDisabled ? 'bg-gray-800 text-gray-600 border-gray-700 cursor-not-allowed' : lift.applied ? 'bg-green-600/20 text-green-400 border-green-600 hover:bg-green-600/30' : 'bg-red-600 text-white border-red-500 hover:bg-red-500'}`}
+                    >
+                        {lift.applied ? '✓ Training Max Applied' : applyDisabled ? 'Enter Data Above' : 'Apply Training Max'}
+                    </button>
                 </div>
             </div>
         );
