@@ -308,9 +308,9 @@ export default function Step1Fundamentals({ onValidChange }) {
                             onChange={(e) => updateLocalState({ rounding: e.target.value })}
                             className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none"
                         >
-                            <option value="ceil">Ceil (Round Up)</option>
+                            <option value="ceil">Round up</option>
                             <option value="nearest">Nearest</option>
-                            <option value="floor">Floor (Round Down)</option>
+                            <option value="floor">Round down</option>
                         </select>
                     </div>
 
