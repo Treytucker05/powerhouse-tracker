@@ -1,5 +1,6 @@
 import { buildAssistanceForDay } from "../.."; // barrel export
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useProgramV2 } from '../../contexts/ProgramContextV2.jsx';
 import { buildMainSetsForLift, buildWarmupSets, roundToIncrement, getWeekScheme } from '../..'; // barrel export
 import { Info, AlertTriangle, Download, Copy, Printer, CheckCircle2, BookOpen } from 'lucide-react';
@@ -45,8 +46,39 @@ function deriveEffectiveConfig(state) {
     return merged;
 }
 
+function TableBlock({ title, rows, units }) {
+    if (!rows || !rows.length) return null;
+    return (
+        <div className="mt-4">
+            <h4 className="text-sm md:text-base font-semibold mb-2 tracking-wide">{title}</h4>
+            <div className="overflow-x-auto">
+                <table className="min-w-[420px] w-full text-xs md:text-sm">
+                    <thead className="text-gray-400">
+                        <tr>
+                            <th className="text-left py-1 pr-4">%</th>
+                            <th className="text-left py-1 pr-4">Reps</th>
+                            <th className="text-left py-1">Weight</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {rows.map((r, i) => (
+                            <tr key={i} className="border-t border-gray-700/40">
+                                <td className="py-1 pr-4 font-mono">{r.pct}%</td>
+                                <td className="py-1 pr-4 font-mono">{r.reps}{r.amrap ? '+' : ''}</td>
+                                <td className="py-1 font-mono">{r.weight}{units}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+}
+
 export default function Step4ReviewExport({ onReadyChange }) {
     const { state, dispatch } = useProgramV2();
+    const navigate = useNavigate();
+    const [starting, setStarting] = useState(false);
     const [showTemplateExplainer, setShowTemplateExplainer] = useState(false);
     const [showChangeTemplate, setShowChangeTemplate] = useState(false);
     const [pendingTemplate, setPendingTemplate] = useState(null);
@@ -318,8 +350,25 @@ export default function Step4ReviewExport({ onReadyChange }) {
         if (assistMode === 'custom') setShowAssistEditor(true);
     }, [assistMode]);
 
+    async function onStartCycle() {
+        setStarting(true);
+        try {
+            // Reuse exportJson as payload (already structured)
+            const programPayload = exportJson;
+            // Persist using existing helper for consistency with TrainToday
+            try {
+                const { persistActiveCycle } = await import('../../../../lib/fiveThreeOne/persistCycle.js');
+                persistActiveCycle(programPayload);
+            } catch { /* ignore dynamic import issues */ }
+            window.dispatchEvent(new CustomEvent('cycle:started'));
+            navigate('/train');
+        } finally {
+            setStarting(false);
+        }
+    }
+
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 text-sm md:text-base leading-6">
             <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                     <h2 className="text-2xl font-bold text-white mb-1">Step 4 — Review & Export</h2>
@@ -391,64 +440,20 @@ export default function Step4ReviewExport({ onReadyChange }) {
 
                     {previewWeek && (
                         <div className="space-y-6">
-                            {previewWeek.days.map((day, idx) => (
+                            {previewWeek.days.map((day, idx) => {
+                                // Map warmups/main into table row objects
+                                const warmupRows = includeWarmups ? (day.warmups || []).map(w => ({ pct: w.percent, reps: w.reps, weight: w.weight })) : [];
+                                const mainRows = (day.main || []).map(m => ({ pct: m.percent, reps: m.reps, weight: m.weight, amrap: !!m.amrap }));
+                                return (
                                 <div key={idx} className="bg-gray-800/50 border border-gray-700 rounded-xl p-5 space-y-4">
                                     <div className="flex items-center justify-between">
-                                        <h3 className="text-lg font-semibold text-white">Day {idx + 1} – {day.lift}</h3>
+                                        <h3 className="text-base md:text-lg font-semibold text-white">Day {idx + 1} — {day.lift}</h3>
                                         {day.supplemental?.type === 'bbb' && (
                                             <span className="text-xs px-2 py-1 rounded bg-red-600/20 text-red-300 border border-red-500">BBB</span>
                                         )}
                                     </div>
-                                    {/* Warm-ups */}
-                                    {includeWarmups && day.warmups && day.warmups.length > 0 && (
-                                        <div>
-                                            <div className="text-xs uppercase tracking-wide text-gray-400 mb-1">Warm-ups</div>
-                                            <div className="overflow-x-auto">
-                                                <table className="min-w-full text-xs text-gray-300">
-                                                    <thead>
-                                                        <tr className="text-gray-500">
-                                                            <th className="text-left font-medium pb-1 pr-4">%</th>
-                                                            <th className="text-left font-medium pb-1 pr-4">Reps</th>
-                                                            <th className="text-left font-medium pb-1">Weight</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {day.warmups.map((s, i2) => (
-                                                            <tr key={i2} className="align-top">
-                                                                <td className="py-0.5 pr-4 font-mono">{s.percent}</td>
-                                                                <td className="py-0.5 pr-4 font-mono">{s.reps}</td>
-                                                                <td className="py-0.5 font-mono">{s.weight}{units}</td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    )}
-                                    {/* Main Sets */}
-                                    <div>
-                                        <div className="text-xs uppercase tracking-wide text-gray-400 mb-1">Main Sets</div>
-                                        <div className="overflow-x-auto">
-                                            <table className="min-w-full text-xs text-gray-300">
-                                                <thead>
-                                                    <tr className="text-gray-500">
-                                                        <th className="text-left font-medium pb-1 pr-4">%</th>
-                                                        <th className="text-left font-medium pb-1 pr-4">Reps</th>
-                                                        <th className="text-left font-medium pb-1">Weight</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {day.main.map((s, i3) => (
-                                                        <tr key={i3} className="align-top">
-                                                            <td className="py-0.5 pr-4 font-mono">{s.percent}</td>
-                                                            <td className="py-0.5 pr-4 font-mono">{s.reps}</td>
-                                                            <td className="py-0.5 font-mono">{s.weight}{units}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
+                                    <TableBlock title="WARM-UPS" rows={warmupRows} units={units} />
+                                    <TableBlock title="MAIN SETS" rows={mainRows} units={units} />
                                     {/* Supplemental */}
                                     {day.supplemental && day.supplemental.type === 'bbb' && (
                                         <div className="text-xs text-red-200 bg-red-900/10 border border-red-700/40 rounded p-3 font-mono">
@@ -516,7 +521,8 @@ export default function Step4ReviewExport({ onReadyChange }) {
                                         </div>
                                     )}
                                 </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
                 </div>
@@ -560,17 +566,15 @@ export default function Step4ReviewExport({ onReadyChange }) {
                             <ToggleButton on={false} disabled={!validation.valid} onClick={handlePrint} className="flex items-center justify-center gap-2 text-xs">
                                 <Printer className="w-4 h-4" /> <span>Print</span>
                             </ToggleButton>
+                            <ToggleButton on={false} disabled={!validation.valid || starting} onClick={onStartCycle} className="flex items-center justify-center gap-2 text-xs !bg-red-600/30 !border-red-500/60 hover:!bg-red-600/40">
+                                <span>{starting ? 'Starting…' : 'Start Cycle'}</span>
+                            </ToggleButton>
                             {exportError && <div className="text-xs text-red-400">{exportError}</div>}
                         </div>
                         {validation.valid && (
                             <div className="flex items-center space-x-2 text-green-400 text-xs"><CheckCircle2 className="w-4 h-4" /><span>Ready to start cycle.</span></div>
                         )}
                     </div>
-
-                    {/* Developer Inspector */}
-                    {import.meta.env.MODE !== 'production' && (
-                        <DevInspector effective={effective} exportJson={exportJson} />
-                    )}
                 </div>
             </div>
             {(showTemplateExplainer || showChangeTemplate) && (
