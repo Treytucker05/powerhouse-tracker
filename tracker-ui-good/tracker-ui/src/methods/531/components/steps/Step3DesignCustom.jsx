@@ -179,12 +179,16 @@ export default function Step3DesignCustom({ onValidChange }) {
 
     return (
         <div className="space-y-8">
-            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 space-y-3">
-                <h2 className="text-2xl font-bold text-white">Step 3 — Custom Design</h2>
-                <p className="text-gray-400 text-sm">Configure schedule order, warm-ups, supplemental strategy, assistance style, equipment, and deadlift rep style.</p>
-                <div className="text-[11px] leading-snug bg-indigo-900/20 border border-indigo-700/40 rounded p-3 text-indigo-100">
-                    <strong className="text-indigo-300">Warm up:</strong> 40%×5, 50%×5, 60%×3 of TM. Use ramp sets; rest 60–90s; focus on bar speed & bracing. Adjust if reps feel slow.
-                </div>
+            {/* Intro Card (rewritten for clarity + brevity) */}
+            <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-4">
+                <h2 className="text-lg font-semibold text-white">Design your cycle</h2>
+                <p className="text-sm text-gray-400 mt-1">Set your warm-ups, main % by week, and supplemental style. You can convert assistance to custom later.</p>
+                <ul className="mt-3 space-y-1 text-sm list-disc pl-5 text-gray-300">
+                    <li><strong>Warm-ups:</strong> 40/50/60% of TM to ramp without fatigue.</li>
+                    <li><strong>Main:</strong> Week 1–3 last set is <strong>AMRAP</strong>; Week 4 is <strong>deload</strong> (no AMRAP).</li>
+                    <li><strong>Supplemental (BBB):</strong> 5×10 @ 60% TM (<strong>same lift</strong> by default).</li>
+                </ul>
+                <p className="text-xs text-gray-500 mt-3">Change days/split in Step 2. Rounding set in Step 1.</p>
             </div>
 
             {/* Schedule */}
