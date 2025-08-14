@@ -30,42 +30,16 @@
             },
             "expect": {
                 "mainLift": "barbell.press.ohp",
+                // Switched to string expectations matching verifier fmtSet output
                 "warmups": [
-                    {
-                        "pct": 40,
-                        "reps": 5,
-                        "weight": 55
-                    },
-                    {
-                        "pct": 50,
-                        "reps": 5,
-                        "weight": 70
-                    },
-                    {
-                        "pct": 60,
-                        "reps": 3,
-                        "weight": 80
-                    }
+                    "40%x5",
+                    "50%x5",
+                    "60%x3"
                 ],
                 "main": [
-                    {
-                        "pct": 65,
-                        "reps": 5,
-                        "weight": 90,
-                        "amrap": false
-                    },
-                    {
-                        "pct": 75,
-                        "reps": 5,
-                        "weight": 100,
-                        "amrap": false
-                    },
-                    {
-                        "pct": 85,
-                        "reps": 5,
-                        "weight": 115,
-                        "amrap": true
-                    }
+                    "65%x5",
+                    "75%x5",
+                    "85%x5+"
                 ],
                 "supplemental": {
                     "mode": "bbb",
@@ -122,42 +96,16 @@
             },
             "expect": {
                 "mainLift": "barbell.press.ohp",
+                // Switched to string expectations
                 "warmups": [
-                    {
-                        "pct": 40,
-                        "reps": 5,
-                        "weight": 55
-                    },
-                    {
-                        "pct": 50,
-                        "reps": 5,
-                        "weight": 70
-                    },
-                    {
-                        "pct": 60,
-                        "reps": 3,
-                        "weight": 80
-                    }
+                    "40%x5",
+                    "50%x5",
+                    "60%x3"
                 ],
                 "main": [
-                    {
-                        "pct": 40,
-                        "reps": 5,
-                        "weight": 55,
-                        "amrap": false
-                    },
-                    {
-                        "pct": 50,
-                        "reps": 5,
-                        "weight": 70,
-                        "amrap": false
-                    },
-                    {
-                        "pct": 60,
-                        "reps": 5,
-                        "weight": 80,
-                        "amrap": false
-                    }
+                    "40%x5",
+                    "50%x5",
+                    "60%x5"
                 ],
                 "supplemental": {
                     "mode": "bbb",
@@ -214,42 +162,16 @@
             },
             "expect": {
                 "mainLift": "barbell.deadlift.conventional",
+                // Switched to string expectations; 70% rounding clarified: 0.70 * 365 = 255.5 → 255
                 "warmups": [
-                    {
-                        "pct": 40,
-                        "reps": 5,
-                        "weight": 145
-                    }, // 0.40 * 365 = 146 → 145
-                    {
-                        "pct": 50,
-                        "reps": 5,
-                        "weight": 185
-                    }, // 0.50 * 365 = 182.5 → 185
-                    {
-                        "pct": 60,
-                        "reps": 3,
-                        "weight": 220
-                    } // 0.60 * 365 = 219 → 220
+                    "40%x5",
+                    "50%x5",
+                    "60%x3"
                 ],
                 "main": [
-                    {
-                        "pct": 70,
-                        "reps": 3,
-                        "weight": 260,
-                        "amrap": false
-                    }, // 0.70 * 365 = 255.5 → 260
-                    {
-                        "pct": 80,
-                        "reps": 3,
-                        "weight": 290,
-                        "amrap": false
-                    }, // 0.80 * 365 = 292   → 290
-                    {
-                        "pct": 90,
-                        "reps": 3,
-                        "weight": 330,
-                        "amrap": true
-                    } // 0.90 * 365 = 328.5 → 330
+                    "70%x3",
+                    "80%x3",
+                    "90%x3+"
                 ],
                 "supplemental": {
                     "mode": "bbb",

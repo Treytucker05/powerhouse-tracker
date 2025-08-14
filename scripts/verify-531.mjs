@@ -30,8 +30,12 @@ try {
 }
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const packPath = path.resolve(__dirname, "../methodology/packs/531.bbb.v1.jsonc");
-const casesPath = path.resolve(__dirname, "../methodology/verification/531.v1.verifier.jsonc");
+// Default legacy pack / cases (kept for structural checks)
+const defaultPackPath = path.resolve(__dirname, "../methodology/packs/531.bbb.v1.jsonc");
+const DEFAULT_CASES = path.resolve(__dirname, "../methodology/verification/531.v1.verifier.jsonc");
+// CLI arg (relative to CWD) overrides default
+const cliArg = process.argv[2];
+const CASES_PATH = cliArg ? path.resolve(process.cwd(), cliArg) : DEFAULT_CASES;
 
 function fmtSet(s) {
     if (!s) return "";
@@ -39,6 +43,25 @@ function fmtSet(s) {
     const repsBase = s.reps ?? (s.rep ? s.rep : "");
     const reps = s.amrap ? `${repsBase}+` : repsBase;
     return `${pct}%x${reps}`.trim();
+}
+
+// Map numeric week (1..4) to key names used inside template main effects
+function weekKey(n) {
+    return n === 4 ? 'w4' : `w${n}`; // explicit for clarity if later weeks differ
+}
+
+// Build main set strings like ["65%x5","75%x5","85%x5+"] for given pack template/week
+function buildMainFromPack(pack, templateId, week) {
+    const tpl = (pack.templates || []).find(t => t.id === templateId);
+    const mainWeeks = tpl?.effects?.main?.weeks;
+    if (!mainWeeks) return [];
+    const wk = mainWeeks[weekKey(week)];
+    if (!wk || !Array.isArray(wk.percentages) || !Array.isArray(wk.reps)) return [];
+    const amrapLast = wk.amrapLast === true;
+    return wk.percentages.map((p, i) => {
+        const base = `${p}%x${wk.reps[i]}`;
+        return (amrapLast && i === wk.percentages.length - 1) ? `${base}+` : base;
+    });
 }
 
 function eq(a, b) {
@@ -332,24 +355,41 @@ function checkAssist(label, exp, errs) {
 }
 
 try {
-    const pack = loadJsonc(packPath);
-    const tests = loadJsonc(casesPath);
+    console.log(`[verify-531] Using cases file: ${CASES_PATH}`);
+    const tests = loadJsonc(CASES_PATH);
+    // Allow test file meta.pack to override default legacy pack
+    const metaPackRel = tests?.meta?.pack;
+    const selectedPackPath = metaPackRel ? path.resolve(__dirname, "../", metaPackRel) : defaultPackPath;
+    const pack = loadJsonc(selectedPackPath);
 
-    const warmupsRaw = (pack.progressions?.warmups || []);
+    // Support legacy progressions structure OR new template.effects structure
+    let warmupsRaw = (pack.progressions?.warmups || []);
+    if (!warmupsRaw.length) {
+        // attempt template-based warmups
+        const tplFromCases = tests?.cases?.[0]?.input?.templateId;
+        const tpl = (pack.templates || []).find(t => t.id === tplFromCases);
+        const effWarm = tpl?.effects?.warmups;
+        if (effWarm?.percentages && effWarm?.reps && effWarm.percentages.length === effWarm.reps.length) {
+            warmupsRaw = effWarm.percentages.map((p, i) => ({ pct: p, reps: effWarm.reps[i], amrap: false }));
+        }
+    }
     const warmups = warmupsRaw.map(fmtSet);
     const weekByLabel = Object.fromEntries(
         (pack.progressions?.weeks || []).map(w => [String(w.label).toLowerCase(), w])
     );
 
     const errs = [];
-    for (const c of tests.cases || []) {
+    let casePassed = 0; let caseFailed = 0;
+    for (const c of (tests.cases || [])) {
+        const preErrCount = errs.length;
         const expWarm = c.expect?.warmups || null;
         const expMain = c.expect?.main || null;
         if (expWarm) assertEqual(`${c.name} warmups`, warmups, expWarm, errs);
 
         const labelKey = String(c.label || "").toLowerCase().replace(/\s+/g, "");
         const wk = weekByLabel[labelKey] || null;
-        const gotMain = (wk?.main || []).map(fmtSet);
+        // Derive main sets from template definition (wk?.main was empty for new pack structure)
+        const gotMain = buildMainFromPack(pack, c.input?.templateId, c.input?.week);
         if (expMain) assertEqual(`${c.name} main`, gotMain, expMain, errs);
 
         if (c.expect?.amrapLast !== undefined) {
@@ -362,7 +402,16 @@ try {
 
         const assistExp = getAssistExpectation(c);
         if (assistExp) checkAssist(`${c.name}`, assistExp, errs);
+        const postErrCount = errs.length;
+        if (postErrCount === preErrCount) {
+            console.log(`  \u2714 ${c.name}`);
+            casePassed++;
+        } else {
+            console.error(`  \u2716 ${c.name}`);
+            caseFailed++;
+        }
     }
+    console.log(`[verify-531] Case summary: ${casePassed} passed, ${caseFailed} failed`);
 
     // New global pack-level checks (independent of cases)
     // 1. Assistance coverage per template

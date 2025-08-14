@@ -184,84 +184,91 @@ export default function Step1Fundamentals({ onValidChange }) {
                         </div>
                     </div>
 
-                    {/* 1RM */}
-                    <div className="col-span-6 sm:col-span-2 md:col-span-2">
-                        <label className="block text-sm mb-1 text-gray-300">1RM</label>
-                        <input
-                            type="number"
-                            value={lift.oneRM}
-                            onChange={(e) => updateLift(liftKey, {
-                                oneRM: e.target.value,
-                                repWeight: '',
-                                repCount: ''
-                            })}
-                            className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none"
-                            disabled={hasRepTest}
-                            placeholder="1RM"
-                        />
+                    {/* 1RM Container */}
+                    <div className="col-span-12 lg:col-span-5">
+                        <div className={`h-full rounded-md border ${hasRepTest ? 'border-gray-700/50 opacity-60' : 'border-gray-700'} bg-gray-900/60 p-3 flex flex-col gap-2`}> 
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium text-gray-300">Tested 1RM</label>
+                                {hasRepTest && <span className="text-[10px] text-gray-500">disabled (rep test in use)</span>}
+                            </div>
+                            <input
+                                type="number"
+                                value={lift.oneRM}
+                                onChange={(e) => updateLift(liftKey, { oneRM: e.target.value, repWeight: '', repCount: '' })}
+                                className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none"
+                                disabled={hasRepTest}
+                                placeholder="Enter 1RM"
+                            />
+                            <div className="text-[10px] text-gray-500 leading-snug">Enter a recent true 1RM. Leave blank if you prefer to estimate from a rep test.</div>
+                        </div>
                     </div>
 
-                    {/* Rep Test Weight */}
-                    <div className="col-span-6 sm:col-span-2 md:col-span-2">
-                        <label className="block text-sm mb-1 text-gray-300">Rep test weight</label>
-                        <input
-                            type="number"
-                            value={lift.repWeight}
-                            onChange={(e) => updateLift(liftKey, {
-                                repWeight: e.target.value,
-                                oneRM: ''
-                            })}
-                            className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none"
-                            disabled={hasOneRM}
-                            placeholder="Weight"
-                        />
+                    {/* OR Divider */}
+                    <div className="col-span-12 lg:col-span-2 flex items-stretch my-2 lg:my-0">
+                        <div className="w-full lg:w-auto flex lg:flex-col items-center justify-center relative">
+                            <div className="hidden lg:block h-full w-px bg-gray-700/50" />
+                            <div className="lg:absolute lg:inset-y-1/2 lg:-translate-y-1/2 flex items-center justify-center">
+                                <span className="text-[10px] tracking-wide uppercase text-gray-500 px-3 py-1 rounded-full border border-gray-700 bg-gray-900/70">OR</span>
+                            </div>
+                            <div className="hidden lg:block h-full w-px bg-gray-700/50" />
+                        </div>
                     </div>
 
-                    {/* Rep Test Reps */}
-                    <div className="col-span-6 sm:col-span-2 md:col-span-2">
-                        <label className="block text-sm mb-1 text-gray-300">Reps</label>
-                        <input
-                            type="number"
-                            value={lift.repCount}
-                            onChange={(e) => updateLift(liftKey, {
-                                repCount: e.target.value,
-                                oneRM: ''
-                            })}
-                            className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none"
-                            disabled={hasOneRM}
-                            placeholder="Reps"
-                        />
+                    {/* Rep Test Container */}
+                    <div className="col-span-12 lg:col-span-5">
+                        <div className={`h-full rounded-md border ${hasOneRM ? 'border-gray-700/50 opacity-60' : 'border-gray-700'} bg-gray-900/60 p-3 flex flex-col gap-2`}>
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium text-gray-300">Rep test (Weight × Reps)</label>
+                                {hasOneRM && <span className="text-[10px] text-gray-500">disabled (1RM in use)</span>}
+                            </div>
+                            <div className="flex gap-2">
+                                <input
+                                    type="number"
+                                    value={lift.repWeight}
+                                    onChange={(e) => updateLift(liftKey, { repWeight: e.target.value, oneRM: '' })}
+                                    className="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none"
+                                    disabled={hasOneRM}
+                                    placeholder="Weight"
+                                />
+                                <input
+                                    type="number"
+                                    value={lift.repCount}
+                                    onChange={(e) => updateLift(liftKey, { repCount: e.target.value, oneRM: '' })}
+                                    className="w-24 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none"
+                                    disabled={hasOneRM}
+                                    placeholder="Reps"
+                                />
+                                {hasRepTest && (
+                                    <button
+                                        onClick={() => copyRepTestToAll(liftKey)}
+                                        className="text-[11px] px-2 py-1 rounded bg-gray-700/60 hover:bg-gray-600 text-gray-200 border border-gray-600"
+                                        title="Copy rep test to all lifts"
+                                    >Copy</button>
+                                )}
+                            </div>
+                            <div className="text-[10px] text-gray-500 leading-snug">Use a recent submax set (3–10 reps). We'll estimate e1RM & TM.</div>
+                        </div>
                     </div>
 
-                    {/* Copy rep test */}
-                    <div className="col-span-6 sm:col-span-1 md:col-span-1 flex items-end">
-                        {hasRepTest && (
-                            <button
-                                onClick={() => copyRepTestToAll(liftKey)}
-                                className="text-[11px] px-2 py-1 rounded bg-gray-700/60 hover:bg-gray-600 text-gray-200 border border-gray-600"
-                                title="Copy rep test to all lifts"
-                            >Copy</button>
-                        )}
-                    </div>
-
-                    {/* TM Override */}
-                    <div className="col-span-6 sm:col-span-2 md:col-span-2">
-                        <label className="block text-sm mb-1 text-gray-300">TM override</label>
-                        <input
-                            type="number"
-                            value={lift.tmOverride}
-                            onChange={(e) => updateLift(liftKey, { tmOverride: e.target.value })}
-                            className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none"
-                            placeholder="Override"
-                        />
-                    </div>
-
-                    {/* Validation indicator */}
-                    <div className="col-span-6 sm:col-span-1 md:col-span-1 flex items-end">
-                        <div className="flex items-center gap-2 text-[11px] text-gray-400">
-                            {validation.level === 'success' && <div className="w-3 h-3 bg-green-500 rounded-full" title="In recommended range" />}
-                            {validation.level === 'warning' && <div className="w-3 h-3 bg-yellow-500 rounded-full" title="Very conservative" />}
-                            {validation.level === 'danger' && <div className="w-3 h-3 bg-red-500 rounded-full" title="Too high" />}
+                    {/* TM Override & Validation */}
+                    <div className="col-span-12 mt-4 grid grid-cols-12 gap-4 items-end">
+                        <div className="col-span-6 sm:col-span-3 md:col-span-2">
+                            <label className="block text-sm mb-1 text-gray-300">TM override</label>
+                            <input
+                                type="number"
+                                value={lift.tmOverride}
+                                onChange={(e) => updateLift(liftKey, { tmOverride: e.target.value })}
+                                className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none"
+                                placeholder="Override"
+                            />
+                        </div>
+                        <div className="col-span-6 sm:col-span-3 md:col-span-2 flex items-end">
+                            <div className="flex items-center gap-2 text-[11px] text-gray-400">
+                                {validation.level === 'success' && <div className="w-3 h-3 bg-green-500 rounded-full" title="In recommended range" />}
+                                {validation.level === 'warning' && <div className="w-3 h-3 bg-yellow-500 rounded-full" title="Very conservative" />}
+                                {validation.level === 'danger' && <div className="w-3 h-3 bg-red-500 rounded-full" title="Too high" />}
+                                <span className="text-[10px] text-gray-500">Validation</span>
+                            </div>
                         </div>
                     </div>
                 </div>
