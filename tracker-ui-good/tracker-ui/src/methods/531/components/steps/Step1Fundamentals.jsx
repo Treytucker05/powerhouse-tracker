@@ -218,15 +218,15 @@ export default function Step1Fundamentals({ onValidChange }) {
                     <div className="col-span-12 lg:col-span-5">
                         <div className={`h-full rounded-md border ${hasOneRM ? 'border-gray-700/50 opacity-60' : 'border-gray-700'} bg-gray-900/60 p-3 flex flex-col gap-2`}>
                             <div className="flex items-center justify-between">
-                                <label className="text-sm font-medium text-gray-300">Rep test (Weight × Reps)</label>
+                                <label className="text-sm font-medium text-gray-300">Rep Test (Weight × Reps)</label>
                                 {hasOneRM && <span className="text-[10px] text-gray-500">disabled (1RM in use)</span>}
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 flex-nowrap">
                                 <input
                                     type="number"
                                     value={lift.repWeight}
                                     onChange={(e) => updateLift(liftKey, { repWeight: e.target.value, oneRM: '' })}
-                                    className="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none"
+                                    className="flex-1 min-w-0 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none"
                                     disabled={hasOneRM}
                                     placeholder="Weight"
                                 />
@@ -234,14 +234,14 @@ export default function Step1Fundamentals({ onValidChange }) {
                                     type="number"
                                     value={lift.repCount}
                                     onChange={(e) => updateLift(liftKey, { repCount: e.target.value, oneRM: '' })}
-                                    className="w-24 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none"
+                                    className="w-24 shrink-0 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none"
                                     disabled={hasOneRM}
                                     placeholder="Reps"
                                 />
                                 {hasRepTest && (
                                     <button
                                         onClick={() => copyRepTestToAll(liftKey)}
-                                        className="text-[11px] px-2 py-1 rounded bg-gray-700/60 hover:bg-gray-600 text-gray-200 border border-gray-600"
+                                        className="text-[11px] px-2 py-1 rounded bg-gray-700/60 hover:bg-gray-600 text-gray-200 border border-gray-600 shrink-0"
                                         title="Copy rep test to all lifts"
                                     >Copy</button>
                                 )}
@@ -253,7 +253,7 @@ export default function Step1Fundamentals({ onValidChange }) {
                     {/* TM Override & Validation */}
                     <div className="col-span-12 mt-4 grid grid-cols-12 gap-4 items-end">
                         <div className="col-span-6 sm:col-span-3 md:col-span-2">
-                            <label className="block text-sm mb-1 text-gray-300">TM override</label>
+                            <label className="block text-sm mb-1 text-gray-300">TM Override</label>
                             <input
                                 type="number"
                                 value={lift.tmOverride}
@@ -365,7 +365,7 @@ export default function Step1Fundamentals({ onValidChange }) {
                     <div className="flex items-start space-x-3">
                         <AlertTriangle className="w-5 h-5 text-yellow-400 mt-0.5 flex-shrink-0" />
                         <div>
-                            <h4 className="font-semibold text-yellow-300 mb-1">Training max validation</h4>
+                            <h4 className="font-semibold text-yellow-300 mb-1">Training Max Validation</h4>
                             <p className="text-yellow-100 text-sm">
                                 If you can't get 5+ reps at your TM on Week 1's top set, your TM is too high.
                             </p>
