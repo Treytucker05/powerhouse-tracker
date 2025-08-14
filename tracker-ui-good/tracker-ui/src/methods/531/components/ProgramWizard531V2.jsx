@@ -750,54 +750,59 @@ function WizardShell() {
                                         </div>
                                     );
                                 }
-                                // 1-day live preview
-                                if (preview?.mode === '1day_live' && Array.isArray(preview?.days) && preview.days.length === 1) {
-                                    const d = preview.days[0];
-                                    return (
-                                        <div className="space-y-6 mt-10">
-                                            <div className="rounded-2xl border border-gray-700 bg-gray-800/40 p-4">
-                                                <div className="text-lg font-semibold mb-3 text-white">Week 1 (1-Day Preview)</div>
-                                                <div className="grid md:grid-cols-1 gap-4">
-                                                    <div className="rounded-xl border border-gray-700/60 bg-gray-900/40 p-3">
-                                                        <div className="text-xs uppercase tracking-wide text-gray-400 mb-2">Day 1</div>
-                                                        <div className="font-medium capitalize text-gray-200 mb-2">{d.lift}</div>
-                                                        <div className="text-xs uppercase tracking-wide text-gray-400">Warm-up</div>
-                                                        <ul className="text-sm mb-2 space-y-0.5">
-                                                            {d.warmups?.length === 0 && <li className="text-gray-500">—</li>}
-                                                            {d.warmups?.map((r, i) => (
-                                                                <li key={i} className="tabular-nums text-gray-300">{r.pct}% × {r.reps} → <span className="text-white">{r.weight}</span> {state?.units || 'lbs'}</li>
-                                                            ))}
-                                                        </ul>
-                                                        <div className="text-xs uppercase tracking-wide text-gray-400">Main</div>
-                                                        <ul className="text-sm mb-2 space-y-0.5">
-                                                            {d.main?.rows?.length === 0 && <li className="text-gray-500">—</li>}
-                                                            {d.main?.rows?.map((r, i) => (
-                                                                <li key={i} className="tabular-nums text-gray-300">{r.pct}% × {r.reps}{r.amrap ? '+' : ''} → <span className="text-white">{r.weight}</span> {state?.units || 'lbs'}{r.amrap && <span className="ml-2 text-[10px] px-1 py-0.5 border border-red-500/40 rounded text-red-300">AMRAP</span>}</li>
-                                                            ))}
-                                                        </ul>
-                                                        {Array.isArray(d.assistance) && d.assistance.length > 0 && (
-                                                            <div>
-                                                                <div className="text-xs uppercase tracking-wide text-gray-400">Assistance</div>
-                                                                <ul className="text-sm space-y-0.5">
-                                                                    {d.assistance.map((a, ai) => (
-                                                                        <li key={ai} className="text-gray-300">{a.name || a.id} — {a.sets ?? '?'}×{a.reps ?? '?'}</li>
-                                                                    ))}
-                                                                </ul>
-                                                            </div>
-                                                        )}
-                                                        {d.conditioning && (
-                                                            <div className="mt-2">
-                                                                <div className="text-xs uppercase tracking-wide text-gray-400">Conditioning</div>
-                                                                <div className="text-xs text-gray-300">
-                                                                    {d.conditioning.type} {d.conditioning.minutes ? `${d.conditioning.minutes}m` : ''}{d.conditioning.intensity ? ` · ${d.conditioning.intensity}` : ''}
+                                // 1-day live preview (globally disabled unless VITE_SHOW_STEP_PREVIEW is truthy)
+                                if (preview?.mode === '1day_live') {
+                                    if (!import.meta.env?.VITE_SHOW_STEP_PREVIEW) {
+                                        return null; // short-circuits the shared 1-day panel everywhere
+                                    }
+                                    if (Array.isArray(preview?.days) && preview.days.length === 1) {
+                                        const d = preview.days[0];
+                                        return (
+                                            <div className="space-y-6 mt-10">
+                                                <div className="rounded-2xl border border-gray-700 bg-gray-800/40 p-4">
+                                                    <div className="text-lg font-semibold mb-3 text-white">Week 1 (1-Day Preview)</div>
+                                                    <div className="grid md:grid-cols-1 gap-4">
+                                                        <div className="rounded-xl border border-gray-700/60 bg-gray-900/40 p-3">
+                                                            <div className="text-xs uppercase tracking-wide text-gray-400 mb-2">Day 1</div>
+                                                            <div className="font-medium capitalize text-gray-200 mb-2">{d.lift}</div>
+                                                            <div className="text-xs uppercase tracking-wide text-gray-400">Warm-up</div>
+                                                            <ul className="text-sm mb-2 space-y-0.5">
+                                                                {d.warmups?.length === 0 && <li className="text-gray-500">—</li>}
+                                                                {d.warmups?.map((r, i) => (
+                                                                    <li key={i} className="tabular-nums text-gray-300">{r.pct}% × {r.reps} → <span className="text-white">{r.weight}</span> {state?.units || 'lbs'}</li>
+                                                                ))}
+                                                            </ul>
+                                                            <div className="text-xs uppercase tracking-wide text-gray-400">Main</div>
+                                                            <ul className="text-sm mb-2 space-y-0.5">
+                                                                {d.main?.rows?.length === 0 && <li className="text-gray-500">—</li>}
+                                                                {d.main?.rows?.map((r, i) => (
+                                                                    <li key={i} className="tabular-nums text-gray-300">{r.pct}% × {r.reps}{r.amrap ? '+' : ''} → <span className="text-white">{r.weight}</span> {state?.units || 'lbs'}{r.amrap && <span className="ml-2 text-[10px] px-1 py-0.5 border border-red-500/40 rounded text-red-300">AMRAP</span>}</li>
+                                                                ))}
+                                                            </ul>
+                                                            {Array.isArray(d.assistance) && d.assistance.length > 0 && (
+                                                                <div>
+                                                                    <div className="text-xs uppercase tracking-wide text-gray-400">Assistance</div>
+                                                                    <ul className="text-sm space-y-0.5">
+                                                                        {d.assistance.map((a, ai) => (
+                                                                            <li key={ai} className="text-gray-300">{a.name || a.id} — {a.sets ?? '?'}×{a.reps ?? '?'}</li>
+                                                                        ))}
+                                                                    </ul>
                                                                 </div>
-                                                            </div>
-                                                        )}
+                                                            )}
+                                                            {d.conditioning && (
+                                                                <div className="mt-2">
+                                                                    <div className="text-xs uppercase tracking-wide text-gray-400">Conditioning</div>
+                                                                    <div className="text-xs text-gray-300">
+                                                                        {d.conditioning.type} {d.conditioning.minutes ? `${d.conditioning.minutes}m` : ''}{d.conditioning.intensity ? ` · ${d.conditioning.intensity}` : ''}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    );
+                                        );
+                                    }
                                 }
                                 return null;
                             })()}
