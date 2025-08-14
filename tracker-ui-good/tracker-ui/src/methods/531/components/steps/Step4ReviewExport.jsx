@@ -242,6 +242,10 @@ export default function Step4ReviewExport({ onReadyChange }) {
         return weeks;
     }, [order, includeWarmups, warmupScheme, roundingIncrement, roundingMode, units, supplemental, assistance, loadingOption, trainingMaxes, state?.bodyweight, state.templateKey, frequency]);
 
+    // Derive template variant display name (BBB 60% same‑lift special case)
+    const isBBB60Same = supplemental?.strategy === 'bbb' && Number(supplemental.percentOfTM) === 60 && supplemental.pairing === 'same';
+    const templateVariantName = isBBB60Same ? 'BBB 60% (Same-Lift)' : (state.templateSpec?.name || state.templateKey || null);
+
     const exportJson = useMemo(() => {
         const freqNum = frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2;
         const assistancePack = state.templateKey || state.assistance?.templateId || (assistance.mode === 'jack_shit' ? 'jack_shit' : 'triumvirate');
@@ -251,7 +255,7 @@ export default function Step4ReviewExport({ onReadyChange }) {
                 catalogVersion: CATALOG_VERSION,
                 createdAt: new Date().toISOString(),
                 templateKey: state.flowMode === 'template' ? state.templateKey : null,
-                templateName: state.templateSpec?.name || null,
+                templateName: templateVariantName || null,
                 pack: assistancePack,
                 assistanceMode: assistMode,
                 units,
@@ -272,7 +276,7 @@ export default function Step4ReviewExport({ onReadyChange }) {
             assistance,
             weeks: weeksData
         };
-    }, [assistMode, state.pack, state.flowMode, state.templateKey, state.assistance?.templateId, state.schedule?.split4, state.advanced?.split4, state.equipment, units, loadingOption, trainingMaxes, state.rounding, roundingIncrement, roundingMode, frequency, order, includeWarmups, warmupScheme, supplemental, assistance, weeksData]);
+    }, [assistMode, state.pack, state.flowMode, state.templateKey, state.assistance?.templateId, state.schedule?.split4, state.advanced?.split4, state.equipment, units, loadingOption, trainingMaxes, state.rounding, roundingIncrement, roundingMode, frequency, order, includeWarmups, warmupScheme, supplemental, assistance, weeksData, templateVariantName]);
 
     const handleDownload = useCallback(() => {
         try {
@@ -373,10 +377,15 @@ export default function Step4ReviewExport({ onReadyChange }) {
                 <div>
                     <h2 className="text-2xl font-bold text-white mb-1">Step 4 — Review & Export</h2>
                     <p className="text-gray-400 text-sm">Preview the full 4-week cycle, confirm details, then export or print.</p>
-                    {/* Context badge */}
-                    <div className="text-xs uppercase tracking-wide opacity-70 mt-2">
-                        {frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2}-day • {String((state.templateKey || state.assistance?.templateId || (assistance.mode === 'jack_shit' ? 'jack_shit' : 'triumvirate'))).toUpperCase()}
-                        {frequency === '4day' && (state.schedule?.split4 || state.advanced?.split4) && ` • Split ${(state.schedule?.split4 || state.advanced?.split4)}`}
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px]">
+                        <span className="px-2 py-1 rounded-full bg-gray-700/50 border border-gray-600 text-gray-300 tracking-wide">{frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2}-Day</span>
+                        {templateVariantName && (
+                            <span className="px-2 py-1 rounded-full bg-red-600/20 border border-red-500/60 text-red-300 tracking-wide">Template: {templateVariantName}</span>
+                        )}
+                        {frequency === '4day' && (state.schedule?.split4 || state.advanced?.split4) && (
+                            <span className="px-2 py-1 rounded-full bg-gray-700/50 border border-gray-600 text-gray-300 tracking-wide">Split {(state.schedule?.split4 || state.advanced?.split4)}</span>
+                        )}
+                        <span className="px-2 py-1 rounded-full bg-gray-700/30 border border-gray-600 text-gray-400 italic">2 easy conditioning sessions (LISS) per week; don’t let conditioning hurt lifting.</span>
                     </div>
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                         {state?.templateSpec && (
@@ -387,7 +396,7 @@ export default function Step4ReviewExport({ onReadyChange }) {
                                 className="!rounded-full !px-3 !py-1 text-[11px] flex items-center gap-1.5"
                             >
                                 <BookOpen className="w-3.5 h-3.5 opacity-80" />
-                                <span>{state.templateSpec.name}</span>
+                                <span>{templateVariantName || state.templateSpec.name}</span>
                                 <span className="opacity-60">Info</span>
                             </ToggleButton>
                         )}
@@ -410,9 +419,6 @@ export default function Step4ReviewExport({ onReadyChange }) {
                     </div>
                 </div>
                 <div className="flex flex-col gap-2 items-start">
-                    {state.flowMode === 'template' && state.templateKey && (
-                        <div className="px-3 py-1 text-xs rounded-full bg-red-600/20 text-red-300 border border-red-500 uppercase tracking-wide self-start md:self-auto">Template: {state.templateKey}</div>
-                    )}
                     <div className="px-3 py-1 text-[10px] rounded-full bg-gray-700/40 text-gray-300 border border-gray-600 uppercase tracking-wide self-start md:self-auto">Assistance Mode: {assistMode}</div>
                 </div>
             </div>
@@ -445,82 +451,82 @@ export default function Step4ReviewExport({ onReadyChange }) {
                                 const warmupRows = includeWarmups ? (day.warmups || []).map(w => ({ pct: w.percent, reps: w.reps, weight: w.weight })) : [];
                                 const mainRows = (day.main || []).map(m => ({ pct: m.percent, reps: m.reps, weight: m.weight, amrap: !!m.amrap }));
                                 return (
-                                <div key={idx} className="bg-gray-800/50 border border-gray-700 rounded-xl p-5 space-y-4">
-                                    <div className="flex items-center justify-between">
-                                        <h3 className="text-base md:text-lg font-semibold text-white">Day {idx + 1} — {day.lift}</h3>
-                                        {day.supplemental?.type === 'bbb' && (
-                                            <span className="text-xs px-2 py-1 rounded bg-red-600/20 text-red-300 border border-red-500">BBB</span>
-                                        )}
-                                    </div>
-                                    <TableBlock title="WARM-UPS" rows={warmupRows} units={units} />
-                                    <TableBlock title="MAIN SETS" rows={mainRows} units={units} />
-                                    {/* Supplemental */}
-                                    {day.supplemental && day.supplemental.type === 'bbb' && (
-                                        <div className="text-xs text-red-200 bg-red-900/10 border border-red-700/40 rounded p-3 font-mono">
-                                            BBB: {day.supplemental.sets} × {day.supplemental.reps} @ {day.supplemental.weight}{units}
+                                    <div key={idx} className="bg-gray-800/50 border border-gray-700 rounded-xl p-5 space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <h3 className="text-base md:text-lg font-semibold text-white">Day {idx + 1} — {day.lift}</h3>
+                                            {day.supplemental?.type === 'bbb' && (
+                                                <span className="text-xs px-2 py-1 rounded bg-red-600/20 text-red-300 border border-red-500">BBB</span>
+                                            )}
                                         </div>
-                                    )}
-                                    {/* Assistance */}
-                                    {/* Assistance (inline condensed) */}
-                                    <div className="mt-2">
-                                        <div className="font-medium text-xs text-gray-300">Assistance</div>
-                                        {Array.isArray(day.assistance) && day.assistance.length > 0 ? (
-                                            <div className="text-[11px] opacity-80 text-gray-400 space-y-0.5">
-                                                {day.assistance.map((a, i) => (
-                                                    <div key={i}>{a.block ? (<><span className="text-gray-300 font-semibold">{a.block}:</span> {a.name} {a.sets}x{a.reps}</>) : (<>{a.name} {a.sets}x{a.reps}</>)}</div>
-                                                ))}
+                                        <TableBlock title="WARM-UPS" rows={warmupRows} units={units} />
+                                        <TableBlock title="MAIN SETS" rows={mainRows} units={units} />
+                                        {/* Supplemental */}
+                                        {day.supplemental && day.supplemental.type === 'bbb' && (
+                                            <div className="text-xs text-red-200 bg-red-900/10 border border-red-700/40 rounded p-3 font-mono">
+                                                BBB: {day.supplemental.sets} × {day.supplemental.reps} @ {day.supplemental.weight}{units}
                                             </div>
-                                        ) : (
-                                            <div className="text-[11px] opacity-80 text-gray-500">None</div>
                                         )}
-                                        {/* Inline custom editor (advanced) */}
-                                        {assistMode === 'custom' && (
-                                            <InlinePerDayCustomEditor
-                                                dayIndex={idx}
-                                                displayLift={day.lift}
-                                                state={state}
-                                                dispatch={dispatch}
-                                                templateKey={state.templateKey || state.pack || 'triumvirate'}
-                                            />
-                                        )}
-                                    </div>
-                                    {/* Conditioning (if available on day) */}
-                                    {day.conditioning && (
+                                        {/* Assistance */}
+                                        {/* Assistance (inline condensed) */}
                                         <div className="mt-2">
-                                            <div className="font-medium text-xs text-gray-300">Conditioning</div>
-                                            <div className="text-[11px] opacity-80 text-gray-400">
-                                                {day.conditioning.type}
-                                                {day.conditioning.minutes ? ` • ${day.conditioning.minutes} min` : ''}
-                                                {day.conditioning.intensity ? ` • ${day.conditioning.intensity}` : ''}
-                                            </div>
+                                            <div className="font-medium text-xs text-gray-300">Assistance</div>
+                                            {Array.isArray(day.assistance) && day.assistance.length > 0 ? (
+                                                <div className="text-[11px] opacity-80 text-gray-400 space-y-0.5">
+                                                    {day.assistance.map((a, i) => (
+                                                        <div key={i}>{a.block ? (<><span className="text-gray-300 font-semibold">{a.block}:</span> {a.name} {a.sets}x{a.reps}</>) : (<>{a.name} {a.sets}x{a.reps}</>)}</div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <div className="text-[11px] opacity-80 text-gray-500">None</div>
+                                            )}
+                                            {/* Inline custom editor (advanced) */}
+                                            {assistMode === 'custom' && (
+                                                <InlinePerDayCustomEditor
+                                                    dayIndex={idx}
+                                                    displayLift={day.lift}
+                                                    state={state}
+                                                    dispatch={dispatch}
+                                                    templateKey={state.templateKey || state.pack || 'triumvirate'}
+                                                />
+                                            )}
                                         </div>
-                                    )}
-                                    {/* Volume & Stress mini-panel */}
-                                    {dayMetrics[idx] && (
-                                        <div className="mt-2 border-t border-gray-700 pt-2 text-[11px] text-gray-400 leading-snug">
-                                            <div className="flex flex-wrap gap-x-4 gap-y-1">
-                                                <span className="text-gray-300 font-medium">Reps:</span>
-                                                <span>main {dayMetrics[idx].mainReps}</span>
-                                                <span>supp {dayMetrics[idx].suppReps}</span>
-                                                <span>assist {dayMetrics[idx].assistReps}</span>
-                                                <span className="text-gray-300">(total {dayMetrics[idx].totalReps})</span>
+                                        {/* Conditioning (if available on day) */}
+                                        {day.conditioning && (
+                                            <div className="mt-2">
+                                                <div className="font-medium text-xs text-gray-300">Conditioning</div>
+                                                <div className="text-[11px] opacity-80 text-gray-400">
+                                                    {day.conditioning.type}
+                                                    {day.conditioning.minutes ? ` • ${day.conditioning.minutes} min` : ''}
+                                                    {day.conditioning.intensity ? ` • ${day.conditioning.intensity}` : ''}
+                                                </div>
                                             </div>
-                                            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
-                                                <span className="text-gray-300 font-medium">Tonnage:</span>
-                                                <span>main {dayMetrics[idx].mainTonnage}</span>
-                                                <span>supp {dayMetrics[idx].suppTonnage}</span>
-                                                <span className="text-gray-300">(total {dayMetrics[idx].totalTonnage})</span>
-                                                {dayMetrics[idx].warnings.map((w, wi) => (
-                                                    <span key={wi} title={w} className="px-1.5 py-0.5 bg-amber-700/30 border border-amber-500/50 text-amber-200 rounded inline-flex items-center gap-1">⚠</span>
-                                                ))}
+                                        )}
+                                        {/* Volume & Stress mini-panel */}
+                                        {dayMetrics[idx] && (
+                                            <div className="mt-2 border-t border-gray-700 pt-2 text-[11px] text-gray-400 leading-snug">
+                                                <div className="flex flex-wrap gap-x-4 gap-y-1">
+                                                    <span className="text-gray-300 font-medium">Reps:</span>
+                                                    <span>main {dayMetrics[idx].mainReps}</span>
+                                                    <span>supp {dayMetrics[idx].suppReps}</span>
+                                                    <span>assist {dayMetrics[idx].assistReps}</span>
+                                                    <span className="text-gray-300">(total {dayMetrics[idx].totalReps})</span>
+                                                </div>
+                                                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
+                                                    <span className="text-gray-300 font-medium">Tonnage:</span>
+                                                    <span>main {dayMetrics[idx].mainTonnage}</span>
+                                                    <span>supp {dayMetrics[idx].suppTonnage}</span>
+                                                    <span className="text-gray-300">(total {dayMetrics[idx].totalTonnage})</span>
+                                                    {dayMetrics[idx].warnings.map((w, wi) => (
+                                                        <span key={wi} title={w} className="px-1.5 py-0.5 bg-amber-700/30 border border-amber-500/50 text-amber-200 rounded inline-flex items-center gap-1">⚠</span>
+                                                    ))}
+                                                </div>
+                                                {/* Legend (shown once per day card) */}
+                                                <div className="mt-1 text-[10px] text-gray-500 italic">
+                                                    Legend: ⚠ badge appears when a category exceeds ~100 reps (soft guardrail). Aim for roughly 50–100 assistance reps per block. BBB recommended 50–70% TM.
+                                                </div>
                                             </div>
-                                            {/* Legend (shown once per day card) */}
-                                            <div className="mt-1 text-[10px] text-gray-500 italic">
-                                                Legend: ⚠ badge appears when a category exceeds ~100 reps (soft guardrail). Aim for roughly 50–100 assistance reps per block. BBB recommended 50–70% TM.
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
+                                        )}
+                                    </div>
                                 );
                             })}
                         </div>

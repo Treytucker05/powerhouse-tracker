@@ -195,11 +195,14 @@ export default function Step3DesignCustom({ onValidChange }) {
                 <h2 className="text-lg font-semibold text-white">Design your cycle</h2>
                 <p className="text-sm text-gray-400 mt-1">Set your warm-ups, main % by week, and supplemental style. You can convert assistance to custom later.</p>
                 <ul className="mt-3 space-y-1 text-sm list-disc pl-5 text-gray-300">
-                    <li><strong>Warm-ups:</strong> 40/50/60% of TM to ramp without fatigue.</li>
-                    <li><strong>Main:</strong> Week 1–3 last set is <strong>AMRAP</strong>; Week 4 is <strong>deload</strong> (no AMRAP).</li>
-                    <li><strong>Supplemental (BBB):</strong> 5×10 @ 60% TM (<strong>same lift</strong> by default).</li>
+                        <li><strong>Warm-ups:</strong> 40/50/60% of TM ramps without fatigue.</li>
+                        <li><strong>Main:</strong> Week 1–3 last set AMRAP; Week 4 deload (no AMRAP).</li>
+                        <li><strong>Supplemental (BBB):</strong> 5×10 @ 50–70% (start 50–60% if new).</li>
                 </ul>
-                <p className="text-xs text-gray-500 mt-3">Change days/split in Step 2. Rounding set in Step 1.</p>
+                <p className="text-xs text-gray-500 mt-3 flex flex-col gap-1">
+                    <span>Change days/split in Step 2. Rounding set in Step 1.</span>
+                    <span className="text-gray-400 italic">Conditioning: 2 easy LISS sessions weekly; don’t let conditioning hurt lifting.</span>
+                </p>
             </div>
 
             {/* Schedule */}
@@ -377,7 +380,7 @@ export default function Step3DesignCustom({ onValidChange }) {
                         </div>
                         <div className="grid sm:grid-cols-3 gap-4">
                             <div className="space-y-1">
-                                <label className="block text-xs uppercase text-gray-400">% of TM</label>
+                                <label className="block text-xs uppercase text-gray-400">% of TM <span className="text-gray-500 lowercase font-normal">(50–70)</span></label>
                                 <input type="number" value={suppPct} min={50} max={70} onChange={e => setSuppPct(Number(e.target.value))} className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-2 text-sm text-white focus:border-red-500" />
                                 {!validation.supplementalOk && <p className="text-xs text-yellow-300">Range 50-70</p>}
                             </div>
@@ -440,12 +443,12 @@ export default function Step3DesignCustom({ onValidChange }) {
                         </select>
                         {assistMode !== 'custom' && (
                             <div className="text-[11px] text-gray-300 bg-gray-800/60 border border-gray-700 rounded p-3 leading-snug space-y-1">
-                                {assistMode === 'minimal' && <p>Main lift + minimal accessories. Choose recovery over fatigue while dialing TMs.</p>}
-                                {assistMode === 'triumvirate' && <p>Main + <strong>2</strong> moves (5×10–15). Balanced stimulus without junk volume.</p>}
-                                {assistMode === 'periodization_bible' && <p>Three blocks (Push/Pull/Core or Hams/Quads/Abs) 5×10–20 — higher total, structured variety.</p>}
-                                {assistMode === 'bodyweight' && <p>All assistance is bodyweight emphasis (push‑ups, chins, dips, core).</p>}
-                                {assistMode === 'custom' && <p>Define each assistance slot manually in Step 4 after conversion.</p>}
-                                <p className="text-gray-500">Switching modes later will override previous auto-picked items.</p>
+                                {assistMode === 'minimal' && <p>Baseline: push / pull / core. Keep total work small while TMs settle.</p>}
+                                {assistMode === 'triumvirate' && <p>Two focused assistance lifts (5 sets each). Coming soon.</p>}
+                                {assistMode === 'periodization_bible' && <p>Layered multi-block assistance (coming soon).</p>}
+                                {assistMode === 'bodyweight' && <p>Bodyweight emphasis for limited equipment.</p>}
+                                {assistMode === 'custom' && <p>Manually define each slot after converting in Step 4.</p>}
+                                <p className="text-gray-500">Target 25–50 total reps per assistance movement. Upper: Pull + Core. Lower: Single-Leg + Posterior chain. Use low end if BBB volume is high.</p>
                             </div>
                         )}
                     </div>
@@ -480,59 +483,74 @@ export default function Step3DesignCustom({ onValidChange }) {
                                             </div>
                                         )}
                                         <div className="space-y-3">
-                                            {dayRows.map((row, rowIdx) => (
-                                                <div key={rowIdx} className="border border-gray-700/60 rounded p-2 space-y-2 bg-gray-800/30">
-                                                    <div className="grid grid-cols-12 gap-2 items-end">
-                                                        <div className="col-span-4">
-                                                            <label className="block text-[10px] uppercase text-gray-500 mb-1">Name</label>
-                                                            <input value={row.name} onChange={e => updateCustomRow(lift, rowIdx, { name: e.target.value })} className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1.5 text-xs text-white focus:border-red-500" placeholder="Movement" />
+                                            {dayRows.map((row, rowIdx) => {
+                                                const rowVolume = (Number(row.sets) || 0) * (Number(row.reps) || 0);
+                                                return (
+                                                    <div key={rowIdx} className="border border-gray-700/60 rounded p-2 space-y-2 bg-gray-800/30">
+                                                        <div className="grid grid-cols-12 gap-2 items-end">
+                                                            <div className="col-span-4">
+                                                                <label className="block text-[10px] uppercase text-gray-500 mb-1">Name</label>
+                                                                <input value={row.name} onChange={e => updateCustomRow(lift, rowIdx, { name: e.target.value })} className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1.5 text-xs text-white focus:border-red-500" placeholder="Movement" />
+                                                            </div>
+                                                            <div className="col-span-2">
+                                                                <label className="block text-[10px] uppercase text-gray-500 mb-1">Sets</label>
+                                                                <input type="number" value={row.sets} min={1} max={10} onChange={e => updateCustomRow(lift, rowIdx, { sets: Number(e.target.value) })} className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1.5 text-xs text-white focus:border-red-500" />
+                                                            </div>
+                                                            <div className="col-span-2">
+                                                                <label className="block text-[10px] uppercase text-gray-500 mb-1">Reps</label>
+                                                                <input type="number" value={row.reps} min={1} max={30} onChange={e => updateCustomRow(lift, rowIdx, { reps: Number(e.target.value) })} className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1.5 text-xs text-white focus:border-red-500" />
+                                                            </div>
+                                                            <div className="col-span-2">
+                                                                <label className="block text-[10px] uppercase text-gray-500 mb-1">Block</label>
+                                                                <input value={row.block || ''} onChange={e => updateCustomRow(lift, rowIdx, { block: e.target.value })} className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1.5 text-xs text-white focus:border-red-500" placeholder="(opt)" />
+                                                            </div>
+                                                            <div className="col-span-2 flex items-center gap-1">
+                                                                <div className="text-[10px] px-1.5 py-1 rounded bg-gray-700/50 border border-gray-600 text-gray-300 font-mono" title="Sets × Reps volume">
+                                                                    {(row.sets || 0)}×{(row.reps || 0)}
+                                                                </div>
+                                                                <ToggleButton on={false} onClick={() => setSwapTarget({ lift, rowIdx })} className="text-xs px-2 py-1">Swap</ToggleButton>
+                                                                <ToggleButton on={false} onClick={() => removeCustomRow(lift, rowIdx)} className="text-xs px-2 py-1">✕</ToggleButton>
+                                                            </div>
                                                         </div>
-                                                        <div className="col-span-2">
-                                                            <label className="block text-[10px] uppercase text-gray-500 mb-1">Sets</label>
-                                                            <input type="number" value={row.sets} min={1} max={10} onChange={e => updateCustomRow(lift, rowIdx, { sets: Number(e.target.value) })} className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1.5 text-xs text-white focus:border-red-500" />
-                                                        </div>
-                                                        <div className="col-span-2">
-                                                            <label className="block text-[10px] uppercase text-gray-500 mb-1">Reps</label>
-                                                            <input type="number" value={row.reps} min={1} max={30} onChange={e => updateCustomRow(lift, rowIdx, { reps: Number(e.target.value) })} className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1.5 text-xs text-white focus:border-red-500" />
-                                                        </div>
-                                                        <div className="col-span-2">
-                                                            <label className="block text-[10px] uppercase text-gray-500 mb-1">Block</label>
-                                                            <input value={row.block || ''} onChange={e => updateCustomRow(lift, rowIdx, { block: e.target.value })} className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1.5 text-xs text-white focus:border-red-500" placeholder="(opt)" />
-                                                        </div>
-                                                        <div className="col-span-2 flex items-center gap-1">
-                                                            <ToggleButton on={false} onClick={() => setSwapTarget({ lift, rowIdx })} className="text-xs px-2 py-1">Swap</ToggleButton>
-                                                            <ToggleButton on={false} onClick={() => removeCustomRow(lift, rowIdx)} className="text-xs px-2 py-1">✕</ToggleButton>
-                                                        </div>
+                                                        {swapTarget && swapTarget.lift === lift && swapTarget.rowIdx === rowIdx && (
+                                                            <div className="mt-1">
+                                                                <AssistanceCatalogPicker
+                                                                    block={row.block}
+                                                                    equipment={equip}
+                                                                    onPick={(x) => {
+                                                                        // Preserve existing sets/reps; update name/id/block
+                                                                        updateCustomRow(lift, rowIdx, { name: x.name, id: x.id, block: x.block || row.block });
+                                                                        // Simple volume mismatch hint (if default sets*approxReps differs > 60%)
+                                                                        try {
+                                                                            const parseReps = (r) => (typeof r === 'string' ? Number(r.split(/[^0-9]/).filter(Boolean)[0]) : r) || 0;
+                                                                            const curVol = (row.sets || 0) * (row.reps || 0);
+                                                                            const newVol = (x.sets || 0) * parseReps(x.reps);
+                                                                            if (curVol && newVol && (newVol / curVol > 1.6 || curVol / newVol > 1.6)) {
+                                                                                // attach transient flag
+                                                                                updateCustomRow(lift, rowIdx, { volumeWarn: true });
+                                                                                setTimeout(() => updateCustomRow(lift, rowIdx, { volumeWarn: false }), 3000);
+                                                                            }
+                                                                        } catch { /* noop */ }
+                                                                        setSwapTarget(null);
+                                                                    }}
+                                                                    onClose={() => setSwapTarget(null)}
+                                                                />
+                                                            </div>
+                                                        )}
+                                                        {row.volumeWarn && <div className="text-[10px] text-amber-300">Volume mismatch vs default suggestion – adjust if needed.</div>}
                                                     </div>
-                                                    {swapTarget && swapTarget.lift === lift && swapTarget.rowIdx === rowIdx && (
-                                                        <div className="mt-1">
-                                                            <AssistanceCatalogPicker
-                                                                block={row.block}
-                                                                equipment={equip}
-                                                                onPick={(x) => {
-                                                                    // Preserve existing sets/reps; update name/id/block
-                                                                    updateCustomRow(lift, rowIdx, { name: x.name, id: x.id, block: x.block || row.block });
-                                                                    // Simple volume mismatch hint (if default sets*approxReps differs > 60%)
-                                                                    try {
-                                                                        const parseReps = (r) => (typeof r === 'string' ? Number(r.split(/[^0-9]/).filter(Boolean)[0]) : r) || 0;
-                                                                        const curVol = (row.sets || 0) * (row.reps || 0);
-                                                                        const newVol = (x.sets || 0) * parseReps(x.reps);
-                                                                        if (curVol && newVol && (newVol / curVol > 1.6 || curVol / newVol > 1.6)) {
-                                                                            // attach transient flag
-                                                                            updateCustomRow(lift, rowIdx, { volumeWarn: true });
-                                                                            setTimeout(() => updateCustomRow(lift, rowIdx, { volumeWarn: false }), 3000);
-                                                                        }
-                                                                    } catch { /* noop */ }
-                                                                    setSwapTarget(null);
-                                                                }}
-                                                                onClose={() => setSwapTarget(null)}
-                                                            />
-                                                        </div>
-                                                    )}
-                                                    {row.volumeWarn && <div className="text-[10px] text-amber-300">Volume mismatch vs default suggestion – adjust if needed.</div>}
-                                                </div>
-                                            ))}
+                                                );
+                                            })}
                                             {dayRows.length === 0 && <div className="text-xs text-gray-500">No assistance added.</div>}
+                                            {dayRows.length > 0 && (() => {
+                                                const dailyVolume = dayRows.reduce((sum, r) => sum + ((Number(r.sets) || 0) * (Number(r.reps) || 0)), 0);
+                                                return (
+                                                    <div className={`mt-1 text-[11px] flex items-center gap-2 ${dailyVolume > 100 ? 'text-amber-300' : 'text-gray-400'}`}>
+                                                        <span className="font-mono px-1.5 py-0.5 rounded bg-gray-700/40 border border-gray-600 text-gray-300">Total: {dailyVolume}</span>
+                                                        {dailyVolume > 100 && <span className="text-amber-300">High assistance volume – ensure recovery.</span>}
+                                                    </div>
+                                                );
+                                            })()}
                                         </div>
                                     </div>
                                 );
@@ -546,6 +564,21 @@ export default function Step3DesignCustom({ onValidChange }) {
                         <span>Custom assistance invalid: ensure names & reps/sets within allowed ranges.</span>
                     </div>
                 )}
+                {assistMode === 'custom' && (() => {
+                    // Weekly cumulative assistance volume (sum of all sets*reps across days)
+                    const weeklyVolume = order.reduce((sum, lift) => {
+                        const rows = customPlan[lift] || [];
+                        return sum + rows.reduce((s, r) => s + ((Number(r.sets) || 0) * (Number(r.reps) || 0)), 0);
+                    }, 0);
+                    if (!weeklyVolume) return null;
+                    const high = weeklyVolume > 400; // heuristic threshold; > ~400 reps/week of assistance can be high alongside main + supplemental
+                    return (
+                        <div className={`mt-3 text-[11px] flex items-center gap-2 ${high ? 'text-amber-300' : 'text-gray-400'}`}>
+                            <span className="font-mono px-1.5 py-0.5 rounded bg-gray-700/40 border border-gray-600 text-gray-300">Weekly assistance reps: {weeklyVolume}</span>
+                            {high && <span className="text-amber-300">High cumulative assistance – monitor recovery.</span>}
+                        </div>
+                    );
+                })()}
                 {assistMode !== 'custom' && (
                     <div className="space-y-3">
                         <div className="text-[11px] text-gray-300 bg-gray-800/60 border border-gray-700 rounded p-3 leading-snug">
