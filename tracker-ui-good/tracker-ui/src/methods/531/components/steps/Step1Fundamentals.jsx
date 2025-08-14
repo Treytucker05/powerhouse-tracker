@@ -196,8 +196,8 @@ export default function Step1Fundamentals({ onValidChange }) {
                         <span className={`px-3 py-1 rounded-md text-[11px] font-medium flex items-center gap-1 bg-gray-900 border ${finalTM ? 'border-gray-600 text-gray-200' : 'border-gray-700 text-gray-500'}`}>
                             Current TM: <span className={`${finalTM ? 'text-green-400' : 'text-gray-500'}`}>{finalTM || '—'}</span>
                         </span>
-                        {validation.level !== 'neutral' && (
-                            <span className={`px-2 py-1 rounded text-[10px] font-medium border ${validation.level === 'success' ? 'bg-green-500/15 text-green-400 border-green-600/40' : validation.level === 'warning' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-600/40' : 'bg-red-500/15 text-red-400 border-red-600/40'}`}>{validation.level === 'success' ? 'In Range' : validation.level === 'warning' ? 'Low' : 'High'}</span>
+                        {(validation.level === 'warning' || validation.level === 'danger') && (
+                            <span className={`px-2 py-1 rounded text-[10px] font-medium border ${validation.level === 'warning' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-600/40' : 'bg-red-500/15 text-red-400 border-red-600/40'}`}>{validation.level === 'warning' ? 'Low' : 'High'}</span>
                         )}
                     </div>
                 </div>
