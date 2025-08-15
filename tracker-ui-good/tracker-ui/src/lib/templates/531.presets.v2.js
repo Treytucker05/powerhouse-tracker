@@ -50,17 +50,37 @@ export function getDefaultSchedule() {
     };
 }
 
-export function presetBBB({ tmPct, units }) {
+/**
+ * presetBBB
+ * Extended to support:
+ *  - variant: 'standard' | 'challenge'
+ *  - startPercent: number (30|40|50|60) – initial cycle % of TM for 5x10
+ *  - progressTo: number (optional target % after several cycles for standard path)
+ *  - pairing: 'same' | 'opposite'
+ *  - challengeStages: [30,45,60] hard-coded progression (3-Month Challenge)
+ */
+export function presetBBB({ tmPct, units, options = {} }) {
+    const variant = options.variant || 'standard';
+    const pairing = options.pairing || 'same'; // opposite allowed
+    const startPercent = (() => {
+        if (variant === 'challenge') return 30; // cycle 1
+        return options.startPercent || 50; // standard start
+    })();
+    const progressTo = variant === 'standard' ? (options.progressTo || 60) : 60; // end target for display
+    const challengeStages = [30, 45, 60];
     return {
         key: TEMPLATE_KEYS.BBB,
         loadingOption: 1,
         schedule: getDefaultSchedule(),
         supplemental: {
             strategy: 'bbb',
-            pairing: 'same', // 'same' | 'opposite'
-            percentOfTM: 50,
+            pairing, // 'same' | 'opposite'
+            percentOfTM: startPercent,
             sets: 5,
-            reps: 10
+            reps: 10,
+            variant,
+            progressTo,
+            challengeStages
         },
         assistance: {
             mode: 'minimal',
@@ -157,11 +177,11 @@ export function presetJackShit() {
     };
 }
 
-export function getTemplatePreset(key, ctx) {
+export function getTemplatePreset(key, ctx, opts = {}) {
     const state = ctx?.state || {};
     const baseArgs = { tmPct: state.tmPct, units: state.units };
     switch (key) {
-        case TEMPLATE_KEYS.BBB: return presetBBB(baseArgs);
+        case TEMPLATE_KEYS.BBB: return presetBBB({ ...baseArgs, options: opts.bbb || {} });
         case TEMPLATE_KEYS.TRIUMVIRATE: return presetTriumvirate();
         case TEMPLATE_KEYS.PERIODIZATION_BIBLE: return presetPeriodizationBible();
         case TEMPLATE_KEYS.BODYWEIGHT: return presetBodyweight();

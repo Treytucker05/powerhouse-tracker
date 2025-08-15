@@ -10,7 +10,7 @@ export default function Step4CycleStructure({ data, updateData }) {
         squat: 1,
         bench: 1,
         deadlift: 1,
-        overhead_press: 1
+        press: 1
     });
     const [usePerLiftOptions, setUsePerLiftOptions] = useState(data.usePerLiftOptions || false);
     const [deadliftStyle, setDeadliftStyle] = useState(data.deadliftStyle || 'dead_stop');
@@ -66,7 +66,7 @@ export default function Step4CycleStructure({ data, updateData }) {
         squat: 'Squat',
         bench: 'Bench Press',
         deadlift: 'Deadlift',
-        overhead_press: 'Overhead Press'
+        press: 'Overhead Press'
     };
 
     const repTargets = {
@@ -102,7 +102,7 @@ export default function Step4CycleStructure({ data, updateData }) {
         let tm = currentTM;
 
         // Increment rules: +5 for upper body, +10 for lower body
-        const increment = (lift === 'bench' || lift === 'overhead_press') ? 5 : 10;
+        const increment = (lift === 'bench' || lift === 'press') ? 5 : 10;
 
         for (let cycle = 1; cycle <= cycles; cycle++) {
             if (cycle > 1) {

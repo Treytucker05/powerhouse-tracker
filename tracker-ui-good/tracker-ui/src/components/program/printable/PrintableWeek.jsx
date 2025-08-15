@@ -5,7 +5,7 @@ import { buildWarmups, buildMainSets } from '../../../lib/fiveThreeOne/percentTa
 import { deriveLiftDayMap, DAYS } from '../../../lib/fiveThreeOne/scheduleHelpers.js';
 
 const LIFT_LABEL = {
-    overhead_press: 'Overhead Press',
+    press: 'Overhead Press',
     bench: 'Bench Press',
     squat: 'Squat',
     deadlift: 'Deadlift',
@@ -26,7 +26,7 @@ export default function PrintableWeek({ state }) {
     // Current wizard shape stores per-lift data under state.lifts with .tm
     const lifts = state?.lifts || {};
     const tms = {
-        overhead_press: Number(lifts?.press?.tm ?? lifts?.overhead_press?.tm ?? 0),
+        press: Number(lifts?.press?.tm ?? 0),
         bench: Number(lifts?.bench?.tm ?? 0),
         squat: Number(lifts?.squat?.tm ?? 0),
         deadlift: Number(lifts?.deadlift?.tm ?? 0)
@@ -65,7 +65,7 @@ export default function PrintableWeek({ state }) {
             <div className="print-grid">
                 {dayEntries.map(({ day, lift }) => {
                     // map schedule keys to TM keys
-                    const tmKey = lift === 'press' ? 'overhead_press' : lift;
+                    const tmKey = lift;
                     const tm = Number(tms?.[tmKey] || 0);
 
                     const sets = tm ? calcSetsForLift(tm, loadingOption, week, includeWarmups, roundInc) : [];

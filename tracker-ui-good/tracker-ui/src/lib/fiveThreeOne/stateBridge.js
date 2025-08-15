@@ -12,7 +12,7 @@ export function getTrainingMaxesFromAny(contextMaybe) {
     if (contextMaybe?.trainingMaxes) return contextMaybe.trainingMaxes;
     // Try known localStorage key
     return getLocal('trainingMaxes', {
-        squat: 0, bench: 0, deadlift: 0, overhead_press: 0
+        squat: 0, bench: 0, deadlift: 0, press: 0
     });
 }
 

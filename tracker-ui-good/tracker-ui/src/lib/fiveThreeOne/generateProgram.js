@@ -4,7 +4,7 @@ import { deriveLiftDayMap, DAYS } from './scheduleHelpers.js';
 
 function liftLabel(key) {
     return ({
-        overhead_press: 'Overhead Press',
+        press: 'Overhead Press',
         press: 'Overhead Press',
         bench: 'Bench Press',
         squat: 'Squat',
@@ -18,8 +18,8 @@ function liftLabel(key) {
 function tmFromState(state, liftKey) {
     // Primary (current wizard shape)
     const lifts = state?.lifts || {};
-    if (liftKey === 'overhead_press' || liftKey === 'press') {
-        return Number(lifts?.press?.tm ?? lifts?.overhead_press?.tm ?? 0);
+    if (liftKey === 'press') {
+        return Number(lifts?.press?.tm ?? 0);
     }
     return Number(lifts?.[liftKey]?.tm ?? 0);
 }
@@ -47,7 +47,7 @@ function assistanceForLift(state, liftKey) {
  * Build a single day entry with warm-ups + main sets for a week
  */
 function buildDayEntry({ state, day, lift, week, includeWarmups, roundInc, loadingOption }) {
-    const tm = tmFromState(state, lift === 'press' ? 'overhead_press' : lift);
+    const tm = tmFromState(state, lift);
     if (!tm) {
         return {
             day,
@@ -118,7 +118,7 @@ export function generateFiveThreeOneProgram(state = {}) {
         meta: { createdAt, generator: 'powerhouse-tracker', programType: '5/3/1' },
         config: cfg,
         lifts: {
-            overhead_press: tmFromState(state, 'overhead_press'),
+            press: tmFromState(state, 'press'),
             bench: tmFromState(state, 'bench'),
             squat: tmFromState(state, 'squat'),
             deadlift: tmFromState(state, 'deadlift')

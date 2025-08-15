@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProgramV2 } from "../methods/531/contexts/ProgramContextV2.jsx"; // real context (JSX module)
+import { startCycle as persistStartCycle } from "../state/programCycle";
 
 /** ========= Types (from spec) ========= **/
 type WeeklyOption = "opt1" | "opt2"; // opt1: 65/75/85, 70/80/90, 75/85/95 ; opt2 per book, p.22
@@ -168,10 +169,17 @@ export default function BuilderReviewPage() {
 
     const scheduleOrder: LiftKey[] = ["press", "deadlift", "bench", "squat"];
 
-    function startCycle(payload: ReviewState) {
-        // TODO: integrate with persistActiveCycle for unified active cycle persistence.
-        try { localStorage.setItem("ph.activePlan.v2", JSON.stringify(payload)); } catch { /* ignore */ }
-        navigate("/train-today");
+    const isReady = !!state?.tm_by_lift?.press && !!state?.tm_by_lift?.bench && !!state?.tm_by_lift?.squat && !!state?.tm_by_lift?.deadlift && !!state?.days && Object.keys(state.days).length > 0;
+
+    function handleStartCycle() {
+        if (!isReady) return;
+        try {
+            persistStartCycle(state, { upper: state.meta.progression?.upper_inc ?? 5, lower: state.meta.progression?.lower_inc ?? 10 });
+            navigate('/program'); // program overview route
+        } catch (e) {
+            console.error(e);
+            alert('Could not start cycle. Verify Training Maxes and plan data.');
+        }
     }
 
     return (
@@ -189,7 +197,8 @@ export default function BuilderReviewPage() {
 
             <FooterActions
                 onBack={() => navigate(-1)}
-                onStartCycle={() => startCycle(state)}
+                onStartCycle={handleStartCycle}
+                startDisabled={!isReady}
             />
         </main>
     );
@@ -396,13 +405,14 @@ function Badge({ children }: { children: React.ReactNode }) {
     return <span className="inline-flex items-center rounded-full border px-2 py-1 text-xs">{children}</span>;
 }
 
-function FooterActions({ onBack, onStartCycle }: { onBack: () => void; onStartCycle: () => void }) {
+function FooterActions({ onBack, onStartCycle, startDisabled }: { onBack: () => void; onStartCycle: () => void; startDisabled?: boolean }) {
     return (
         <footer className="sticky bottom-0 mt-10 flex justify-between gap-3 border-t bg-white/90 p-4 backdrop-blur">
             <button onClick={onBack} className="rounded-lg border px-4 py-2">Back</button>
             <button
                 onClick={onStartCycle}
-                className="rounded-lg bg-red-600 px-4 py-2 font-medium text-white hover:bg-red-700"
+                disabled={startDisabled}
+                className={`rounded-lg px-4 py-2 font-medium text-white ${startDisabled ? 'bg-red-300 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'}`}
             >
                 Start Cycle
             </button>

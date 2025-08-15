@@ -11,7 +11,7 @@ export default function Step7Week3Execution({ data = {}, updateData }) {
     // Threaded inputs from prior steps (defensive defaults)
     const trainingMaxes = data?.trainingMaxes || {};
     const loadingOption = data?.loadingOption || 1;
-    const schedule = data?.schedule || { frequency: '4day', liftOrder: ['overhead_press', 'deadlift', 'bench', 'squat'] };
+    const schedule = data?.schedule || { frequency: '4day', liftOrder: ['press', 'deadlift', 'bench', 'squat'] };
     const week2Results = data?.week2Results || {}; // for PR comparison via e1RM
 
     // Week 3 percentages and reps
@@ -24,7 +24,7 @@ export default function Step7Week3Execution({ data = {}, updateData }) {
         squat: 'Squat',
         bench: 'Bench Press',
         deadlift: 'Deadlift',
-        overhead_press: 'Overhead Press'
+        press: 'Overhead Press'
     };
 
     // Round up to nearest 5 lbs to stay conservative on heavy week

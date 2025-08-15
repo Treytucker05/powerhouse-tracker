@@ -12,7 +12,7 @@ export default function Step6Week2Execution({ data = {}, updateData }) {
     // Integration with previous steps - all with safe fallbacks
     const trainingMaxes = data?.trainingMaxes || {};
     const loadingOption = data?.loadingOption || 1;
-    const schedule = data?.schedule || { frequency: '4day', liftOrder: ['overhead_press', 'deadlift', 'bench', 'squat'] };
+    const schedule = data?.schedule || { frequency: '4day', liftOrder: ['press', 'deadlift', 'bench', 'squat'] };
 
     // Week 2 percentages based on loading option
     const week2Percentages = loadingOption === 1
@@ -32,7 +32,7 @@ export default function Step6Week2Execution({ data = {}, updateData }) {
         squat: 'Squat',
         bench: 'Bench Press',
         deadlift: 'Deadlift',
-        overhead_press: 'Overhead Press'
+        press: 'Overhead Press'
     };
 
     // Handle AMRAP result input

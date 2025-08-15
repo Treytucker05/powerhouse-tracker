@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { ChevronRight, CheckCircle2, Info } from 'lucide-react';
+import { ChevronRight, CheckCircle2, Info, AlertTriangle } from 'lucide-react';
 import ToggleButton from './ToggleButton.jsx';
 import { useNavigate } from "react-router-dom";
 import { useProgramV2 } from "../contexts/ProgramContextV2.jsx";
@@ -71,6 +71,10 @@ const STEPS = [
 function WizardShell() {
     const [stepIndex, setStepIndex] = useState(0);
     const [stepValidation, setStepValidation] = useState({ fundamentals: false, design: false, review: false, progress: true });
+    // Step1 feedback state
+    const [step1Error, setStep1Error] = useState(null); // string message
+    const [step1Missing, setStep1Missing] = useState([]); // array of lift keys / field labels
+    const [step1FlashToken, setStep1FlashToken] = useState(0); // increment to trigger child highlight
     const navigate = useNavigate();
     const { state, dispatch } = useProgramV2();
     const packRef = useRef(null);
@@ -209,11 +213,11 @@ function WizardShell() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [state.daysPerWeek, state.advanced?.split4, state.schedule?.split4, state.week, state.cycle, state.units, state.rounding, state.tmPct, state.lifts?.squat?.tm, state.lifts?.bench?.tm, state.lifts?.deadlift?.tm, state.lifts?.press?.tm, state.equipment, state.templateKey, state.assistance?.mode, state.assistance?.templateId]);
     function humanLiftName(key) {
-        return key === "overhead_press" ? "Press" : key[0].toUpperCase() + key.slice(1);
+        return key === "press" ? "Press" : key[0].toUpperCase() + key.slice(1);
     }
     function oppositeOf(liftKey) {
-        if (liftKey === "overhead_press") return "bench";
-        if (liftKey === "bench") return "overhead_press";
+        if (liftKey === "press") return "bench";
+        if (liftKey === "bench") return "press";
         if (liftKey === "squat") return "deadlift";
         if (liftKey === "deadlift") return "squat";
         return liftKey;
@@ -224,7 +228,6 @@ function WizardShell() {
             units = "lbs",
             rounding = { increment: 5, mode: "nearest" },
             loadingOption = 1,
-            trainingMaxes = {},
             schedule = {},
             supplemental = { strategy: "none" },
             assistance = { mode: "minimal" },
@@ -233,12 +236,20 @@ function WizardShell() {
             conditioning: conditioningState
         } = state || {};
 
-        const tmKeys = ["squat", "bench", "deadlift", "overhead_press"];
+        // Derive training maxes from current lift TMs in context (state does not store a standalone trainingMaxes object)
+        const trainingMaxes = {
+            squat: state?.lifts?.squat?.tm || 0,
+            bench: state?.lifts?.bench?.tm || 0,
+            deadlift: state?.lifts?.deadlift?.tm || 0,
+            press: state?.lifts?.press?.tm || 0
+        };
+
+        const tmKeys = ["squat", "bench", "deadlift", "press"];
         const tmOk = tmKeys.every(k => Number(trainingMaxes?.[k]) > 0);
         if (!tmOk) return;
 
         const freq = Number(schedule?.frequency || 4);
-        const defaultDays = ["overhead_press", "deadlift", "bench", "squat"];
+        const defaultDays = ["press", "deadlift", "bench", "squat"];
         const days = Array.isArray(schedule?.days) && schedule.days.length === freq
             ? schedule.days
             : defaultDays.slice(0, freq);
@@ -261,6 +272,11 @@ function WizardShell() {
         }
         const weekdayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
+        // Normalize rounding (state.rounding may be a string from Step1Fundamentals or an object from legacy/other flows)
+        const roundingConfig = typeof rounding === 'object'
+            ? { increment: rounding.increment || (units === 'kg' ? 2.5 : 5), mode: rounding.mode || 'nearest' }
+            : { increment: units === 'kg' ? 2.5 : 5, mode: rounding || 'nearest' };
+
         const weeks = [];
         for (let w = 0; w < 4; w++) {
             const daysOut = days.map((liftKey, idx) => {
@@ -270,8 +286,8 @@ function WizardShell() {
                     includeWarmups: !!schedule?.includeWarmups,
                     warmupScheme: schedule?.warmupScheme,
                     tm,
-                    roundingIncrement: rounding.increment,
-                    roundingMode: rounding.mode,
+                    roundingIncrement: roundingConfig.increment,
+                    roundingMode: roundingConfig.mode,
                     units
                 });
 
@@ -279,8 +295,8 @@ function WizardShell() {
                     tm,
                     weekIndex: w,
                     option: loadingOption || 1,
-                    roundingIncrement: rounding.increment,
-                    roundingMode: rounding.mode,
+                    roundingIncrement: roundingConfig.increment,
+                    roundingMode: roundingConfig.mode,
                     units
                 });
 
@@ -291,7 +307,7 @@ function WizardShell() {
                     const bbbTm = Number(trainingMaxes?.[bbbLiftKey] || 0);
                     const pct = Number(supplemental?.percentOfTM || 50);
                     const raw = bbbTm * (pct / 100);
-                    const weight = roundToIncrement(raw, rounding.increment, rounding.mode);
+                    const weight = roundToIncrement(raw, roundingConfig.increment, roundingConfig.mode);
                     supplementalOut = {
                         type: "bbb",
                         pairing,
@@ -352,7 +368,7 @@ function WizardShell() {
                 loadingOption
             },
             trainingMaxes,
-            rounding,
+            rounding: { increment: roundingConfig.increment, mode: roundingConfig.mode },
             schedule: {
                 frequency: freq,
                 days,
@@ -395,7 +411,35 @@ function WizardShell() {
 
     const handleNext = () => {
         if (canGoNext) {
+            // Clear any prior error context when advancing
+            if (stepIndex === 0) {
+                setStep1Error(null);
+                setStep1Missing([]);
+            }
             setStepIndex(prev => prev + 1);
+            return;
+        }
+        // If user clicked while disabled on Step 1, surface guidance
+        if (stepIndex === 0 && !canGoNext) {
+            const missing = [];
+            if (!(state?.units === 'lbs' || state?.units === 'lb' || state?.units === 'kg')) missing.push('units');
+            if (!state?.rounding) missing.push('rounding');
+            if (!(state?.tmPct === 0.9 || state?.tmPct === 0.85 || state?.tmPct === 0.90 || state?.tmPct === 0.850)) missing.push('TM %');
+            const liftsMissing = [];
+            for (const k of LIFTS) {
+                const tm = state?.lifts?.[k]?.tm;
+                if (!(Number.isFinite(tm) && tm > 0)) liftsMissing.push(k);
+            }
+            if (liftsMissing.length) missing.push(...liftsMissing.map(l => `${l} TM`));
+            setStep1Missing(missing);
+            const msg = missing.length ? `Still need: ${missing.join(', ')}` : 'Complete all required fields to continue.';
+            setStep1Error(msg);
+            // trigger child highlight animation
+            setStep1FlashToken(t => t + 1);
+            // auto-clear after delay
+            setTimeout(() => {
+                setStep1Error(null);
+            }, 4000);
         }
     };
 
@@ -448,7 +492,7 @@ function WizardShell() {
         switch (stepIndex) {
             case 0:
                 return (
-                    <Step1Fundamentals onValidChange={onFundamentalsValidChange} />
+                    <Step1Fundamentals onValidChange={onFundamentalsValidChange} flashToken={step1FlashToken} missing={step1Missing} />
                 );
             case 1:
                 return (
@@ -928,12 +972,20 @@ function WizardShell() {
                                 </div>
 
                                 {stepIndex === 0 && (
-                                    <ToggleButton
-                                        on={canGoNext}
-                                        disabled={!canGoNext}
-                                        onClick={handleNext}
-                                        className={`flex items-center gap-2 text-sm px-5 ${!canGoNext ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    >Next <ChevronRight className="w-4 h-4" /></ToggleButton>
+                                    <div className="flex flex-col items-end gap-2 relative">
+                                        <ToggleButton
+                                            on={canGoNext}
+                                            disabled={!canGoNext}
+                                            onClick={handleNext}
+                                            className={`flex items-center gap-2 text-sm px-5 ${!canGoNext ? 'opacity-50' : ''}`}
+                                        >Next <ChevronRight className="w-4 h-4" /></ToggleButton>
+                                        {!canGoNext && step1Error && (
+                                            <div className="flex items-start gap-2 text-xs max-w-xs p-2 rounded-md border border-amber-600/40 bg-amber-900/30 text-amber-300 shadow-lg animate-fade-in">
+                                                <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                                                <span>{step1Error}</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 )}
                                 {stepIndex === 2 && (
                                     <ToggleButton

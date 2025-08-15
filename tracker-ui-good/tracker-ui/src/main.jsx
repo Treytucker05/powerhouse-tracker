@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import './index.css'
 import App from './App.jsx'
 import { TrainingStateProvider } from './context/TrainingStateContext.jsx'
+import { ExerciseDBProvider } from './contexts/ExerciseDBContext.jsx'
 import { AppProvider } from './context/AppContext.jsx'
 import { ToastProvider } from './components/ui/Toast.jsx'
 import { SettingsProvider } from './contexts/SettingsContext.jsx'
@@ -25,13 +26,15 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <SettingsProvider>
-        <AppProvider>
-          <TrainingStateProvider>
-            <ToastProvider>
-              <App />
-            </ToastProvider>
-          </TrainingStateProvider>
-        </AppProvider>
+        <ExerciseDBProvider>
+          <AppProvider>
+            <TrainingStateProvider>
+              <ToastProvider>
+                <App />
+              </ToastProvider>
+            </TrainingStateProvider>
+          </AppProvider>
+        </ExerciseDBProvider>
       </SettingsProvider>
     </QueryClientProvider>
   </StrictMode>,

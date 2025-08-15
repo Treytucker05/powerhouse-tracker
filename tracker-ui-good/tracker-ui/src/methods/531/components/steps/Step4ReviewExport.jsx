@@ -26,7 +26,7 @@ const LIFT_KEY_MAP = {
     Press: 'press',
     Overhead: 'press'
 };
-const DISPLAY_LIFT_NAMES = { squat: 'Squat', bench: 'Bench', deadlift: 'Deadlift', press: 'Press', overhead_press: 'Press' };
+const DISPLAY_LIFT_NAMES = { squat: 'Squat', bench: 'Bench', deadlift: 'Deadlift', press: 'Press' };
 
 function deriveEffectiveConfig(state) {
     const merged = { ...state };
@@ -87,8 +87,8 @@ function useSafeNavigate() {
 }
 
 export default function Step4ReviewExport({ onReadyChange }) {
-    const { state, dispatch } = useProgramV2();
     const navigate = useSafeNavigate();
+    const { state, dispatch } = useProgramV2();
     const [starting, setStarting] = useState(false);
     const [showTemplateExplainer, setShowTemplateExplainer] = useState(false);
     const [showChangeTemplate, setShowChangeTemplate] = useState(false);
@@ -112,7 +112,7 @@ export default function Step4ReviewExport({ onReadyChange }) {
         squat: effective.lifts?.squat?.tm || 0,
         bench: effective.lifts?.bench?.tm || 0,
         deadlift: effective.lifts?.deadlift?.tm || 0,
-        overhead_press: effective.lifts?.press?.tm || effective.lifts?.overhead_press?.tm || 0
+        press: effective.lifts?.press?.tm || 0
     };
 
     const roundingMode = typeof effective.rounding === 'string' ? effective.rounding : (effective.rounding?.mode || 'nearest');
@@ -181,7 +181,6 @@ export default function Step4ReviewExport({ onReadyChange }) {
 
     function getTMForDisplayLift(display) {
         const key = mapLiftDisplayName(display);
-        if (key === 'press') return trainingMaxes.overhead_press; // unify
         return trainingMaxes[key] || 0;
     }
 
@@ -653,8 +652,14 @@ export default function Step4ReviewExport({ onReadyChange }) {
                             <ToggleButton on={false} disabled={!validation.valid} onClick={handlePrint} className="flex items-center justify-center gap-2 text-xs">
                                 <Printer className="w-4 h-4" /> <span>Print</span>
                             </ToggleButton>
-                            <ToggleButton on={false} disabled={!validation.valid || starting} onClick={onStartCycle} className="flex items-center justify-center gap-2 text-xs !bg-red-600/30 !border-red-500/60 hover:!bg-red-600/40">
-                                <span>{starting ? 'Starting…' : 'Start Cycle'}</span>
+                            <ToggleButton
+                                on={false}
+                                disabled={!validation.valid}
+                                onClick={() => navigate('/builder/review')}
+                                className="flex items-center justify-center gap-2 text-xs !bg-red-600/30 !border-red-500/60 hover:!bg-red-600/40"
+                                data-testid="start-final-review"
+                            >
+                                <span>Start Final Review</span>
                             </ToggleButton>
                             {exportError && <div className="text-xs text-red-400">{exportError}</div>}
                         </div>

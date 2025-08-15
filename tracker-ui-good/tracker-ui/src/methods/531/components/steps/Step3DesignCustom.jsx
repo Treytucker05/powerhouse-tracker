@@ -412,39 +412,103 @@ export default function Step3DesignCustom({ onValidChange }) {
                 )}
             </section>
 
-            {/* Equipment (polished chips) */}
-            <section className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-white">F) Equipment</h3>
+            {/* Equipment & Exercise Options (Redesigned Section F) */}
+            <section className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 space-y-6">
+                <div className="space-y-1">
+                    <h3 className="text-lg font-semibold text-white">F) Equipment & Exercise Options</h3>
+                    <p className="text-xs text-gray-400">Select available equipment to filter assistance exercise recommendations.</p>
+                    <p className="text-[11px] text-gray-500">Equipment selection determines which assistance exercises will be suggested and available for your program.</p>
                 </div>
-                <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-gray-200">Equipment <span className="text-gray-500">({equip.length}/{ALL_EQUIP.length})</span></span>
-                    <div className="text-xs text-gray-400">
-                        <button type="button" className="underline mr-3" onClick={() => setEquip([...ALL_EQUIP])}>All</button>
-                        <button type="button" className="underline" onClick={() => setEquip([])}>None</button>
-                    </div>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                    {ALL_EQUIP.map(id => {
-                        const active = equip.includes(id);
-                        const equipmentLabelMap = { bw: 'Bodyweight', db: 'Dumbbells', bb: 'Barbell', kb: 'Kettlebell' };
-                        const ambiguous = ['ghr', 'reverse_hyper'].includes(id);
-                        const label = equipmentLabelMap[id] || id;
+                {/* Profile Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    {[{
+                        id: 'full', title: 'Commercial Gym / Full Setup', badge: 'All Exercises Available', desc: 'Complete equipment access including machines, cables, specialty items', items: [...ALL_EQUIP]
+                    }, {
+                        id: 'home', title: 'Home Gym Essentials', badge: 'Most Exercises Available', desc: 'Basic home setup with key equipment for comprehensive training', items: ['bb', 'plate', 'bench', 'db', 'dip', 'rings', 'bw']
+                    }, {
+                        id: 'minimal', title: 'Minimal Equipment', badge: 'Core + Bodyweight', desc: 'Barbell‑centric with bodyweight accessories', items: ['bb', 'plate', 'bw', 'dip', 'rings', 'bench']
+                    }, {
+                        id: 'bodyweight', title: 'Bodyweight Only', badge: 'Bodyweight Only', desc: 'Calisthenics / core focus', items: ['bw', 'rings', 'dip', 'abwheel', 'box']
+                    }].map(card => {
+                        const active = JSON.stringify([...equip].sort()) === JSON.stringify([...card.items].sort());
                         return (
-                            <button
-                                key={id}
-                                type="button"
-                                className={`px-2 py-1 rounded text-[11px] border transition-colors ${active ? 'bg-red-600/70 border-red-500 text-white' : 'bg-gray-800 border-gray-600 text-gray-300 hover:border-gray-500'}`}
-                                onClick={() => toggleEquip(id)}
-                                title={ambiguous ? (id === 'ghr' ? 'Glute-Ham Raise machine' : 'Reverse hyperextension machine') : undefined}
-                                aria-pressed={active}
-                            >
-                                {label}
+                            <button key={card.id} type="button" onClick={() => setEquip([...new Set(card.items)])} className={`text-left bg-gray-900/50 border rounded p-3 hover:bg-gray-900 transition relative ${active ? 'border-red-500 ring-2 ring-red-600' : 'border-gray-700'}`}>
+                                <div className="flex items-start justify-between">
+                                    <div className="text-sm font-semibold text-white leading-snug pr-4">{card.title}</div>
+                                    {active && <span className="text-green-400 text-[11px] font-medium">Active</span>}
+                                </div>
+                                <div className="text-[11px] text-gray-300 mt-2 leading-snug">{card.desc}</div>
+                                <div className="mt-3 inline-block text-[10px] px-2 py-0.5 rounded border border-red-500 text-red-300 tracking-wide">{card.badge}</div>
                             </button>
                         );
                     })}
                 </div>
-                {equip.length === 0 && <div className="text-xs text-yellow-300">Select at least bodyweight (bw) or another implement.</div>}
+                {/* Categorized Custom Selection */}
+                <div className="space-y-5">
+                    {[{
+                        id: 'essential', label: 'Essential Equipment', note: 'Core barbell requirements', items: [['bb', 'Barbell'], ['plate', 'Plates'], ['bench', 'Bench'], ['bar', 'Straight Bar (Alt)']]
+                    }, {
+                        id: 'assistance', label: 'Assistance Equipment', note: 'Expands accessory selection', items: [['db', 'Dumbbells'], ['machine', 'Machines'], ['cable', 'Cable Machine'], ['band', 'Resistance Bands']]
+                    }, {
+                        id: 'specialty', label: 'Specialty Equipment', note: 'Variation / overload tools', items: [['kb', 'Kettlebell'], ['landmine', 'Landmine'], ['box', 'Plyo Box'], ['abwheel', 'Ab Wheel']]
+                    }, {
+                        id: 'bodyweight', label: 'Bodyweight Accessories', note: 'Calisthenics & core tools', items: [['bw', 'Bodyweight'], ['dip', 'Dip Station'], ['rings', 'Rings']]
+                    }].map(cat => (
+                        <div key={cat.id} className="bg-gray-900/40 border border-gray-700 rounded p-4 space-y-3">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="text-white font-medium text-sm">{cat.label}</div>
+                                    <div className="text-[11px] text-gray-400">{cat.note}</div>
+                                </div>
+                                {cat.id === 'essential' && !(['bb', 'plate', 'bench'].every(k => equip.includes(k))) && <span className="text-[10px] text-red-400">Incomplete</span>}
+                            </div>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                                {cat.items.map(([id, label]) => {
+                                    const on = equip.includes(id);
+                                    return (
+                                        <button key={id} type="button" onClick={() => toggleEquip(id)} className={`px-2 py-1 rounded border text-[11px] flex items-center justify-between gap-2 ${on ? 'border-red-500 bg-red-600/10 text-white' : 'border-gray-600 bg-gray-900/40 text-gray-300 hover:bg-gray-800/60'}`}>
+                                            <span className="truncate">{label}</span>
+                                            <span className={`w-3 h-3 rounded-full ${on ? 'bg-green-500' : 'bg-gray-600'}`}></span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                {/* Impact Preview (heuristic) */}
+                {(() => {
+                    const base = { pull: 4, push: 6, core: 6, single: 4, posterior: 3 };
+                    const impact = {
+                        bb: { push: 2, posterior: 3, single: 1 }, plate: { push: 1, posterior: 1 }, bench: { push: 4 }, db: { pull: 4, push: 3, single: 3 },
+                        cable: { pull: 4, push: 3, core: 2 }, machine: { push: 3, pull: 2 }, band: { pull: 2, push: 1, core: 1 }, kb: { posterior: 2, core: 2, single: 1 },
+                        bw: { core: 2, pull: 1, push: 1 }, dip: { push: 3 }, rings: { pull: 3, push: 2, core: 1 }, abwheel: { core: 4 }, box: { single: 2, posterior: 1 }, landmine: { posterior: 2, push: 1, single: 1 }
+                    };
+                    const tally = { ...base };
+                    equip.forEach(k => { if (impact[k]) Object.entries(impact[k]).forEach(([c, v]) => { tally[c] += v; }); });
+                    return (
+                        <div className="bg-gray-900/40 border border-gray-700 rounded p-4 space-y-3">
+                            <div className="flex items-center gap-2">
+                                <span className="text-white font-medium text-sm">Available Exercise Categories</span>
+                            </div>
+                            <p className="text-[11px] text-gray-400">With current selection: {tally.pull} pull, {tally.push} push, {tally.core} core ({tally.single} single‑leg, {tally.posterior} posterior).</p>
+                            <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-[11px]">
+                                {Object.entries(tally).map(([cat, val]) => (
+                                    <div key={cat} className="bg-gray-800/50 border border-gray-700 rounded p-2 flex flex-col gap-1">
+                                        <div className="text-gray-300 font-medium capitalize">{cat}</div>
+                                        <div className="flex items-center gap-2">
+                                            <div className="flex-1 h-2 bg-gray-700 rounded overflow-hidden">
+                                                <div style={{ width: Math.min(100, (val / (base[cat] + 20)) * 100) + '%' }} className="h-full bg-red-600/70"></div>
+                                            </div>
+                                            <div className="text-[10px] text-gray-400 w-6 text-right">{val}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="text-[10px] text-gray-500 italic">Illustrative counts only; final assistance builder will refine further.</div>
+                        </div>
+                    );
+                })()}
             </section>
 
             {/* Assistance */}

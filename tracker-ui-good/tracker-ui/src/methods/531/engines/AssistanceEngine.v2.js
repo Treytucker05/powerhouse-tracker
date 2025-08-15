@@ -2,9 +2,9 @@
 // Pure helpers for assistance weight calculation from TM with rounding.
 export function computeAssistanceLoad({
     method,            // 'percentOfTM' | 'bodyweight' | 'na' | 'percentOfBodyweight'
-    sourceLift,        // 'squat'|'bench'|'deadlift'|'overhead_press' | undefined
+    sourceLift,        // 'squat'|'bench'|'deadlift'|'press' | undefined
     percent = 0,       // e.g., 0.35 => 35% of TM
-    tms = {},          // { squat, bench, deadlift, overhead_press }
+    tms = {},          // { squat, bench, deadlift, press }
     bodyweight = 0,    // optional, if we later want % of BW for DB rows etc.
     roundingIncrement = 5,
     roundingMode = 'nearest',

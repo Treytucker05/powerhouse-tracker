@@ -47,13 +47,13 @@ const LIFT_LABELS = {
     squat: 'Squat',
     bench: 'Bench Press',
     deadlift: 'Deadlift',
-    overhead_press: 'Overhead Press',
+    press: 'Overhead Press',
     press: 'Overhead Press',
 };
 
 function liftKeysFromOrder(order) {
     // Normalize possible values
-    return order.map(k => (k === 'overhead_press' ? 'overhead_press' : k));
+    return order.map(k => (k === 'press' ? 'press' : k));
 }
 
 export default function PrintWeek() {

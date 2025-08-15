@@ -12,7 +12,7 @@ export default function Step8DeloadWeek({ data = {}, updateData }) {
 
     // Integration with previous steps - all with safe fallbacks
     const trainingMaxes = data?.trainingMaxes || {};
-    const schedule = data?.schedule || { frequency: '4day', liftOrder: ['overhead_press', 'deadlift', 'bench', 'squat'] };
+    const schedule = data?.schedule || { frequency: '4day', liftOrder: ['press', 'deadlift', 'bench', 'squat'] };
 
     // Deload percentages - SAME FOR ALL OPTIONS
     const deloadPercentages = [40, 50, 60];
@@ -29,7 +29,7 @@ export default function Step8DeloadWeek({ data = {}, updateData }) {
         squat: 'Squat',
         bench: 'Bench Press',
         deadlift: 'Deadlift',
-        overhead_press: 'Overhead Press'
+        press: 'Overhead Press'
     };
 
     // Handle session completion

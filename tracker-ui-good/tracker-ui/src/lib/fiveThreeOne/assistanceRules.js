@@ -98,33 +98,22 @@ export function buildAssistanceForDay(templateId, mainLift, opts = {}) {
     }
 
     if (templateId === TEMPLATE_IDS.PERIODIZATION_BIBLE) {
-        // 3 categories per session, higher volume, moderate intensity
-        if (mainLift === 'bench' || mainLift === 'press') {
-            return {
-                kind: 'pb',
-                blocks: [
-                    { category: 'Shoulders/Chest', items: [{ name: 'DB Press', sets: 5, reps: '10-15' }, { name: 'Dips', sets: 3, reps: '10-15' }] },
-                    { category: 'Lats/Upper Back', items: [{ name: 'Row (any)', sets: 5, reps: '10-15' }, { name: 'Chin-Ups', sets: 3, reps: '8-12' }] },
-                    { category: 'Triceps', items: [{ name: 'Pushdown/Extension', sets: 5, reps: '10-15' }] },
-                ],
-            };
-        } else {
-            const lowerDay = (mainLift === 'deadlift') ? 'DL' : 'SQ';
-            return {
-                kind: 'pb',
-                blocks: lowerDay === 'DL'
-                    ? [
-                        { category: 'Hamstrings', items: [{ name: 'Romanian Deadlift', sets: 5, reps: '8-12' }] },
-                        { category: 'Quads', items: [{ name: 'Leg Press', sets: 3, reps: '10-15' }] },
-                        { category: 'Abs', items: [{ name: 'Hanging Leg Raise', sets: 3, reps: '10-15' }] },
-                    ]
-                    : [
-                        { category: 'Low Back', items: [{ name: 'Back Extension', sets: 5, reps: '10-15' }] },
-                        { category: 'Quads', items: [{ name: 'Leg Press', sets: 3, reps: '10-15' }] },
-                        { category: 'Abs', items: [{ name: 'Cable Crunch', sets: 3, reps: '12-20' }] },
-                    ],
-            };
-        }
+        // Dave Tate pattern: each day 3 assistance categories, each 5x10-20 (user chooses specific lifts later)
+        const upperCats = [
+            'Shoulders/Chest',
+            'Lats/Upper Back',
+            'Triceps'
+        ];
+        const lowerCats = [
+            'Hamstrings',
+            'Quads',
+            'Abs'
+        ];
+        const chosen = (mainLift === 'press' || mainLift === 'bench') ? upperCats : lowerCats;
+        return {
+            kind: 'pb',
+            blocks: chosen.map(cat => ({ category: cat, items: [{ name: cat + ' (choose exercise)', sets: 5, reps: '10-20' }] }))
+        };
     }
 
     if (templateId === TEMPLATE_IDS.BODYWEIGHT) {

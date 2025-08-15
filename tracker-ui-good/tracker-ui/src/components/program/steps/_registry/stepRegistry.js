@@ -97,7 +97,7 @@ export const DEFAULT_WIZARD_STATE = {
     advanced: {
         autoreg: {},
         specialization: { focus: [], volumeBiasPct: 15 },
-        history: { bench: [], overhead_press: [], squat: [], deadlift: [] }
+        history: { bench: [], press: [], squat: [], deadlift: [] }
     }
 };
 

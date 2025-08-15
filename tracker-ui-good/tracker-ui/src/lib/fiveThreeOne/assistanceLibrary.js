@@ -18,7 +18,7 @@ export const OPPOSITES = {
     deadlift: 'squat',
     bench: 'press',
     press: 'bench',
-    overhead_press: 'bench'
+    press: 'bench'
 };
 
 // Lightweight catalogue of assistance exercises by bucket

@@ -37,7 +37,7 @@ export default function FiveThreeOneWorkflow() {
             squat: null,
             bench: null,
             deadlift: null,
-            overhead_press: null
+            press: null
         },
         // Configuration
         schedule: 'four_day',

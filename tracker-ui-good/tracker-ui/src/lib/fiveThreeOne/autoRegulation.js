@@ -21,13 +21,13 @@ export const DEFAULT_AUTOREG = {
  * @returns per-lift inc suggestion in pounds e.g. { bench:5, press:5, squat:10, deadlift:10 }
  */
 export function recommendTMIncrements(history = {}, baseIncrements = { upper: 5, lower: 10 }, opts = DEFAULT_AUTOREG) {
-    const lifts = ['bench', 'overhead_press', 'squat', 'deadlift'];
+    const lifts = ['bench', 'press', 'squat', 'deadlift'];
     const out = {};
     for (const k of lifts) {
         const arr = Array.isArray(history[k]) ? history[k] : [];
         const last = arr[arr.length - 1];
         const prev = arr[arr.length - 2];
-        const isUpper = (k === 'bench' || k === 'overhead_press');
+        const isUpper = (k === 'bench' || k === 'press');
         const base = isUpper ? baseIncrements.upper : baseIncrements.lower;
 
         if (last && prev && opts.holdTMIfE1RMDrops) {

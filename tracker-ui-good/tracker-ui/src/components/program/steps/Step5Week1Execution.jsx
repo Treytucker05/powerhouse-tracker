@@ -20,7 +20,7 @@ export default function Step5Week1Execution({ data, updateData }) {
         squat: [],
         bench: [],
         deadlift: [],
-        overhead_press: []
+        press: []
     });
     const [trainingMaxes, setTrainingMaxes] = useState(data.trainingMaxes || {});
     const [loadingOption, setLoadingOption] = useState(data.loadingOption || 1);
@@ -123,7 +123,7 @@ export default function Step5Week1Execution({ data, updateData }) {
             'Finish with hips, not back',
             'Control the descent'
         ],
-        overhead_press: [
+        press: [
             'Feet shoulder-width apart',
             'Grip just outside shoulders',
             'Big breath and brace core',
@@ -228,7 +228,7 @@ export default function Step5Week1Execution({ data, updateData }) {
         squat: 'Squat',
         bench: 'Bench Press',
         deadlift: 'Deadlift',
-        overhead_press: 'Overhead Press'
+        press: 'Overhead Press'
     };
 
     return (

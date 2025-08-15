@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import ToggleButton from '../ToggleButton.jsx';
-import { Info, AlertTriangle, Calculator, Copy } from 'lucide-react';
+import { Info, AlertTriangle, Calculator, Copy, CheckCircle2 } from 'lucide-react';
 import { useProgramV2 } from '../../contexts/ProgramContextV2.jsx';
 import { roundToIncrement } from '../..'; // barrel export
 
@@ -38,7 +38,7 @@ const LIFT_LABELS = {
     press: 'Overhead Press'
 };
 
-export default function Step1Fundamentals({ onValidChange }) {
+export default function Step1Fundamentals({ onValidChange, flashToken, missing = [] }) {
     const { state, dispatch } = useProgramV2();
 
     // Local working state for smooth typing
@@ -47,12 +47,35 @@ export default function Step1Fundamentals({ onValidChange }) {
         rounding: state.rounding,
         tmPct: state.tmPct,
         lifts: {
-            squat: { oneRM: state.lifts.squat.oneRM || '', repWeight: '', repCount: '', tmOverride: '', activeMethod: 'oneRM', applied: false },
-            bench: { oneRM: state.lifts.bench.oneRM || '', repWeight: '', repCount: '', tmOverride: '', activeMethod: 'oneRM', applied: false },
-            deadlift: { oneRM: state.lifts.deadlift.oneRM || '', repWeight: '', repCount: '', tmOverride: '', activeMethod: 'oneRM', applied: false },
-            press: { oneRM: state.lifts.press.oneRM || '', repWeight: '', repCount: '', tmOverride: '', activeMethod: 'oneRM', applied: false }
+            squat: { oneRM: state.lifts.squat.oneRM || '', repWeight: '', repCount: '', tmOverride: '', activeMethod: 'oneRM' },
+            bench: { oneRM: state.lifts.bench.oneRM || '', repWeight: '', repCount: '', tmOverride: '', activeMethod: 'oneRM' },
+            deadlift: { oneRM: state.lifts.deadlift.oneRM || '', repWeight: '', repCount: '', tmOverride: '', activeMethod: 'oneRM' },
+            press: { oneRM: state.lifts.press.oneRM || '', repWeight: '', repCount: '', tmOverride: '', activeMethod: 'oneRM' }
         }
     });
+
+    // Auto-save flash indicator
+    const [autoSaved, setAutoSaved] = useState(false);
+    const autoSaveTimerRef = useRef(null);
+
+    // Overall progress (count lifts with a valid computed or overridden TM > 0)
+    const tmProgress = useMemo(() => {
+        let completed = 0;
+        const total = Object.keys(localState.lifts).length;
+        Object.entries(localState.lifts).forEach(([liftKey, lift]) => {
+            let oneRM = null;
+            if (lift.oneRM && Number(lift.oneRM) > 0) oneRM = Number(lift.oneRM);
+            else if (lift.repWeight && lift.repCount && Number(lift.repWeight) > 0 && Number(lift.repCount) > 0) {
+                oneRM = calculateE1RM(Number(lift.repWeight), Number(lift.repCount));
+            }
+            let tm = null;
+            if (lift.tmOverride && Number(lift.tmOverride) > 0) tm = Number(lift.tmOverride);
+            else if (oneRM) tm = calculateTM(oneRM, localState.tmPct);
+            if (tm && tm > 0) completed += 1;
+        });
+        const percent = total ? Math.min(100, Math.round((completed / total) * 100)) : 0;
+        return { completed, total, percent };
+    }, [localState.lifts, localState.tmPct]);
 
     // Debounced dispatch to V2 context
     useEffect(() => {
@@ -86,6 +109,11 @@ export default function Step1Fundamentals({ onValidChange }) {
             });
 
             dispatch({ type: 'BULK_SET_LIFTS', lifts: liftData });
+
+            // Trigger auto-saved flash
+            setAutoSaved(true);
+            if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+            autoSaveTimerRef.current = setTimeout(() => setAutoSaved(false), 1200);
         }, 250);
 
         return () => clearTimeout(timeoutId);
@@ -151,212 +179,181 @@ export default function Step1Fundamentals({ onValidChange }) {
         const hasRepTest = lift.repWeight && lift.repCount && Number(lift.repWeight) > 0 && Number(lift.repCount) > 0;
         const hasOverride = lift.tmOverride && Number(lift.tmOverride) > 0;
         let e1rm = null;
-        if (hasOneRM) {
-            e1rm = Number(lift.oneRM);
-        } else if (hasRepTest) {
-            e1rm = calculateE1RM(Number(lift.repWeight), Number(lift.repCount));
-        }
+        if (hasOneRM) e1rm = Number(lift.oneRM); else if (hasRepTest) e1rm = calculateE1RM(Number(lift.repWeight), Number(lift.repCount));
         const suggestedTM = e1rm ? roundToIncrement(calculateTM(e1rm, localState.tmPct), localState.units, localState.rounding) : null;
         const finalTM = hasOverride ? roundToIncrement(Number(lift.tmOverride), localState.units, localState.rounding) : suggestedTM;
         const validation = validateTM(finalTM, e1rm);
+        const needsAttention = (missing.includes(`${liftKey} TM`) || missing.includes(liftKey)) && flashToken > 0;
 
-        const setActiveMethod = (method) => updateLift(liftKey, { activeMethod: method });
+        const methods = [
+            { id: 'oneRM', label: 'Tested 1RM', hint: "Enter the heaviest weight you've successfully lifted for 1 rep." },
+            { id: 'reps', label: 'Rep Calculator', hint: 'Enter weight and reps from a recent set (3–10 reps work best).' },
+            { id: 'override', label: 'Manual Override', hint: 'Enter your desired training max directly (typically 85–90% of 1RM).' }
+        ];
+        const setActiveMethod = (m) => updateLift(liftKey, { activeMethod: m });
         const isActive = (m) => lift.activeMethod === m;
-        const methodCompleted = {
-            oneRM: hasOneRM,
-            reps: hasRepTest,
-            override: hasOverride
-        };
-
-        const cardBase = 'method-card rounded-lg border bg-gray-900/70 transition-all cursor-pointer px-4 py-3';
-        const cardState = (m) => [
-            isActive(m) ? 'border-red-500 ring-1 ring-red-500/40 shadow-sm' : 'border-gray-700',
-            methodCompleted[m] && !isActive(m) ? 'border-green-600/70' : '',
-            'hover:border-red-400/70'
-        ].join(' ');
-
-        const applyDisabled = !finalTM; // must have a TM to apply
-        const handleApply = () => {
-            if (applyDisabled) return;
-            // Mark applied (and if override method not selected, do not force override; just flag)
-            updateLift(liftKey, { applied: true });
-        };
+        const methodCompleted = { oneRM: hasOneRM, reps: hasRepTest, override: hasOverride };
 
         return (
-            <div key={liftKey} className="p-6 rounded-xl bg-gray-800/40 border border-gray-700/60">
-                <div className="flex items-start justify-between mb-5 flex-wrap gap-3">
-                    <div className="min-w-[160px]">
-                        <h4 className="text-base font-semibold text-white tracking-tight">{LIFT_LABELS[liftKey]}</h4>
-                        <div className="text-[11px] text-gray-500 mt-1 flex flex-wrap items-center gap-1">
-                            {e1rm ? <><span>e1RM</span><span className="text-gray-300 font-mono">{Math.round(e1rm)}</span></> : <span>Choose a method below</span>}
+            <div key={liftKey} className={`p-4 rounded-xl bg-gray-800/40 border ${needsAttention ? 'border-amber-500/70 animate-pulse' : 'border-gray-700/60'} space-y-3`}>
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                        <h4 className="text-lg font-semibold text-white tracking-tight flex items-center gap-1">
+                            {LIFT_LABELS[liftKey]}
+                            {finalTM ? <CheckCircle2 className="w-4 h-4 text-green-500" aria-label="Training max set" /> : null}
+                        </h4>
+                        <div className="text-[12px] text-gray-400 mt-0.5 flex flex-wrap items-center gap-1">
+                            {e1rm ? <><span>e1RM</span><span className="text-gray-300 font-mono">{Math.round(e1rm)}</span></> : <span>Select a method</span>}
                             {finalTM && <><span className="text-gray-600">•</span><span>TM</span><span className="text-gray-200 font-mono">{finalTM}</span></>}
                         </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <span className={`px-3 py-1 rounded-md text-[11px] font-medium flex items-center gap-1 bg-gray-900 border ${finalTM ? 'border-gray-600 text-gray-200' : 'border-gray-700 text-gray-500'}`}>
-                            Current TM: <span className={`${finalTM ? 'text-green-400' : 'text-gray-500'}`}>{finalTM || '—'}</span>
+                    <div className="flex items-center gap-2 self-start">
+                        <span className={`px-3 py-1.5 rounded-md text-[12px] font-semibold flex items-center gap-1 bg-gray-900/80 border shadow-sm ${finalTM ? 'border-green-600/60 text-green-300' : 'border-gray-700 text-gray-500'}`}>
+                            TM <span className={`${finalTM ? 'text-green-400 font-bold' : 'text-gray-500 font-medium'}`}>{finalTM || '—'}</span>
                         </span>
                         {(validation.level === 'warning' || validation.level === 'danger') && (
-                            <span className={`px-2 py-1 rounded text-[10px] font-medium border ${validation.level === 'warning' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-600/40' : 'bg-red-500/15 text-red-400 border-red-600/40'}`}>{validation.level === 'warning' ? 'Low' : 'High'}</span>
+                            <span className={`px-2 py-1 rounded text-[12px] font-medium border ${validation.level === 'warning' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-600/40' : 'bg-red-500/15 text-red-400 border-red-600/40'}`}>{validation.level === 'warning' ? 'Low' : 'High'}</span>
                         )}
                     </div>
                 </div>
 
-                <div className="space-y-6">
-                    {/* Method 1: Tested 1RM */}
-                    <div className={cardBase + ' ' + cardState('oneRM')} onClick={() => setActiveMethod('oneRM')}>
-                        <div className="flex items-start gap-3">
-                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-semibold ${isActive('oneRM') ? 'bg-red-500 text-white' : methodCompleted.oneRM ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-300'}`}>1</div>
-                            <div className="flex-1">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[13px] font-semibold text-white">Tested 1RM</span>
-                                    {methodCompleted.oneRM && <span className="text-green-500 text-xs">✓</span>}
+                <div>
+                    <div className="flex items-center justify-between mb-2">
+                        <span className="text-[13px] uppercase tracking-wide text-gray-400 font-medium">Choose one method:</span>
+                    </div>
+                    <div role="tablist" className="inline-flex flex-wrap gap-1 bg-gray-900/70 backdrop-blur-sm p-1.5 rounded-lg border border-gray-700/70 shadow-inner">
+                        {methods.map(m => (
+                            <button
+                                key={m.id}
+                                role="tab"
+                                aria-selected={isActive(m.id)}
+                                onClick={() => setActiveMethod(m.id)}
+                                className={`px-3.5 py-1.5 text-[12px] md:text-sm font-semibold rounded-md border transition-colors flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-offset-0 focus:ring-red-600/40 ${isActive(m.id)
+                                    ? 'bg-red-600/30 border-red-500/70 text-red-200 shadow-sm'
+                                    : methodCompleted[m.id]
+                                        ? 'bg-gray-800/90 border-green-600/60 text-green-400 hover:bg-gray-700'
+                                        : 'bg-gray-800/70 border-gray-700 text-gray-400 hover:text-gray-200 hover:border-gray-600'}`}
+                            >
+                                {m.label}
+                                {methodCompleted[m.id] && !isActive(m.id) && <span className="text-green-500">✓</span>}
+                            </button>
+                        ))}
+                    </div>
+                    <div className="mt-2">
+                        {lift.activeMethod === 'oneRM' && (
+                            <div className="space-y-2">
+                                <p className="text-[13px] text-gray-400">Enter the heaviest weight you've successfully lifted for 1 rep.</p>
+                                <div>
+                                    <label className="block text-[12px] uppercase tracking-wide text-gray-400 mb-1">Weight</label>
+                                    <input
+                                        type="number"
+                                        value={lift.oneRM}
+                                        onChange={(e) => updateLift(liftKey, { oneRM: e.target.value, repWeight: '', repCount: '', tmOverride: '' })}
+                                        className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
+                                        placeholder="e.g. 280"
+                                    />
                                 </div>
-                                <p className="text-[11px] text-gray-500 mt-0.5">Enter your actual one-rep max.</p>
-                                {isActive('oneRM') && (
-                                    <div className="mt-4">
-                                        <label className="block text-[10px] uppercase tracking-wide text-gray-500 mb-1">Weight</label>
-                                        <input
-                                            type="number"
-                                            value={lift.oneRM}
-                                            onChange={(e) => updateLift(liftKey, { oneRM: e.target.value, repWeight: '', repCount: '', tmOverride: '', applied: false })}
-                                            className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
-                                            placeholder="e.g. 280"
-                                        />
-                                        {suggestedTM && hasOneRM && (
-                                            <div className="mt-3 text-[11px] bg-gray-800/70 border border-red-500/40 rounded p-2 flex justify-between items-center">
-                                                <span className="text-gray-400">TM ({Math.round(localState.tmPct * 100)}%)</span>
-                                                <span className="text-red-400 font-semibold">{suggestedTM}</span>
-                                            </div>
-                                        )}
+                                {suggestedTM && hasOneRM && (
+                                    <div className="text-[13px] bg-gray-900/70 border border-red-500/40 rounded p-2 flex justify-between items-center">
+                                        <span className="text-gray-400">TM ({Math.round(localState.tmPct * 100)}%)</span>
+                                        <span className="text-red-400 font-semibold">{suggestedTM}</span>
                                     </div>
                                 )}
                             </div>
-                        </div>
-                    </div>
-
-                    <div className="relative flex items-center justify-center h-8">
-                        <div className="absolute inset-x-0 h-px bg-gray-700/60" />
-                        <span className="relative z-10 px-4 text-[10px] font-semibold tracking-wider text-gray-600 bg-gray-800/40 rounded-full">OR</span>
-                    </div>
-
-                    {/* Method 2: Rep Calculator */}
-                    <div className={cardBase + ' ' + cardState('reps')} onClick={() => setActiveMethod('reps')}>
-                        <div className="flex items-start gap-3">
-                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-semibold ${isActive('reps') ? 'bg-red-500 text-white' : methodCompleted.reps ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-300'}`}>2</div>
-                            <div className="flex-1">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[13px] font-semibold text-white">Rep Calculator</span>
-                                    {methodCompleted.reps && <span className="text-green-500 text-xs">✓</span>}
+                        )}
+                        {lift.activeMethod === 'reps' && (
+                            <div className="space-y-2">
+                                <p className="text-[13px] text-gray-400">Enter weight and reps from a recent set (3–10 reps work best).</p>
+                                <div className="flex gap-2 flex-wrap">
+                                    <input
+                                        type="number"
+                                        value={lift.repWeight}
+                                        onChange={(e) => updateLift(liftKey, { repWeight: e.target.value, oneRM: '', tmOverride: '' })}
+                                        className="flex-1 min-w-[120px] bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
+                                        placeholder="Weight"
+                                    />
+                                    <input
+                                        type="number"
+                                        value={lift.repCount}
+                                        onChange={(e) => updateLift(liftKey, { repCount: e.target.value, oneRM: '', tmOverride: '' })}
+                                        className="w-28 bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
+                                        placeholder="Reps"
+                                        min={1}
+                                        max={12}
+                                    />
+                                    {hasRepTest && (
+                                        <button
+                                            type="button"
+                                            onClick={(e) => { e.stopPropagation(); copyRepTestToAll(liftKey); }}
+                                            className="text-[12px] px-3 py-2 rounded bg-gray-800 hover:bg-gray-700 text-gray-200 border border-gray-600"
+                                        >Copy to All</button>
+                                    )}
                                 </div>
-                                <p className="text-[11px] text-gray-500 mt-0.5">Calculate from a recent rep test (3–10 reps).</p>
-                                {isActive('reps') && (
-                                    <div className="mt-3 flex flex-col gap-3">
-                                        <div className="flex gap-2 flex-wrap">
-                                            <input
-                                                type="number"
-                                                value={lift.repWeight}
-                                                onChange={(e) => updateLift(liftKey, { repWeight: e.target.value, oneRM: '', tmOverride: '' })}
-                                                className="flex-1 min-w-[120px] bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
-                                                placeholder="Weight"
-                                            />
-                                            <input
-                                                type="number"
-                                                value={lift.repCount}
-                                                onChange={(e) => updateLift(liftKey, { repCount: e.target.value, oneRM: '', tmOverride: '' })}
-                                                className="w-28 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
-                                                placeholder="Reps"
-                                                min={1}
-                                                max={12}
-                                            />
-                                            {hasRepTest && (
-                                                <button
-                                                    type="button"
-                                                    onClick={(e) => { e.stopPropagation(); copyRepTestToAll(liftKey); }}
-                                                    className="text-[11px] px-3 py-2 rounded bg-gray-700/60 hover:bg-gray-600 text-gray-200 border border-gray-600"
-                                                >Copy to All</button>
-                                            )}
-                                        </div>
-                                        {hasRepTest && suggestedTM && (
-                                            <div className="text-[11px] bg-gray-800/70 border border-red-500/40 rounded p-2">
-                                                <span className="text-gray-400">Est. 1RM </span>
-                                                <span className="text-gray-300 font-mono">{e1rm && Math.round(e1rm)}</span>
-                                                <span className="mx-1">→</span>
-                                                <span className="text-gray-400">TM </span>
-                                                <span className="text-red-400 font-semibold">{suggestedTM}</span>
-                                            </div>
-                                        )}
+                                {hasRepTest && suggestedTM && (
+                                    <div className="text-[13px] bg-gray-900/70 border border-red-500/40 rounded p-2">
+                                        <span className="text-gray-400">Est. 1RM </span>
+                                        <span className="text-gray-300 font-mono">{e1rm && Math.round(e1rm)}</span>
+                                        <span className="mx-1">→</span>
+                                        <span className="text-gray-400">TM </span>
+                                        <span className="text-red-400 font-semibold">{suggestedTM}</span>
                                     </div>
                                 )}
                             </div>
-                        </div>
-                    </div>
-
-                    <div className="relative flex items-center justify-center h-8">
-                        <div className="absolute inset-x-0 h-px bg-gray-700/60" />
-                        <span className="relative z-10 px-4 text-[10px] font-semibold tracking-wider text-gray-600 bg-gray-800/40 rounded-full">OR</span>
-                    </div>
-
-                    {/* Method 3: Manual Override */}
-                    <div className={cardBase + ' ' + cardState('override')} onClick={() => setActiveMethod('override')}>
-                        <div className="flex items-start gap-3">
-                            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-semibold ${isActive('override') ? 'bg-red-500 text-white' : methodCompleted.override ? 'bg-green-600 text-white' : 'bg-gray-700 text-gray-300'}`}>3</div>
-                            <div className="flex-1">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-[13px] font-semibold text-white">Manual Override</span>
-                                    {methodCompleted.override && <span className="text-green-500 text-xs">✓</span>}
+                        )}
+                        {lift.activeMethod === 'override' && (
+                            <div className="space-y-2">
+                                <p className="text-[13px] text-gray-400">Enter your desired training max directly (typically 85–90% of 1RM).</p>
+                                <div>
+                                    <label className="block text-[12px] uppercase tracking-wide text-gray-400 mb-1">Training Max</label>
+                                    <input
+                                        type="number"
+                                        value={lift.tmOverride}
+                                        onChange={(e) => updateLift(liftKey, { tmOverride: e.target.value, oneRM: '', repWeight: '', repCount: '' })}
+                                        className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
+                                        placeholder="e.g. 250"
+                                    />
                                 </div>
-                                <p className="text-[11px] text-gray-500 mt-0.5">Set a custom training max directly.</p>
-                                {isActive('override') && (
-                                    <div className="mt-4">
-                                        <label className="block text-[10px] uppercase tracking-wide text-gray-500 mb-1">Training Max</label>
-                                        <input
-                                            type="number"
-                                            value={lift.tmOverride}
-                                            onChange={(e) => updateLift(liftKey, { tmOverride: e.target.value, oneRM: '', repWeight: '', repCount: '', applied: false })}
-                                            className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-white focus:border-red-500 focus:outline-none"
-                                            placeholder="e.g. 250"
-                                        />
-                                    </div>
-                                )}
                             </div>
-                        </div>
+                        )}
                     </div>
-                </div>
-
-                {/* Apply Button */}
-                <div className="mt-6">
-                    <button
-                        type="button"
-                        disabled={applyDisabled}
-                        onClick={handleApply}
-                        className={`w-full text-sm font-semibold rounded-md px-4 py-3 border transition-colors ${applyDisabled ? 'bg-gray-800 text-gray-600 border-gray-700 cursor-not-allowed' : lift.applied ? 'bg-green-600/20 text-green-400 border-green-600 hover:bg-green-600/30' : 'bg-red-600 text-white border-red-500 hover:bg-red-500'}`}
-                    >
-                        {lift.applied ? '✓ Training Max Applied' : applyDisabled ? 'Enter Data Above' : 'Apply Training Max'}
-                    </button>
                 </div>
             </div>
         );
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-5">
             {/* Header */}
-            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
-                <h2 className="text-2xl font-bold text-white mb-2">Step 1 — Program Fundamentals</h2>
-                <p className="text-gray-400">
-                    Configure basic settings and establish training maxes for all four lifts.
-                </p>
+            <div className="bg-gray-800/60 border border-gray-700 rounded-lg px-5 py-4 flex flex-col gap-3 md:gap-2 md:flex-row md:items-center md:justify-between">
+                <div className="w-full md:w-auto flex-1">
+                    <h2 className="text-2xl md:text-3xl font-bold text-white mb-1 tracking-tight">Step 1 — Program Fundamentals</h2>
+                    <p className="text-gray-300 text-sm md:text-base mb-2 md:mb-1 leading-snug">Configure base settings and establish training maxes (TMs) for all four main lifts.</p>
+                    <div className="flex items-center gap-3" aria-label="Training max progress">
+                        <div className="w-48 h-2.5 bg-gray-700/50 rounded-full overflow-hidden">
+                            <div className="h-full bg-gradient-to-r from-green-500 via-green-400 to-emerald-400 transition-all duration-300" style={{ width: `${tmProgress.percent}%` }} />
+                        </div>
+                        <span className="text-xs font-medium text-gray-400 tabular-nums">{tmProgress.completed}/{tmProgress.total} set</span>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    {autoSaved && (
+                        <div className="inline-flex items-center gap-1 text-[12px] font-medium text-green-400 bg-green-500/10 border border-green-500/30 px-2 py-1 rounded-md shadow-sm transition-opacity animate-pulse">
+                            <span className="inline-block w-2 h-2 rounded-full bg-green-400" /> Auto-saved
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Settings */}
-            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">Settings</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-gray-800/60 border border-gray-700 rounded-lg px-4 py-3">
+                <div className="flex items-center justify-start mb-2 gap-4">
+                    <h3 className="text-lg font-semibold text-white tracking-wide uppercase">Settings</h3>
+                </div>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-4 items-start">
                     {/* Units */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Units</label>
-                        <div className="flex gap-2">
+                        <label className="block text-[12px] font-semibold text-gray-300 mb-1 uppercase tracking-wide">Units</label>
+                        <div className="flex gap-2 mb-1">
                             {['lb', 'kg'].map(unit => (
                                 <ToggleButton
                                     key={unit}
@@ -366,26 +363,32 @@ export default function Step1Fundamentals({ onValidChange }) {
                                 >{unit.toUpperCase()}</ToggleButton>
                             ))}
                         </div>
+                        <p className="text-[12px] leading-snug text-gray-400">Choose weight units. <span className="font-medium text-gray-300">LB</span> uses 2.5 / 5 lb increments, <span className="font-medium text-gray-300">KG</span> uses 1.25 / 2.5 kg increments.</p>
                     </div>
 
                     {/* Rounding */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Rounding</label>
+                        <label className="block text-[12px] font-semibold text-gray-300 mb-1 uppercase tracking-wide">Rounding</label>
                         <select
                             value={localState.rounding}
                             onChange={(e) => updateLocalState({ rounding: e.target.value })}
-                            className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none"
+                            className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none mb-1"
                         >
                             <option value="ceil">Round up</option>
                             <option value="nearest">Nearest</option>
                             <option value="floor">Round down</option>
                         </select>
+                        <ul className="text-[12px] leading-snug text-gray-400 space-y-0.5">
+                            <li><span className="text-gray-400 font-medium">Round up:</span> Always to next increment (slightly heavier).</li>
+                            <li><span className="text-gray-400 font-medium">Nearest:</span> Standard rounding (recommended).</li>
+                            <li><span className="text-gray-400 font-medium">Round down:</span> Slightly lighter / conservative.</li>
+                        </ul>
                     </div>
 
                     {/* TM Percentage */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">Training Max %</label>
-                        <div className="flex gap-2">
+                        <label className="block text-[12px] font-semibold text-gray-300 mb-1 uppercase tracking-wide">Training Max %</label>
+                        <div className="flex gap-2 mb-1">
                             {[0.90, 0.85].map(pct => (
                                 <ToggleButton
                                     key={pct}
@@ -395,15 +398,36 @@ export default function Step1Fundamentals({ onValidChange }) {
                                 >{Math.round(pct * 100)}%</ToggleButton>
                             ))}
                         </div>
+                        <ul className="text-[12px] leading-snug text-gray-400 space-y-0.5">
+                            <li><span className="text-gray-400 font-medium">90%:</span> Standard starting point for most lifters.</li>
+                            <li><span className="text-gray-400 font-medium">85%:</span> Conservative (new lifters, return from layoff/injury).</li>
+                        </ul>
                     </div>
                 </div>
             </div>
 
             {/* Training Max Inputs */}
-            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 space-y-4">
-                <h3 className="text-lg font-semibold text-white mb-2">Training Maxes</h3>
-                <p className="text-xs text-gray-400 mb-4">Provide either a tested 1RM or a recent rep test (weight and reps) for each lift. Optionally override the calculated TM.</p>
-                <div className="space-y-4">
+            <div className="bg-gray-800/60 border border-gray-700 rounded-lg px-5 py-6 space-y-6">
+                <h3 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight leading-tight">Training Maxes</h3>
+                <div className="prose prose-invert max-w-none text-sm md:text-[15px] leading-relaxed [&_strong]:text-gray-100 [&_strong]:font-semibold">
+                    <p className="text-gray-200">Establish your training max for each lift using <strong>ONE</strong> of three methods. Your training max should be <strong>85–90% of your true 1RM</strong> to allow sustainable progress without burnout.</p>
+                    <div className="space-y-5 mt-4">
+                        <div className="bg-gray-900/60 border border-gray-700/70 rounded-lg p-4 shadow-sm">
+                            <h4 className="text-base font-semibold text-white mb-1">Tested 1RM <span className="text-xs font-medium text-gray-500">— Use your actual tested maximum</span></h4>
+                            <p className="text-gray-300 text-sm">Enter the heaviest weight you can lift for 1 clean rep with solid form (no grind). Wendler suggests it should feel like you could perform 2–3 more reps on a fresh day.</p>
+                        </div>
+                        <div className="bg-gray-900/60 border border-gray-700/70 rounded-lg p-4 shadow-sm">
+                            <h4 className="text-base font-semibold text-white mb-1">Rep Calculator <span className="text-xs font-medium text-gray-500">— Calculate from recent rep test (3–10 reps)</span></h4>
+                            <p className="text-gray-300 text-sm">Use Wendler's formula: <span className="font-mono">Est. 1RM = Weight × Reps × 0.0333 + Weight</span>. Most accurate with sets of 3–5 reps. Enter weight and reps from your most recent heavy set.</p>
+                        </div>
+                        <div className="bg-gray-900/60 border border-gray-700/70 rounded-lg p-4 shadow-sm">
+                            <h4 className="text-base font-semibold text-white mb-1">Manual Override <span className="text-xs font-medium text-gray-500">— Set custom training max (85–90% of 1RM)</span></h4>
+                            <p className="text-gray-300 text-sm">Directly input your desired training max. Use <strong>85%</strong> if returning from a break, managing fatigue, or prioritizing long runway. Use <strong>90%</strong> for standard progression. Better to start <em>too light</em> than too heavy.</p>
+                        </div>
+                    </div>
+                    <p className="mt-2 text-gray-400 text-sm">Only one method is needed per lift. Switching tabs preserves previous entries but only the active tab's data is used.</p>
+                </div>
+                <div className="grid md:grid-cols-2 gap-4 md:gap-5">
                     {Object.keys(localState.lifts).map(renderLiftRow)}
                 </div>
             </div>
