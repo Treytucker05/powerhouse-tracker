@@ -195,14 +195,33 @@ export default function Step3DesignCustom({ onValidChange }) {
                 <h2 className="text-lg font-semibold text-white">Design your cycle</h2>
                 <p className="text-sm text-gray-400 mt-1">Set your warm-ups, main % by week, and supplemental style. You can convert assistance to custom later.</p>
                 <ul className="mt-3 space-y-1 text-sm list-disc pl-5 text-gray-300">
-                        <li><strong>Warm-ups:</strong> 40/50/60% of TM ramps without fatigue.</li>
-                        <li><strong>Main:</strong> Week 1–3 last set AMRAP; Week 4 deload (no AMRAP).</li>
-                        <li><strong>Supplemental (BBB):</strong> 5×10 @ 50–70% (start 50–60% if new).</li>
+                    <li><strong>Warm-ups:</strong> 40/50/60% of TM ramps without fatigue.</li>
+                    <li><strong>Main:</strong> Week 1–3 last set AMRAP; Week 4 deload (no AMRAP) <span className="text-gray-400">(can optionally skip below if running a longer Leader block).</span></li>
+                    <li><strong>Supplemental (BBB):</strong> 5×10 @ 50–70% (start 50–60% if new).</li>
                 </ul>
                 <p className="text-xs text-gray-500 mt-3 flex flex-col gap-1">
                     <span>Change days/split in Step 2. Rounding set in Step 1.</span>
                     <span className="text-gray-400 italic">Conditioning: 2 easy LISS sessions weekly; don’t let conditioning hurt lifting.</span>
                 </p>
+                <div className="mt-4 bg-gray-900/40 border border-gray-700 rounded-md p-3">
+                    <div className="flex items-center justify-between">
+                        <div className="text-xs font-semibold tracking-wide text-gray-300">Deload Week 4</div>
+                        <label className="inline-flex items-center gap-2 text-xs text-gray-400">
+                            <input
+                                type="checkbox"
+                                className="h-3 w-3"
+                                checked={!(state?.advanced?.skipDeload)}
+                                onChange={(e) => {
+                                    dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), skipDeload: !e.target.checked } });
+                                }}
+                            />
+                            <span>{state?.advanced?.skipDeload ? 'Off (skipped this cycle)' : 'On (default)'}</span>
+                        </label>
+                    </div>
+                    <p className="mt-2 text-[11px] leading-relaxed text-gray-400">
+                        Keep ON for standard 4-week cycles. Advanced users running multi-phase (Leader/Anchor) can disable interim deloads (e.g. only deload after final Anchor). When OFF, export will show only 3 loading weeks; progression still expects full recovery management on you.
+                    </p>
+                </div>
             </div>
 
             {/* Schedule */}
@@ -364,7 +383,7 @@ export default function Step3DesignCustom({ onValidChange }) {
                                         checked={suppPairing === 'same'}
                                         onChange={() => setSuppPairing('same')}
                                     />
-                                    <span>Same lift (BBB 5×10 @ 60% TM)</span>
+                                    <span>Same lift (BBB 5×10 @ {suppPct || 50}% TM)</span>
                                 </label>
                                 <label className="inline-flex items-center gap-2 text-xs">
                                     <input
@@ -448,7 +467,7 @@ export default function Step3DesignCustom({ onValidChange }) {
                                 {assistMode === 'periodization_bible' && <p>Layered multi-block assistance (coming soon).</p>}
                                 {assistMode === 'bodyweight' && <p>Bodyweight emphasis for limited equipment.</p>}
                                 {assistMode === 'custom' && <p>Manually define each slot after converting in Step 4.</p>}
-                                <p className="text-gray-500">Target 25–50 total reps per assistance movement. Upper: Pull + Core. Lower: Single-Leg + Posterior chain. Use low end if BBB volume is high.</p>
+                                <p className="text-gray-500">Target 25–50 total reps per assistance movement (BBB Same‑Lift variant: pick ONLY one movement). Use the low end if high supplemental volume or fatigue. Categories for variety: Upper – Pull / Core. Lower – Single-Leg / Posterior chain.</p>
                             </div>
                         )}
                     </div>

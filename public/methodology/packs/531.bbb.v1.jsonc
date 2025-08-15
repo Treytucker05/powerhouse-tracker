@@ -68,6 +68,61 @@
     ],
     "templates": [
         {
+            "id": "bbb50",
+            "name": "Boring But Big 50% (Start)",
+            "effects": {
+                "supplemental": {
+                    "mode": "bbb",
+                    "pairing": "same",
+                    "intensity": {
+                        "kind": "percent_of",
+                        "of": "TM",
+                        "value": 50
+                    },
+                    "sets": 5,
+                    "reps": 10
+                }
+            },
+            "assistanceDefaults": {
+                "press": [
+                    {
+                        "id": "bw.pullup",
+                        "name": "Chin-up",
+                        "sets": 5,
+                        "reps": 10
+                    }
+                ],
+                "deadlift": [
+                    {
+                        "id": "core.hlr",
+                        "name": "Hanging Leg Raise",
+                        "sets": 5,
+                        "reps": 15
+                    }
+                ],
+                "bench": [
+                    {
+                        "id": "db.row",
+                        "name": "DB Row",
+                        "sets": 5,
+                        "reps": 10
+                    }
+                ],
+                "squat": [
+                    {
+                        "id": "mach.legcurl",
+                        "name": "Leg Curl",
+                        "sets": 5,
+                        "reps": 10
+                    }
+                ]
+            },
+            "provenance": {
+                "source": "book",
+                "note": "BBB start at 50% TM (Wendler guidance)"
+            }
+        },
+        {
             "id": "bbb60",
             "name": "Boring But Big 60%",
             "effects": {
@@ -328,6 +383,12 @@
                         "name": "Pull-ups/Chins",
                         "sets": 5,
                         "reps": 10
+                    },
+                    {
+                        "id": "core.ab_wheel",
+                        "name": "Ab Wheel",
+                        "sets": 5,
+                        "reps": 12
                     }
                 ],
                 "deadlift": [
@@ -340,6 +401,12 @@
                     {
                         "id": "core.hlr",
                         "name": "Hanging Leg Raise",
+                        "sets": 5,
+                        "reps": 15
+                    },
+                    {
+                        "id": "bw.back_raise",
+                        "name": "Back Raises",
                         "sets": 5,
                         "reps": 15
                     }
@@ -356,6 +423,12 @@
                         "name": "Inverted Rows",
                         "sets": 5,
                         "reps": 12
+                    },
+                    {
+                        "id": "core.hlr",
+                        "name": "Hanging Leg Raise",
+                        "sets": 5,
+                        "reps": 15
                     }
                 ],
                 "squat": [
@@ -370,12 +443,18 @@
                         "name": "Ab Wheel",
                         "sets": 5,
                         "reps": 12
+                    },
+                    {
+                        "id": "bw.back_raise",
+                        "name": "Back Raises",
+                        "sets": 5,
+                        "reps": 15
                     }
                 ]
             },
             "provenance": {
                 "source": "book",
-                "note": "All assistance is calisthenics; moderate-to-high reps"
+                "note": "All assistance is calisthenics; push + pull + core/legs/posterior balance"
             }
         }
     ],
@@ -580,7 +659,7 @@
                         {
                             "when": "High Volume (BBB)",
                             "set": {
-                                "templateId": "bbb60"
+                                "templateId": "bbb50"
                             }
                         },
                         {

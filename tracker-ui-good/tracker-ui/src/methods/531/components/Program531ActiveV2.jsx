@@ -112,6 +112,20 @@ export default function Program531ActiveV2() {
                                     )}
                                 </div>
                             )}
+                            {d.conditioning && (
+                                <div className="mt-3">
+                                    <h4 className="text-sm text-gray-300 mb-1">Conditioning</h4>
+                                    <div className="text-xs text-gray-400 flex flex-wrap gap-2 items-center">
+                                        <span className="px-1.5 py-0.5 rounded bg-gray-700/40 border border-gray-600/60 text-gray-200">
+                                            {d.conditioning.type || (d.conditioning.mode === 'hiit' ? 'HIIT' : d.conditioning.mode === 'liss' ? 'LISS' : 'Cond')}
+                                        </span>
+                                        {d.conditioning.modality && <span className="text-gray-300">{String(d.conditioning.modality).replace(/_/g, ' ')}</span>}
+                                        {d.conditioning.minutes && <span className="text-gray-400">{d.conditioning.minutes} min</span>}
+                                        {d.conditioning.intensity && <span className="text-gray-400">@ {d.conditioning.intensity}</span>}
+                                    </div>
+                                    {d.conditioning.notes && <div className="text-[11px] text-gray-500 mt-1 italic">{d.conditioning.notes}</div>}
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>

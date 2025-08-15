@@ -81,10 +81,10 @@ export const initialProgramV2 = {
     advanced: { autoreg: { rpeCap: 9 }, specialization: {}, prTracking: true },
     assistanceLoadMode: 'percentRules', // 'percentRules' | 'off'
     conditioning: {
-        sessionsPerWeek: 2,
-        hiitPerWeek: 1,
-        modalities: { hiit: ['Prowler Pushes'], liss: ['Walking'] },
-        note: 'Do 2–3 sessions/week as tolerated.'
+        sessionsPerWeek: 3, // Wendler recommends 3–4 (minimum 2)
+        hiitPerWeek: 2,
+        modalities: { hiit: ['Prowler Pushes', 'Hill Sprints'], liss: ['Walking'] },
+        note: 'Target 3–4 conditioning sessions (hill sprints / prowler). Keep after lifting or on off days.'
     },
     amrapWk3: {},
     cycle: 1

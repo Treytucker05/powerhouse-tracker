@@ -27,21 +27,29 @@ describe('calc additional branch coverage', () => {
         // Default sets/reps + pct fallback (no percentOfTM / intensity)
         const cfg = computeBBBFromConfig({ supplemental: { strategy: 'bbb' }, lift: 'bench', tms: { bench: 200 }, units: 'lbs' });
         expect(cfg).toBeTruthy();
-        expect(cfg.pct).toBe(60);
+        // Default lowered to 50% (legacy was 60%)
+        expect(cfg.pct).toBe(50);
         expect(cfg.sets).toBe(5);
         expect(cfg.reps).toBe(10);
     });
 
-    it('computeSupplemental covers null sup, non-bbb, and fallback 60% with default sets/reps', () => {
+    it('computeSupplemental covers null sup, non-bbb, and fallback 50% with default sets/reps', () => {
         // No supplemental in state
         expect(computeSupplemental(null, 'squat', 300, { units: 'lbs' })).toBeNull();
         // Non-bbb strategy
         expect(computeSupplemental(null, 'squat', 300, { supplemental: { strategy: 'fsl' }, units: 'lbs' })).toBeNull();
-        // Fallback 60 path
+        // Fallback now 50 path
         const sup = computeSupplemental(null, 'squat', 300, { supplemental: { strategy: 'bbb' }, units: 'lbs', roundingPref: { lbs: 5 } });
-        expect(sup.pct).toBe(60);
+        expect(sup.pct).toBe(50);
         expect(sup.sets).toBe(5);
         expect(sup.reps).toBe(10);
+    });
+
+    it('explicit legacy 60% override still honored', () => {
+        const cfg = computeBBBFromConfig({ supplemental: { strategy: 'bbb', percentOfTM: 60 }, lift: 'bench', tms: { bench: 200 }, units: 'lbs' });
+        expect(cfg.pct).toBe(60);
+        const sup = computeSupplemental(null, 'bench', 200, { supplemental: { strategy: 'bbb', percentOfTM: 60 }, units: 'lbs' });
+        expect(sup.pct).toBe(60);
     });
 
     it('nextTM kg increments differ for upper vs lower lifts', () => {

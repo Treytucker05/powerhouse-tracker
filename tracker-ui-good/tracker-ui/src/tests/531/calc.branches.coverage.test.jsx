@@ -65,8 +65,8 @@ describe('calc targeted branch coverage', () => {
         expect(next.squat).toBe(290); // -10
     });
 
-    it('bbb config default 60% fallback branch', () => {
+    it('bbb config default 50% fallback branch', () => {
         const cfg = computeBBBFromConfig({ supplemental: { strategy: 'bbb', sets: 2, reps: 12 }, lift: 'press', tms: { press: 100 }, units: 'lbs', rounding: { lbs: 5 } });
-        expect(cfg.pct).toBe(60); // default fallback path
+        expect(cfg.pct).toBe(50); // default fallback path updated to 50%
     });
 });

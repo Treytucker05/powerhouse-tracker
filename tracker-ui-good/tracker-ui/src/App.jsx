@@ -9,6 +9,7 @@ import { MacrocycleBuilderProvider } from './contexts/MacrocycleBuilderContext.t
 // 5/3/1 V2 barrel imports
 import { Program531ActiveV2, ProgramV2Provider } from "./methods/531";
 const ProgramWizard531V2 = lazy(() => import("./methods/531/components/ProgramWizard531V2.jsx")); // kept dynamic for code-splitting
+const BuilderReviewPage = lazy(() => import('./pages/BuilderReview.tsx'));
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import GlobalReset from './components/shared/GlobalReset.jsx';
 import './App.css';
@@ -72,6 +73,7 @@ function App() {
                   </ProgramV2Provider>
                 } />
                 <Route path="program/531/active" element={<Program531ActiveV2 />} />
+                <Route path="builder/review" element={<BuilderReviewPage />} />
 
                 {/* NASM placeholder */}
                 <Route path="builder/nasm" element={<div className='text-gray-300 p-8'>NASM Builder (stub)</div>} />

@@ -38,24 +38,26 @@ export default function TemplateExplainerModal({ spec, state, open, onClose, onA
 
     if (!open || !spec) return null;
 
-    // Dynamic naming: detect BBB 60% (Same-Lift) variant from current supplemental settings
+    // Dynamic naming: detect BBB Same-Lift start (50%) or legacy (60%) variants
     let dynamicName = spec?.name;
     if (spec?.key === 'bbb') {
         const supp = state?.supplemental;
-        if (supp?.strategy === 'bbb' && supp?.percentOfTM === 60 && (supp?.pairing === 'same' || !supp?.pairing)) {
-            dynamicName = 'BBB 60% (Same-Lift)';
+        if (supp?.strategy === 'bbb' && (supp?.pairing === 'same' || !supp?.pairing)) {
+            if (supp?.percentOfTM === 50) dynamicName = 'BBB 50% (Same-Lift Start)';
+            else if (supp?.percentOfTM === 60) dynamicName = 'BBB 60% (Same-Lift)';
         }
     }
-    const isBBBVariant = dynamicName === 'BBB 60% (Same-Lift)';
+    const isBBBVariant = /^BBB (50% \(Same-Lift Start\)|60% \(Same-Lift\))$/.test(dynamicName || '');
     const isJackShit = spec?.key === 'jack_shit';
 
     // Variant-specific structure / recovery overrides
+    const suppPct = state?.supplemental?.percentOfTM;
     const variantStructure = isBBBVariant ? [
         'Main 5/3/1 sets (Week 1–3 AMRAP, Week 4 deload)',
-        'Supplemental: 5×10 @ 60% TM (same lift)',
-        'Assistance: Pull + Core (upper), Single-Leg + Posterior (lower)'
+        `Supplemental: 5×10 @ ${suppPct || 50}% TM (same lift)`,
+        'Assistance: ONE movement (classic BBB) – e.g. chins, dips, rows, back raises, abs'
     ] : spec?.structure;
-    const variantRecovery = isBBBVariant ? 'High supplemental volume – favor easy conditioning (LISS) and cap assistance at 25–50 quality reps per movement. Deload Week 4.' : spec?.recovery;
+    const variantRecovery = isBBBVariant ? 'High supplemental volume – start lighter (50%) and progress cautiously (60–70% later cycles). Favor easy conditioning (LISS) and cap assistance at 25–50 quality reps per movement. Deload Week 4.' : spec?.recovery;
     const jackShitStructure = [
         'Main 5/3/1 sets only (Week 1–3 AMRAP, Week 4 deload)',
         'Optional: 1–2 easy assistance movements (chins / dips / core)'
@@ -72,7 +74,7 @@ export default function TemplateExplainerModal({ spec, state, open, onClose, onA
                         {onApply && <span className="px-2 py-0.5 rounded bg-indigo-600/20 border border-indigo-500/40 text-indigo-300 text-[10px] uppercase tracking-wide">Template</span>}
                     </h2>
                     <p className="text-sm text-indigo-200 mt-2 leading-snug">
-                        {isBBBVariant ? 'Classic high-volume BBB locked at 60% on the same lift. Potent hypertrophy driver—respect recovery.' : isJackShit ? 'Bare‑bones 5/3/1: main work only. Add a little optional assistance if fresh.' : spec?.blurb}
+                        {isBBBVariant ? `High‑volume BBB same‑lift at ${suppPct || 50}% TM. Start light (50%)—only increase when recovery is solid.` : isJackShit ? 'Bare‑bones 5/3/1: main work only. Add a little optional assistance if fresh.' : spec?.blurb}
                     </p>
                 </header>
 
@@ -97,7 +99,7 @@ export default function TemplateExplainerModal({ spec, state, open, onClose, onA
                 {spec.assistanceHint && !isJackShit && (
                     <section className="space-y-3">
                         <h3 className="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-1">Assistance Guidance</h3>
-                        <p className="text-[11px] text-gray-300 leading-snug">{isBBBVariant ? 'Pull + Core (upper); Single-Leg + Posterior (lower). 25–50 quality reps each. Use low end if fatigue rises.' : spec.assistanceHint.intent}</p>
+                        <p className="text-[11px] text-gray-300 leading-snug">{isBBBVariant ? 'Choose ONE assistance movement only (book example). 25–50 quality reps. Keep it simple (e.g., chins, dips, rows, back raises, ab wheel). Progress load or reps slowly once recovery is rock solid.' : spec.assistanceHint.intent}</p>
                         {spec.assistanceHint.examples && Object.keys(spec.assistanceHint.examples).length > 0 && (
                             <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-2">
                                 {Object.entries(spec.assistanceHint.examples).map(([lift, arr]) => (

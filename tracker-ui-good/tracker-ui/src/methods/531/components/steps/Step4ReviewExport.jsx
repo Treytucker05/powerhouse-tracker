@@ -16,6 +16,8 @@ import AssistanceRow from '../assistance/AssistanceRow.jsx';
 import AssistanceCatalogPicker from '../assistance/AssistanceCatalogPicker.jsx';
 import ToggleButton from '../ToggleButton.jsx';
 import { CardioTemplates, pickCardio } from '../../cardioTemplates.js';
+// New planner (hiit/liss distribution + weekday placement logic)
+import { buildConditioningPlan, planConditioningFromState, normalizeConditioningModalities } from '../../../../lib/fiveThreeOne/conditioningPlanner.js';
 
 const LIFT_KEY_MAP = {
     Squat: 'squat',
@@ -75,9 +77,18 @@ function TableBlock({ title, rows, units }) {
     );
 }
 
+function useSafeNavigate() {
+    try {
+        return useNavigate();
+    } catch {
+        // Outside a Router (e.g., isolated unit test) – provide no-op
+        return () => { };
+    }
+}
+
 export default function Step4ReviewExport({ onReadyChange }) {
     const { state, dispatch } = useProgramV2();
-    const navigate = useNavigate();
+    const navigate = useSafeNavigate();
     const [starting, setStarting] = useState(false);
     const [showTemplateExplainer, setShowTemplateExplainer] = useState(false);
     const [showChangeTemplate, setShowChangeTemplate] = useState(false);
@@ -114,11 +125,16 @@ export default function Step4ReviewExport({ onReadyChange }) {
     const assistMode = state.assistMode || 'template';
     const assistCustom = state.assistCustom || {};
     const conditioning = effective.conditioning || {
-        sessionsPerWeek: 2,
-        hiitPerWeek: 1,
-        modalities: { hiit: ['Prowler Pushes'], liss: ['Walking'] },
-        note: 'Do 2–3 sessions/week as tolerated.'
+        sessionsPerWeek: 3,
+        hiitPerWeek: 2,
+        modalities: { hiit: ['Prowler Pushes', 'Hill Sprints'], liss: ['Walking'] },
+        note: 'Target 3–4 conditioning sessions (hill sprints / prowler). Keep after lifting or on off days.'
     };
+
+    // Build a weekly conditioning session array (slim object) for export & per-day injection
+    const plannedConditioning = useMemo(() => planConditioningFromState(state).map(s => ({
+        day: s.day, mode: s.mode, modality: s.modality, notes: s.notes, prescription: s.prescription
+    })), [state]);
 
     // Validation collection
     const validation = useMemo(() => {
@@ -176,11 +192,12 @@ export default function Step4ReviewExport({ onReadyChange }) {
         return map[mainDisplay] || mainDisplay;
     }
 
-    // Build weeks JSON for export (4 weeks always include deload per spec preview)
+    // Build weeks JSON for export (optionally omit Deload week if user skipped)
     const weeksData = useMemo(() => {
-        // Assistance pack fallback: if no template chosen, prefer 'triumvirate' (never empty except Jack Shit)
+        const skipDeload = state?.advanced?.skipDeload === true;
         const assistancePack = state.templateKey || state.assistance?.templateId || (assistance.mode === 'jack_shit' ? 'jack_shit' : 'triumvirate');
-        const weeks = [0, 1, 2, 3].map(wi => {
+        const indexes = skipDeload ? [0, 1, 2] : [0, 1, 2, 3];
+        const weeks = indexes.map(wi => {
             const daysData = order.map((displayLift) => {
                 const tm = getTMForDisplayLift(displayLift);
                 const warmups = buildWarmupSets({ includeWarmups, warmupScheme, tm, roundingIncrement, roundingMode, units });
@@ -225,26 +242,67 @@ export default function Step4ReviewExport({ onReadyChange }) {
                         note: it.note || null
                     }));
                 }
-                // Conditioning: mimic schedule.js strategy (single pickCardio id reused across days)
-                const cardioId = pickCardio(frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2, state || {});
-                const conditioning = CardioTemplates[cardioId] || { type: 'LISS', minutes: 30 };
+                // Conditioning: inject planned session if weekday matches; fallback to legacy placeholder when none
+                let conditioningBlock = null;
+                if (plannedConditioning.length) {
+                    // Determine weekday label index wise (assume Mon/Tue/Thu/Fri for 4-day, sequential otherwise)
+                    const defaultDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                    const weekday = defaultDays[idxForWeekday(order, displayLift, frequency)];
+                    const match = plannedConditioning.find(pc => pc.day === weekday);
+                    if (match) {
+                        conditioningBlock = {
+                            type: match.mode === 'hiit' ? 'HIIT' : 'LISS',
+                            modality: match.modality,
+                            minutes: match.prescription?.minutes || match.prescription?.duration || undefined,
+                            intensity: match.prescription?.intensity || undefined,
+                            notes: match.notes || undefined
+                        };
+                    }
+                }
+                if (!conditioningBlock) {
+                    const cardioId = pickCardio(frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2, state || {});
+                    const legacy = CardioTemplates[cardioId] || { type: 'LISS', minutes: 30 };
+                    conditioningBlock = legacy;
+                }
                 return {
                     lift: displayLift,
                     warmups,
                     main,
                     supplemental: supplementalBlock,
                     assistance: assistanceComputed, // plain array for UI/export
-                    conditioning
+                    conditioning: conditioningBlock
                 };
             });
-            return { week: wi + 1, days: daysData };
+            return { week: wi + 1, deload: (!skipDeload && wi === 3), days: daysData };
         });
         return weeks;
-    }, [order, includeWarmups, warmupScheme, roundingIncrement, roundingMode, units, supplemental, assistance, loadingOption, trainingMaxes, state?.bodyweight, state.templateKey, frequency]);
+    }, [order, includeWarmups, warmupScheme, roundingIncrement, roundingMode, units, supplemental, assistance, loadingOption, trainingMaxes, state?.bodyweight, state.templateKey, frequency, state?.advanced?.skipDeload, plannedConditioning, state]);
 
-    // Derive template variant display name (BBB 60% same‑lift special case)
-    const isBBB60Same = supplemental?.strategy === 'bbb' && Number(supplemental.percentOfTM) === 60 && supplemental.pairing === 'same';
-    const templateVariantName = isBBB60Same ? 'BBB 60% (Same-Lift)' : (state.templateSpec?.name || state.templateKey || null);
+    // helper to map order index to a weekday label consistently (Mon/Tue/Thu/Fri default for 4-day classic split)
+    function idxForWeekday(orderArr, liftDisplay, freq) {
+        const i = orderArr.indexOf(liftDisplay);
+        if (freq === '4day' || freq === 4) {
+            // classic 4-day pressing & lower spacing: Mon/Tue/Thu/Fri
+            return [0, 1, 3, 4][i] ?? i; // map Day3 -> Thu
+        }
+        if (freq === '3day' || freq === 3) {
+            // Mon/Wed/Fri spacing
+            return [0, 2, 4][i] ?? i;
+        }
+        if (freq === '2day' || freq === 2) {
+            return [1, 4][i] ?? i; // Tue/Fri
+        }
+        return i;
+    }
+
+    // Derive template variant display name (BBB same‑lift special cases 50% start / 60% legacy)
+    const isBBBSame = supplemental?.strategy === 'bbb' && supplemental.pairing === 'same';
+    let templateVariantName = state.templateSpec?.name || state.templateKey || null;
+    if (isBBBSame) {
+        const pct = Number(supplemental.percentOfTM);
+        if (pct === 50) templateVariantName = 'BBB 50% (Same-Lift Start)';
+        else if (pct === 60) templateVariantName = 'BBB 60% (Same-Lift)';
+    }
 
     const exportJson = useMemo(() => {
         const freqNum = frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2;
@@ -272,11 +330,24 @@ export default function Step4ReviewExport({ onReadyChange }) {
                 includeWarmups,
                 warmupScheme
             },
+            conditioning: conditioning ? {
+                sessionsPerWeek: conditioning.sessionsPerWeek || conditioning.options?.frequency,
+                hiitPerWeek: conditioning.hiitPerWeek || conditioning.options?.hiitPerWeek,
+                modalities: normalizeConditioningModalities(
+                    conditioning.modalities || {
+                        hiit: conditioning.options?.hiitModalities,
+                        liss: conditioning.options?.lissModalities
+                    }
+                ),
+                note: conditioning.note,
+                placement: conditioning.options?.placement || conditioning.placement,
+                sessions: plannedConditioning
+            } : undefined,
             supplemental,
             assistance,
             weeks: weeksData
         };
-    }, [assistMode, state.pack, state.flowMode, state.templateKey, state.assistance?.templateId, state.schedule?.split4, state.advanced?.split4, state.equipment, units, loadingOption, trainingMaxes, state.rounding, roundingIncrement, roundingMode, frequency, order, includeWarmups, warmupScheme, supplemental, assistance, weeksData, templateVariantName]);
+    }, [assistMode, state.pack, state.flowMode, state.templateKey, state.assistance?.templateId, state.schedule?.split4, state.advanced?.split4, state.equipment, units, loadingOption, trainingMaxes, state.rounding, roundingIncrement, roundingMode, frequency, order, includeWarmups, warmupScheme, supplemental, assistance, weeksData, templateVariantName, conditioning, plannedConditioning]);
 
     const handleDownload = useCallback(() => {
         try {
@@ -385,7 +456,7 @@ export default function Step4ReviewExport({ onReadyChange }) {
                         {frequency === '4day' && (state.schedule?.split4 || state.advanced?.split4) && (
                             <span className="px-2 py-1 rounded-full bg-gray-700/50 border border-gray-600 text-gray-300 tracking-wide">Split {(state.schedule?.split4 || state.advanced?.split4)}</span>
                         )}
-                        <span className="px-2 py-1 rounded-full bg-gray-700/30 border border-gray-600 text-gray-400 italic">2 easy conditioning sessions (LISS) per week; don’t let conditioning hurt lifting.</span>
+                        <span className="px-2 py-1 rounded-full bg-gray-700/30 border border-gray-600 text-gray-400 italic" title="Wendler: 'Lift weights. Condition: run hills, push Prowler. Do this 3–4 times a week.'">Condition: hills / prowler 3–4x weekly (after lifts or off‑days) — keep easy enough to recover.</span>
                     </div>
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                         {state?.templateSpec && (
@@ -437,9 +508,9 @@ export default function Step4ReviewExport({ onReadyChange }) {
                 {/* Left: Week Preview */}
                 <div className="xl:col-span-8 space-y-6">
                     <div className="flex flex-wrap gap-2">
-                        {[0, 1, 2, 3].map(i => (
-                            <ToggleButton key={i} on={weekIndex === i} onClick={() => setWeekIndex(i)} className="text-xs px-4 py-2">
-                                Week {i + 1}{i === 3 && ' (Deload)'}
+                        {weeksData.map((w, i) => (
+                            <ToggleButton key={w.week} on={weekIndex === i} onClick={() => setWeekIndex(i)} className="text-xs px-4 py-2">
+                                Week {w.week}{w.deload ? ' (Deload)' : ''}
                             </ToggleButton>
                         ))}
                     </div>
@@ -553,11 +624,21 @@ export default function Step4ReviewExport({ onReadyChange }) {
                                 </div>
                             ))}
                         </div>
-                        <div className="text-xs text-gray-400">
+                        <div className="text-xs text-gray-400 space-y-1">
                             <div>Loading Option: {loadingOption} {loadingOption === 1 ? '(Conservative)' : '(Aggressive)'}</div>
                             <div>Schedule: {(frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2)} days – {order.join(' / ')}</div>
                             {state.deadliftRepStyle && <div>Deadlift Style: {state.deadliftRepStyle.replace('_', ' ')}</div>}
                             <div>Units: {units}</div>
+                            {conditioning && (
+                                <div className="pt-1 border-t border-gray-700/50">
+                                    <div className="text-gray-300 font-medium mb-0.5">Conditioning Plan</div>
+                                    <div className="text-[11px] leading-snug">
+                                        Sessions Target: {conditioning.sessionsPerWeek || 3}{conditioning.sessionsPerWeek < 2 ? ' (below guideline – aim for ≥2)' : ''}<br />
+                                        HIIT: {conditioning.hiitPerWeek || 0} · Modalities: {(conditioning.modalities?.hiit || []).join(', ') || '—'}<br />
+                                        LISS: {Math.max(0, (conditioning.sessionsPerWeek || 0) - (conditioning.hiitPerWeek || 0))} · Modalities: {(conditioning.modalities?.liss || []).join(', ') || '—'}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-5 space-y-4">
