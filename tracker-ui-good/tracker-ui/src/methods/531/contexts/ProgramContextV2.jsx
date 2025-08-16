@@ -245,6 +245,16 @@ function reducerV2(state, action) {
         }
         case 'HYDRATE_FROM_STORAGE': return { ...state, ...action.state };
         case 'RESET_PROGRAM': return { ...initialProgramV2 };
+        case 'RESET_FUNDAMENTALS': {
+            return {
+                ...state,
+                units: null,
+                rounding: null,
+                tmPct: null,
+                lifts: {},
+                tms: {}
+            };
+        }
         default: return state;
     }
 }

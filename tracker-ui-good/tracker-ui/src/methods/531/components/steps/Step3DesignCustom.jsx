@@ -23,7 +23,7 @@ function parseCsvNums(str) {
 export default function Step3DesignCustom(props) {
     const { onValidChange } = props || {};
     const { state, dispatch } = useProgramV2();
-    
+
     const [isLoading, setIsLoading] = useState(false);
     const [configErrors, setConfigErrors] = useState([]);
 
@@ -193,51 +193,51 @@ export default function Step3DesignCustom(props) {
     const comprehensiveValidation = useMemo(() => {
         const errors = [];
         const warnings = [];
-        
+
         // Schedule validation
         const desired = frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2;
         if (order.length !== desired) {
             errors.push(`Schedule must have ${desired} days for ${frequency} frequency`);
         }
-        
+
         const unique = new Set(order);
         if (unique.size !== order.length) {
             errors.push('Each training day must use a different main lift');
         }
-        
+
         if (!order.every(l => CORE_LIFTS.includes(l))) {
             errors.push('All lifts must be from the core 4: Press, Deadlift, Bench, Squat');
         }
-        
+
         // Warmup validation
         if (includeWarmups) {
             const warmPercentages = parseCsvNums(warmPctCsv);
             const warmReps = parseCsvNums(warmRepsCsv);
-            
+
             if (warmPercentages.length === 0 || warmPercentages.length !== warmReps.length) {
                 errors.push('Warmup percentages and reps must have matching counts');
             }
-            
+
             if (warmPercentages.length > 5) {
                 warnings.push('More than 5 warmup sets may cause fatigue');
             }
-            
+
             if (!warmPercentages.every(n => n > 0 && n < 100)) {
                 errors.push('Warmup percentages must be between 1-99%');
             }
-            
+
             if (!warmReps.every(r => r > 0 && r < 30)) {
                 errors.push('Warmup reps must be between 1-29');
             }
         }
-        
+
         // Programming approach validation
         if (!programmingApproach) {
             errors.push('Select a programming approach');
         } else if (programmingApproach === 'leaderAnchor' && !leaderAnchorPattern) {
             errors.push('Select a Leader/Anchor pattern');
         }
-        
+
         // Supplemental validation
         if (suppStrategy === 'bbb') {
             if (!(suppPct >= 50 && suppPct <= 70)) {
@@ -250,7 +250,7 @@ export default function Step3DesignCustom(props) {
                 errors.push('BBB percentage too high (maximum 80%)');
             }
         }
-        
+
         // Assistance validation
         if (assistMode === 'custom') {
             for (const lift of order) {
@@ -258,7 +258,7 @@ export default function Step3DesignCustom(props) {
                 if (rows.length > 2) {
                     warnings.push(`${lift} has more than recommended 2 assistance exercises`);
                 }
-                
+
                 for (const r of rows) {
                     if (!r.name || r.name.trim().length === 0) {
                         errors.push(`${lift} has unnamed assistance exercise`);
@@ -272,12 +272,12 @@ export default function Step3DesignCustom(props) {
                 }
             }
         }
-        
+
         // Equipment validation
         if (!equip || equip.length === 0) {
             warnings.push('No equipment selected - this will limit exercise options');
         }
-        
+
         return {
             isValid: errors.length === 0,
             errors,
@@ -404,12 +404,12 @@ export default function Step3DesignCustom(props) {
                     </div>
                 </div>
             )}
-            
+
             {/* Configuration Status */}
             <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-4">
                 <h2 className="text-lg font-semibold text-white mb-2">Step 3: Design Your Cycle</h2>
                 <p className="text-sm text-gray-400 mb-4">Configure your training schedule, supplemental work, and assistance exercises.</p>
-                
+
                 {comprehensiveValidation.isValid ? (
                     <div className="bg-green-900/20 border border-green-500/50 rounded-lg p-3">
                         <div className="flex items-center gap-2">
@@ -442,7 +442,7 @@ export default function Step3DesignCustom(props) {
                         </div>
                     </div>
                 )}
-                
+
                 {comprehensiveValidation.hasWarnings && (
                     <div className="bg-yellow-900/20 border border-yellow-500/50 rounded-lg p-3 mt-3">
                         <div className="flex items-start gap-2">
@@ -1762,12 +1762,13 @@ export default function Step3DesignCustom(props) {
                                                     setCustomPlan(prev => {
                                                         const list = prev[lift] ? [...prev[lift]] : [];
                                                         if (list.length >= 2) return prev;
-                                                        list.push({ name: x.name, sets: x.sets || 3, reps: x.reps || 10, block: x.block });
+                                                        list.push({ name: x.name, sets: x.sets || 5, reps: x.reps || 10, block: x.block }); // Default 5 sets for BBB-style assistance
                                                         return { ...prev, [lift]: list };
                                                     });
-                                                    setShowDayPicker(null);
+                                                    // Keep modal open for easier multi-selection
                                                 }}
                                                 onClose={() => setShowDayPicker(null)}
+                                                keepOpen={true}
                                             />
                                         </div>
                                     )}
@@ -1820,9 +1821,10 @@ export default function Step3DesignCustom(props) {
                                                                             setTimeout(() => updateCustomRow(lift, rowIdx, { volumeWarn: false }), 3000);
                                                                         }
                                                                     } catch { /* noop */ }
-                                                                    setSwapTarget(null);
+                                                                    // Modal stays open for easier browsing
                                                                 }}
                                                                 onClose={() => setSwapTarget(null)}
+                                                                keepOpen={true}
                                                             />
                                                         </div>
                                                     )}

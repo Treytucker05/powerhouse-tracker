@@ -11,7 +11,7 @@
  */
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { ChevronRight, CheckCircle2, Info, AlertTriangle } from 'lucide-react';
+import { ChevronRight, CheckCircle2, Info, AlertTriangle, RotateCcw } from 'lucide-react';
 import ToggleButton from './ToggleButton.jsx';
 import { useNavigate } from "react-router-dom";
 import { useProgramV2 } from "../contexts/ProgramContextV2.jsx";
@@ -86,6 +86,135 @@ function WizardShell() {
     const { state, dispatch } = useProgramV2();
     const packRef = useRef(null);
     // Packs always on unless env kill-switch disables
+
+    // Enhanced step validation helper functions
+    const getStepWarnings = (stepIndex) => {
+        const warnings = [];
+        const errors = [];
+
+        switch (stepIndex) {
+            case 0: // Fundamentals
+                if (!state?.units) errors.push("Units (lbs/kg) required");
+                if (!state?.rounding) errors.push("Rounding preference required");
+                if (!state?.tmPct) errors.push("Training max percentage required");
+
+                const tmsSource = state?.tms || {};
+                LIFTS.forEach(lift => {
+                    const tm = Number(tmsSource[lift] || state?.lifts?.[lift]?.tm);
+                    if (!Number.isFinite(tm) || tm <= 0) {
+                        errors.push(`${lift.charAt(0).toUpperCase() + lift.slice(1)} training max required`);
+                    }
+                });
+                break;
+
+            case 1: // Template/Custom
+                if (!state?.templateKey && !state?.schedule?.frequency) {
+                    errors.push("Select a template or configure custom schedule");
+                }
+                if (state?.templateKey && !isStep1Complete(state)) {
+                    errors.push("Complete Step 1 before using templates");
+                }
+                if (state?.templateKey) {
+                    warnings.push("Template selected - ready to apply configuration");
+                } else if (!state?.schedule?.frequency) {
+                    warnings.push("Custom path chosen - configure schedule in next step");
+                }
+                break;
+
+            case 2: // Design Custom
+                if (!state?.templateKey) { // Only validate if not using template
+                    if (!state?.schedule?.frequency) {
+                        errors.push("Training frequency not set");
+                    } else {
+                        warnings.push(`${state.schedule.frequency}-day schedule configured`);
+                    }
+
+                    if (!state?.supplemental?.strategy || state?.supplemental?.strategy === 'none') {
+                        warnings.push("Supplemental work not configured");
+                    } else {
+                        warnings.push(`${state.supplemental.strategy.toUpperCase()} supplemental configured`);
+                    }
+
+                    if (!state?.assistance?.mode || state?.assistance?.mode === 'minimal') {
+                        warnings.push("Assistance exercises not configured");
+                    } else {
+                        warnings.push(`${state.assistance.mode} assistance configured`);
+                    }
+                } else {
+                    warnings.push("Template applied - custom design skipped");
+                }
+                break;
+
+            case 3: // Review & Export
+                if (!isStep1Complete(state)) {
+                    errors.push("Training maxes incomplete");
+                }
+                if (!state?.schedule?.frequency && !state?.templateKey) {
+                    errors.push("No training schedule configured");
+                }
+                if (state?.templateKey) {
+                    warnings.push(`Using ${state.templateKey.toUpperCase()} template`);
+                } else {
+                    if (state?.schedule?.frequency) {
+                        warnings.push(`Custom ${state.schedule.frequency}-day program`);
+                    }
+                }
+                if (!state?.advanced?.generatedProgram) {
+                    warnings.push("Program ready to generate");
+                } else {
+                    warnings.push("Program generated - ready for export");
+                }
+                break;
+
+            case 4: // Progress
+                if (!state?.advanced?.generatedProgram) {
+                    warnings.push("Generate program first in Review step");
+                }
+                if (!state?.amrapWk3 || Object.keys(state.amrapWk3).length === 0) {
+                    warnings.push("Enter Week 3 AMRAP results to calculate new training maxes");
+                } else {
+                    warnings.push("AMRAP data entered - training maxes ready to advance");
+                }
+                break;
+        }
+
+        return { errors, warnings, hasIssues: errors.length > 0 || warnings.length > 0 };
+    };
+
+    // Reset step function with confirmation
+    const resetStep = (stepIndex) => {
+        const stepName = STEPS[stepIndex].title;
+        const confirmed = window.confirm(`Reset ${stepName} to defaults?\n\nThis will clear all data for this step and cannot be undone.`);
+
+        if (!confirmed) return;
+
+        switch (stepIndex) {
+            case 0: // Fundamentals
+                dispatch({ type: 'RESET_FUNDAMENTALS' });
+                break;
+            case 1: // Template/Custom
+                dispatch({ type: 'SET_TEMPLATE_KEY', templateKey: null });
+                dispatch({ type: 'SET_SCHEDULE', schedule: {} });
+                break;
+            case 2: // Design Custom
+                dispatch({ type: 'SET_SCHEDULE', schedule: {} });
+                dispatch({ type: 'SET_SUPPLEMENTAL', supplemental: { strategy: 'none' } });
+                dispatch({ type: 'SET_ASSISTANCE', assistance: { mode: 'minimal' } });
+                dispatch({ type: 'SET_CONDITIONING', conditioning: {} });
+                break;
+            case 3: // Review & Export
+                // Reset any program generation state
+                dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), generatedProgram: null } });
+                break;
+            case 4: // Progress
+                dispatch({ type: 'SET_AMRAP_WK3', payload: {} });
+                dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), progressData: null } });
+                break;
+        }
+
+        // Show success feedback
+        setStep1FlashToken(prev => prev + 1); // Reuse flash system for visual feedback
+    };
 
     // Optional future pack loading (no behavior change while flag is false)
     useEffect(() => {
@@ -674,6 +803,71 @@ function WizardShell() {
                     {/* Main Content */}
                     <main className="lg:col-span-9">
                         <div className="space-y-6">
+                            {/* Step Header with Reset Button and Validation */}
+                            <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4">
+                                <div className="flex items-center justify-between mb-3">
+                                    <div>
+                                        <h2 className="text-xl font-semibold text-white">
+                                            Step {stepIndex + 1}: {STEPS[stepIndex].title}
+                                        </h2>
+                                        <p className="text-sm text-gray-400 mt-1">
+                                            {STEPS[stepIndex].description}
+                                        </p>
+                                    </div>
+                                    <button
+                                        onClick={() => resetStep(stepIndex)}
+                                        className="text-xs text-gray-400 hover:text-white cursor-pointer flex items-center gap-1 px-2 py-1 rounded hover:bg-gray-700/50 transition-colors"
+                                        title={`Reset ${STEPS[stepIndex].title}`}
+                                    >
+                                        <RotateCcw className="w-3 h-3" />
+                                        Reset
+                                    </button>
+                                </div>
+
+                                {(() => {
+                                    const validation = getStepWarnings(stepIndex);
+                                    if (validation.hasIssues) {
+                                        return (
+                                            <div className="space-y-2">
+                                                {validation.errors.length > 0 && (
+                                                    <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-3">
+                                                        <div className="flex items-start gap-2">
+                                                            <AlertTriangle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+                                                            <div>
+                                                                <div className="text-red-300 text-sm font-medium">
+                                                                    {validation.errors.length} required field(s) missing
+                                                                </div>
+                                                                <ul className="mt-1 space-y-1">
+                                                                    {validation.errors.map((error, idx) => (
+                                                                        <li key={idx} className="text-red-200 text-xs">• {error}</li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                {validation.warnings.length > 0 && (
+                                                    <div className="bg-yellow-900/20 border border-yellow-500/50 rounded-lg p-3">
+                                                        <div className="flex items-start gap-2">
+                                                            <Info className="w-4 h-4 text-yellow-400 mt-0.5 flex-shrink-0" />
+                                                            <div>
+                                                                <div className="text-yellow-300 text-sm font-medium">Recommendations</div>
+                                                                <ul className="mt-1 space-y-1">
+                                                                    {validation.warnings.map((warning, idx) => (
+                                                                        <li key={idx} className="text-yellow-200 text-xs">• {warning}</li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                })()}
+                            </div>
+
                             {/* Step content always rendered so validation can update */}
                             {renderStepContent()}
                             {/* 3-day schedule preview appended (does not replace step content) */}
@@ -995,13 +1189,24 @@ function WizardShell() {
                                         )}
                                     </div>
                                 )}
-                                {stepIndex === 2 && (
-                                    <ToggleButton
-                                        on={canGoNext}
-                                        disabled={!canGoNext}
-                                        onClick={handleNext}
-                                        className={`flex items-center gap-2 text-sm px-5 ${!canGoNext ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    >Next <ChevronRight className="w-4 h-4" /></ToggleButton>
+                                {(stepIndex === 1 || stepIndex === 2) && (
+                                    <div className="flex flex-col items-end gap-2">
+                                        {(() => {
+                                            const validation = getStepWarnings(stepIndex);
+                                            const canProceed = validation.errors.length === 0;
+
+                                            return (
+                                                <ToggleButton
+                                                    on={canProceed}
+                                                    disabled={!canProceed}
+                                                    onClick={handleNext}
+                                                    className={`flex items-center gap-2 text-sm px-5 ${!canProceed ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                >
+                                                    {stepIndex === 1 ? 'Continue' : 'Review & Export'} <ChevronRight className="w-4 h-4" />
+                                                </ToggleButton>
+                                            );
+                                        })()}
+                                    </div>
                                 )}
                                 {stepIndex === 3 && (
                                     <ToggleButton

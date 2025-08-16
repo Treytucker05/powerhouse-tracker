@@ -172,10 +172,11 @@ function supplementalFor(lift, week, state) {
 }
 
 function defaultTriumvirate(lift) {
-    if (lift === 'press') return [{ ex: 'Dips', scheme: '5x15' }, { ex: 'Chin-ups', scheme: '5x10' }];
-    if (lift === 'bench') return [{ ex: 'DB Rows', scheme: '5x10' }, { ex: 'Dips', scheme: '5x15' }];
-    if (lift === 'deadlift') return [{ ex: 'Good Mornings', scheme: '5x10' }, { ex: 'Hanging Leg Raises', scheme: '5x15' }];
-    if (lift === 'squat') return [{ ex: 'Leg Curls', scheme: '5x10' }, { ex: 'Leg Raises', scheme: '5x15' }];
+    // Book-accurate Triumvirate assistance per p. 48
+    if (lift === 'press') return [{ ex: 'Dips', scheme: '5×15' }, { ex: 'Chin-ups', scheme: '5×10' }];
+    if (lift === 'bench') return [{ ex: 'DB Bench Press', scheme: '5×15' }, { ex: 'DB Rows', scheme: '5×10' }]; // Fixed: p. 48
+    if (lift === 'deadlift') return [{ ex: 'Good Mornings', scheme: '5×10' }, { ex: 'Hanging Leg Raises', scheme: '5×15' }];
+    if (lift === 'squat') return [{ ex: 'Leg Press', scheme: '5×15' }, { ex: 'Leg Curls', scheme: '5×10' }]; // Fixed: p. 48
     return [];
 }
 
