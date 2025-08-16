@@ -1,5 +1,6 @@
 import { buildAssistanceForDay } from "../.."; // barrel export
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useProgramV2 } from '../../contexts/ProgramContextV2.jsx';
 import { buildMainSetsForLift, buildWarmupSets, roundToIncrement, getWeekScheme } from '../..'; // barrel export
 import { Info, AlertTriangle, Download, Copy, Printer, CheckCircle2, BookOpen } from 'lucide-react';
@@ -15,6 +16,8 @@ import AssistanceRow from '../assistance/AssistanceRow.jsx';
 import AssistanceCatalogPicker from '../assistance/AssistanceCatalogPicker.jsx';
 import ToggleButton from '../ToggleButton.jsx';
 import { CardioTemplates, pickCardio } from '../../cardioTemplates.js';
+// New planner (hiit/liss distribution + weekday placement logic)
+import { buildConditioningPlan, planConditioningFromState, normalizeConditioningModalities } from '../../../../lib/fiveThreeOne/conditioningPlanner.js';
 
 const LIFT_KEY_MAP = {
     Squat: 'squat',
@@ -23,7 +26,7 @@ const LIFT_KEY_MAP = {
     Press: 'press',
     Overhead: 'press'
 };
-const DISPLAY_LIFT_NAMES = { squat: 'Squat', bench: 'Bench', deadlift: 'Deadlift', press: 'Press', overhead_press: 'Press' };
+const DISPLAY_LIFT_NAMES = { squat: 'Squat', bench: 'Bench', deadlift: 'Deadlift', press: 'Press' };
 
 function deriveEffectiveConfig(state) {
     const merged = { ...state };
@@ -45,8 +48,48 @@ function deriveEffectiveConfig(state) {
     return merged;
 }
 
+function TableBlock({ title, rows, units }) {
+    if (!rows || !rows.length) return null;
+    return (
+        <div className="mt-4">
+            <h4 className="text-sm md:text-base font-semibold mb-2 tracking-wide text-white">{title}</h4>
+            <div className="overflow-x-auto rounded border border-gray-700">
+                <table className="min-w-[420px] w-full text-xs md:text-sm">
+                    <thead className="bg-gray-800 text-gray-300">
+                        <tr>
+                            <th className="text-left py-1.5 px-3 font-medium">% TM</th>
+                            <th className="text-left py-1.5 px-3 font-medium">Reps</th>
+                            <th className="text-left py-1.5 px-3 font-medium">Load</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {rows.map((r, i) => (
+                            <tr key={i} className={`border-t border-gray-700 ${i % 2 ? 'bg-gray-900/80' : 'bg-gray-900'} text-gray-300`}>
+                                <td className="py-1 px-3 font-mono text-gray-200">{r.pct}%</td>
+                                <td className="py-1 px-3 font-mono">{r.reps}{r.amrap ? '+' : ''}</td>
+                                <td className="py-1 px-3 font-mono text-gray-100">{r.weight}{units}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+}
+
+function useSafeNavigate() {
+    try {
+        return useNavigate();
+    } catch {
+        // Outside a Router (e.g., isolated unit test) – provide no-op
+        return () => { };
+    }
+}
+
 export default function Step4ReviewExport({ onReadyChange }) {
+    const navigate = useSafeNavigate();
     const { state, dispatch } = useProgramV2();
+    const [starting, setStarting] = useState(false);
     const [showTemplateExplainer, setShowTemplateExplainer] = useState(false);
     const [showChangeTemplate, setShowChangeTemplate] = useState(false);
     const [pendingTemplate, setPendingTemplate] = useState(null);
@@ -54,6 +97,9 @@ export default function Step4ReviewExport({ onReadyChange }) {
     const [weekIndex, setWeekIndex] = useState(0);
     const [exportError, setExportError] = useState(null);
     const [copied, setCopied] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [errors, setErrors] = useState([]);
+    const [warnings, setWarnings] = useState([]);
 
     const effective = useMemo(() => deriveEffectiveConfig(state), [state]);
 
@@ -69,8 +115,52 @@ export default function Step4ReviewExport({ onReadyChange }) {
         squat: effective.lifts?.squat?.tm || 0,
         bench: effective.lifts?.bench?.tm || 0,
         deadlift: effective.lifts?.deadlift?.tm || 0,
-        overhead_press: effective.lifts?.press?.tm || effective.lifts?.overhead_press?.tm || 0
+        press: effective.lifts?.press?.tm || 0
     };
+
+    // Comprehensive validation for Step 4
+    const comprehensiveValidation = useMemo(() => {
+        const errors = [];
+        const warnings = [];
+
+        // Training maxes validation
+        const trainingMaxes = effective.trainingMax || {};
+        order.forEach(lift => {
+            if (!trainingMaxes[lift.toLowerCase()] || trainingMaxes[lift.toLowerCase()] <= 0) {
+                errors.push(`Training max for ${lift} is required`);
+            }
+        });
+
+        // Schedule validation
+        if (!effective.schedule?.order?.length) {
+            errors.push('Training schedule not configured');
+        }
+
+        // Supplemental validation
+        if (supplemental.strategy === 'bbb' && !supplemental.percentage) {
+            warnings.push('BBB percentage not set - defaulting to 50%');
+        }
+
+        // Assistance validation
+        if (assistance.mode === 'custom' && assistMode === 'template') {
+            warnings.push('Assistance set to custom but using template mode');
+        }
+
+        // Program readiness check
+        if (errors.length === 0 && !starting) {
+            setErrors([]);
+        } else {
+            setErrors(errors);
+        }
+        setWarnings(warnings);
+
+        return {
+            isValid: errors.length === 0,
+            hasWarnings: warnings.length > 0,
+            errors,
+            warnings
+        };
+    }, [effective, order, supplemental, assistance, assistMode, starting]);
 
     const roundingMode = typeof effective.rounding === 'string' ? effective.rounding : (effective.rounding?.mode || 'nearest');
     const roundingIncrement = typeof effective.rounding === 'object' ? (effective.rounding.increment || 5) : (effective.units === 'kg' ? 2.5 : 5);
@@ -82,11 +172,38 @@ export default function Step4ReviewExport({ onReadyChange }) {
     const assistMode = state.assistMode || 'template';
     const assistCustom = state.assistCustom || {};
     const conditioning = effective.conditioning || {
-        sessionsPerWeek: 2,
-        hiitPerWeek: 1,
-        modalities: { hiit: ['Prowler Pushes'], liss: ['Walking'] },
-        note: 'Do 2–3 sessions/week as tolerated.'
+        sessionsPerWeek: 3,
+        hiitPerWeek: 2,
+        modalities: { hiit: ['Prowler Pushes', 'Hill Sprints'], liss: ['Walking'] },
+        note: 'Target 3–4 conditioning sessions (hill sprints / prowler). Keep after lifting or on off days.'
     };
+
+    // Build a weekly conditioning session array (slim object) for export & per-day injection
+    const plannedConditioning = useMemo(() => planConditioningFromState(state).map(s => ({
+        day: s.day, mode: s.mode, modality: s.modality, notes: s.notes, prescription: s.prescription
+    })), [state]);
+
+    // Diagnostic: log any mismatch between schedule.order and rendered order (once per mount or when underlying changes)
+    useEffect(() => {
+        try {
+            const schedOrder = state?.schedule?.order;
+            if (!Array.isArray(schedOrder) || !schedOrder.length) return;
+            const displaySched = schedOrder.map(l => l && l.charAt(0).toUpperCase() + l.slice(1));
+            const mismatch = JSON.stringify(displaySched) !== JSON.stringify(order);
+            if (mismatch) {
+                if (typeof window !== 'undefined' && window?.localStorage?.getItem('debug.531.template') === 'off') return;
+                // eslint-disable-next-line no-console
+                console.info('[531:TEMPLATE_SYNC]', 'step4.orderMismatch', { scheduleOrder: displaySched, uiOrder: order });
+            } else {
+                if (typeof window !== 'undefined' && window?.localStorage?.getItem('debug.531.template') === 'off') return;
+                // eslint-disable-next-line no-console
+                console.info('[531:TEMPLATE_SYNC]', 'step4.orderAligned', { order: displaySched });
+            }
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.warn('[531:TEMPLATE_SYNC]', 'step4.orderCheckError', e.message);
+        }
+    }, [state?.schedule?.order, order]);
 
     // Validation collection
     const validation = useMemo(() => {
@@ -133,7 +250,6 @@ export default function Step4ReviewExport({ onReadyChange }) {
 
     function getTMForDisplayLift(display) {
         const key = mapLiftDisplayName(display);
-        if (key === 'press') return trainingMaxes.overhead_press; // unify
         return trainingMaxes[key] || 0;
     }
 
@@ -144,11 +260,22 @@ export default function Step4ReviewExport({ onReadyChange }) {
         return map[mainDisplay] || mainDisplay;
     }
 
-    // Build weeks JSON for export (4 weeks always include deload per spec preview)
+    function getBbbExerciseName(liftDisplay) {
+        const exerciseNames = {
+            'Press': 'Overhead Press',
+            'Bench': 'Bench Press',
+            'Squat': 'Back Squat',
+            'Deadlift': 'Deadlift'
+        };
+        return exerciseNames[liftDisplay] || liftDisplay;
+    }
+
+    // Build weeks JSON for export (optionally omit Deload week if user skipped)
     const weeksData = useMemo(() => {
-        // Assistance pack fallback: if no template chosen, prefer 'triumvirate' (never empty except Jack Shit)
+        const skipDeload = state?.advanced?.skipDeload === true;
         const assistancePack = state.templateKey || state.assistance?.templateId || (assistance.mode === 'jack_shit' ? 'jack_shit' : 'triumvirate');
-        const weeks = [0, 1, 2, 3].map(wi => {
+        const indexes = skipDeload ? [0, 1, 2] : [0, 1, 2, 3];
+        const weeks = indexes.map(wi => {
             const daysData = order.map((displayLift) => {
                 const tm = getTMForDisplayLift(displayLift);
                 const warmups = buildWarmupSets({ includeWarmups, warmupScheme, tm, roundingIncrement, roundingMode, units });
@@ -158,10 +285,14 @@ export default function Step4ReviewExport({ onReadyChange }) {
                     const bbbTargetLiftDisplay = getBbbPairLift(displayLift);
                     const bbbTm = getTMForDisplayLift(bbbTargetLiftDisplay);
                     const bbbWeight = roundToIncrement(bbbTm * (supplemental.percentOfTM / 100), roundingIncrement, roundingMode);
+                    const bbbExerciseName = getBbbExerciseName(bbbTargetLiftDisplay);
                     supplementalBlock = {
                         type: 'bbb',
+                        exercise: bbbExerciseName,
+                        targetLift: bbbTargetLiftDisplay,
                         sets: supplemental.sets, reps: supplemental.reps,
-                        weight: bbbWeight, units
+                        weight: bbbWeight, units,
+                        percentOfTM: supplemental.percentOfTM
                     };
                 }
                 // Normalized assistance via template rules (ignores legacy state.assistance shape)
@@ -193,22 +324,67 @@ export default function Step4ReviewExport({ onReadyChange }) {
                         note: it.note || null
                     }));
                 }
-                // Conditioning: mimic schedule.js strategy (single pickCardio id reused across days)
-                const cardioId = pickCardio(frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2, state || {});
-                const conditioning = CardioTemplates[cardioId] || { type: 'LISS', minutes: 30 };
+                // Conditioning: inject planned session if weekday matches; fallback to legacy placeholder when none
+                let conditioningBlock = null;
+                if (plannedConditioning.length) {
+                    // Determine weekday label index wise (assume Mon/Tue/Thu/Fri for 4-day, sequential otherwise)
+                    const defaultDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                    const weekday = defaultDays[idxForWeekday(order, displayLift, frequency)];
+                    const match = plannedConditioning.find(pc => pc.day === weekday);
+                    if (match) {
+                        conditioningBlock = {
+                            type: match.mode === 'hiit' ? 'HIIT' : 'LISS',
+                            modality: match.modality,
+                            minutes: match.prescription?.minutes || match.prescription?.duration || undefined,
+                            intensity: match.prescription?.intensity || undefined,
+                            notes: match.notes || undefined
+                        };
+                    }
+                }
+                if (!conditioningBlock) {
+                    const cardioId = pickCardio(frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2, state || {});
+                    const legacy = CardioTemplates[cardioId] || { type: 'LISS', minutes: 30 };
+                    conditioningBlock = legacy;
+                }
                 return {
                     lift: displayLift,
                     warmups,
                     main,
                     supplemental: supplementalBlock,
                     assistance: assistanceComputed, // plain array for UI/export
-                    conditioning
+                    conditioning: conditioningBlock
                 };
             });
-            return { week: wi + 1, days: daysData };
+            return { week: wi + 1, deload: (!skipDeload && wi === 3), days: daysData };
         });
         return weeks;
-    }, [order, includeWarmups, warmupScheme, roundingIncrement, roundingMode, units, supplemental, assistance, loadingOption, trainingMaxes, state?.bodyweight, state.templateKey, frequency]);
+    }, [order, includeWarmups, warmupScheme, roundingIncrement, roundingMode, units, supplemental, assistance, loadingOption, trainingMaxes, state?.bodyweight, state.templateKey, frequency, state?.advanced?.skipDeload, plannedConditioning, state]);
+
+    // helper to map order index to a weekday label consistently (Mon/Tue/Thu/Fri default for 4-day classic split)
+    function idxForWeekday(orderArr, liftDisplay, freq) {
+        const i = orderArr.indexOf(liftDisplay);
+        if (freq === '4day' || freq === 4) {
+            // classic 4-day pressing & lower spacing: Mon/Tue/Thu/Fri
+            return [0, 1, 3, 4][i] ?? i; // map Day3 -> Thu
+        }
+        if (freq === '3day' || freq === 3) {
+            // Mon/Wed/Fri spacing
+            return [0, 2, 4][i] ?? i;
+        }
+        if (freq === '2day' || freq === 2) {
+            return [1, 4][i] ?? i; // Tue/Fri
+        }
+        return i;
+    }
+
+    // Derive template variant display name (BBB same‑lift special cases 50% start / 60% legacy)
+    const isBBBSame = supplemental?.strategy === 'bbb' && supplemental.pairing === 'same';
+    let templateVariantName = state.templateSpec?.name || state.templateKey || null;
+    if (isBBBSame) {
+        const pct = Number(supplemental.percentOfTM);
+        if (pct === 50) templateVariantName = 'BBB 50% (Same-Lift Start)';
+        else if (pct === 60) templateVariantName = 'BBB 60% (Same-Lift)';
+    }
 
     const exportJson = useMemo(() => {
         const freqNum = frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2;
@@ -219,7 +395,7 @@ export default function Step4ReviewExport({ onReadyChange }) {
                 catalogVersion: CATALOG_VERSION,
                 createdAt: new Date().toISOString(),
                 templateKey: state.flowMode === 'template' ? state.templateKey : null,
-                templateName: state.templateSpec?.name || null,
+                templateName: templateVariantName || null,
                 pack: assistancePack,
                 assistanceMode: assistMode,
                 units,
@@ -236,11 +412,24 @@ export default function Step4ReviewExport({ onReadyChange }) {
                 includeWarmups,
                 warmupScheme
             },
+            conditioning: conditioning ? {
+                sessionsPerWeek: conditioning.sessionsPerWeek || conditioning.options?.frequency,
+                hiitPerWeek: conditioning.hiitPerWeek || conditioning.options?.hiitPerWeek,
+                modalities: normalizeConditioningModalities(
+                    conditioning.modalities || {
+                        hiit: conditioning.options?.hiitModalities,
+                        liss: conditioning.options?.lissModalities
+                    }
+                ),
+                note: conditioning.note,
+                placement: conditioning.options?.placement || conditioning.placement,
+                sessions: plannedConditioning
+            } : undefined,
             supplemental,
             assistance,
             weeks: weeksData
         };
-    }, [assistMode, state.pack, state.flowMode, state.templateKey, state.assistance?.templateId, state.schedule?.split4, state.advanced?.split4, state.equipment, units, loadingOption, trainingMaxes, state.rounding, roundingIncrement, roundingMode, frequency, order, includeWarmups, warmupScheme, supplemental, assistance, weeksData]);
+    }, [assistMode, state.pack, state.flowMode, state.templateKey, state.assistance?.templateId, state.schedule?.split4, state.advanced?.split4, state.equipment, units, loadingOption, trainingMaxes, state.rounding, roundingIncrement, roundingMode, frequency, order, includeWarmups, warmupScheme, supplemental, assistance, weeksData, templateVariantName, conditioning, plannedConditioning]);
 
     const handleDownload = useCallback(() => {
         try {
@@ -318,16 +507,38 @@ export default function Step4ReviewExport({ onReadyChange }) {
         if (assistMode === 'custom') setShowAssistEditor(true);
     }, [assistMode]);
 
+    async function onStartCycle() {
+        setStarting(true);
+        try {
+            // Reuse exportJson as payload (already structured)
+            const programPayload = exportJson;
+            // Persist using existing helper for consistency with TrainToday
+            try {
+                const { persistActiveCycle } = await import('../../../../lib/fiveThreeOne/persistCycle.js');
+                persistActiveCycle(programPayload);
+            } catch { /* ignore dynamic import issues */ }
+            window.dispatchEvent(new CustomEvent('cycle:started'));
+            navigate('/train');
+        } finally {
+            setStarting(false);
+        }
+    }
+
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 text-sm md:text-base leading-6">
             <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                     <h2 className="text-2xl font-bold text-white mb-1">Step 4 — Review & Export</h2>
                     <p className="text-gray-400 text-sm">Preview the full 4-week cycle, confirm details, then export or print.</p>
-                    {/* Context badge */}
-                    <div className="text-xs uppercase tracking-wide opacity-70 mt-2">
-                        {frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2}-day • {String((state.templateKey || state.assistance?.templateId || (assistance.mode === 'jack_shit' ? 'jack_shit' : 'triumvirate'))).toUpperCase()}
-                        {frequency === '4day' && (state.schedule?.split4 || state.advanced?.split4) && ` • Split ${(state.schedule?.split4 || state.advanced?.split4)}`}
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px]">
+                        <span className="px-2 py-1 rounded-full bg-gray-700/50 border border-gray-600 text-gray-300 tracking-wide">{frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2}-Day</span>
+                        {templateVariantName && (
+                            <span className="px-2 py-1 rounded-full bg-red-600/20 border border-red-500/60 text-red-300 tracking-wide">Template: {templateVariantName}</span>
+                        )}
+                        {frequency === '4day' && (state.schedule?.split4 || state.advanced?.split4) && (
+                            <span className="px-2 py-1 rounded-full bg-gray-700/50 border border-gray-600 text-gray-300 tracking-wide">Split {(state.schedule?.split4 || state.advanced?.split4)}</span>
+                        )}
+                        <span className="px-2 py-1 rounded-full bg-gray-700/30 border border-gray-600 text-gray-400 italic" title="Wendler: 'Lift weights. Condition: run hills, push Prowler. Do this 3–4 times a week.'">Condition: hills / prowler 3–4x weekly (after lifts or off‑days) — keep easy enough to recover.</span>
                     </div>
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                         {state?.templateSpec && (
@@ -338,7 +549,7 @@ export default function Step4ReviewExport({ onReadyChange }) {
                                 className="!rounded-full !px-3 !py-1 text-[11px] flex items-center gap-1.5"
                             >
                                 <BookOpen className="w-3.5 h-3.5 opacity-80" />
-                                <span>{state.templateSpec.name}</span>
+                                <span>{templateVariantName || state.templateSpec.name}</span>
                                 <span className="opacity-60">Info</span>
                             </ToggleButton>
                         )}
@@ -361,9 +572,6 @@ export default function Step4ReviewExport({ onReadyChange }) {
                     </div>
                 </div>
                 <div className="flex flex-col gap-2 items-start">
-                    {state.flowMode === 'template' && state.templateKey && (
-                        <div className="px-3 py-1 text-xs rounded-full bg-red-600/20 text-red-300 border border-red-500 uppercase tracking-wide self-start md:self-auto">Template: {state.templateKey}</div>
-                    )}
                     <div className="px-3 py-1 text-[10px] rounded-full bg-gray-700/40 text-gray-300 border border-gray-600 uppercase tracking-wide self-start md:self-auto">Assistance Mode: {assistMode}</div>
                 </div>
             </div>
@@ -382,141 +590,105 @@ export default function Step4ReviewExport({ onReadyChange }) {
                 {/* Left: Week Preview */}
                 <div className="xl:col-span-8 space-y-6">
                     <div className="flex flex-wrap gap-2">
-                        {[0, 1, 2, 3].map(i => (
-                            <ToggleButton key={i} on={weekIndex === i} onClick={() => setWeekIndex(i)} className="text-xs px-4 py-2">
-                                Week {i + 1}{i === 3 && ' (Deload)'}
+                        {weeksData.map((w, i) => (
+                            <ToggleButton key={w.week} on={weekIndex === i} onClick={() => setWeekIndex(i)} className="text-xs px-4 py-2">
+                                Week {w.week}{w.deload ? ' (Deload)' : ''}
                             </ToggleButton>
                         ))}
                     </div>
 
                     {previewWeek && (
                         <div className="space-y-6">
-                            {previewWeek.days.map((day, idx) => (
-                                <div key={idx} className="bg-gray-800/50 border border-gray-700 rounded-xl p-5 space-y-4">
-                                    <div className="flex items-center justify-between">
-                                        <h3 className="text-lg font-semibold text-white">Day {idx + 1} – {day.lift}</h3>
-                                        {day.supplemental?.type === 'bbb' && (
-                                            <span className="text-xs px-2 py-1 rounded bg-red-600/20 text-red-300 border border-red-500">BBB</span>
-                                        )}
-                                    </div>
-                                    {/* Warm-ups */}
-                                    {includeWarmups && day.warmups && day.warmups.length > 0 && (
-                                        <div>
-                                            <div className="text-xs uppercase tracking-wide text-gray-400 mb-1">Warm-ups</div>
-                                            <div className="overflow-x-auto">
-                                                <table className="min-w-full text-xs text-gray-300">
-                                                    <thead>
-                                                        <tr className="text-gray-500">
-                                                            <th className="text-left font-medium pb-1 pr-4">%</th>
-                                                            <th className="text-left font-medium pb-1 pr-4">Reps</th>
-                                                            <th className="text-left font-medium pb-1">Weight</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {day.warmups.map((s, i2) => (
-                                                            <tr key={i2} className="align-top">
-                                                                <td className="py-0.5 pr-4 font-mono">{s.percent}</td>
-                                                                <td className="py-0.5 pr-4 font-mono">{s.reps}</td>
-                                                                <td className="py-0.5 font-mono">{s.weight}{units}</td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
+                            {previewWeek.days.map((day, idx) => {
+                                // Map warmups/main into table row objects
+                                const warmupRows = includeWarmups ? (day.warmups || []).map(w => ({ pct: w.percent, reps: w.reps, weight: w.weight })) : [];
+                                const mainRows = (day.main || []).map(m => ({ pct: m.percent, reps: m.reps, weight: m.weight, amrap: !!m.amrap }));
+                                return (
+                                    <div key={idx} className="bg-gray-800/50 border border-gray-700 rounded-xl p-5 space-y-4">
+                                        <div className="flex items-center justify-between">
+                                            <h3 className="text-base md:text-lg font-semibold text-white">Day {idx + 1} — {day.lift}</h3>
+                                            {day.supplemental?.type === 'bbb' && (
+                                                <span className="text-xs px-2 py-1 rounded bg-red-600/20 text-red-300 border border-red-500">BBB</span>
+                                            )}
+                                        </div>
+                                        <TableBlock title="WARM-UPS" rows={warmupRows} units={units} />
+                                        <TableBlock title="MAIN SETS" rows={mainRows} units={units} />
+                                        {/* Supplemental */}
+                                        {day.supplemental && day.supplemental.type === 'bbb' && (
+                                            <div className="text-xs text-red-200 bg-red-900/10 border border-red-700/40 rounded p-3 font-mono">
+                                                BBB {day.supplemental.exercise}: {day.supplemental.sets} × {day.supplemental.reps} @ {day.supplemental.weight}{units} ({day.supplemental.percentOfTM}% TM)
                                             </div>
-                                        </div>
-                                    )}
-                                    {/* Main Sets */}
-                                    <div>
-                                        <div className="text-xs uppercase tracking-wide text-gray-400 mb-1">Main Sets</div>
-                                        <div className="overflow-x-auto">
-                                            <table className="min-w-full text-xs text-gray-300">
-                                                <thead>
-                                                    <tr className="text-gray-500">
-                                                        <th className="text-left font-medium pb-1 pr-4">%</th>
-                                                        <th className="text-left font-medium pb-1 pr-4">Reps</th>
-                                                        <th className="text-left font-medium pb-1">Weight</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {day.main.map((s, i3) => (
-                                                        <tr key={i3} className="align-top">
-                                                            <td className="py-0.5 pr-4 font-mono">{s.percent}</td>
-                                                            <td className="py-0.5 pr-4 font-mono">{s.reps}</td>
-                                                            <td className="py-0.5 font-mono">{s.weight}{units}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    {/* Supplemental */}
-                                    {day.supplemental && day.supplemental.type === 'bbb' && (
-                                        <div className="text-xs text-red-200 bg-red-900/10 border border-red-700/40 rounded p-3 font-mono">
-                                            BBB: {day.supplemental.sets} × {day.supplemental.reps} @ {day.supplemental.weight}{units}
-                                        </div>
-                                    )}
-                                    {/* Assistance */}
-                                    {/* Assistance (inline condensed) */}
-                                    <div className="mt-2">
-                                        <div className="font-medium text-xs text-gray-300">Assistance</div>
-                                        {Array.isArray(day.assistance) && day.assistance.length > 0 ? (
-                                            <div className="text-[11px] opacity-80 text-gray-400 space-y-0.5">
-                                                {day.assistance.map((a, i) => (
-                                                    <div key={i}>{a.block ? (<><span className="text-gray-300 font-semibold">{a.block}:</span> {a.name} {a.sets}x{a.reps}</>) : (<>{a.name} {a.sets}x{a.reps}</>)}</div>
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <div className="text-[11px] opacity-80 text-gray-500">None</div>
                                         )}
-                                        {/* Inline custom editor (advanced) */}
-                                        {assistMode === 'custom' && (
-                                            <InlinePerDayCustomEditor
-                                                dayIndex={idx}
-                                                displayLift={day.lift}
-                                                state={state}
-                                                dispatch={dispatch}
-                                                templateKey={state.templateKey || state.pack || 'triumvirate'}
-                                            />
-                                        )}
-                                    </div>
-                                    {/* Conditioning (if available on day) */}
-                                    {day.conditioning && (
+                                        {/* Assistance */}
+                                        {/* Assistance (inline condensed) */}
                                         <div className="mt-2">
-                                            <div className="font-medium text-xs text-gray-300">Conditioning</div>
-                                            <div className="text-[11px] opacity-80 text-gray-400">
-                                                {day.conditioning.type}
-                                                {day.conditioning.minutes ? ` • ${day.conditioning.minutes} min` : ''}
-                                                {day.conditioning.intensity ? ` • ${day.conditioning.intensity}` : ''}
-                                            </div>
+                                            <div className="font-medium text-xs text-gray-300">Assistance</div>
+                                            {Array.isArray(day.assistance) && day.assistance.length > 0 ? (
+                                                <div className="text-[11px] opacity-80 text-gray-400 space-y-0.5">
+                                                    {day.assistance.map((a, i) => (
+                                                        <div key={i}>
+                                                            {a.displayName ? a.displayName :
+                                                                a.block ? (<><span className="text-gray-300 font-semibold">{a.block}:</span> {a.name} {a.sets}×{a.reps}</>) :
+                                                                    (<>{a.name} {a.sets}×{a.reps}</>)
+                                                            }
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <div className="text-[11px] opacity-80 text-gray-500">
+                                                    {state.templateKey === 'jack_shit' ? 'Main lift only' : 'None'}
+                                                </div>
+                                            )}
+                                            {/* Inline custom editor (advanced) */}
+                                            {assistMode === 'custom' && (
+                                                <InlinePerDayCustomEditor
+                                                    dayIndex={idx}
+                                                    displayLift={day.lift}
+                                                    state={state}
+                                                    dispatch={dispatch}
+                                                    templateKey={state.templateKey || state.pack || 'triumvirate'}
+                                                />
+                                            )}
                                         </div>
-                                    )}
-                                    {/* Volume & Stress mini-panel */}
-                                    {dayMetrics[idx] && (
-                                        <div className="mt-2 border-t border-gray-700 pt-2 text-[11px] text-gray-400 leading-snug">
-                                            <div className="flex flex-wrap gap-x-4 gap-y-1">
-                                                <span className="text-gray-300 font-medium">Reps:</span>
-                                                <span>main {dayMetrics[idx].mainReps}</span>
-                                                <span>supp {dayMetrics[idx].suppReps}</span>
-                                                <span>assist {dayMetrics[idx].assistReps}</span>
-                                                <span className="text-gray-300">(total {dayMetrics[idx].totalReps})</span>
+                                        {/* Conditioning (if available on day) */}
+                                        {day.conditioning && (
+                                            <div className="mt-2">
+                                                <div className="font-medium text-xs text-gray-300">Conditioning</div>
+                                                <div className="text-[11px] opacity-80 text-gray-400">
+                                                    {day.conditioning.type}
+                                                    {day.conditioning.minutes ? ` • ${day.conditioning.minutes} min` : ''}
+                                                    {day.conditioning.intensity ? ` • ${day.conditioning.intensity}` : ''}
+                                                </div>
                                             </div>
-                                            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
-                                                <span className="text-gray-300 font-medium">Tonnage:</span>
-                                                <span>main {dayMetrics[idx].mainTonnage}</span>
-                                                <span>supp {dayMetrics[idx].suppTonnage}</span>
-                                                <span className="text-gray-300">(total {dayMetrics[idx].totalTonnage})</span>
-                                                {dayMetrics[idx].warnings.map((w, wi) => (
-                                                    <span key={wi} title={w} className="px-1.5 py-0.5 bg-amber-700/30 border border-amber-500/50 text-amber-200 rounded inline-flex items-center gap-1">⚠</span>
-                                                ))}
+                                        )}
+                                        {/* Volume & Stress mini-panel */}
+                                        {dayMetrics[idx] && (
+                                            <div className="mt-2 border-t border-gray-700 pt-2 text-[11px] text-gray-400 leading-snug">
+                                                <div className="flex flex-wrap gap-x-4 gap-y-1">
+                                                    <span className="text-gray-300 font-medium">Reps:</span>
+                                                    <span>main {dayMetrics[idx].mainReps}</span>
+                                                    <span>supp {dayMetrics[idx].suppReps}</span>
+                                                    <span>assist {dayMetrics[idx].assistReps}</span>
+                                                    <span className="text-gray-300">(total {dayMetrics[idx].totalReps})</span>
+                                                </div>
+                                                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-1">
+                                                    <span className="text-gray-300 font-medium">Tonnage:</span>
+                                                    <span>main {dayMetrics[idx].mainTonnage}</span>
+                                                    <span>supp {dayMetrics[idx].suppTonnage}</span>
+                                                    <span className="text-gray-300">(total {dayMetrics[idx].totalTonnage})</span>
+                                                    {dayMetrics[idx].warnings.map((w, wi) => (
+                                                        <span key={wi} title={w} className="px-1.5 py-0.5 bg-amber-700/30 border border-amber-500/50 text-amber-200 rounded inline-flex items-center gap-1">⚠</span>
+                                                    ))}
+                                                </div>
+                                                {/* Legend (shown once per day card) */}
+                                                <div className="mt-1 text-[10px] text-gray-500 italic">
+                                                    Legend: ⚠ badge appears when a category exceeds ~100 reps (soft guardrail). Aim for roughly 50–100 assistance reps per block. BBB recommended 50–70% TM.
+                                                </div>
                                             </div>
-                                            {/* Legend (shown once per day card) */}
-                                            <div className="mt-1 text-[10px] text-gray-500 italic">
-                                                Legend: ⚠ badge appears when a category exceeds ~100 reps (soft guardrail). Aim for roughly 50–100 assistance reps per block. BBB recommended 50–70% TM.
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                 </div>
@@ -541,11 +713,21 @@ export default function Step4ReviewExport({ onReadyChange }) {
                                 </div>
                             ))}
                         </div>
-                        <div className="text-xs text-gray-400">
+                        <div className="text-xs text-gray-400 space-y-1">
                             <div>Loading Option: {loadingOption} {loadingOption === 1 ? '(Conservative)' : '(Aggressive)'}</div>
                             <div>Schedule: {(frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2)} days – {order.join(' / ')}</div>
                             {state.deadliftRepStyle && <div>Deadlift Style: {state.deadliftRepStyle.replace('_', ' ')}</div>}
                             <div>Units: {units}</div>
+                            {conditioning && (
+                                <div className="pt-1 border-t border-gray-700/50">
+                                    <div className="text-gray-300 font-medium mb-0.5">Conditioning Plan</div>
+                                    <div className="text-[11px] leading-snug">
+                                        Sessions Target: {conditioning.sessionsPerWeek || 3}{conditioning.sessionsPerWeek < 2 ? ' (below guideline – aim for ≥2)' : ''}<br />
+                                        HIIT: {conditioning.hiitPerWeek || 0} · Modalities: {(conditioning.modalities?.hiit || []).join(', ') || '—'}<br />
+                                        LISS: {Math.max(0, (conditioning.sessionsPerWeek || 0) - (conditioning.hiitPerWeek || 0))} · Modalities: {(conditioning.modalities?.liss || []).join(', ') || '—'}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-5 space-y-4">
@@ -560,17 +742,21 @@ export default function Step4ReviewExport({ onReadyChange }) {
                             <ToggleButton on={false} disabled={!validation.valid} onClick={handlePrint} className="flex items-center justify-center gap-2 text-xs">
                                 <Printer className="w-4 h-4" /> <span>Print</span>
                             </ToggleButton>
+                            <ToggleButton
+                                on={false}
+                                disabled={!validation.valid}
+                                onClick={() => navigate('/builder/review')}
+                                className="flex items-center justify-center gap-2 text-xs !bg-red-600/30 !border-red-500/60 hover:!bg-red-600/40"
+                                data-testid="start-final-review"
+                            >
+                                <span>Start Final Review</span>
+                            </ToggleButton>
                             {exportError && <div className="text-xs text-red-400">{exportError}</div>}
                         </div>
                         {validation.valid && (
                             <div className="flex items-center space-x-2 text-green-400 text-xs"><CheckCircle2 className="w-4 h-4" /><span>Ready to start cycle.</span></div>
                         )}
                     </div>
-
-                    {/* Developer Inspector */}
-                    {import.meta.env.MODE !== 'production' && (
-                        <DevInspector effective={effective} exportJson={exportJson} />
-                    )}
                 </div>
             </div>
             {(showTemplateExplainer || showChangeTemplate) && (

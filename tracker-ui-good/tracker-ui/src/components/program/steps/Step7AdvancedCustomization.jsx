@@ -8,7 +8,7 @@ import { getPRs } from '../../../lib/fiveThreeOne/prTracking.js';
 import PrintableWeek from '../printable/PrintableWeek.jsx';
 
 const LIFTS = [
-    { key: 'overhead_press', label: 'Overhead Press', type: 'upper' },
+    { key: 'press', label: 'Overhead Press', type: 'upper' },
     { key: 'bench', label: 'Bench Press', type: 'upper' },
     { key: 'squat', label: 'Squat', type: 'lower' },
     { key: 'deadlift', label: 'Deadlift', type: 'lower' }
@@ -30,7 +30,7 @@ export default function Step7AdvancedCustomization({ data, updateData }) {
         return recommendTMIncrements(
             {
                 bench: hist.bench || [],
-                overhead_press: hist.overhead_press || [],
+                press: hist.press || [],
                 squat: hist.squat || [],
                 deadlift: hist.deadlift || []
             },

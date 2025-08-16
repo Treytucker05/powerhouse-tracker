@@ -12,12 +12,12 @@ export function applyDecisionsFromPack({ pack, answers }) {
 
     // 2) Assistance / template selection -> template id
     const a = String(answers?.assistanceChoice || '').toLowerCase();
-    if (a.includes('bbb')) out.templateId = 'bbb60';
+    if (a.includes('bbb')) out.templateId = 'bbb50';
     else if (a.includes('triumv')) out.templateId = 'triumvirate';
     else if (a.includes('jack')) out.templateId = 'jack_shit';
     else if (a.includes('period') || a.includes('bible')) out.templateId = 'periodization_bible';
     else if (a.includes('bodyweight')) out.templateId = 'bodyweight';
-    else out.templateId = pack?.templates?.[0]?.id || 'bbb60';
+    else out.templateId = pack?.templates?.[0]?.id || 'bbb50';
 
     // 3) TM method
     const tmm = String(answers?.tmMethod || '').toLowerCase();

@@ -63,6 +63,9 @@ export default function Step8ReviewAndStart({ data }) {
                             <li>We save a snapshot of your 5/3/1 program as the <b>active cycle</b>.</li>
                             <li>Progress starts at <b>Week 1</b>, day 1 of your schedule.</li>
                             <li>You can print, copy, or download the full plan JSON for records.</li>
+                            <li><b>Conditioning:</b> Perform 2–3 weekly sessions (hill sprints, Prowler pushes, loaded carries) separate from lower‑body lifting when possible.</li>
+                            <li><b>Recovery:</b> Add at least one rest day after two consecutive training days.</li>
+                            <li><b>Guardrails:</b> Keep TM at 85–90% of true max; don’t layer extra random assistance beyond template.</li>
                         </ul>
                     </div>
                 </div>
@@ -72,7 +75,7 @@ export default function Step8ReviewAndStart({ data }) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="bg-gray-900/60 border border-gray-700 rounded p-4 space-y-2">
                     <div className="text-white font-medium mb-1">Training Maxes</div>
-                    <Row label="Overhead Press" value={tm.overhead_press ? `${tm.overhead_press} lb` : '—'} />
+                    <Row label="Overhead Press" value={tm.press ? `${tm.press} lb` : '—'} />
                     <Row label="Bench Press" value={tm.bench ? `${tm.bench} lb` : '—'} />
                     <Row label="Squat" value={tm.squat ? `${tm.squat} lb` : '—'} />
                     <Row label="Deadlift" value={tm.deadlift ? `${tm.deadlift} lb` : '—'} />
@@ -138,6 +141,17 @@ export default function Step8ReviewAndStart({ data }) {
                     <CheckCircle className="w-4 h-4" /> Active 5/3/1 cycle saved. You can now train from Week 1 Day 1.
                 </div>
             )}
+
+            {/* Guardrail Warnings (always visible) */}
+            <div className="bg-gray-900/60 border border-gray-700 rounded p-4">
+                <div className="text-white font-medium mb-2">Common Mistakes to Avoid</div>
+                <ul className="list-disc ml-5 space-y-1 text-sm text-gray-300">
+                    <li>Adding extra assistance volume “just because” — progress main lifts first.</li>
+                    <li>Pushing Training Max too high. Stay conservative; only adjust after consistent AMRAP performance.</li>
+                    <li>Skipping conditioning entirely. Short quality sessions improve recovery and work capacity.</li>
+                    <li>Stringing 3–4 lifting days in a row — recovery and reps suffer. Insert rest.</li>
+                </ul>
+            </div>
         </div>
     );
 }

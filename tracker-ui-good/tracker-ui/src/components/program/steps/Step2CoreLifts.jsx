@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dumbbell, Calendar, AlertTriangle, CheckCircle, Info, Clock, Users } from 'lucide-react';
+import { Dumbbell, Calendar, AlertTriangle, CheckCircle, Info, Clock, Users, Filter, Layers, Package } from 'lucide-react';
 
 export default function Step2CoreLifts({ data, updateData }) {
     const [coreLifts, setCoreLifts] = useState(data.coreLifts || {
@@ -11,12 +11,23 @@ export default function Step2CoreLifts({ data, updateData }) {
     const [customLifts, setCustomLifts] = useState(data.customLifts || {});
     const [trainingFrequency, setTrainingFrequency] = useState(data.trainingFrequency || '');
     const [schedulePattern, setSchedulePattern] = useState(data.schedulePattern || '');
-    const [equipmentAccess, setEquipmentAccess] = useState(data.equipmentAccess || {
+    const [equipmentAccess, setEquipmentAccess] = useState({
         barbell: false,
-        squat_rack: false,
+        plates: false,
         bench: false,
-        plates: false
+        squat_rack: false,
+        dumbbells: false,
+        cables: false,
+        machines: false,
+        kettlebells: false,
+        bands: false,
+        suspension: false,
+        pullup_bar: false,
+        dip_station: false,
+        rings: false,
+        ...(data.equipmentAccess || {})
     });
+    const [equipmentProfile, setEquipmentProfile] = useState(data.equipmentProfile || '');
     const [injuryLimitations, setInjuryLimitations] = useState(data.injuryLimitations || {
         back: false,
         shoulders: false,
@@ -128,6 +139,31 @@ export default function Step2CoreLifts({ data, updateData }) {
         updateStepData({ equipmentAccess: newEquipment });
     };
 
+    const applyEquipmentProfile = (profile) => {
+        let preset = {};
+        switch (profile) {
+            case 'full':
+                preset = Object.keys(equipmentAccess).reduce((acc, k) => ({ ...acc, [k]: true }), {});
+                break;
+            case 'home_basic':
+                preset = { ...equipmentAccess, barbell: true, plates: true, bench: true, squat_rack: true, dumbbells: true, bands: true };
+                break;
+            case 'minimal':
+                preset = { ...equipmentAccess, barbell: true, plates: true, pullup_bar: true };
+                break;
+            case 'bodyweight':
+                preset = { ...equipmentAccess, pullup_bar: true, dip_station: true, rings: true };
+                // Turn off loaded equipment
+                Object.keys(preset).forEach(k => { if (!['pullup_bar', 'dip_station', 'rings'].includes(k)) preset[k] = false; });
+                break;
+            default:
+                return;
+        }
+        setEquipmentAccess(preset);
+        setEquipmentProfile(profile);
+        updateStepData({ equipmentAccess: preset, equipmentProfile: profile });
+    };
+
     const handleInjuryChange = (injury, hasInjury) => {
         const newInjuries = { ...injuryLimitations, [injury]: hasInjury };
         setInjuryLimitations(newInjuries);
@@ -147,12 +183,8 @@ export default function Step2CoreLifts({ data, updateData }) {
     };
 
     const validateEquipment = () => {
-        const required =
-            equipmentAccess.barbell &&
-            equipmentAccess.squat_rack &&
-            equipmentAccess.bench &&
-            equipmentAccess.plates;
-        return required;
+        // Keep legacy requirement for core barbell lifts
+        return equipmentAccess.barbell && equipmentAccess.squat_rack && equipmentAccess.bench && equipmentAccess.plates;
     };
 
     const getEquipmentWarnings = () => {
@@ -215,54 +247,81 @@ export default function Step2CoreLifts({ data, updateData }) {
                 </div>
             </div>
 
-            {/* Equipment Check */}
-            <div className="bg-gray-700 p-6 rounded-lg">
-                <h4 className="text-lg font-medium text-white mb-4">Equipment Access</h4>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {[
-                        {
-                            key: 'barbell',
-                            name: 'Barbell',
-                            icon: Dumbbell
-                        },
-                        {
-                            key: 'squat_rack',
-                            name: 'Squat Rack',
-                            icon: Users
-                        },
-                        {
-                            key: 'bench',
-                            name: 'Bench',
-                            icon: Users
-                        },
-                        {
-                            key: 'plates',
-                            name: 'Weight Plates',
-                            icon: Dumbbell
-                        }
-                    ].map(({ key, name, icon: Icon }) => (
-                        <div key={key} className="flex items-center space-x-2">
-                            <input
-                                type="checkbox"
-                                id={key}
-                                checked={equipmentAccess[key]}
-                                onChange={(e) => handleEquipmentChange(key, e.target.checked)}
-                                className="w-4 h-4 text-red-500 bg-gray-800 border-gray-600 rounded focus:ring-red-500"
-                            />
-                            <Icon className="w-4 h-4 text-gray-400" />
-                            <label htmlFor={key} className="text-gray-300 text-sm">
-                                {name}
-                            </label>
+            {/* Equipment Access & Profiles (Redesigned) */}
+            <div className="bg-gray-700 p-6 rounded-lg space-y-6 border border-gray-600">
+                <div className="space-y-2">
+                    <h4 className="text-lg font-medium text-white">Equipment Access & Profiles</h4>
+                    <p className="text-gray-300 text-sm">Selected equipment determines available assistance exercises and variations. Expand availability responsibly—more options can add unnecessary decision fatigue.</p>
+                    <p className="text-[11px] text-gray-400">Toggle individual items or choose a profile below. Adjustments instantly update the sample assistance filter preview.</p>
+                </div>
+
+                {/* Profiles */}
+                <div>
+                    <div className="text-white font-medium text-sm mb-2 flex items-center gap-2"><Package className="w-4 h-4 text-gray-300" />Quick Profiles</div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        {[{
+                            id: 'full', title: 'Full Gym', desc: 'All equipment available'
+                        }, { id: 'home_basic', title: 'Home Gym Basic', desc: 'Barbell, rack, bench, DBs, bands' }, { id: 'minimal', title: 'Minimal Setup', desc: 'Barbell + bodyweight only' }, { id: 'bodyweight', title: 'Bodyweight Only', desc: 'Rings / bar / dips' }].map(p => {
+                            const active = equipmentProfile === p.id;
+                            return (
+                                <button key={p.id} onClick={() => applyEquipmentProfile(p.id)} className={`text-left p-3 rounded border transition bg-gray-800/50 hover:bg-gray-800 ${active ? 'border-red-500 ring-2 ring-red-600' : 'border-gray-600'}`}>
+                                    <div className="text-sm font-semibold text-white">{p.title}</div>
+                                    <div className="text-[11px] text-gray-400 mt-1 leading-snug">{p.desc}</div>
+                                    {active && <div className="mt-1 text-[10px] text-green-400 flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Active</div>}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* Categorized Equipment */}
+                <div className="space-y-5">
+                    {[{
+                        label: 'Essential', note: 'Core barbell work requirements', items: [['barbell', 'Barbell'], ['plates', 'Plates'], ['bench', 'Bench'], ['squat_rack', 'Squat Rack']]
+                    }, {
+                        label: 'Assistance', note: 'Expands accessory & hypertrophy options', items: [['dumbbells', 'Dumbbells'], ['cables', 'Cables'], ['machines', 'Selectorized Machines']]
+                    }, {
+                        label: 'Specialty', note: 'Variation & conditioning tools', items: [['kettlebells', 'Kettlebells'], ['bands', 'Bands'], ['suspension', 'Suspension Trainer']]
+                    }, {
+                        label: 'Bodyweight', note: 'Calisthenics apparatus', items: [['pullup_bar', 'Pull-Up Bar'], ['dip_station', 'Dip Station'], ['rings', 'Rings']]
+                    }].map(cat => (
+                        <div key={cat.label} className="bg-gray-800/50 border border-gray-600 rounded p-4">
+                            <div className="flex items-center justify-between mb-2">
+                                <div>
+                                    <div className="text-white font-medium text-sm">{cat.label}</div>
+                                    <div className="text-[11px] text-gray-400">{cat.note}</div>
+                                </div>
+                                {cat.label === 'Essential' && !validateEquipment() && <span className="text-[10px] text-red-400">Incomplete</span>}
+                            </div>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                                {cat.items.map(([key, label]) => (
+                                    <label key={key} className={`flex items-center gap-2 px-2 py-1 rounded border text-xs cursor-pointer select-none ${equipmentAccess[key] ? 'bg-red-600/10 border-red-500 text-white' : 'bg-gray-900/40 border-gray-600 text-gray-300 hover:bg-gray-900/70'}`}>
+                                        <input type="checkbox" className="hidden" checked={!!equipmentAccess[key]} onChange={e => handleEquipmentChange(key, e.target.checked)} />
+                                        <span className="w-2.5 h-2.5 rounded-full border ${equipmentAccess[key] ? 'border-red-400 bg-red-500' : 'border-gray-500'}"></span>
+                                        {label}
+                                    </label>
+                                ))}
+                            </div>
                         </div>
                     ))}
                 </div>
 
+                {/* Impact & Preview */}
+                <div className="bg-gray-800/70 border border-gray-600 rounded p-4 space-y-4">
+                    <div className="flex items-center gap-2">
+                        <Layers className="w-4 h-4 text-gray-300" />
+                        <div className="text-white font-medium text-sm">Assistance Availability Preview</div>
+                    </div>
+                    <p className="text-[11px] text-gray-400">Demonstrates how equipment toggles unlock / restrict common assistance exercises.</p>
+                    <EquipmentPreview equipmentAccess={equipmentAccess} />
+                </div>
+
                 {!validateEquipment() && (
-                    <div className="mt-4 p-3 bg-red-900/20 border border-red-600 rounded-lg">
+                    <div className="p-3 bg-red-900/20 border border-red-600 rounded-lg">
                         <div className="flex items-start space-x-2">
                             <AlertTriangle className="w-5 h-5 text-red-400 mt-0.5" />
                             <div>
-                                <h5 className="text-red-300 font-medium mb-1">Equipment Warnings</h5>
+                                <h5 className="text-red-300 font-medium mb-1">Essential Equipment Warnings</h5>
                                 <ul className="text-red-200 text-sm space-y-1">
                                     {getEquipmentWarnings().map((warning, index) => (
                                         <li key={index}>• {warning}</li>
@@ -389,8 +448,8 @@ export default function Step2CoreLifts({ data, updateData }) {
                             key={frequency}
                             onClick={() => handleFrequencyChange(frequency)}
                             className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${trainingFrequency === frequency
-                                    ? 'border-red-500 bg-red-900/20'
-                                    : 'border-gray-600 bg-gray-800 hover:border-gray-500'
+                                ? 'border-red-500 bg-red-900/20'
+                                : 'border-gray-600 bg-gray-800 hover:border-gray-500'
                                 }`}
                         >
                             <div className="flex items-start justify-between">
@@ -466,6 +525,37 @@ export default function Step2CoreLifts({ data, updateData }) {
                     </div>
                 </div>
             )}
+        </div>
+    );
+}
+
+// --- Helper: EquipmentPreview ---
+function EquipmentPreview({ equipmentAccess }) {
+    const CATALOG = [
+        { name: 'Chin Ups', need: ['pullup_bar'], cat: 'Pull' },
+        { name: 'Dips', need: ['dip_station'], cat: 'Push' },
+        { name: 'Ring Rows', need: ['rings'], cat: 'Pull' },
+        { name: 'DB Row', need: ['dumbbells'], cat: 'Pull' },
+        { name: 'DB Incline Press', need: ['dumbbells', 'bench'], cat: 'Push' },
+        { name: 'Face Pull', need: ['cables'], cat: 'Rear Delt' },
+        { name: 'Leg Extension', need: ['machines'], cat: 'Quad' },
+        { name: 'Hamstring Curl', need: ['machines'], cat: 'Posterior' },
+        { name: 'Kettlebell Swing', need: ['kettlebells'], cat: 'Posterior' },
+        { name: 'Band Pull-Apart', need: ['bands'], cat: 'Upper Back' },
+        { name: 'Suspension Fallouts', need: ['suspension'], cat: 'Core' }
+    ];
+    const rows = CATALOG.map(row => {
+        const available = row.need.every(req => equipmentAccess[req]);
+        return { ...row, available };
+    });
+    return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+            {rows.map(r => (
+                <div key={r.name} className={`text-[11px] px-2 py-1 rounded border flex items-center justify-between ${r.available ? 'border-green-600 bg-green-900/20 text-green-200' : 'border-gray-600 bg-gray-900/40 text-gray-400'}`}>
+                    <span>{r.name}</span>
+                    <span className={`px-1.5 py-0.5 rounded text-[10px] tracking-wide ${r.available ? 'bg-green-700/40 text-green-200' : 'bg-gray-700/40 text-gray-400'}`}>{r.available ? 'UNLOCKED' : 'LOCKED'}</span>
+                </div>
+            ))}
         </div>
     );
 }

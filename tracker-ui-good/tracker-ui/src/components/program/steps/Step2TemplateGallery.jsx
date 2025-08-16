@@ -1,9 +1,10 @@
 // src/components/program/steps/Step2TemplateGallery.jsx
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Info, CheckCircle, AlertTriangle, Dumbbell, Layers, Activity } from 'lucide-react';
 import StepStatusPill from './_shared/StepStatusPill.jsx';
 import { STEP_IDS } from './_registry/stepRegistry.js';
 import { TEMPLATE_IDS } from '../../../lib/fiveThreeOne/assistanceRules.js';
+import { useExerciseDB } from '../../../contexts/ExerciseDBContext.jsx';
 
 const TILES = [
     { id: TEMPLATE_IDS.BBB, title: 'Boring But Big', blurb: 'Main 5/3/1 + 5×10 supplemental. Simple, high volume, great for muscle.', color: 'border-red-500' },
@@ -17,6 +18,82 @@ export default function Step2TemplateGallery({ data, updateData }) {
     const st = data || {};
     const set = (patch) => updateData({ ...st, ...patch });
     const cfg = st.templateConfig || { bbbPair: 'same', bbbPercent: 60, bwTarget: 75 };
+    const assistance = st.assistance || { options: { bbb: { percent: cfg.bbbPercent || 60, pairMode: cfg.bbbPair || 'same' } }, perDay: { press: [], deadlift: [], bench: [], squat: [] } };
+    const { loaded: exLoaded, categoriesMap, exercises } = useExerciseDB();
+
+    // Helper to find row by name
+    const byName = useMemo(() => {
+        const map = {};
+        exercises?.forEach(r => { map[r.exercise.toLowerCase()] = r; });
+        return map;
+    }, [exercises]);
+
+    // Default seeding per template (only once when template selected & list empty)
+    useEffect(() => {
+        if (!st.template || !exLoaded) return;
+        const perDay = { ...assistance.perDay };
+        let changed = false;
+        const ensure = (day, names) => {
+            if (perDay[day] && perDay[day].length) return; // keep user edits
+            const items = [];
+            names.forEach(n => {
+                const row = byName[n.toLowerCase()];
+                if (row) {
+                    const sets = Number(row.default_sets) || 5;
+                    const reps = row.numeric_reps || (/amrap/i.test(row.default_reps) ? 10 : Number(row.default_reps) || 10);
+                    const load = (/body|bw|bodyweight/i.test(row.equipment || '') || /AMRAP/i.test(row.default_reps)) ? { type: 'bw' } : undefined;
+                    items.push({ name: row.exercise, sets, reps, load });
+                }
+            });
+            if (items.length) { perDay[day] = items; changed = true; }
+        };
+        switch (st.template) {
+            case TEMPLATE_IDS.TRIUMVIRATE:
+                ensure('press', ['Dips', 'Chin-ups']);
+                ensure('bench', ['DB Rows', 'Dips']);
+                ensure('deadlift', ['Back Extension', 'Ab Wheel']);
+                ensure('squat', ['Romanian Deadlift', 'Hanging Leg Raises']);
+                break;
+            case TEMPLATE_IDS.PERIODIZATION_BIBLE:
+                // Dave Tate pattern: each day 3 categories; pick one starter exercise per category (user can swap later)
+                ensure('press', ['DB Press', 'DB Rows', 'Dips']); // shoulders/chest, lats/upper back, triceps
+                ensure('bench', ['DB Incline Press', 'Chin-ups', 'Close-Grip Bench']); // chest, lats/upper back, triceps
+                ensure('deadlift', ['Romanian Deadlift', 'Leg Press', 'Hanging Leg Raises']); // hamstrings, quads, abs
+                ensure('squat', ['Back Extension', 'Leg Press', 'Ab Wheel']); // hamstrings/low back, quads, abs
+                break;
+            case TEMPLATE_IDS.BODYWEIGHT:
+                ensure('press', ['Push-Ups', 'Chin-ups', 'Dips']);
+                ensure('bench', ['Push-Ups', 'Chin-ups', 'Dips']);
+                ensure('deadlift', ['Chin-ups', 'Hanging Leg Raises']);
+                ensure('squat', ['Push-Ups', 'Hanging Leg Raises', 'Sit-Ups']);
+                break;
+            case TEMPLATE_IDS.BBB:
+            case TEMPLATE_IDS.JACK_SHIT:
+            default:
+                break;
+        }
+        if (changed) {
+            set({ assistance: { ...assistance, perDay } });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [st.template, exLoaded]);
+
+    // Movement pattern balance validation (simple heuristic)
+    const validation = useMemo(() => {
+        if (!exLoaded) return { warnings: [] };
+        const counts = { Pull: 0, Push: 0, Core: 0, Posterior: 0, 'Single-Leg': 0 };
+        Object.values(assistance.perDay).forEach(list => list.forEach(it => {
+            const row = byName[it.name.toLowerCase()];
+            if (row) {
+                counts[row.category_normalized] = (counts[row.category_normalized] || 0) + 1;
+            }
+        }));
+        const warnings = [];
+        if (counts.Pull < counts.Push) warnings.push('Pull work is lower than Push — consider adding a pull movement.');
+        if (counts.Core < 2) warnings.push('Low core volume — add a core exercise.');
+        if (counts.Posterior < 2 && (st.template === TEMPLATE_IDS.TRIUMVIRATE || st.template === TEMPLATE_IDS.PERIODIZATION_BIBLE)) warnings.push('Posterior chain underrepresented.');
+        return { counts, warnings };
+    }, [assistance.perDay, byName, exLoaded, st.template]);
 
     const choose = (id) => set({ template: id });
 
@@ -123,6 +200,113 @@ export default function Step2TemplateGallery({ data, updateData }) {
                         <AlertTriangle className="w-4 h-4 mt-0.5" />
                         Select a template to continue.
                     </div>
+                </div>
+            )}
+
+            {/* Assistance configurator (pre-wizard) */}
+            {st.template && st.template !== TEMPLATE_IDS.JACK_SHIT && (
+                <div className="bg-gray-900/60 border border-gray-700 rounded p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                        <div className="text-white font-medium">Assistance Preview & Edits</div>
+                        {!exLoaded && <div className="text-xs text-gray-400">Loading exercise database…</div>}
+                    </div>
+                    <p className="text-xs text-gray-400">These selections seed Step 5. You can refine later. Categories & defaults sourced from research database.</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {['press', 'bench', 'deadlift', 'squat'].map(day => {
+                            const items = assistance.perDay[day] || [];
+                            const canAdd = (() => {
+                                switch (st.template) {
+                                    case TEMPLATE_IDS.TRIUMVIRATE: return items.length < 2;
+                                    case TEMPLATE_IDS.PERIODIZATION_BIBLE: return items.length < 3;
+                                    case TEMPLATE_IDS.BODYWEIGHT: return items.length < 4;
+                                    default: return false;
+                                }
+                            })();
+                            return (
+                                <div key={day} className="border border-gray-700 rounded p-3 bg-gray-800/40">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div className="text-gray-200 font-medium capitalize">{day} Day</div>
+                                        <div className="text-xs text-gray-500">{items.length} items</div>
+                                    </div>
+                                    <ul className="space-y-2 mb-2">
+                                        {items.map((it, idx) => (
+                                            <li key={idx} className="bg-gray-800/60 border border-gray-700 rounded p-2 text-sm">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-gray-100">{it.name}</span>
+                                                    <span className="text-gray-400">{it.sets}×{it.reps}{it.load?.type === 'bw' && ' @BW'}</span>
+                                                </div>
+                                                <div className="mt-2 flex gap-2">
+                                                    <select
+                                                        className="flex-1 bg-gray-900 border border-gray-600 text-gray-200 rounded px-2 py-1"
+                                                        value={it.name}
+                                                        onChange={e => {
+                                                            const row = byName[e.target.value.toLowerCase()];
+                                                            if (!row) return;
+                                                            const sets = Number(row.default_sets) || it.sets;
+                                                            const reps = row.numeric_reps || (/amrap/i.test(row.default_reps) ? 10 : Number(row.default_reps) || it.reps);
+                                                            const load = (/body|bw|bodyweight/i.test(row.equipment || '') || /AMRAP/i.test(row.default_reps)) ? { type: 'bw' } : undefined;
+                                                            const next = { ...assistance };
+                                                            next.perDay[day][idx] = { ...it, name: row.exercise, sets, reps, load };
+                                                            set({ assistance: next });
+                                                        }}
+                                                    >
+                                                        {Object.keys(categoriesMap).sort().map(cat => (
+                                                            <optgroup key={cat} label={cat}>
+                                                                {categoriesMap[cat].map(r => {
+                                                                    const equip = r.equipment ? ` (${r.equipment.split(';')[0]})` : '';
+                                                                    return <option key={r.exercise} value={r.exercise}>{r.exercise}{equip}</option>;
+                                                                })}
+                                                            </optgroup>
+                                                        ))}
+                                                    </select>
+                                                    <button
+                                                        onClick={() => {
+                                                            const next = { ...assistance };
+                                                            next.perDay[day] = next.perDay[day].filter((_, i) => i !== idx);
+                                                            set({ assistance: next });
+                                                        }}
+                                                        className="px-2 py-1 rounded border border-gray-600 text-gray-300 hover:bg-gray-700/40"
+                                                    >✕</button>
+                                                </div>
+                                            </li>
+                                        ))}
+                                        {!items.length && <li className="text-xs text-gray-500">No assistance yet.</li>}
+                                    </ul>
+                                    {canAdd && exLoaded && (
+                                        <select
+                                            className="w-full bg-gray-900 border border-gray-600 text-gray-200 rounded px-2 py-1 text-sm mb-2"
+                                            value=""
+                                            onChange={e => {
+                                                const v = e.target.value; if (!v) return;
+                                                const row = byName[v.toLowerCase()]; if (!row) return;
+                                                const sets = Number(row.default_sets) || 5;
+                                                const reps = row.numeric_reps || (/amrap/i.test(row.default_reps) ? 10 : Number(row.default_reps) || 10);
+                                                const load = (/body|bw|bodyweight/i.test(row.equipment || '') || /AMRAP/i.test(row.default_reps)) ? { type: 'bw' } : undefined;
+                                                const next = { ...assistance };
+                                                next.perDay[day] = [...(next.perDay[day] || []), { name: row.exercise, sets, reps, load }];
+                                                set({ assistance: next });
+                                            }}
+                                        >
+                                            <option value="">+ Add Exercise</option>
+                                            {Object.keys(categoriesMap).sort().map(cat => (
+                                                <optgroup key={cat} label={cat}>
+                                                    {categoriesMap[cat].map(r => {
+                                                        const equip = r.equipment ? ` (${r.equipment.split(';')[0]})` : '';
+                                                        return <option key={r.exercise} value={r.exercise}>{r.exercise}{equip}</option>;
+                                                    })}
+                                                </optgroup>
+                                            ))}
+                                        </select>
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                    {!!validation.warnings.length && (
+                        <div className="bg-yellow-900/20 border border-yellow-600 rounded p-3 text-yellow-200 text-xs space-y-1">
+                            {validation.warnings.map((w, i) => <div key={i} className="flex gap-2"><AlertTriangle className="w-4 h-4" /> <span>{w}</span></div>)}
+                        </div>
+                    )}
                 </div>
             )}
         </div>

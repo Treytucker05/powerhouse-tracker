@@ -1,4 +1,5 @@
-// Public copy 531 BBB pack (JSONC)
+// 531 BBB methodology pack (tracker-ui public copy)
+// Repaired after structural corruption (duplicate/misalplaced objects). Preserves tracker-ui schema.
 {
     "meta": {
         "method": "531",
@@ -69,6 +70,31 @@
     ],
     "templates": [
         {
+            "id": "bbb50",
+            "name": "Boring But Big 50% (Start)",
+            "effects": {
+                "supplemental": {
+                    "mode": "bbb",
+                    "pairing": "same",
+                    "intensity": {
+                        "kind": "percent_of",
+                        "of": "TM",
+                        "value": 50
+                    },
+                    "sets": 5,
+                    "reps": 10,
+                    "provenance": {
+                        "source": "book",
+                        "note": "Wendler guidance: begin BBB at ~50% TM"
+                    }
+                }
+            },
+            "provenance": {
+                "source": "book",
+                "note": "BBB start 50%"
+            }
+        },
+        {
             "id": "bbb60",
             "name": "Boring But Big 60%",
             "effects": {
@@ -84,7 +110,7 @@
                     "reps": 10,
                     "provenance": {
                         "source": "book",
-                        "note": "Wendler 5/3/1: percentages and assistance templates"
+                        "note": "Legacy 60% BBB option"
                     }
                 }
             },
@@ -100,12 +126,12 @@
                 "assistance": {
                     "slots": [
                         {
-                            "id": "assist_a",
+                            "category": "assist_a",
                             "sets": 5,
                             "reps": "10-15"
                         },
                         {
-                            "id": "assist_b",
+                            "category": "assist_b",
                             "sets": 5,
                             "reps": "10-15"
                         }
@@ -195,7 +221,7 @@
                     ],
                     "provenance": {
                         "source": "book",
-                        "note": "Bodyweight emphasis"
+                        "note": "Bodyweight emphasis (push/pull/core)"
                     }
                 }
             },
@@ -377,6 +403,12 @@
                 "id": "assistance_volume",
                 "prompt": "Select assistance / supplemental emphasis",
                 "options": [
+                    {
+                        "value": "bbb50",
+                        "effects": {
+                            "templateKey": "bbb50"
+                        }
+                    },
                     {
                         "value": "bbb60",
                         "effects": {

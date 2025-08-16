@@ -39,7 +39,8 @@ export function computeSupplemental(pack, lift, tm, state) {
     if (!sup) return null;
     const mode = sup.strategy || sup.mode;
     if (mode !== 'bbb') return null; // future: extend for FSL, SSL, etc.
-    const pct = sup.percentOfTM ?? sup.intensity?.value ?? 60;
+    // BBB default intensity adjusted from legacy 60% to 50% (still overrideable)
+    const pct = sup.percentOfTM ?? sup.intensity?.value ?? 50;
     if (!tm) return null;
     const units = state?.units || 'lbs';
     const rounding = state?.roundingPref || { lbs: 5, kg: 2.5 };
@@ -96,7 +97,8 @@ export function computeBBBFromConfig({ supplemental, lift, tms, units = "lbs", r
     const tm = tmFor(lift, tms);
     if (!tm) return null;
     const rnd = rounding || pack?.program?.defaults?.rounding || { lbs: 5, kg: 2.5 };
-    const value = supplemental.percentOfTM ?? supplemental.intensity?.value ?? 60;
+    // Default BBB percent lowered from 60 to 50 (legacy export may still specify 60 explicitly)
+    const value = supplemental.percentOfTM ?? supplemental.intensity?.value ?? 50;
     const load = roundLoad((tm * value) / 100, units, rnd);
     return {
         sets: supplemental.sets ?? 5,

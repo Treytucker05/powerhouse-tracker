@@ -1,14 +1,23 @@
 /**
  * ProgramWizard531V2.jsx - New V2 5/3/1 Wizard Shell
  * Clean, minimal wizard with step navigation and V2 context integration
+ * 
+ * This is the RESTORED and ENHANCED 5-step workflow that includes:
+ * - Enhanced Section C (Programming Approach)
+ * - Enhanced Section E (Assistance)
+ * - Enhanced Section G (Conditioning)
+ * 
+ * The route /builder/531/v2 has been updated to use this component directly.
  */
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { ChevronRight, CheckCircle2, Info } from 'lucide-react';
+import { ChevronRight, CheckCircle2, Info, AlertTriangle } from 'lucide-react';
 import ToggleButton from './ToggleButton.jsx';
 import { useNavigate } from "react-router-dom";
 import { useProgramV2 } from "../contexts/ProgramContextV2.jsx";
 import { buildMainSetsForLift, buildWarmupSets, roundToIncrement } from "../"; // barrel export
+// Conditioning planner (HIIT/LISS distribution)
+import { buildConditioningPlan, planConditioningFromState } from '../../../lib/fiveThreeOne/conditioningPlanner.js';
 import { loadPack531BBB } from "../loadPack";
 import { extractSupplementalFromPack, extractWarmups, extractWeekByLabel } from "../packAdapter";
 import { applyDecisionsFromPack } from "../decisionAdapter";
@@ -62,12 +71,17 @@ const STEPS = [
     { id: 'fundamentals', title: 'Fundamentals', description: 'Units, rounding, TM%, 1RM/rep tests' },
     { id: 'template', title: 'Template / Custom', description: 'Select template or continue custom' },
     { id: 'design', title: 'Design (if Custom)', description: 'Custom schedule, warm-ups, supplemental, assistance' },
-    { id: 'review', title: 'Review & Export', description: 'Cycle preview, export & print' }
+    { id: 'review', title: 'Review & Export', description: 'Cycle preview, export & print' },
+    { id: 'progress', title: 'Progress TMs', description: 'Week 4 done? Advance training maxes' }
 ];
 
 function WizardShell() {
     const [stepIndex, setStepIndex] = useState(0);
-    const [stepValidation, setStepValidation] = useState({ fundamentals: false, design: false, review: false });
+    const [stepValidation, setStepValidation] = useState({ fundamentals: false, design: false, review: false, progress: true });
+    // Step1 feedback state
+    const [step1Error, setStep1Error] = useState(null); // string message
+    const [step1Missing, setStep1Missing] = useState([]); // array of lift keys / field labels
+    const [step1FlashToken, setStep1FlashToken] = useState(0); // increment to trigger child highlight
     const navigate = useNavigate();
     const { state, dispatch } = useProgramV2();
     const packRef = useRef(null);
@@ -124,7 +138,7 @@ function WizardShell() {
                 } catch (e) {
                     console.warn('Decision adapter error', e);
                 }
-                const sup = extractSupplementalFromPack(pack, "bbb60");
+                const sup = extractSupplementalFromPack(pack, "bbb50");
                 if (sup) {
                     // Dispatch only supplemental fields (non-destructive)
                     dispatch({
@@ -140,7 +154,7 @@ function WizardShell() {
                 }
                 // Assistance mapping from selected template (only if no custom assistance already)
                 try {
-                    const selectedTemplateId = state?.templateKey || state?.template || 'bbb60';
+                    const selectedTemplateId = state?.templateKey || state?.template || 'bbb50';
                     const tpl = (pack.templates || []).find(t => t.id === selectedTemplateId);
                     if (tpl?.effects?.assistance && (!state?.assistance || state.assistance.mode === 'minimal')) {
                         const items = mapTemplateAssistance(tpl.effects.assistance);
@@ -206,11 +220,11 @@ function WizardShell() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [state.daysPerWeek, state.advanced?.split4, state.schedule?.split4, state.week, state.cycle, state.units, state.rounding, state.tmPct, state.lifts?.squat?.tm, state.lifts?.bench?.tm, state.lifts?.deadlift?.tm, state.lifts?.press?.tm, state.equipment, state.templateKey, state.assistance?.mode, state.assistance?.templateId]);
     function humanLiftName(key) {
-        return key === "overhead_press" ? "Press" : key[0].toUpperCase() + key.slice(1);
+        return key === "press" ? "Press" : key[0].toUpperCase() + key.slice(1);
     }
     function oppositeOf(liftKey) {
-        if (liftKey === "overhead_press") return "bench";
-        if (liftKey === "bench") return "overhead_press";
+        if (liftKey === "press") return "bench";
+        if (liftKey === "bench") return "press";
         if (liftKey === "squat") return "deadlift";
         if (liftKey === "deadlift") return "squat";
         return liftKey;
@@ -221,23 +235,54 @@ function WizardShell() {
             units = "lbs",
             rounding = { increment: 5, mode: "nearest" },
             loadingOption = 1,
-            trainingMaxes = {},
             schedule = {},
             supplemental = { strategy: "none" },
             assistance = { mode: "minimal" },
             flowMode,
             templateKey,
+            conditioning: conditioningState
         } = state || {};
 
-        const tmKeys = ["squat", "bench", "deadlift", "overhead_press"];
+        // Derive training maxes from current lift TMs in context (state does not store a standalone trainingMaxes object)
+        const trainingMaxes = {
+            squat: state?.lifts?.squat?.tm || 0,
+            bench: state?.lifts?.bench?.tm || 0,
+            deadlift: state?.lifts?.deadlift?.tm || 0,
+            press: state?.lifts?.press?.tm || 0
+        };
+
+        const tmKeys = ["squat", "bench", "deadlift", "press"];
         const tmOk = tmKeys.every(k => Number(trainingMaxes?.[k]) > 0);
         if (!tmOk) return;
 
         const freq = Number(schedule?.frequency || 4);
-        const defaultDays = ["overhead_press", "deadlift", "bench", "squat"];
+        const defaultDays = ["press", "deadlift", "bench", "squat"];
         const days = Array.isArray(schedule?.days) && schedule.days.length === freq
             ? schedule.days
             : defaultDays.slice(0, freq);
+
+        // Unified planned conditioning (supports Step6 advanced config or legacy simple fields)
+        const plannedConditioning = planConditioningFromState(state).map(s => ({
+            day: s.day,
+            mode: s.mode,
+            modality: s.modality,
+            prescription: s.prescription,
+            notes: s.notes
+        }));
+
+        function weekdayIndexMap(i, freq) {
+            // Map training day index -> weekday index (Mon=0 .. Sun=6) similar to Step4ReviewExport
+            if (freq === 4) return [0, 1, 3, 4][i] ?? i; // Mon/Tue/Thu/Fri
+            if (freq === 3) return [0, 2, 4][i] ?? i;     // Mon/Wed/Fri
+            if (freq === 2) return [1, 4][i] ?? i;        // Tue/Fri
+            return i; // fallback sequential
+        }
+        const weekdayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+        // Normalize rounding (state.rounding may be a string from Step1Fundamentals or an object from legacy/other flows)
+        const roundingConfig = typeof rounding === 'object'
+            ? { increment: rounding.increment || (units === 'kg' ? 2.5 : 5), mode: rounding.mode || 'nearest' }
+            : { increment: units === 'kg' ? 2.5 : 5, mode: rounding || 'nearest' };
 
         const weeks = [];
         for (let w = 0; w < 4; w++) {
@@ -248,8 +293,8 @@ function WizardShell() {
                     includeWarmups: !!schedule?.includeWarmups,
                     warmupScheme: schedule?.warmupScheme,
                     tm,
-                    roundingIncrement: rounding.increment,
-                    roundingMode: rounding.mode,
+                    roundingIncrement: roundingConfig.increment,
+                    roundingMode: roundingConfig.mode,
                     units
                 });
 
@@ -257,8 +302,8 @@ function WizardShell() {
                     tm,
                     weekIndex: w,
                     option: loadingOption || 1,
-                    roundingIncrement: rounding.increment,
-                    roundingMode: rounding.mode,
+                    roundingIncrement: roundingConfig.increment,
+                    roundingMode: roundingConfig.mode,
                     units
                 });
 
@@ -269,7 +314,7 @@ function WizardShell() {
                     const bbbTm = Number(trainingMaxes?.[bbbLiftKey] || 0);
                     const pct = Number(supplemental?.percentOfTM || 50);
                     const raw = bbbTm * (pct / 100);
-                    const weight = roundToIncrement(raw, rounding.increment, rounding.mode);
+                    const weight = roundToIncrement(raw, roundingConfig.increment, roundingConfig.mode);
                     supplementalOut = {
                         type: "bbb",
                         pairing,
@@ -291,14 +336,32 @@ function WizardShell() {
                     }));
                 }
 
+                // Conditioning: inject matching planned session for this weekday (single plan repeated across weeks)
+                let conditioningBlock = undefined;
+                if (plannedConditioning.length) {
+                    const weekday = weekdayNames[weekdayIndexMap(idx, freq)] || weekdayNames[0];
+                    const match = plannedConditioning.find(pc => pc.day === weekday);
+                    if (match) {
+                        conditioningBlock = {
+                            type: match.mode === 'hiit' ? 'HIIT' : 'LISS',
+                            modality: match.modality,
+                            minutes: match.prescription?.minutes || match.prescription?.duration || undefined,
+                            intensity: match.prescription?.intensity || undefined,
+                            notes: match.notes || undefined
+                        };
+                    }
+                }
+
                 return {
                     day: idx + 1,
                     liftKey,
                     lift: humanLiftName(liftKey),
                     warmups,
                     main,
-                    supplemental: supplementalOut,
-                    assistance: assistanceOut
+                    // Always provide a supplemental object (prevents downstream undefined access)
+                    supplemental: supplementalOut || { type: 'none', sets: 0, reps: 0, percentOfTM: null },
+                    assistance: assistanceOut,
+                    conditioning: conditioningBlock
                 };
             });
             weeks.push({ week: w + 1, days: daysOut });
@@ -313,7 +376,7 @@ function WizardShell() {
                 loadingOption
             },
             trainingMaxes,
-            rounding,
+            rounding: { increment: roundingConfig.increment, mode: roundingConfig.mode },
             schedule: {
                 frequency: freq,
                 days,
@@ -322,6 +385,7 @@ function WizardShell() {
             },
             supplemental: supplemental || { strategy: "none" },
             assistance: assistance || { mode: "minimal" },
+            conditioning: conditioningState ? { ...conditioningState, sessions: plannedConditioning } : undefined,
             weeks
         };
 
@@ -340,6 +404,7 @@ function WizardShell() {
         if (currentStep.id === 'fundamentals') return allowStep1Next(state); // new single source of truth
         if (currentStep.id === 'design') return stepValidation.design;
         if (currentStep.id === 'review') return stepValidation.review;
+        if (currentStep.id === 'progress') return stepValidation.progress;
         return false;
     })() && stepIndex < STEPS.length - 1;
     const canGoBack = stepIndex > 0;
@@ -354,7 +419,35 @@ function WizardShell() {
 
     const handleNext = () => {
         if (canGoNext) {
+            // Clear any prior error context when advancing
+            if (stepIndex === 0) {
+                setStep1Error(null);
+                setStep1Missing([]);
+            }
             setStepIndex(prev => prev + 1);
+            return;
+        }
+        // If user clicked while disabled on Step 1, surface guidance
+        if (stepIndex === 0 && !canGoNext) {
+            const missing = [];
+            if (!(state?.units === 'lbs' || state?.units === 'lb' || state?.units === 'kg')) missing.push('units');
+            if (!state?.rounding) missing.push('rounding');
+            if (!(state?.tmPct === 0.9 || state?.tmPct === 0.85 || state?.tmPct === 0.90 || state?.tmPct === 0.850)) missing.push('TM %');
+            const liftsMissing = [];
+            for (const k of LIFTS) {
+                const tm = state?.lifts?.[k]?.tm;
+                if (!(Number.isFinite(tm) && tm > 0)) liftsMissing.push(k);
+            }
+            if (liftsMissing.length) missing.push(...liftsMissing.map(l => `${l} TM`));
+            setStep1Missing(missing);
+            const msg = missing.length ? `Still need: ${missing.join(', ')}` : 'Complete all required fields to continue.';
+            setStep1Error(msg);
+            // trigger child highlight animation
+            setStep1FlashToken(t => t + 1);
+            // auto-clear after delay
+            setTimeout(() => {
+                setStep1Error(null);
+            }, 4000);
         }
     };
 
@@ -372,7 +465,7 @@ function WizardShell() {
     };
 
     // Placeholder: progression trigger (would be invoked after reviewing Week 4 / Deload completion)
-    function onAdvanceCycle(amrapWk3 = {}) {
+    function onAdvanceCycle(amrapWk3 = {}, includeMap) {
         const forcePass = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_PROGRESS_FORCE_PASS === 'true');
         const repsMap = forcePass ? {} : amrapWk3; // empty map => treat all as pass
         // We don't have direct state setter (using reducer) so dispatch an advanced patch capturing next TMs
@@ -380,6 +473,17 @@ function WizardShell() {
             ...state,
             tms: Object.fromEntries(Object.entries(state.lifts || {}).map(([k, v]) => [k, v?.tm || 0]))
         }, { amrapWk3: repsMap });
+        // If selective include map provided, override nextState.tms accordingly
+        if (includeMap && Object.keys(includeMap).some(k => includeMap[k] === false)) {
+            for (const lift of Object.keys(nextState.lifts || {})) {
+                if (includeMap[lift] === false) {
+                    // revert TM for excluded lift to previous value
+                    const prevTm = state.lifts?.[lift]?.tm || 0;
+                    nextState.lifts[lift].tm = prevTm;
+                    nextState.tms[lift] = prevTm;
+                }
+            }
+        }
         // Apply updated lift TMs
         for (const lift of Object.keys(nextState.lifts || {})) {
             const tmVal = nextState.lifts[lift].tm;
@@ -396,7 +500,7 @@ function WizardShell() {
         switch (stepIndex) {
             case 0:
                 return (
-                    <Step1Fundamentals onValidChange={onFundamentalsValidChange} />
+                    <Step1Fundamentals onValidChange={onFundamentalsValidChange} flashToken={step1FlashToken} missing={step1Missing} />
                 );
             case 1:
                 return (
@@ -477,6 +581,12 @@ function WizardShell() {
             case 3:
                 return (
                     <Step4ReviewExport onReadyChange={(ok) => handleStepValidation('review', ok)} />
+                );
+            case 4:
+                return (
+                    <ProgressionStep state={state} onAdvance={(includeMap) => {
+                        onAdvanceCycle(state?.amrapWk3 || {}, includeMap);
+                    }} />
                 );
             default:
                 return <div className="text-red-400">Unknown step</div>;
@@ -750,54 +860,59 @@ function WizardShell() {
                                         </div>
                                     );
                                 }
-                                // 1-day live preview
-                                if (preview?.mode === '1day_live' && Array.isArray(preview?.days) && preview.days.length === 1) {
-                                    const d = preview.days[0];
-                                    return (
-                                        <div className="space-y-6 mt-10">
-                                            <div className="rounded-2xl border border-gray-700 bg-gray-800/40 p-4">
-                                                <div className="text-lg font-semibold mb-3 text-white">Week 1 (1-Day Preview)</div>
-                                                <div className="grid md:grid-cols-1 gap-4">
-                                                    <div className="rounded-xl border border-gray-700/60 bg-gray-900/40 p-3">
-                                                        <div className="text-xs uppercase tracking-wide text-gray-400 mb-2">Day 1</div>
-                                                        <div className="font-medium capitalize text-gray-200 mb-2">{d.lift}</div>
-                                                        <div className="text-xs uppercase tracking-wide text-gray-400">Warm-up</div>
-                                                        <ul className="text-sm mb-2 space-y-0.5">
-                                                            {d.warmups?.length === 0 && <li className="text-gray-500">—</li>}
-                                                            {d.warmups?.map((r, i) => (
-                                                                <li key={i} className="tabular-nums text-gray-300">{r.pct}% × {r.reps} → <span className="text-white">{r.weight}</span> {state?.units || 'lbs'}</li>
-                                                            ))}
-                                                        </ul>
-                                                        <div className="text-xs uppercase tracking-wide text-gray-400">Main</div>
-                                                        <ul className="text-sm mb-2 space-y-0.5">
-                                                            {d.main?.rows?.length === 0 && <li className="text-gray-500">—</li>}
-                                                            {d.main?.rows?.map((r, i) => (
-                                                                <li key={i} className="tabular-nums text-gray-300">{r.pct}% × {r.reps}{r.amrap ? '+' : ''} → <span className="text-white">{r.weight}</span> {state?.units || 'lbs'}{r.amrap && <span className="ml-2 text-[10px] px-1 py-0.5 border border-red-500/40 rounded text-red-300">AMRAP</span>}</li>
-                                                            ))}
-                                                        </ul>
-                                                        {Array.isArray(d.assistance) && d.assistance.length > 0 && (
-                                                            <div>
-                                                                <div className="text-xs uppercase tracking-wide text-gray-400">Assistance</div>
-                                                                <ul className="text-sm space-y-0.5">
-                                                                    {d.assistance.map((a, ai) => (
-                                                                        <li key={ai} className="text-gray-300">{a.name || a.id} — {a.sets ?? '?'}×{a.reps ?? '?'}</li>
-                                                                    ))}
-                                                                </ul>
-                                                            </div>
-                                                        )}
-                                                        {d.conditioning && (
-                                                            <div className="mt-2">
-                                                                <div className="text-xs uppercase tracking-wide text-gray-400">Conditioning</div>
-                                                                <div className="text-xs text-gray-300">
-                                                                    {d.conditioning.type} {d.conditioning.minutes ? `${d.conditioning.minutes}m` : ''}{d.conditioning.intensity ? ` · ${d.conditioning.intensity}` : ''}
+                                // 1-day live preview (globally disabled unless VITE_SHOW_STEP_PREVIEW is truthy)
+                                if (preview?.mode === '1day_live') {
+                                    if (!import.meta.env?.VITE_SHOW_STEP_PREVIEW) {
+                                        return null; // short-circuits the shared 1-day panel everywhere
+                                    }
+                                    if (Array.isArray(preview?.days) && preview.days.length === 1) {
+                                        const d = preview.days[0];
+                                        return (
+                                            <div className="space-y-6 mt-10">
+                                                <div className="rounded-2xl border border-gray-700 bg-gray-800/40 p-4">
+                                                    <div className="text-lg font-semibold mb-3 text-white">Week 1 (1-Day Preview)</div>
+                                                    <div className="grid md:grid-cols-1 gap-4">
+                                                        <div className="rounded-xl border border-gray-700/60 bg-gray-900/40 p-3">
+                                                            <div className="text-xs uppercase tracking-wide text-gray-400 mb-2">Day 1</div>
+                                                            <div className="font-medium capitalize text-gray-200 mb-2">{d.lift}</div>
+                                                            <div className="text-xs uppercase tracking-wide text-gray-400">Warm-up</div>
+                                                            <ul className="text-sm mb-2 space-y-0.5">
+                                                                {d.warmups?.length === 0 && <li className="text-gray-500">—</li>}
+                                                                {d.warmups?.map((r, i) => (
+                                                                    <li key={i} className="tabular-nums text-gray-300">{r.pct}% × {r.reps} → <span className="text-white">{r.weight}</span> {state?.units || 'lbs'}</li>
+                                                                ))}
+                                                            </ul>
+                                                            <div className="text-xs uppercase tracking-wide text-gray-400">Main</div>
+                                                            <ul className="text-sm mb-2 space-y-0.5">
+                                                                {d.main?.rows?.length === 0 && <li className="text-gray-500">—</li>}
+                                                                {d.main?.rows?.map((r, i) => (
+                                                                    <li key={i} className="tabular-nums text-gray-300">{r.pct}% × {r.reps}{r.amrap ? '+' : ''} → <span className="text-white">{r.weight}</span> {state?.units || 'lbs'}{r.amrap && <span className="ml-2 text-[10px] px-1 py-0.5 border border-red-500/40 rounded text-red-300">AMRAP</span>}</li>
+                                                                ))}
+                                                            </ul>
+                                                            {Array.isArray(d.assistance) && d.assistance.length > 0 && (
+                                                                <div>
+                                                                    <div className="text-xs uppercase tracking-wide text-gray-400">Assistance</div>
+                                                                    <ul className="text-sm space-y-0.5">
+                                                                        {d.assistance.map((a, ai) => (
+                                                                            <li key={ai} className="text-gray-300">{a.name || a.id} — {a.sets ?? '?'}×{a.reps ?? '?'}</li>
+                                                                        ))}
+                                                                    </ul>
                                                                 </div>
-                                                            </div>
-                                                        )}
+                                                            )}
+                                                            {d.conditioning && (
+                                                                <div className="mt-2">
+                                                                    <div className="text-xs uppercase tracking-wide text-gray-400">Conditioning</div>
+                                                                    <div className="text-xs text-gray-300">
+                                                                        {d.conditioning.type} {d.conditioning.minutes ? `${d.conditioning.minutes}m` : ''}{d.conditioning.intensity ? ` · ${d.conditioning.intensity}` : ''}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    );
+                                        );
+                                    }
                                 }
                                 return null;
                             })()}
@@ -865,12 +980,20 @@ function WizardShell() {
                                 </div>
 
                                 {stepIndex === 0 && (
-                                    <ToggleButton
-                                        on={canGoNext}
-                                        disabled={!canGoNext}
-                                        onClick={handleNext}
-                                        className={`flex items-center gap-2 text-sm px-5 ${!canGoNext ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    >Next <ChevronRight className="w-4 h-4" /></ToggleButton>
+                                    <div className="flex flex-col items-end gap-2 relative">
+                                        <ToggleButton
+                                            on={canGoNext}
+                                            disabled={!canGoNext}
+                                            onClick={handleNext}
+                                            className={`flex items-center gap-2 text-sm px-5 ${!canGoNext ? 'opacity-50' : ''}`}
+                                        >Next <ChevronRight className="w-4 h-4" /></ToggleButton>
+                                        {!canGoNext && step1Error && (
+                                            <div className="flex items-start gap-2 text-xs max-w-xs p-2 rounded-md border border-amber-600/40 bg-amber-900/30 text-amber-300 shadow-lg animate-fade-in">
+                                                <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                                                <span>{step1Error}</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 )}
                                 {stepIndex === 2 && (
                                     <ToggleButton
@@ -884,9 +1007,17 @@ function WizardShell() {
                                     <ToggleButton
                                         on={stepValidation.review}
                                         disabled={!stepValidation.review}
-                                        onClick={handleStartCycle}
+                                        onClick={() => setStepIndex(4)}
                                         className={`flex items-center gap-2 text-sm px-5 ${!stepValidation.review ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    >Start Cycle <ChevronRight className="w-4 h-4" /></ToggleButton>
+                                    >Week 4 Complete → Progress TMs <ChevronRight className="w-4 h-4" /></ToggleButton>
+                                )}
+                                {stepIndex === 4 && (
+                                    <ToggleButton
+                                        on={true}
+                                        disabled={false}
+                                        onClick={handleStartCycle}
+                                        className={`flex items-center gap-2 text-sm px-5`}
+                                    >Start Next Cycle <ChevronRight className="w-4 h-4" /></ToggleButton>
                                 )}
                                 {!(stepIndex === 0 || stepIndex === 2 || stepIndex === 3) && <div className="w-[96px]" />}
                             </div>
@@ -899,3 +1030,58 @@ function WizardShell() {
 }
 
 export default function ProgramWizard531V2() { return <WizardShell />; }
+
+// Inline lightweight progression step component (kept at bottom to avoid new file churn)
+function ProgressionStep({ state, onAdvance }) {
+    const [include, setInclude] = useState({ squat: true, bench: true, deadlift: true, press: true });
+    const [applied, setApplied] = useState(false);
+    const lifts = state?.lifts || {};
+    const amrap = state?.amrapWk3 || {};
+    const units = state?.units || 'lbs';
+    const plannedIncrements = {
+        squat: units === 'kg' ? 5 : 10,
+        deadlift: units === 'kg' ? 5 : 10,
+        bench: units === 'kg' ? 2.5 : 5,
+        press: units === 'kg' ? 2.5 : 5
+    };
+    return (
+        <div className="space-y-8">
+            <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-5">
+                <h2 className="text-lg font-semibold text-white">Advance Training Maxes</h2>
+                <p className="text-sm text-gray-400 mt-1">Per Wendler: +{units === 'kg' ? '2.5 kg (upper) / 5 kg (lower)' : '5 lb (upper) / 10 lb (lower)'} to each Training Max after a full 4-week cycle (Weeks 1–3 main sets + Week 4 deload). Uncheck any lift you want to hold this cycle.</p>
+                <div className="mt-4 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {Object.entries(lifts).map(([k, v]) => {
+                        const current = v?.tm || 0;
+                        const inc = plannedIncrements[k] || 0;
+                        const next = current + inc;
+                        const passed = amrap[k] == null || amrap[k] >= (state?.amrapMinWk3 || 1);
+                        return (
+                            <label key={k} className={`flex flex-col rounded-lg border p-3 bg-gray-900/60 cursor-pointer ${include[k] ? 'border-red-500/50' : 'border-gray-700'}`}>\n+                                <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm font-semibold text-white capitalize">{k}</span>
+                                <input type="checkbox" checked={include[k]} onChange={e => setInclude(prev => ({ ...prev, [k]: e.target.checked }))} />
+                            </div>
+                                <div className="text-xs text-gray-400 flex flex-col gap-0.5 font-mono">
+                                    <span>TM: <span className="text-gray-200">{current || '—'}</span></span>
+                                    <span>Inc: +{inc}</span>
+                                    <span className="text-gray-500">Next: {include[k] ? next : current}</span>
+                                    <span className={`mt-1 ${passed ? 'text-green-400' : 'text-yellow-500'}`}>{passed ? 'AMRAP pass' : 'No data'}</span>
+                                </div>
+                            </label>
+                        );
+                    })}
+                </div>
+                <div className="mt-6 flex items-center gap-3">
+                    <button
+                        disabled={applied}
+                        onClick={() => { if (!applied) { onAdvance(include); setApplied(true); } }}
+                        className={`px-5 py-2 rounded-lg border font-medium transition-colors ${applied ? 'border-gray-600 text-gray-500' : 'border-green-500 bg-green-600/10 text-green-300 hover:bg-green-600/20'}`}
+                    >{applied ? 'Applied' : 'Apply Progression'}</button>
+                    {applied && <span className="text-xs text-gray-400">Progression applied. Start next cycle when ready.</span>}
+                </div>
+            </div>
+            <div className="bg-gray-800/40 border border-gray-700 rounded-lg p-4 text-xs text-gray-400 leading-relaxed">
+                <p><strong className="text-gray-300">Note:</strong> If you stalled on a lift (missed Week 3 top set by a wide margin), you can uncheck it and keep the same TM next cycle. Adjusting only one lift at a time is common.</p>
+            </div>
+        </div>
+    );
+}

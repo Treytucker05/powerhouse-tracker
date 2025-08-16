@@ -14,11 +14,11 @@ export default function Step9CycleProgression({ data = {}, updateData }) {
     // Integration with previous steps - all with safe fallbacks
     const currentTrainingMaxes = data?.trainingMaxes || {};
     const week3Results = data?.week3Results || {};
-    const schedule = data?.schedule || { frequency: '4day', liftOrder: ['overhead_press', 'deadlift', 'bench', 'squat'] };
+    const schedule = data?.schedule || { frequency: '4day', liftOrder: ['press', 'deadlift', 'bench', 'squat'] };
 
     // Standard increment rules
     const incrementRules = {
-        overhead_press: 5,  // Upper body
+        press: 5,  // Upper body
         bench: 5,           // Upper body
         squat: 10,          // Lower body
         deadlift: 10        // Lower body
@@ -39,12 +39,12 @@ export default function Step9CycleProgression({ data = {}, updateData }) {
         squat: 'Squat',
         bench: 'Bench Press',
         deadlift: 'Deadlift',
-        overhead_press: 'Overhead Press'
+        press: 'Overhead Press'
     };
 
     // Get lift category for increment rules
     const getLiftCategory = (lift) => {
-        return ['overhead_press', 'bench'].includes(lift) ? 'Upper Body' : 'Lower Body';
+        return ['press', 'bench'].includes(lift) ? 'Upper Body' : 'Lower Body';
     };
 
     // Analyze Week 3 performance for progression recommendations

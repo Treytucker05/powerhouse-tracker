@@ -9,15 +9,63 @@ import { applyTemplate } from '../../../lib/templates/index.js';
 // Assistance normalization (used for convert-to-custom action)
 import { normalizeAssistance } from '../assistance/index.js';
 
-// Local template application helper (dedupes historical dual SET_TEMPLATE branches)
+// --- Template schedule normalization & logging helpers ---
+function normalizeTemplateSchedule(rawSchedule) {
+    const sched = rawSchedule || {};
+    let daysRaw = sched.days || [];
+    if (Array.isArray(daysRaw) && daysRaw.length && typeof daysRaw[0] === 'string') {
+        daysRaw = daysRaw.map((name, i) => ({ id: `D${i + 1}`, lift: name.toLowerCase() }));
+    }
+    if (Array.isArray(daysRaw) && daysRaw.length && typeof daysRaw[0] === 'object') {
+        daysRaw = daysRaw.map((d, i) => ({ id: d.id || `D${i + 1}`, lift: (d.lift || d.name || '').toLowerCase() }));
+    }
+    const order = daysRaw.map(d => d.lift);
+    return {
+        frequency: sched.frequency || (order.length === 3 ? '3day' : order.length === 2 ? '2day' : '4day'),
+        days: daysRaw,
+        order,
+        includeWarmups: sched.includeWarmups !== false,
+        warmupScheme: sched.warmupScheme || { percentages: [40, 50, 60], reps: [5, 5, 3] }
+    };
+}
+
+function logTemplateSync(stage, payload) {
+    try {
+        if (typeof window !== 'undefined' && window.localStorage?.getItem('debug.531.template') === 'off') return;
+        // eslint-disable-next-line no-console
+        console.info('[531:TEMPLATE_SYNC]', stage, payload);
+    } catch { /* ignore */ }
+}
+
+// Local template application helper (dedupes historical dual SET_TEMPLATE branches) with schedule normalization
 function applyTemplateLocal(state, template) {
     const next = { ...state };
     next.template = template;
     next.templateKey = template; // keep both aligned
-    // Reset progression-volatile fields
     next.week = 1;
     next.amrapWk3 = {};
-    // Clear any cached preview so UI rebuilds with new template context
+
+    // Attempt to pull preset for schedule normalization dynamically (safe guarded)
+    try {
+        const presetModule = require('../../../lib/templates/531.presets.v2.js');
+        if (presetModule?.getTemplatePreset) {
+            const preset = presetModule.getTemplatePreset(template, { state });
+            if (preset?.schedule) {
+                const norm = normalizeTemplateSchedule(preset.schedule);
+                next.schedule = { ...(next.schedule || {}), ...norm };
+                logTemplateSync('applyTemplateLocal.appliedPresetSchedule', { template, order: norm.order });
+            }
+        }
+    } catch (e) {
+        logTemplateSync('applyTemplateLocal.presetLoadFailed', { template, error: e.message });
+    }
+
+    // Normalize any existing schedule if still not normalized
+    if (next.schedule?.days) {
+        const normExisting = normalizeTemplateSchedule(next.schedule);
+        next.schedule = { ...next.schedule, ...normExisting };
+    }
+
     if (next.advanced?.schedulePreview) {
         next.advanced = { ...next.advanced, schedulePreview: null };
     }
@@ -81,10 +129,10 @@ export const initialProgramV2 = {
     advanced: { autoreg: { rpeCap: 9 }, specialization: {}, prTracking: true },
     assistanceLoadMode: 'percentRules', // 'percentRules' | 'off'
     conditioning: {
-        sessionsPerWeek: 2,
-        hiitPerWeek: 1,
-        modalities: { hiit: ['Prowler Pushes'], liss: ['Walking'] },
-        note: 'Do 2–3 sessions/week as tolerated.'
+        sessionsPerWeek: 3, // Wendler recommends 3–4 (minimum 2)
+        hiitPerWeek: 2,
+        modalities: { hiit: ['Prowler Pushes', 'Hill Sprints'], liss: ['Walking'] },
+        note: 'Target 3–4 conditioning sessions (hill sprints / prowler). Keep after lifting or on off days.'
     },
     amrapWk3: {},
     cycle: 1

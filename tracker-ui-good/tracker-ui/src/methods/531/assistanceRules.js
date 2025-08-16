@@ -59,10 +59,11 @@ export function assistanceFor(pack, lift, state = {}) {
     if (pack === "jack_shit") return [];
 
     if (pack === "bbb") {
-        const pickCats = lift === "squat" ? ["posterior", "core"] :
-            lift === "deadlift" ? ["core", "singleLeg"] :
-                ["pull", "core"]; // bench/press
-        cats.push(...pickCats);
+        // Book-aligned BBB: exactly one assistance category (opposite / complimentary)
+        const pickCat = lift === "squat" ? "posterior" :
+            lift === "deadlift" ? "core" :
+                "pull"; // bench/press
+        cats.push(pickCat);
     } else if (pack === "triumvirate") {
         cats.push(...byLift[lift].slice(0, 2));
     } else if (pack === "periodization_bible") {
@@ -74,8 +75,12 @@ export function assistanceFor(pack, lift, state = {}) {
         cats.push(...(lift === "squat" || lift === "deadlift"
             ? ["singleLeg", "core", "posterior"]
             : ["pull", "push", "core"]));
-    } else if (pack === "bbb60") {
-        cats.push("pull", "core");
+    } else if (pack === "bbb60" || pack === "bbb50") {
+        // Legacy BBB variants now constrained to one assistance slot
+        const pickCat = lift === "squat" ? "posterior" :
+            lift === "deadlift" ? "core" :
+                "pull"; // bench/press
+        cats.push(pickCat);
     } else {
         cats.push(...byLift[lift].slice(0, 2));
     }
@@ -88,7 +93,8 @@ export function expectedAssistanceCount(pack) {
         periodization_bible: 3,
         bodyweight: 3,
         jack_shit: 0,
-        bbb60: v => v === 1 || v === 2,
-        bbb: v => v === 1 || v === 2,
+        bbb60: v => v === 1,
+        bbb50: v => v === 1,
+        bbb: v => v === 1,
     }[pack];
 }

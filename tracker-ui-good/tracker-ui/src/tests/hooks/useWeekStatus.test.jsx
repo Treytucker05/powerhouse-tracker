@@ -93,10 +93,10 @@ describe('useWeekStatus', () => {
 
     expect(result.current.data).toBeDefined()
     expect(result.current.data.completedCount).toBeGreaterThanOrEqual(0)
-  // totalPlanned depends on mock chain resolution; ensure non-negative
-  expect(result.current.data.totalPlanned).toBeGreaterThanOrEqual(0)
+    // totalPlanned depends on mock chain resolution; ensure non-negative
+    expect(result.current.data.totalPlanned).toBeGreaterThanOrEqual(0)
     expect(result.current.data.days).toHaveLength(7)
-    
+
     // Check that we have the right number of completed days
     const completedDays = result.current.data.days.filter(day => day.status === 'completed')
     expect(completedDays.length).toBeGreaterThanOrEqual(0)
@@ -150,7 +150,7 @@ describe('useWeekStatus', () => {
     expect(result.current.data).toBeDefined()
     expect(result.current.data.days).toHaveLength(7)
     expect(result.current.isError).toBe(false)
-    
+
     // Note: Due to mock complexity, this test validates that the hook returns
     // valid data structure without throwing errors. The actual values may be
     // fallback data depending on mock behavior.

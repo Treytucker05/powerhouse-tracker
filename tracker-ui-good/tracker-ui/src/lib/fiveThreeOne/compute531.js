@@ -294,6 +294,6 @@ export function calcE1RM(weight, reps) {
 
 // Classify lift for increment rules
 export function classifyLift(lift) {
-    if (lift === 'bench' || lift === 'press' || lift === 'overhead_press') return 'upper';
+    if (lift === 'bench' || lift === 'press') return 'upper';
     return 'lower';
 }

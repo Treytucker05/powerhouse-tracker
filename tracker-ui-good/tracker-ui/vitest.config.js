@@ -9,8 +9,8 @@ export default defineConfig({
     plugins: [react()],
     test: {
         environment: 'jsdom',
-    testTimeout: 15000,
-    hookTimeout: 15000,
+        testTimeout: 15000,
+        hookTimeout: 15000,
         include: [
             'src/**/*.{test,spec}.{js,jsx,ts,tsx}',
             'src/**/__tests__/**/*.{js,jsx,ts,tsx}',
@@ -32,7 +32,7 @@ export default defineConfig({
         restoreMocks: true,
         css: false,
         reporters: [
-            [ 'default', { summary: false } ]
+            ['default', { summary: false }]
         ],
         coverage: {
             provider: 'v8',
@@ -46,23 +46,33 @@ export default defineConfig({
                 '**/*.stories.*',
                 '**/e2e/**',
                 // Phase 1: exclude large domain/template modules slated for later dedicated coverage
-                'src/methods/531/**',
+                // Reintroducing progression.js for coverage; explicitly exclude other 5/3/1 modules
+                'src/methods/531/cardioTemplates.js',
+                'src/methods/531/scheduleRender.js',
+                // 'src/methods/531/schedule.js',
+                'src/methods/531/packAdapter.js',
+                'src/methods/531/loadPack.js',
+                'src/methods/531/index.js',
+                'src/methods/531/decisionAdapter.js',
+                'src/methods/531/assistanceRules.js',
+                'src/methods/531/assistanceMapper.js',
+                'src/methods/531/assistanceCatalog.js',
+                // Reintroducing assistance/index.js for coverage; keep deeper assistance subdirs excluded if any
+                // 'src/methods/531/assistance/**',
+                'src/methods/531/components/**',
+                'src/methods/531/contexts/**',
+                'src/methods/531/engines/**',
                 'src/lib/templates/**',
                 'src/lib/api/**',
-                // Skip pure UI skin / placeholder components with minimal logic (will add later targeted tests)
-                'src/components/ui/Skeleton.jsx'
-                ,
+                // (Reinstated) Skeleton now covered by dedicated test
                 // Additional Phase 1 temporary exclusions for low coverage modules (will be targeted in Phase 2)
                 'src/components/navigation/TopNav.jsx',
-                'src/hooks/useRecentWorkouts.js',
-                'src/hooks/useWeekStatus.js',
                 'src/layout/AppShell.jsx'
                 ,
                 // Temp exclusions (low function coverage) to achieve Phase 1 green; will add targeted tests later
-                'src/components/dashboard/QuickActions.jsx',
-                'src/components/dashboard/SimpleVolumeChart.jsx',
-                'src/components/dashboard/PowerHouseVolumeChart.jsx',
-                'src/hooks/useQuickActions.js'
+                // 'src/components/dashboard/SimpleVolumeChart.jsx', // reinstated for coverage in Step 8
+                // 'src/components/dashboard/PowerHouseVolumeChart.jsx', // reinstated for coverage in Step 9
+                // 'src/hooks/useQuickActions.js' // reinstated for coverage in Step 7
             ],
             all: false,
             thresholds: {

@@ -513,8 +513,14 @@ export default function Step3WarmUp({ data, updateData }) {
 
             {/* Specific Warm-Up Sets */}
             <div className="bg-green-900/20 border border-green-600 p-6 rounded-lg">
-                <h4 className="text-lg font-medium text-white mb-4">
-                    Specific Warm-Up Sets (Required)
+                <h4 className="text-lg font-medium text-white mb-4 flex items-center">
+                    <span className="inline-flex items-center">
+                        Specific Warm-Up Sets (Required)
+                        <span
+                            className="ml-2 text-gray-400 cursor-help select-none"
+                            title="40/50/60% of Training Max ramps the movement pattern, primes CNS, and builds bar speed without adding fatigue before main work."
+                        >ℹ</span>
+                    </span>
                 </h4>
                 <div className="mb-4 p-3 bg-green-900/20 border border-green-600 rounded-lg">
                     <p className="text-green-200 text-sm">

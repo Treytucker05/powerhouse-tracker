@@ -1,14 +1,17 @@
 // src/components/program/steps/Step5AssistanceRouter.jsx
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Info, AlertTriangle, RefreshCcw, Settings, CheckCircle } from 'lucide-react';
 import StepStatusPill from './_shared/StepStatusPill.jsx';
 import { STEP_IDS } from './_registry/stepRegistry.js';
 import { TEMPLATE_IDS } from '../../../lib/fiveThreeOne/assistanceLibrary.js';
 import { buildAssistancePlan } from '../../../lib/fiveThreeOne/assistPlanner.js';
 import { percentOfTM, toDisplayWeight } from '../../../lib/fiveThreeOne/math.js';
+import { useExerciseDB } from '../../../contexts/ExerciseDBContext.jsx';
 
 export default function Step5AssistanceRouter({ data, updateData }) {
     const st = data || {};
+    const { loaded: exLoaded, categoriesMap } = useExerciseDB();
+    const [newPick, setNewPick] = useState({}); // { press: name }
     const set = (patch) => updateData({ ...st, ...patch });
 
     const templateId = st?.template?.id || st?.template; // support either shape
@@ -238,18 +241,52 @@ export default function Step5AssistanceRouter({ data, updateData }) {
                             )}
 
                             {/* Add quick bodyweight or simple item */}
-                            <div className="mt-3">
-                                <button
-                                    onClick={() => {
-                                        const next = { ...assistance };
-                                        const newItem = { name: 'Chin-Ups', sets: 5, reps: 10, load: { type: 'bw' } };
-                                        next.perDay[day] = [...(next.perDay[day] || []), newItem];
-                                        set({ assistance: next });
-                                    }}
-                                    className="px-3 py-1 rounded border border-gray-600 hover:bg-gray-700/40 text-white"
-                                >
-                                    + Add Chin-Ups (5×10)
-                                </button>
+                            <div className="mt-3 space-y-2">
+                                <div>
+                                    <label className="text-xs text-gray-400 mb-1 block">Add Exercise</label>
+                                    {!exLoaded && <div className="text-gray-500 text-xs">Loading exercise database...</div>}
+                                    {exLoaded && (
+                                        <select
+                                            value={newPick[day] || ''}
+                                            onChange={e => setNewPick(p => ({ ...p, [day]: e.target.value }))}
+                                            className="w-full bg-gray-800 border border-gray-600 text-white rounded px-2 py-1 text-sm"
+                                        >
+                                            <option value="">-- Select Exercise --</option>
+                                            {Object.keys(categoriesMap).sort().map(cat => (
+                                                <optgroup key={cat} label={cat}>
+                                                    {categoriesMap[cat].map(row => {
+                                                        const equip = row.equipment ? ` (${row.equipment.split(';')[0]})` : '';
+                                                        return <option key={row.exercise} value={row.exercise}>{row.exercise}{equip}</option>
+                                                    })}
+                                                </optgroup>
+                                            ))}
+                                        </select>
+                                    )}
+                                </div>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => {
+                                            const choice = newPick[day];
+                                            if (!choice) return;
+                                            const row = Object.values(categoriesMap).flat().find(r => r.exercise === choice);
+                                            const sets = Number(row?.default_sets) || 5;
+                                            const reps = row?.numeric_reps || (/amrap/i.test(row?.default_reps || '') ? 12 : Number(row?.default_reps) || 10);
+                                            const load = (/body|bw|bodyweight/i.test(row?.equipment || '') || /AMRAP/i.test(row?.default_reps)) ? { type: 'bw' } : undefined;
+                                            const next = { ...assistance };
+                                            next.perDay[day] = [...(next.perDay[day] || []), { name: choice, sets, reps, load }];
+                                            set({ assistance: next });
+                                            setNewPick(p => ({ ...p, [day]: '' }));
+                                        }}
+                                        disabled={!newPick[day]}
+                                        className={`px-3 py-1 rounded border ${newPick[day] ? 'border-gray-600 hover:bg-gray-700/40 text-white' : 'border-gray-700 text-gray-500 cursor-not-allowed'}`}
+                                    >
+                                        + Add
+                                    </button>
+                                    <button
+                                        onClick={() => setNewPick(p => ({ ...p, [day]: '' }))}
+                                        className="px-3 py-1 rounded border border-gray-700 hover:bg-gray-700/40 text-gray-300"
+                                    >Clear</button>
+                                </div>
                             </div>
                         </div>
                     );

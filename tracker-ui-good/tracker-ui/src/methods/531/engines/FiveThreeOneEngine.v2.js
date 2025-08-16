@@ -90,8 +90,8 @@ export function generateDay({ lift, weekIndex, program, dayId }) {
 
     let supplemental = null;
 
-    // BBB supplemental work if template is BBB
-    if (program.template === 'bbb' && program.supplemental?.type === 'BBB') {
+    // BBB supplemental work if template is BBB (skip during deload weekIndex 3)
+    if (program.template === 'bbb' && program.supplemental?.type === 'BBB' && weekIndex !== 3) {
         const pairing = program.supplemental.pairing || 'same';
         let supplementalLift = lift;
 
@@ -157,7 +157,7 @@ export function buildMainSetsForLift({ tm, weekIndex, option = 1, roundingIncrem
     const week = weekIndex + 1;
     const isDeload = week === 4;
     const percents = scheme[weekIndex]; // e.g., [65,75,85] or [40,50,60]
-    const amrapOnLast = !isDeload; // weeks 1–3 only
+    const amrapOnLast = !isDeload; // weeks 1–3 only (no AMRAP on deload 40/50/60 ×5)
 
     const sets = percents.map((p, i) => {
         const raw = tm * (p / 100);

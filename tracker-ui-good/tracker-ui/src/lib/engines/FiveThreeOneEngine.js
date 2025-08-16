@@ -52,7 +52,7 @@ class FiveThreeOneEngine {
             four_day: {
                 name: "4 Days/Week (Standard)",
                 description: "One main lift per day",
-                pattern: ['overhead_press', 'deadlift', 'bench', 'squat'],
+                pattern: ['press', 'deadlift', 'bench', 'squat'],
                 deload: true
             },
             three_day: {
@@ -64,7 +64,7 @@ class FiveThreeOneEngine {
             two_day: {
                 name: "2 Days/Week",
                 description: "Paired lifts",
-                pattern: [['squat', 'bench'], ['deadlift', 'overhead_press']],
+                pattern: [['squat', 'bench'], ['deadlift', 'press']],
                 deload: false
             }
         };
@@ -213,7 +213,7 @@ class FiveThreeOneEngine {
     // Validate maxes
     validateMaxes(maxes) {
         const errors = [];
-        const requiredLifts = ['squat', 'bench', 'deadlift', 'overhead_press'];
+        const requiredLifts = ['squat', 'bench', 'deadlift', 'press'];
 
         requiredLifts.forEach(lift => {
             if (!maxes[lift] || maxes[lift] <= 0) {

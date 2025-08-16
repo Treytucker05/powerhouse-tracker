@@ -34,11 +34,16 @@ export function validateTemplate(state) {
 
 export function validateScheduleWarmup(state) {
     const freq = state?.schedule?.frequency;
-    const order = state?.schedule?.order || [];
+    const days = state?.schedule?.days || [];
     const errs = [];
     if (!freq) errs.push('Select training frequency');
-    if (!order.length) errs.push('Set lift order for your week');
-    // Warmup is fixed Wendler scheme; no extra checks
+    if (!days.length) errs.push('Configure at least 3 training days');
+    if (days.length > 4) errs.push('Limit lifting days to 3–4 per week');
+    // Detect >2 consecutive days (simplistic check: if user added artificial extra days)
+    if (days.length >= 3) {
+        // If they have provided a frequency flag inconsistent with day count, note it
+        if (freq === '3day' && days.length > 3) errs.push('3‑day rolling schedule should list only 3 days here');
+    }
     return { ok: errs.length === 0, errors: errs };
 }
 

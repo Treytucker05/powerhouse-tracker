@@ -9,7 +9,7 @@ import { roundToIncrement, classifyLift } from './compute531.js';
  */
 export function applyIncrements(lifts, inc = { upper: 5, lower: 10 }, rounding = { increment: 5, mode: 'nearest' }) {
     const next = { ...(lifts || {}) };
-    ['squat', 'deadlift', 'bench', 'press', 'overhead_press'].forEach(lift => {
+    ['squat', 'deadlift', 'bench', 'press'].forEach(lift => {
         if (!next[lift]) return;
         const klass = classifyLift(lift);
         const add = klass === 'upper' ? (inc.upper ?? 5) : (inc.lower ?? 10);

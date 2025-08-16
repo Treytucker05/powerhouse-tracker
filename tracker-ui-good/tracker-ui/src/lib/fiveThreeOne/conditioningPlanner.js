@@ -121,3 +121,77 @@ export function buildConditioningPlan(state, options) {
     out.sort((a, b) => DAYS.indexOf(a.day) - DAYS.indexOf(b.day));
     return out.slice(0, freq);
 }
+
+/**
+ * planConditioningFromState: unified accessor that returns a normalized weekly conditioning plan
+ * regardless of whether the wizard is using the new Step6 (conditioning.options + weeklyPlan)
+ * shape or the earlier simple shape (sessionsPerWeek, hiitPerWeek, modalities{..}).
+ * Falls back to auto-generation when only options are present. Returns [] if no sessions requested.
+ */
+// Internal mapper: convert arbitrary user-entered labels to canonical modality keys
+function mapToCanonicalModality(label, fallbackMode) {
+    if (MODALITIES[label]) return label;
+    const lower = String(label).toLowerCase();
+    if (lower.includes('prowler')) return 'prowler_push';
+    if (lower.includes('hill')) return 'hill_sprint';
+    if (lower.includes('sled')) return 'sled_drag';
+    if (lower.includes('row') && fallbackMode === 'hiit') return 'row_interval';
+    if (lower.includes('bike') && fallbackMode === 'hiit') return 'bike_interval';
+    if (lower.includes('walk')) return 'walk';
+    if (lower.includes('swim')) return 'swim';
+    if (lower.includes('bike')) return 'easy_bike';
+    if (lower.includes('row')) return 'easy_row';
+    return fallbackMode === 'hiit' ? 'hill_sprint' : 'walk';
+}
+
+export function normalizeConditioningModalities(modalitiesObj = {}) {
+    return {
+        hiit: (modalitiesObj.hiit || []).map(m => mapToCanonicalModality(m, 'hiit')),
+        liss: (modalitiesObj.liss || []).map(m => mapToCanonicalModality(m, 'liss'))
+    };
+}
+
+export function planConditioningFromState(state) {
+    const cond = state?.conditioning || {};
+
+    // Case 1: Explicit weeklyPlan authored by user (Step6 UI). Trust it and normalize.
+    if (Array.isArray(cond.weeklyPlan) && cond.weeklyPlan.length) {
+        return cond.weeklyPlan.map(s => ({
+            day: s.day,
+            mode: s.mode,
+            modality: mapToCanonicalModality(s.modality, s.mode),
+            prescription: { ...(s.prescription || {}) },
+            notes: s.notes || (s.mode === 'hiit' ? 'After lift' : 'Easy session')
+        }));
+    }
+
+    // Collect option style config (Step6) or legacy flat fields.
+    const opts = cond.options || cond; // legacy cond placed fields at root
+    const frequency = Number(opts.frequency ?? cond.sessionsPerWeek ?? 0) || 0;
+    if (!frequency) return [];
+    const hiitPerWeek = Number(opts.hiitPerWeek ?? cond.hiitPerWeek ?? frequency);
+    const lissPerWeek = Number(opts.lissPerWeek ?? Math.max(0, frequency - hiitPerWeek));
+    const placement = opts.placement || CONDITIONING_PLACEMENT.AFTER_LIFTS;
+
+    const hiitModalities = (opts.hiitModalities || cond.modalities?.hiit || []).map(m => mapToCanonicalModality(m, 'hiit'));
+    const lissModalities = (opts.lissModalities || cond.modalities?.liss || []).map(m => mapToCanonicalModality(m, 'liss'));
+
+    try {
+        return buildConditioningPlan(state, {
+            frequency,
+            hiitPerWeek,
+            lissPerWeek,
+            placement,
+            hiitModalities,
+            lissModalities
+        });
+    } catch (e) {
+        console.warn('planConditioningFromState failed', e);
+        return [];
+    }
+}
+
+// Export mapping function for external consumers (e.g., export builders) to canonicalize stored legacy modality labels
+export function toCanonicalModalityKey(label, modeHint) {
+    return mapToCanonicalModality(label, modeHint);
+}

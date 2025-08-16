@@ -85,6 +85,17 @@ export function validateScheduleWarmup(state) {
         if (invalid) errors.push('Custom warm-up rows need positive % and reps');
     }
 
+    // Programming approach (Section C) foundation
+    const approach = state?.programmingApproach;
+    if (!approach) {
+        errors.push('Select a Programming Approach (Basic, Leader/Anchor, etc.)');
+    }
+    if (approach === 'leaderAnchor') {
+        const pattern = state?.leaderAnchorPattern || state?.programmingPattern; // backward compatibility
+        if (!pattern) errors.push('Choose a Leader/Anchor pattern (2+1 or 3+1)');
+        else if (!['2+1', '3+1'].includes(pattern)) errors.push('Invalid Leader/Anchor pattern');
+    }
+
     return { isValid: errors.length === 0, errors };
 }
 

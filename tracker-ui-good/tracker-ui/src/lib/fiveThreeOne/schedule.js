@@ -13,6 +13,11 @@ export function buildDaysByFrequency(freq = '4day') {
         // For the editor we present the first week's order; the calendar handles rolling.
         return [{ id: 'D1', lift: 'press' }, { id: 'D2', lift: 'deadlift' }, { id: 'D3', lift: 'bench' }];
     }
+    if (freq === '2day') {
+        // Minimal template: 2 training days; remaining lifts roll forward.
+        // Present first two in recommended recovery-friendly order.
+        return [{ id: 'D1', lift: 'press' }, { id: 'D2', lift: 'squat' }];
+    }
     if (freq === '4day') {
         return CANONICAL_ORDER.map((lift, idx) => ({ id: `D${idx + 1}`, lift }));
     }
