@@ -82,24 +82,35 @@ function coerceRepValue(repStr) {
 function parseCSV(csvText) {
     const lines = csvText.split(/\r?\n/).filter(l => l.trim().length);
     if (!lines.length) return [];
-    const header = splitCSVLine(lines[0]).map(h => h.toLowerCase());
+    // Normalize & alias headers
+    const rawHeader = splitCSVLine(lines[0]);
+    const normalizeHeader = h => (h || '')
+        .replace(/\ufeff/g, '') // strip BOM
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '_');
+    const ALIASES = { sets: 'default_sets', reps: 'default_reps', progression: 'progression_rule', equipment_needed: 'equipment' };
+    const header = rawHeader.map(h => {
+        const norm = normalizeHeader(h);
+        return ALIASES[norm] || norm;
+    });
     const req = ['exercise', 'category', 'equipment', 'default_sets', 'default_reps', 'progression_rule', 'notes', 'source'];
     const missing = req.filter(r => !header.includes(r));
     if (missing.length) {
-        console.warn('[exerciseDatabase] Missing columns:', missing.join(', '));
+        console.error('[exerciseDatabase] Missing columns:', missing.join(', '), 'present=', header);
     }
     const rows = [];
     for (let i = 1; i < lines.length; i++) {
         const cols = splitCSVLine(lines[i]);
         if (!cols.length) continue;
         const row = {};
-    header.forEach((h, idx) => { row[h] = (cols[idx] || '').trim(); });
-    // Ensure all required keys exist even if missing in header
-    ['exercise','category','equipment','default_sets','default_reps','progression_rule','notes','source'].forEach(k => { if (row[k] == null) row[k] = ''; });
+        header.forEach((h, idx) => { row[h] = (cols[idx] || '').trim(); });
+        // Ensure all required keys exist even if missing in header
+        ['exercise', 'category', 'equipment', 'default_sets', 'default_reps', 'progression_rule', 'notes', 'source'].forEach(k => { if (row[k] == null) row[k] = ''; });
         if (!row.exercise) continue;
         row.category_normalized = normalizeCategory(row.category);
         row.equipment_list = row.equipment ? row.equipment.split(/\s*,\s*/).filter(Boolean) : [];
-    row.numeric_reps = coerceRepValue(row.default_reps);
+        row.numeric_reps = coerceRepValue(row.default_reps);
         rows.push(row);
     }
     return rows;
@@ -132,6 +143,10 @@ export async function loadExerciseDatabase({ fetchImpl } = {}) {
         const res = await fetchFn(pathGuess, { cache: 'no-store' });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         text = await res.text();
+        // HTML guard (wrong path or dev server fallback)
+        if (text.trim().startsWith('<')) {
+            throw new Error('Received HTML instead of CSV at ' + pathGuess);
+        }
     } catch (err) {
         console.warn('[exerciseDatabase] Could not load CSV at', pathGuess, err.message);
         // Provide empty placeholder

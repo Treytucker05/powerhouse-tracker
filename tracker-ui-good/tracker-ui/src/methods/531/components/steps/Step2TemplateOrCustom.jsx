@@ -16,7 +16,9 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
     const ctx = useProgramV2();
     const { state, dispatch } = ctx;
     const [selectedTemplate, setSelectedTemplate] = useState(null);
-    const [expandedTemplate, setExpandedTemplate] = useState(null); // new inline expansion key
+    const [expandedTemplate, setExpandedTemplate] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [errors, setErrors] = useState([]);
 
     const templateCards = useMemo(() => Object.values(TEMPLATE_SPECS).map(spec => ({
         key: spec.key,
@@ -26,9 +28,43 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
         spec
     })), []);
 
+    function logTemplate(stage, payload) {
+        try {
+            if (typeof window !== 'undefined' && window.localStorage?.getItem('debug.531.template') === 'off') return;
+            // eslint-disable-next-line no-console
+            console.info('[531:TEMPLATE_SYNC] Step2', stage, payload);
+        } catch { /* ignore */ }
+    }
+
     function handleSelectTemplate(key) {
         setSelectedTemplate(key);
         setExpandedTemplate(prev => prev === key ? null : key);
+        setErrors([]);
+        logTemplate('select', { key });
+        
+        // Validate template requirements
+        const validation = validateTemplateRequirements(key, state);
+        if (!validation.isValid) {
+            setErrors(validation.errors);
+        }
+    }
+
+    function validateTemplateRequirements(templateKey, currentState) {
+        const errors = [];
+        
+        if (!currentState?.lifts) {
+            errors.push('Complete Step 1 (Training Maxes) before selecting a template');
+            return { isValid: false, errors };
+        }
+        
+        const lifts = ['press', 'bench', 'squat', 'deadlift'];
+        const missingTMs = lifts.filter(lift => !currentState.lifts[lift]?.tm || currentState.lifts[lift].tm <= 0);
+        
+        if (missingTMs.length > 0) {
+            errors.push(`Missing training maxes for: ${missingTMs.map(l => l.charAt(0).toUpperCase() + l.slice(1)).join(', ')}`);
+        }
+        
+        return { isValid: errors.length === 0, errors };
     }
 
     // Local BBB variant state (only used when BBB expanded)
@@ -101,37 +137,67 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
 
     function applyTemplate(templateKeyOverride) {
         const key = templateKeyOverride || selectedTemplate;
-        if (!key) return;
-        const opts = {};
-        if (key === TEMPLATE_KEYS.BBB) {
-            opts.bbb = {
-                variant: bbbVariant,
-                pairing: bbbPairing,
-                startPercent: bbbVariant === 'standard' ? bbbStartPercent : 30,
-                progressTo: bbbVariant === 'standard' ? bbbProgressTo : 60
-            };
+        if (!key || errors.length > 0) return;
+        
+        setIsLoading(true);
+        setErrors([]);
+        
+        try {
+            const opts = {};
+            if (key === TEMPLATE_KEYS.BBB) {
+                opts.bbb = {
+                    variant: bbbVariant,
+                    pairing: bbbPairing,
+                    startPercent: bbbVariant === 'standard' ? bbbStartPercent : 30,
+                    progressTo: bbbVariant === 'standard' ? bbbProgressTo : 60
+                };
+            }
+            
+            const preset = getTemplatePreset(key, ctx, opts);
+            if (!preset) {
+                throw new Error(`Template ${key} configuration not found`);
+            }
+            
+            const spec = getTemplateSpec(key);
+            
+            // Inject custom assistance if user edited
+            if (assistEdit[key]) {
+                const plan = assistEdit[key];
+                preset.assistance = {
+                    mode: 'custom',
+                    customPlan: plan
+                };
+            }
+            
+            dispatch({ type: 'SET_TEMPLATE_KEY', payload: preset.key });
+            dispatch({ type: 'APPLY_TEMPLATE_CONFIG', payload: preset });
+            logTemplate('apply', { key: preset.key, schedule: preset.schedule, assistanceMode: preset.assistance?.mode, hasCustomAssist: !!assistEdit[key] });
+            
+            if (spec) {
+                dispatch({ type: 'SET_TEMPLATE_SPEC', payload: spec });
+                if (spec.assistanceHint) dispatch({ type: 'SET_ASSISTANCE_HINT', payload: spec.assistanceHint });
+            }
+            
+            dispatch({ type: 'SET_FLOW_MODE', payload: 'template' });
+            
+            setTimeout(() => {
+                setIsLoading(false);
+                // post-dispatch state snapshot
+                try {
+                    const st = ctx.state;
+                    logTemplate('postDispatchState', { order: st?.schedule?.order, days: st?.schedule?.days });
+                } catch { /* ignore */ }
+                
+                onChoose && onChoose('template');
+                onAutoNext && onAutoNext();
+                setExpandedTemplate(null);
+            }, 300);
+            
+        } catch (error) {
+            console.error('Template application error:', error);
+            setErrors([error.message]);
+            setIsLoading(false);
         }
-        const preset = getTemplatePreset(key, ctx, opts);
-        if (!preset) return;
-        const spec = getTemplateSpec(key);
-        // Inject custom assistance if user edited
-        if (assistEdit[key]) {
-            const plan = assistEdit[key];
-            preset.assistance = {
-                mode: 'custom',
-                customPlan: plan
-            };
-        }
-        dispatch({ type: 'SET_TEMPLATE_KEY', payload: preset.key });
-        dispatch({ type: 'APPLY_TEMPLATE_CONFIG', payload: preset });
-        if (spec) {
-            dispatch({ type: 'SET_TEMPLATE_SPEC', payload: spec });
-            if (spec.assistanceHint) dispatch({ type: 'SET_ASSISTANCE_HINT', payload: spec.assistanceHint });
-        }
-        dispatch({ type: 'SET_FLOW_MODE', payload: 'template' });
-        onChoose && onChoose('template');
-        onAutoNext && onAutoNext();
-        setExpandedTemplate(null);
     }
 
     function chooseCustom() {
@@ -174,11 +240,39 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 relative">
+            {isLoading && (
+                <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
+                    <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 flex items-center gap-3">
+                        <div className="animate-spin w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                        <span className="text-white text-sm">Configuring template...</span>
+                    </div>
+                </div>
+            )}
+            
             <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
                 <h2 className="text-2xl font-bold text-white mb-2">Step 2 — Template or Custom</h2>
                 <p className="text-gray-400">Select a proven Wendler template for instant configuration or continue with a fully custom build.</p>
             </div>
+
+            {errors.length > 0 && (
+                <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                        <div className="text-red-400 mt-0.5">⚠️</div>
+                        <div>
+                            <h4 className="text-red-300 font-medium mb-2">Template Selection Issues</h4>
+                            <ul className="space-y-1">
+                                {errors.map((error, idx) => (
+                                    <li key={idx} className="text-red-200 text-sm">• {error}</li>
+                                ))}
+                            </ul>
+                            <div className="mt-3 text-xs text-red-300">
+                                💡 Complete Step 1 (Training Maxes) before selecting a template
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="bg-blue-900/20 border border-blue-700/40 rounded-lg p-4 flex space-x-3">
                 <Info className="w-5 h-5 text-blue-300 flex-shrink-0" />

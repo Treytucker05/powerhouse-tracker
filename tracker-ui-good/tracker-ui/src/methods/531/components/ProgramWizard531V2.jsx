@@ -1,6 +1,13 @@
 /**
  * ProgramWizard531V2.jsx - New V2 5/3/1 Wizard Shell
  * Clean, minimal wizard with step navigation and V2 context integration
+ * 
+ * This is the RESTORED and ENHANCED 5-step workflow that includes:
+ * - Enhanced Section C (Programming Approach)
+ * - Enhanced Section E (Assistance)
+ * - Enhanced Section G (Conditioning)
+ * 
+ * The route /builder/531/v2 has been updated to use this component directly.
  */
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
@@ -351,7 +358,8 @@ function WizardShell() {
                     lift: humanLiftName(liftKey),
                     warmups,
                     main,
-                    supplemental: supplementalOut,
+                    // Always provide a supplemental object (prevents downstream undefined access)
+                    supplemental: supplementalOut || { type: 'none', sets: 0, reps: 0, percentOfTM: null },
                     assistance: assistanceOut,
                     conditioning: conditioningBlock
                 };

@@ -1,11 +1,27 @@
+/**
+ * Step3ScheduleWarmup.jsx - Complete Step 3 implementation with all sections A-F
+ * 
+ * This is the CONSOLIDATED version that includes:
+ * - Section A: Schedule (frequency selection, lift order)
+ * - Section B: Warm-up Scheme (standard/minimal options)
+ * - Section C: Programming Approach (4 cards: Basic 4-Week, Leader/Anchor, Competition Prep, Specialized)
+ * - Section D: Supplemental (FSL, SSL, BBB, 5s PRO, None options)
+ * - Section E: Assistance (4 cards: Minimal, Standard, Custom, Template-Based)
+ * - Section F: Equipment (profile cards: Full Gym, Home Gym, Minimal, Bodyweight)
+ * 
+ * This replaces both the older Step3WarmUp.jsx component and the Step3DesignCustom.jsx component
+ * from the v2 implementation path.
+ */
 import React, { useState, useMemo } from 'react';
-import { Info, Plus, Trash2, RotateCcw, CheckCircle, Filter, Layers, Settings as Cog } from 'lucide-react';
+import { Info, Plus, Trash2, RotateCcw, CheckCircle, Filter, Layers, Settings as Cog, AlertTriangle } from 'lucide-react';
 import StepStatusPill from './_shared/StepStatusPill.jsx';
 import { STEP_IDS } from './_registry/stepRegistry.js';
 import { buildDaysByFrequency, resetToCanonical, liftOptions } from '../../../lib/fiveThreeOne/schedule.js';
 import { useExerciseDB } from '../../../contexts/ExerciseDBContext.jsx';
 
 export default function Step3ScheduleWarmup({ data, updateData }) {
+    alert('STEP3SCHEDULEWARMUP IS LOADING!');
+    console.log('STEP3SCHEDULEWARMUP IS RENDERING - This should show Sections C and E', { data });
     const st = data || {};
     const schedule = st.schedule || {};
     const warm = st.warmup || {};
@@ -278,8 +294,26 @@ export default function Step3ScheduleWarmup({ data, updateData }) {
         { week: 3, fsl: 75, ssl: 85 }
     ];
 
+    // Debug component to help diagnose missing sections
+    const RenderDebug = () => (
+        <div className="bg-red-900/20 border border-red-500 p-4 rounded mb-4">
+            <h4 className="text-red-300 font-bold">Debug Info</h4>
+            <div className="text-xs text-red-200 space-y-1">
+                <div>Component: Step3ScheduleWarmup</div>
+                <div>Data: {JSON.stringify({
+                    hasWarmup: !!warm,
+                    hasSupplemental: !!supplemental,
+                    hasProgrammingApproach: !!programmingApproach,
+                    hasAssistance: !!assistanceConfig,
+                    dataKeys: Object.keys(st)
+                })}</div>
+            </div>
+        </div>
+    );
+
     return (
         <div className="space-y-6">
+            <RenderDebug />
             <div className="flex items-start justify-between">
                 <div>
                     <h3 className="text-xl font-semibold text-white mb-1">Step 3: Training Schedule & Warm‑Up</h3>
@@ -436,6 +470,26 @@ export default function Step3ScheduleWarmup({ data, updateData }) {
                 )}
             </div>
 
+            {/* Deadlift rep style (belongs to Warm‑ups Section B) */}
+            <div className="bg-gray-900/60 border border-gray-700 rounded p-4">
+                <div className="text-white font-medium mb-2">Deadlift Rep Style</div>
+                <div className="flex flex-wrap gap-2">
+                    {[
+                        { id: 'touch', label: 'Touch‑and‑Go' },
+                        { id: 'deadstop', label: 'Dead‑Stop (reset each rep)' },
+                    ].map(opt => (
+                        <button
+                            key={opt.id}
+                            onClick={() => setDeadliftStyle(opt.id)}
+                            className={`px-3 py-1 rounded border ${warm.deadliftRepStyle === opt.id ? 'border-red-500 ring-2 ring-red-600' : 'border-gray-600 hover:bg-gray-700/40'} text-white`}
+                        >
+                            {opt.label}
+                        </button>
+                    ))}
+                </div>
+                <p className="text-gray-400 text-xs mt-2">Pick whichever lets you keep tightness and best technique. This will display as a cue on Deadlift days.</p>
+            </div>
+
             {/* Programming Approach (Section C) */}
             <div className="bg-gray-900/60 border border-gray-700 rounded p-4 space-y-4">
                 <div>
@@ -563,25 +617,7 @@ export default function Step3ScheduleWarmup({ data, updateData }) {
                 <div className="text-[10px] text-gray-500 italic">Foundation stored in state (programmingApproach / leaderAnchorPattern) for downstream plan generation.</div>
             </div>
 
-            {/* Deadlift rep style */}
-            <div className="bg-gray-900/60 border border-gray-700 rounded p-4">
-                <div className="text-white font-medium mb-2">Deadlift Rep Style</div>
-                <div className="flex flex-wrap gap-2">
-                    {[
-                        { id: 'touch', label: 'Touch‑and‑Go' },
-                        { id: 'deadstop', label: 'Dead‑Stop (reset each rep)' },
-                    ].map(opt => (
-                        <button
-                            key={opt.id}
-                            onClick={() => setDeadliftStyle(opt.id)}
-                            className={`px-3 py-1 rounded border ${warm.deadliftRepStyle === opt.id ? 'border-red-500 ring-2 ring-red-600' : 'border-gray-600 hover:bg-gray-700/40'} text-white`}
-                        >
-                            {opt.label}
-                        </button>
-                    ))}
-                </div>
-                <p className="text-gray-400 text-xs mt-2">Pick whichever lets you keep tightness and best technique. This will display as a cue on Deadlift days.</p>
-            </div>
+
 
             {/* Supplemental Work Selector */}
             <div className="bg-gray-900/60 border border-gray-700 rounded p-4 space-y-4">
@@ -914,6 +950,37 @@ export default function Step3ScheduleWarmup({ data, updateData }) {
                     </div>
                     <div className="text-[10px] text-gray-500 italic">Counts are illustrative. Final exercise pool may adjust based on programming approach and assistance mode.</div>
                 </div>
+            </div>
+
+            {/* Step 3 Progress Summary */}
+            <div className="bg-gray-900/60 border border-gray-700 rounded p-4 text-[11px] text-gray-300">
+                {(() => {
+                    const scheduleOk = !!(schedule.frequency && (schedule.days || []).length);
+                    const warmOk = !!warm.policy; // basic
+                    const progOk = !!programmingApproach;
+                    const suppOk = !!supplemental.type;
+                    const assistOk = !!assistanceConfig.mode;
+                    const essentialOk = equipmentMap.barbell && equipmentMap.plates && equipmentMap.squat_rack && equipmentMap.bench;
+                    const items = [
+                        { id: 'schedule', label: 'Schedule', ok: scheduleOk },
+                        { id: 'warm', label: 'Warm‑ups', ok: warmOk },
+                        { id: 'programming', label: 'Programming', ok: progOk },
+                        { id: 'supplemental', label: 'Supplemental', ok: suppOk },
+                        { id: 'assistance', label: 'Assistance', ok: assistOk },
+                        { id: 'equipment', label: 'Equipment', ok: essentialOk }
+                    ];
+                    return (
+                        <div className="flex flex-wrap gap-3 items-center">
+                            {items.map(it => (
+                                <div key={it.id} className={`flex items-center gap-1 px-2 py-1 rounded border ${it.ok ? 'border-green-600 text-green-300' : 'border-gray-600 text-gray-400'}`}>
+                                    {it.ok ? <CheckCircle className="w-3 h-3" /> : <AlertTriangle className="w-3 h-3 text-yellow-400" />}
+                                    <span>{it.label}</span>
+                                </div>
+                            ))}
+                            {!essentialOk && <span className="text-yellow-400">Essential equipment incomplete (barbell, plates, rack, bench).</span>}
+                        </div>
+                    );
+                })()}
             </div>
         </div>
     );

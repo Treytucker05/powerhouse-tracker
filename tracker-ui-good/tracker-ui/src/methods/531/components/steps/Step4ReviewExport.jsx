@@ -52,22 +52,22 @@ function TableBlock({ title, rows, units }) {
     if (!rows || !rows.length) return null;
     return (
         <div className="mt-4">
-            <h4 className="text-sm md:text-base font-semibold mb-2 tracking-wide">{title}</h4>
-            <div className="overflow-x-auto">
+            <h4 className="text-sm md:text-base font-semibold mb-2 tracking-wide text-white">{title}</h4>
+            <div className="overflow-x-auto rounded border border-gray-700">
                 <table className="min-w-[420px] w-full text-xs md:text-sm">
-                    <thead className="text-gray-400">
+                    <thead className="bg-gray-800 text-gray-300">
                         <tr>
-                            <th className="text-left py-1 pr-4">%</th>
-                            <th className="text-left py-1 pr-4">Reps</th>
-                            <th className="text-left py-1">Weight</th>
+                            <th className="text-left py-1.5 px-3 font-medium">% TM</th>
+                            <th className="text-left py-1.5 px-3 font-medium">Reps</th>
+                            <th className="text-left py-1.5 px-3 font-medium">Load</th>
                         </tr>
                     </thead>
                     <tbody>
                         {rows.map((r, i) => (
-                            <tr key={i} className="border-t border-gray-700/40">
-                                <td className="py-1 pr-4 font-mono">{r.pct}%</td>
-                                <td className="py-1 pr-4 font-mono">{r.reps}{r.amrap ? '+' : ''}</td>
-                                <td className="py-1 font-mono">{r.weight}{units}</td>
+                            <tr key={i} className={`border-t border-gray-700 ${i % 2 ? 'bg-gray-900/80' : 'bg-gray-900'} text-gray-300`}>
+                                <td className="py-1 px-3 font-mono text-gray-200">{r.pct}%</td>
+                                <td className="py-1 px-3 font-mono">{r.reps}{r.amrap ? '+' : ''}</td>
+                                <td className="py-1 px-3 font-mono text-gray-100">{r.weight}{units}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -97,6 +97,9 @@ export default function Step4ReviewExport({ onReadyChange }) {
     const [weekIndex, setWeekIndex] = useState(0);
     const [exportError, setExportError] = useState(null);
     const [copied, setCopied] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [errors, setErrors] = useState([]);
+    const [warnings, setWarnings] = useState([]);
 
     const effective = useMemo(() => deriveEffectiveConfig(state), [state]);
 
@@ -114,6 +117,50 @@ export default function Step4ReviewExport({ onReadyChange }) {
         deadlift: effective.lifts?.deadlift?.tm || 0,
         press: effective.lifts?.press?.tm || 0
     };
+
+    // Comprehensive validation for Step 4
+    const comprehensiveValidation = useMemo(() => {
+        const errors = [];
+        const warnings = [];
+
+        // Training maxes validation
+        const trainingMaxes = effective.trainingMax || {};
+        order.forEach(lift => {
+            if (!trainingMaxes[lift.toLowerCase()] || trainingMaxes[lift.toLowerCase()] <= 0) {
+                errors.push(`Training max for ${lift} is required`);
+            }
+        });
+
+        // Schedule validation
+        if (!effective.schedule?.order?.length) {
+            errors.push('Training schedule not configured');
+        }
+
+        // Supplemental validation
+        if (supplemental.strategy === 'bbb' && !supplemental.percentage) {
+            warnings.push('BBB percentage not set - defaulting to 50%');
+        }
+
+        // Assistance validation
+        if (assistance.mode === 'custom' && assistMode === 'template') {
+            warnings.push('Assistance set to custom but using template mode');
+        }
+
+        // Program readiness check
+        if (errors.length === 0 && !starting) {
+            setErrors([]);
+        } else {
+            setErrors(errors);
+        }
+        setWarnings(warnings);
+
+        return {
+            isValid: errors.length === 0,
+            hasWarnings: warnings.length > 0,
+            errors,
+            warnings
+        };
+    }, [effective, order, supplemental, assistance, assistMode, starting]);
 
     const roundingMode = typeof effective.rounding === 'string' ? effective.rounding : (effective.rounding?.mode || 'nearest');
     const roundingIncrement = typeof effective.rounding === 'object' ? (effective.rounding.increment || 5) : (effective.units === 'kg' ? 2.5 : 5);
@@ -135,6 +182,28 @@ export default function Step4ReviewExport({ onReadyChange }) {
     const plannedConditioning = useMemo(() => planConditioningFromState(state).map(s => ({
         day: s.day, mode: s.mode, modality: s.modality, notes: s.notes, prescription: s.prescription
     })), [state]);
+
+    // Diagnostic: log any mismatch between schedule.order and rendered order (once per mount or when underlying changes)
+    useEffect(() => {
+        try {
+            const schedOrder = state?.schedule?.order;
+            if (!Array.isArray(schedOrder) || !schedOrder.length) return;
+            const displaySched = schedOrder.map(l => l && l.charAt(0).toUpperCase() + l.slice(1));
+            const mismatch = JSON.stringify(displaySched) !== JSON.stringify(order);
+            if (mismatch) {
+                if (typeof window !== 'undefined' && window?.localStorage?.getItem('debug.531.template') === 'off') return;
+                // eslint-disable-next-line no-console
+                console.info('[531:TEMPLATE_SYNC]', 'step4.orderMismatch', { scheduleOrder: displaySched, uiOrder: order });
+            } else {
+                if (typeof window !== 'undefined' && window?.localStorage?.getItem('debug.531.template') === 'off') return;
+                // eslint-disable-next-line no-console
+                console.info('[531:TEMPLATE_SYNC]', 'step4.orderAligned', { order: displaySched });
+            }
+        } catch (e) {
+            // eslint-disable-next-line no-console
+            console.warn('[531:TEMPLATE_SYNC]', 'step4.orderCheckError', e.message);
+        }
+    }, [state?.schedule?.order, order]);
 
     // Validation collection
     const validation = useMemo(() => {
@@ -191,6 +260,16 @@ export default function Step4ReviewExport({ onReadyChange }) {
         return map[mainDisplay] || mainDisplay;
     }
 
+    function getBbbExerciseName(liftDisplay) {
+        const exerciseNames = {
+            'Press': 'Overhead Press',
+            'Bench': 'Bench Press',
+            'Squat': 'Back Squat',
+            'Deadlift': 'Deadlift'
+        };
+        return exerciseNames[liftDisplay] || liftDisplay;
+    }
+
     // Build weeks JSON for export (optionally omit Deload week if user skipped)
     const weeksData = useMemo(() => {
         const skipDeload = state?.advanced?.skipDeload === true;
@@ -206,10 +285,14 @@ export default function Step4ReviewExport({ onReadyChange }) {
                     const bbbTargetLiftDisplay = getBbbPairLift(displayLift);
                     const bbbTm = getTMForDisplayLift(bbbTargetLiftDisplay);
                     const bbbWeight = roundToIncrement(bbbTm * (supplemental.percentOfTM / 100), roundingIncrement, roundingMode);
+                    const bbbExerciseName = getBbbExerciseName(bbbTargetLiftDisplay);
                     supplementalBlock = {
                         type: 'bbb',
+                        exercise: bbbExerciseName,
+                        targetLift: bbbTargetLiftDisplay,
                         sets: supplemental.sets, reps: supplemental.reps,
-                        weight: bbbWeight, units
+                        weight: bbbWeight, units,
+                        percentOfTM: supplemental.percentOfTM
                     };
                 }
                 // Normalized assistance via template rules (ignores legacy state.assistance shape)
@@ -533,7 +616,7 @@ export default function Step4ReviewExport({ onReadyChange }) {
                                         {/* Supplemental */}
                                         {day.supplemental && day.supplemental.type === 'bbb' && (
                                             <div className="text-xs text-red-200 bg-red-900/10 border border-red-700/40 rounded p-3 font-mono">
-                                                BBB: {day.supplemental.sets} × {day.supplemental.reps} @ {day.supplemental.weight}{units}
+                                                BBB {day.supplemental.exercise}: {day.supplemental.sets} × {day.supplemental.reps} @ {day.supplemental.weight}{units} ({day.supplemental.percentOfTM}% TM)
                                             </div>
                                         )}
                                         {/* Assistance */}
@@ -543,11 +626,18 @@ export default function Step4ReviewExport({ onReadyChange }) {
                                             {Array.isArray(day.assistance) && day.assistance.length > 0 ? (
                                                 <div className="text-[11px] opacity-80 text-gray-400 space-y-0.5">
                                                     {day.assistance.map((a, i) => (
-                                                        <div key={i}>{a.block ? (<><span className="text-gray-300 font-semibold">{a.block}:</span> {a.name} {a.sets}x{a.reps}</>) : (<>{a.name} {a.sets}x{a.reps}</>)}</div>
+                                                        <div key={i}>
+                                                            {a.displayName ? a.displayName :
+                                                                a.block ? (<><span className="text-gray-300 font-semibold">{a.block}:</span> {a.name} {a.sets}×{a.reps}</>) :
+                                                                    (<>{a.name} {a.sets}×{a.reps}</>)
+                                                            }
+                                                        </div>
                                                     ))}
                                                 </div>
                                             ) : (
-                                                <div className="text-[11px] opacity-80 text-gray-500">None</div>
+                                                <div className="text-[11px] opacity-80 text-gray-500">
+                                                    {state.templateKey === 'jack_shit' ? 'Main lift only' : 'None'}
+                                                </div>
                                             )}
                                             {/* Inline custom editor (advanced) */}
                                             {assistMode === 'custom' && (

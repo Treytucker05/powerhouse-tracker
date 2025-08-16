@@ -183,7 +183,7 @@ export default function BuilderReviewPage() {
     }
 
     return (
-        <main className="mx-auto max-w-6xl px-4 py-8 text-neutral-900">
+        <main className="mx-auto max-w-6xl px-4 py-8 text-gray-100">
             <HeaderSummary meta={state.meta} />
             <section className="mt-6">
                 <TMTable tmByLift={state.tm_by_lift} />
@@ -225,18 +225,18 @@ function HeaderSummary({ meta }: { meta: ReviewState["meta"] }) {
 /** ========= TM Table ========= **/
 function TMTable({ tmByLift }: { tmByLift: Record<LiftKey, number> }) {
     return (
-        <div className="rounded-2xl border bg-white p-6 shadow-sm">
-            <h2 className="mb-3 text-lg font-medium">Training Maxes (90% of 1RM)</h2>
+        <div className="rounded-2xl border border-gray-700 bg-gray-800/70 p-6 shadow-sm backdrop-blur">
+            <h2 className="mb-3 text-lg font-medium text-white">Training Maxes (90% of 1RM)</h2>
             <div className="grid grid-cols-1 gap-2 text-sm md:grid-cols-4">
                 {(["press", "bench", "squat", "deadlift"] as LiftKey[]).map((k) => (
-                    <div key={k} className="flex items-center justify-between rounded-lg border p-3">
-                        <span className="font-medium">{LIFT_LABEL[k]}</span>
-                        <span className="tabular-nums">{tmByLift[k]}{/* units label kept minimal */}</span>
+                    <div key={k} className="flex items-center justify-between rounded-lg border border-gray-700/70 bg-gray-900/60 p-3">
+                        <span className="font-medium text-gray-200">{LIFT_LABEL[k]}</span>
+                        <span className="tabular-nums text-gray-100">{tmByLift[k]}{/* units label kept minimal */}</span>
                     </div>
                 ))}
             </div>
-            <p className="mt-3 text-xs text-neutral-500">
-                All working percentages are based on <strong>Training Max (TM)</strong>, not true 1RM. {/* book p.21–22 */}
+            <p className="mt-3 text-xs text-gray-400">
+                All working percentages are based on <strong className="text-gray-200">Training Max (TM)</strong>, not true 1RM.
             </p>
         </div>
     );
@@ -290,32 +290,37 @@ function DayCard({
     }, [computedWeek, supplementalLoad, day.supplemental]);
 
     return (
-        <details className="group rounded-2xl border bg-white p-6 shadow-sm" open>
+        <details className="group rounded-2xl border border-gray-700 bg-gray-800/70 p-6 shadow-sm backdrop-blur" open>
             <summary className="flex cursor-pointer list-none items-center justify-between">
-                <h3 className="text-lg font-semibold">Day — {LIFT_LABEL[lift]}</h3>
-                <span className="text-xs text-neutral-500">TM {tm}</span>
+                <h3 className="text-lg font-semibold text-gray-100">Day — {LIFT_LABEL[lift]}</h3>
+                <span className="text-xs text-gray-400">TM {tm}</span>
             </summary>
 
             {/* Warm-ups */}
             <div className="mt-4">
-                <h4 className="mb-2 text-sm font-medium">Warm‑up (40/50/60 × 5/5/3)</h4>
-                <table className="w-full text-sm">
-                    <thead>
-                        <tr className="text-left">
-                            <th className="py-1 pr-2">Set</th><th className="py-1 pr-2">% of TM</th><th className="py-1 pr-2">Reps</th><th className="py-1">Load</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {computedWarmup.map((w, idx) => (
-                            <tr key={idx} className={idx % 2 ? "bg-neutral-50" : ""}>
-                                <td className="py-1 pr-2">{idx + 1}</td>
-                                <td className="py-1 pr-2">{Math.round(w.pct_of_tm * 100)}%</td>
-                                <td className="py-1 pr-2">{w.reps}</td>
-                                <td className="py-1 tabular-nums">{w.load_rounded}{meta.units}</td>
+                <h4 className="mb-2 text-sm font-medium text-gray-200">Warm‑up (40/50/60 × 5/5/3)</h4>
+                <div className="overflow-x-auto rounded border border-gray-700">
+                    <table className="w-full text-sm">
+                        <thead className="bg-gray-800 text-gray-300">
+                            <tr>
+                                <th className="py-1.5 px-2 text-left font-medium">Set</th>
+                                <th className="py-1.5 px-2 text-left font-medium">% TM</th>
+                                <th className="py-1.5 px-2 text-left font-medium">Reps</th>
+                                <th className="py-1.5 px-2 text-left font-medium">Load</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {computedWarmup.map((w, idx) => (
+                                <tr key={idx} className={`border-t border-gray-700 ${idx % 2 ? 'bg-gray-900/80' : 'bg-gray-900'}`}>
+                                    <td className="py-1 px-2 text-gray-200">{idx + 1}</td>
+                                    <td className="py-1 px-2 text-gray-300">{Math.round(w.pct_of_tm * 100)}%</td>
+                                    <td className="py-1 px-2 text-gray-300">{w.reps}</td>
+                                    <td className="py-1 px-2 tabular-nums text-gray-100">{w.load_rounded}{meta.units}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             {/* Main Work */}
@@ -325,38 +330,44 @@ function DayCard({
                         <button
                             key={t.key}
                             onClick={() => setWk(t.key)}
-                            className={`rounded-full border px-3 py-1 text-xs ${wk === t.key ? "bg-neutral-900 text-white" : "bg-white"}`}
+                            className={`rounded-full border px-3 py-1 text-xs transition-colors ${wk === t.key ? "bg-red-600 text-white border-red-500" : "bg-gray-900/60 border-gray-700 text-gray-300 hover:bg-gray-900"}`}
                         >
                             {t.label}
                         </button>
                     ))}
                 </div>
 
-                <table className="w-full text-sm">
-                    <thead>
-                        <tr className="text-left">
-                            <th className="py-1 pr-2">Set</th><th className="py-1 pr-2">% of TM</th><th className="py-1 pr-2">Reps</th><th className="py-1 pr-2">Note</th><th className="py-1">Load</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {computedWeek.sets.map((s, idx) => (
-                            <tr key={idx} className={idx % 2 ? "bg-neutral-50" : ""}>
-                                <td className="py-1 pr-2">{s.set}</td>
-                                <td className="py-1 pr-2">{Math.round(s.pct_of_tm * 100)}%</td>
-                                <td className="py-1 pr-2">{s.reps}</td>
-                                <td className="py-1 pr-2">{s.amrap ? <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs">AMRAP</span> : "—"}</td>
-                                <td className="py-1 tabular-nums">{s.load_rounded}{meta.units}</td>
+                <div className="overflow-x-auto rounded border border-gray-700">
+                    <table className="w-full text-sm">
+                        <thead className="bg-gray-800 text-gray-300">
+                            <tr>
+                                <th className="py-1.5 px-2 text-left font-medium">Set</th>
+                                <th className="py-1.5 px-2 text-left font-medium">% TM</th>
+                                <th className="py-1.5 px-2 text-left font-medium">Reps</th>
+                                <th className="py-1.5 px-2 text-left font-medium">Note</th>
+                                <th className="py-1.5 px-2 text-left font-medium">Load</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {computedWeek.sets.map((s, idx) => (
+                                <tr key={idx} className={`border-t border-gray-700 ${idx % 2 ? 'bg-gray-900/80' : 'bg-gray-900'}`}>
+                                    <td className="py-1 px-2 text-gray-200">{s.set}</td>
+                                    <td className="py-1 px-2 text-gray-300">{Math.round(s.pct_of_tm * 100)}%</td>
+                                    <td className="py-1 px-2 text-gray-300">{s.reps}</td>
+                                    <td className="py-1 px-2">{s.amrap ? <span className="rounded-full bg-amber-600/30 border border-amber-500/40 text-amber-200 px-2 py-0.5 text-[11px] font-medium tracking-wide">AMRAP</span> : <span className="text-gray-500">—</span>}</td>
+                                    <td className="py-1 px-2 tabular-nums text-gray-100">{s.load_rounded}{meta.units}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             {/* Supplemental */}
             <div className="mt-5">
                 <h4 className="mb-1 text-sm font-medium">Supplemental</h4>
                 {!day.supplemental || day.supplemental.mode === null ? (
-                    <p className="text-sm text-neutral-600">No supplemental today (Jack Shit).</p>
+                    <p className="text-sm text-gray-500">No supplemental today (Jack Shit).</p>
                 ) : day.supplemental.mode === "bbb" ? (
                     <p className="text-sm">
                         BBB — <span className="font-medium">{day.supplemental.sets}×{day.supplemental.reps}</span> @{" "}
@@ -385,7 +396,7 @@ function DayCard({
             </div>
 
             {/* Conditioning */}
-            <div className="mt-4 text-sm text-neutral-700">
+            <div className="mt-4 text-sm text-gray-300">
                 <strong>Conditioning:</strong> {day.conditioning_note}
             </div>
 
@@ -407,7 +418,7 @@ function Badge({ children }: { children: React.ReactNode }) {
 
 function FooterActions({ onBack, onStartCycle, startDisabled }: { onBack: () => void; onStartCycle: () => void; startDisabled?: boolean }) {
     return (
-        <footer className="sticky bottom-0 mt-10 flex justify-between gap-3 border-t bg-white/90 p-4 backdrop-blur">
+        <footer className="sticky bottom-0 mt-10 flex justify-between gap-3 border-t border-gray-700 bg-gray-900/80 p-4 backdrop-blur">
             <button onClick={onBack} className="rounded-lg border px-4 py-2">Back</button>
             <button
                 onClick={onStartCycle}

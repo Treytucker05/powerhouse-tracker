@@ -63,14 +63,38 @@ export function buildAssistanceForDay(templateId, mainLift, opts = {}) {
     const bwTarget = cap(Number(opts?.bwTarget || 75), 50, 200);
 
     if (templateId === TEMPLATE_IDS.JACK_SHIT) {
-        return { kind: 'jack', blocks: [] };
+        return { kind: 'jack', blocks: [], displayText: 'Main lift only' };
     }
 
     if (templateId === TEMPLATE_IDS.BBB) {
         const liftName = bbbPair === 'opposite' ? lib.opposite : lib.supplementalSame;
-        const block = { type: 'BBB', items: [{ name: liftName, sets: 5, reps: 10, percentTM: bbbPct }] };
+        const exerciseNames = {
+            'press': 'Overhead Press',
+            'bench': 'Bench Press',
+            'squat': 'Back Squat',
+            'deadlift': 'Deadlift'
+        };
+        const bbbExerciseName = exerciseNames[mainLift] || mainLift;
+        const displayName = `BBB ${bbbExerciseName} 5×10 @ ${bbbPct}%`;
+
+        const block = {
+            type: 'BBB',
+            items: [{
+                name: liftName,
+                displayName: displayName,
+                exercise: bbbExerciseName,
+                sets: 5,
+                reps: 10,
+                percentTM: bbbPct
+            }]
+        };
         // Keep accessories lean per Wendler spirit
-        const accessories = (lib.accessories || []).slice(0, 2).map(name => ({ name, sets: 3, reps: 12 }));
+        const accessories = (lib.accessories || []).slice(0, 2).map(name => ({
+            name,
+            sets: 3,
+            reps: 12,
+            displayName: `${name} 3×12`
+        }));
         return { kind: 'bbb', blocks: [block], accessories };
     }
 
@@ -78,54 +102,78 @@ export function buildAssistanceForDay(templateId, mainLift, opts = {}) {
         // Exactly 3 exercises: main 5/3/1 is assumed; provide two recs by main lift
         const recsByLift = {
             press: [
-                { name: 'Dips', sets: 5, reps: '15' },
-                { name: 'Chin-Ups', sets: 5, reps: '10' },
+                { name: 'Dips', sets: 5, reps: '15', displayName: 'Dips 5×15' },
+                { name: 'Chin-Ups', sets: 5, reps: '10', displayName: 'Chin-Ups 5×10' },
             ],
             deadlift: [
-                { name: 'Good Morning', sets: 5, reps: '10-12' },
-                { name: 'Hanging Leg Raise', sets: 5, reps: '12-15' },
+                { name: 'Good Morning', sets: 5, reps: '10-12', displayName: 'Good Morning 5×10-12' },
+                { name: 'Hanging Leg Raise', sets: 5, reps: '12-15', displayName: 'Hanging Leg Raise 5×12-15' },
             ],
             bench: [
-                { name: 'DB Row', sets: 5, reps: '10-12' },
-                { name: 'Dips', sets: 5, reps: '12-15' },
+                { name: 'DB Row', sets: 5, reps: '10-12', displayName: 'DB Row 5×10-12' },
+                { name: 'Dips', sets: 5, reps: '12-15', displayName: 'Dips 5×12-15' },
             ],
             squat: [
-                { name: 'Leg Press', sets: 5, reps: '12-15' },
-                { name: 'Leg Curl', sets: 5, reps: '10-12' },
+                { name: 'Leg Press', sets: 5, reps: '12-15', displayName: 'Leg Press 5×12-15' },
+                { name: 'Leg Curl', sets: 5, reps: '10-12', displayName: 'Leg Curl 5×10-12' },
             ],
         };
         return { kind: 'triumvirate', blocks: [{ type: 'Triumvirate', items: recsByLift[mainLift] || [] }] };
     }
-
-    if (templateId === TEMPLATE_IDS.PERIODIZATION_BIBLE) {
-        // Dave Tate pattern: each day 3 assistance categories, each 5x10-20 (user chooses specific lifts later)
-        const upperCats = [
-            'Shoulders/Chest',
-            'Lats/Upper Back',
-            'Triceps'
-        ];
-        const lowerCats = [
-            'Hamstrings',
-            'Quads',
-            'Abs'
-        ];
-        const chosen = (mainLift === 'press' || mainLift === 'bench') ? upperCats : lowerCats;
-        return {
-            kind: 'pb',
-            blocks: chosen.map(cat => ({ category: cat, items: [{ name: cat + ' (choose exercise)', sets: 5, reps: '10-20' }] }))
+            ],
+    squat: [
+        { name: 'Leg Press', sets: 5, reps: '12-15' },
+        { name: 'Leg Curl', sets: 5, reps: '10-12' },
+    ],
         };
+return { kind: 'triumvirate', blocks: [{ type: 'Triumvirate', items: recsByLift[mainLift] || [] }] };
     }
 
-    if (templateId === TEMPLATE_IDS.BODYWEIGHT) {
-        const upper = (mainLift === 'bench' || mainLift === 'press');
-        const bwList = upper
-            ? [{ name: 'Chin-Ups', targetReps: bwTarget }, { name: 'Dips', targetReps: bwTarget }, { name: 'Push-Ups', targetReps: bwTarget }]
-            : [{ name: 'Chin-Ups', targetReps: bwTarget }, { name: 'Single-Leg Squat/Lunge', targetReps: bwTarget }, { name: 'Sit-Ups/Ab Wheel', targetReps: bwTarget }];
-        return { kind: 'bodyweight', blocks: [{ type: 'Bodyweight', items: bwList }] };
-    }
+if (templateId === TEMPLATE_IDS.PERIODIZATION_BIBLE) {
+    // Dave Tate pattern: each day 3 assistance categories, each 5x10-20 (user chooses specific lifts later)
+    const upperCats = [
+        { category: 'Shoulders/Chest', displayName: 'Shoulders/Chest 5×10-20' },
+        { category: 'Lats/Upper Back', displayName: 'Lats/Upper Back 5×10-20' },
+        { category: 'Triceps', displayName: 'Triceps 5×10-20' }
+    ];
+    const lowerCats = [
+        { category: 'Hamstrings', displayName: 'Hamstrings 5×10-20' },
+        { category: 'Quads', displayName: 'Quads 5×10-20' },
+        { category: 'Abs', displayName: 'Abs 5×10-20' }
+    ];
+    const chosen = (mainLift === 'press' || mainLift === 'bench') ? upperCats : lowerCats;
+    return {
+        kind: 'pb',
+        blocks: chosen.map(cat => ({
+            category: cat.category,
+            items: [{
+                name: cat.category + ' (choose exercise)',
+                displayName: cat.displayName,
+                sets: 5,
+                reps: '10-20'
+            }]
+        }))
+    };
+}
 
-    // Fallback
-    return { kind: 'custom', blocks: [] };
+if (templateId === TEMPLATE_IDS.BODYWEIGHT) {
+    const upper = (mainLift === 'bench' || mainLift === 'press');
+    const bwList = upper
+        ? [
+            { name: 'Chin-Ups', targetReps: bwTarget, displayName: `Chin-Ups (${bwTarget} total reps)` },
+            { name: 'Dips', targetReps: bwTarget, displayName: `Dips (${bwTarget} total reps)` },
+            { name: 'Push-Ups', targetReps: bwTarget, displayName: `Push-Ups (${bwTarget} total reps)` }
+        ]
+        : [
+            { name: 'Chin-Ups', targetReps: bwTarget, displayName: `Chin-Ups (${bwTarget} total reps)` },
+            { name: 'Single-Leg Squat/Lunge', targetReps: bwTarget, displayName: `Single-Leg Squat/Lunge (${bwTarget} total reps)` },
+            { name: 'Sit-Ups/Ab Wheel', targetReps: bwTarget, displayName: `Sit-Ups/Ab Wheel (${bwTarget} total reps)` }
+        ];
+    return { kind: 'bodyweight', blocks: [{ type: 'Bodyweight', items: bwList }] };
+}
+
+// Fallback
+return { kind: 'custom', blocks: [] };
 }
 
 /**

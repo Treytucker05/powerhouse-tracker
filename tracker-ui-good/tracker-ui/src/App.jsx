@@ -8,7 +8,9 @@ import { MacrocycleBuilderProvider } from './contexts/MacrocycleBuilderContext.t
 // removed duplicate import
 // 5/3/1 V2 barrel imports
 import { Program531ActiveV2, ProgramV2Provider } from "./methods/531";
-const ProgramWizard531V2 = lazy(() => import("./methods/531/components/ProgramWizard531V2.jsx")); // kept dynamic for code-splitting
+import FiveThreeOneWorkflow from './components/program/FiveThreeOneWorkflow';
+// RESTORED - Using the original ProgramWizard531V2 for the 5-step workflow
+const ProgramWizard531V2 = lazy(() => import("./methods/531/components/ProgramWizard531V2.jsx"));
 const BuilderReviewPage = lazy(() => import('./pages/BuilderReview.tsx'));
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import GlobalReset from './components/shared/GlobalReset.jsx';
@@ -65,7 +67,7 @@ function App() {
                 {/* Legacy program route (kept temporarily) */}
                 <Route path="program" element={<Program />} />
 
-                {/* 5/3/1 canonical */}
+                {/* 5/3/1 canonical - RESTORED ORIGINAL 5-STEP FLOW */}
                 <Route path="builder/531" element={<Navigate to="/builder/531/v2" replace />} />
                 <Route path="builder/531/v2" element={
                   <ProgramV2Provider>
@@ -73,7 +75,7 @@ function App() {
                   </ProgramV2Provider>
                 } />
                 <Route path="program/531/active" element={<Program531ActiveV2 />} />
-                <Route path="builder/review" element={<BuilderReviewPage />} />
+                <Route path="builder/review" element={<ProgramV2Provider><BuilderReviewPage /></ProgramV2Provider>} />
 
                 {/* NASM placeholder */}
                 <Route path="builder/nasm" element={<div className='text-gray-300 p-8'>NASM Builder (stub)</div>} />
