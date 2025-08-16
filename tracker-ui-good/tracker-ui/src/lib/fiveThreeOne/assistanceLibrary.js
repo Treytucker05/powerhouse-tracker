@@ -52,23 +52,23 @@ export const ASSISTANCE_CATALOG = {
     situps: { name: 'Sit-Ups', bucket: 'core' }
 };
 
-// Triumvirate (exact-style examples per day)
+// Triumvirate (book-accurate assistance per p. 48)
 export const TRIUMVIRATE_DEFAULTS = {
     press: [
         { ref: 'dips', sets: 5, reps: 15 },
         { ref: 'chins', sets: 5, reps: 10 }
     ],
+    bench: [
+        { ref: 'db_press', sets: 5, reps: 15 }, // Fixed: DB Bench Press per p. 48
+        { ref: 'rows', sets: 5, reps: 10 }      // Fixed: DB Rows per p. 48
+    ],
     deadlift: [
         { ref: 'goodmornings', sets: 5, reps: 10 },
         { ref: 'hlr', sets: 5, reps: 15 }
     ],
-    bench: [
-        { ref: 'rows', sets: 5, reps: 10 },
-        { ref: 'dips', sets: 5, reps: 15 }
-    ],
     squat: [
-        { ref: 'legcurl', sets: 5, reps: 10 },
-        { ref: 'hlr', sets: 5, reps: 15 }
+        { ref: 'legpress', sets: 5, reps: 15 }, // Fixed: Leg Press per p. 48
+        { ref: 'legcurl', sets: 5, reps: 10 }   // Fixed: Leg Curls per p. 48
     ]
 };
 

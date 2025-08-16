@@ -41,7 +41,7 @@ export const TEMPLATE_KEYS = {
 export function getDefaultSchedule() {
     return {
         frequency: '4day',
-        days: ['Press', 'Deadlift', 'Bench', 'Squat'], // canonical order (press first)
+        days: ['press', 'deadlift', 'bench', 'squat'], // canonical order (press first)
         includeWarmups: true,
         warmupScheme: {
             percentages: [40, 50, 60],

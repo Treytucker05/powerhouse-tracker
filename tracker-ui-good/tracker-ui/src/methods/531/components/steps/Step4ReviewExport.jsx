@@ -107,7 +107,17 @@ export default function Step4ReviewExport({ onReadyChange }) {
     const scheduleDesign = effective.schedule || {};
     const frequencyRaw = scheduleDesign.frequency || '4day';
     const frequency = typeof frequencyRaw === 'number' ? frequencyRaw : (frequencyRaw || '4day');
-    const order = scheduleDesign.order || scheduleDesign.days || ['Press', 'Deadlift', 'Bench', 'Squat'];
+    // Normalize order to capitalized format for consistent validation
+    const rawOrder = scheduleDesign.order || scheduleDesign.days || ['Press', 'Deadlift', 'Bench', 'Squat'];
+    const order = rawOrder.map(lift => {
+        // Convert to lowercase first, then capitalize properly
+        const normalized = typeof lift === 'string' ? lift.toLowerCase() : lift;
+        if (normalized === 'press') return 'Press';
+        if (normalized === 'deadlift') return 'Deadlift';
+        if (normalized === 'bench') return 'Bench';
+        if (normalized === 'squat') return 'Squat';
+        return lift; // fallback to original if unknown
+    });
     const includeWarmups = scheduleDesign.includeWarmups !== false;
     const warmupScheme = scheduleDesign.warmupScheme || { percentages: [40, 50, 60], reps: [5, 5, 3] };
 
@@ -117,6 +127,12 @@ export default function Step4ReviewExport({ onReadyChange }) {
         deadlift: effective.lifts?.deadlift?.tm || 0,
         press: effective.lifts?.press?.tm || 0
     };
+
+    // Declare variables before useMemo to avoid "Cannot access before initialization" error
+    const supplemental = effective.supplemental || { strategy: 'none' };
+    const assistance = effective.assistance || { mode: 'minimal' };
+    const assistMode = state.assistMode || 'template';
+    const assistCustom = state.assistCustom || {};
 
     // Comprehensive validation for Step 4
     const comprehensiveValidation = useMemo(() => {
@@ -166,11 +182,6 @@ export default function Step4ReviewExport({ onReadyChange }) {
     const roundingIncrement = typeof effective.rounding === 'object' ? (effective.rounding.increment || 5) : (effective.units === 'kg' ? 2.5 : 5);
     const units = effective.units === 'kg' ? 'kg' : 'lbs';
     const loadingOption = effective.loadingOption || effective.loading?.option || 1;
-
-    const supplemental = effective.supplemental || { strategy: 'none' };
-    const assistance = effective.assistance || { mode: 'minimal' };
-    const assistMode = state.assistMode || 'template';
-    const assistCustom = state.assistCustom || {};
     const conditioning = effective.conditioning || {
         sessionsPerWeek: 3,
         hiitPerWeek: 2,
@@ -525,10 +536,71 @@ export default function Step4ReviewExport({ onReadyChange }) {
     }
 
     return (
-        <div className="space-y-8 text-sm md:text-base leading-6">
+        <div className="space-y-8 text-sm md:text-base leading-6 relative">
+            {isLoading && (
+                <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm rounded-lg flex items-center justify-center z-10">
+                    <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 flex items-center gap-3">
+                        <div className="animate-spin w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                        <span className="text-white text-sm">Processing program...</span>
+                    </div>
+                </div>
+            )}
+
+            {/* Program Status */}
+            <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-4">
+                <h2 className="text-lg font-semibold text-white mb-2">Step 4: Review & Export</h2>
+                <p className="text-sm text-gray-400 mb-4">Final review of your 4-week 5/3/1 cycle before starting training.</p>
+
+                {comprehensiveValidation.isValid ? (
+                    <div className="bg-green-900/20 border border-green-500/50 rounded-lg p-3">
+                        <div className="flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-green-400" />
+                            <span className="text-green-300 text-sm font-medium">Program Ready to Start</span>
+                        </div>
+                        {comprehensiveValidation.hasWarnings && (
+                            <div className="mt-2 text-xs text-yellow-300">
+                                {comprehensiveValidation.warnings.length} recommendation(s) below
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-3">
+                        <div className="flex items-start gap-2">
+                            <AlertTriangle className="w-4 h-4 text-red-400 mt-0.5" />
+                            <div>
+                                <div className="text-red-300 text-sm font-medium">
+                                    {comprehensiveValidation.errors.length} issue(s) preventing start
+                                </div>
+                                <ul className="mt-1 space-y-1">
+                                    {comprehensiveValidation.errors.map((error, idx) => (
+                                        <li key={idx} className="text-red-200 text-xs">• {error}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {comprehensiveValidation.hasWarnings && (
+                    <div className="bg-yellow-900/20 border border-yellow-500/50 rounded-lg p-3 mt-3">
+                        <div className="flex items-start gap-2">
+                            <Info className="w-4 h-4 text-yellow-400 mt-0.5" />
+                            <div>
+                                <div className="text-yellow-300 text-sm font-medium">Recommendations</div>
+                                <ul className="mt-1 space-y-1">
+                                    {comprehensiveValidation.warnings.map((warning, idx) => (
+                                        <li key={idx} className="text-yellow-200 text-xs">• {warning}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+
             <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-bold text-white mb-1">Step 4 — Review & Export</h2>
+                    <h2 className="text-2xl font-bold text-white mb-1">Program Overview</h2>
                     <p className="text-gray-400 text-sm">Preview the full 4-week cycle, confirm details, then export or print.</p>
                     <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px]">
                         <span className="px-2 py-1 rounded-full bg-gray-700/50 border border-gray-600 text-gray-300 tracking-wide">{frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2}-Day</span>
@@ -733,27 +805,44 @@ export default function Step4ReviewExport({ onReadyChange }) {
                     <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-5 space-y-4">
                         <h4 className="text-sm font-semibold text-white uppercase tracking-wide">Export</h4>
                         <div className="flex flex-col space-y-2">
-                            <ToggleButton on={false} disabled={!validation.valid} onClick={handleDownload} className="flex items-center justify-center gap-2 text-xs">
+                            <ToggleButton on={false} disabled={!comprehensiveValidation.isValid} onClick={handleDownload} className="flex items-center justify-center gap-2 text-xs">
                                 <Download className="w-4 h-4" /> <span>Download JSON</span>
                             </ToggleButton>
-                            <ToggleButton on={copied} disabled={!validation.valid} onClick={handleCopy} className="flex items-center justify-center gap-2 text-xs">
+                            <ToggleButton on={copied} disabled={!comprehensiveValidation.isValid} onClick={handleCopy} className="flex items-center justify-center gap-2 text-xs">
                                 <Copy className="w-4 h-4" /> <span>{copied ? 'Copied!' : 'Copy JSON'}</span>
                             </ToggleButton>
-                            <ToggleButton on={false} disabled={!validation.valid} onClick={handlePrint} className="flex items-center justify-center gap-2 text-xs">
+                            <ToggleButton on={false} disabled={!comprehensiveValidation.isValid} onClick={handlePrint} className="flex items-center justify-center gap-2 text-xs">
                                 <Printer className="w-4 h-4" /> <span>Print</span>
                             </ToggleButton>
                             <ToggleButton
-                                on={false}
-                                disabled={!validation.valid}
-                                onClick={() => navigate('/builder/review')}
-                                className="flex items-center justify-center gap-2 text-xs !bg-red-600/30 !border-red-500/60 hover:!bg-red-600/40"
-                                data-testid="start-final-review"
+                                on={starting}
+                                disabled={!comprehensiveValidation.isValid || starting}
+                                onClick={async () => {
+                                    if (!comprehensiveValidation.isValid) return;
+                                    setIsLoading(true);
+                                    try {
+                                        await handleStartProgram();
+                                    } finally {
+                                        setIsLoading(false);
+                                    }
+                                }}
+                                className="flex items-center justify-center gap-2 text-xs !bg-green-600/30 !border-green-500/60 hover:!bg-green-600/40 disabled:!bg-gray-600/30 disabled:!border-gray-500/60"
+                                data-testid="start-program"
                             >
-                                <span>Start Final Review</span>
+                                {starting ? (
+                                    <>
+                                        <div className="animate-spin w-3 h-3 border border-white border-t-transparent rounded-full"></div>
+                                        <span>Starting...</span>
+                                    </>
+                                ) : comprehensiveValidation.isValid ? (
+                                    <span>Start Program</span>
+                                ) : (
+                                    <span>Fix Issues Above</span>
+                                )}
                             </ToggleButton>
                             {exportError && <div className="text-xs text-red-400">{exportError}</div>}
                         </div>
-                        {validation.valid && (
+                        {comprehensiveValidation.isValid && (
                             <div className="flex items-center space-x-2 text-green-400 text-xs"><CheckCircle2 className="w-4 h-4" /><span>Ready to start cycle.</span></div>
                         )}
                     </div>
@@ -995,6 +1084,7 @@ function InlineCustomAssistanceEditor({ order, assistCustom, dispatch, state }) 
                                     equipment={equipment}
                                     onPick={applyCatalog}
                                     onClose={() => setPicker(null)}
+                                    keepOpen={true}
                                 />
                             </div>
                         )}
@@ -1056,13 +1146,14 @@ function InlinePerDayCustomEditor({ dayIndex, displayLift, state, dispatch, temp
                         block={picker.block}
                         equipment={state.equipment || []}
                         onPick={pick => {
-                            const next = { id: pick.id, name: pick.name, sets: pick.sets || 3, reps: pick.reps || 10, block: pick.block };
+                            const next = { id: pick.id, name: pick.name, sets: pick.sets || 5, reps: pick.reps || 10, block: pick.block }; // Default 5 sets for BBB compatibility
                             const copy = [...items];
                             if (picker.index < copy.length) copy[picker.index] = next; else copy.push(next);
                             update(copy);
-                            setPicker(null);
+                            // Modal stays open for easier multi-selection
                         }}
                         onClose={() => setPicker(null)}
+                        keepOpen={true}
                     />
                 </div>
             )}

@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useProgramV2 } from '../../contexts/ProgramContextV2.jsx';
 import { TEMPLATE_KEYS, getTemplatePreset } from '../../../../lib/templates/531.presets.v2.js';
 import { getTemplateSpec, TEMPLATE_SPECS } from '../../../../lib/templates/531.templateSpecs.js';
-import { CheckCircle2, Info, X } from 'lucide-react';
+import { CheckCircle2, Info, X, AlertTriangle } from 'lucide-react';
 import ToggleButton from '../ToggleButton.jsx';
 import { normalizeAssistance } from '../../assistance/index.js';
 import AssistanceCatalogPicker from '../assistance/AssistanceCatalogPicker.jsx';
@@ -41,7 +41,7 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
         setExpandedTemplate(prev => prev === key ? null : key);
         setErrors([]);
         logTemplate('select', { key });
-        
+
         // Validate template requirements
         const validation = validateTemplateRequirements(key, state);
         if (!validation.isValid) {
@@ -51,45 +51,67 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
 
     function validateTemplateRequirements(templateKey, currentState) {
         const errors = [];
-        
+
         if (!currentState?.lifts) {
             errors.push('Complete Step 1 (Training Maxes) before selecting a template');
             return { isValid: false, errors };
         }
-        
+
         const lifts = ['press', 'bench', 'squat', 'deadlift'];
         const missingTMs = lifts.filter(lift => !currentState.lifts[lift]?.tm || currentState.lifts[lift].tm <= 0);
-        
+
         if (missingTMs.length > 0) {
             errors.push(`Missing training maxes for: ${missingTMs.map(l => l.charAt(0).toUpperCase() + l.slice(1)).join(', ')}`);
         }
-        
+
         return { isValid: errors.length === 0, errors };
     }
 
-    // Local BBB variant state (only used when BBB expanded)
-    const [bbbVariant, setBbbVariant] = useState('standard'); // 'standard' | 'challenge'
+    // Local BBB variant state (book-accurate BBB only)
+    const [bbbVariant, setBbbVariant] = useState('standard'); // always standard (book-accurate)
     const [bbbPairing, setBbbPairing] = useState('same'); // 'same' | 'opposite'
-    const [bbbStartPercent, setBbbStartPercent] = useState(50); // 30|40|50|60 (standard path)
-    const [bbbProgressTo, setBbbProgressTo] = useState(60); // target escalation for standard
+    const [bbbStartPercent, setBbbStartPercent] = useState(50); // 50|55|60 (book range)
+    const [bbbProgressTo, setBbbProgressTo] = useState(60); // target escalation within book range
 
     // Assistance editing state per template key -> map of Lift -> array of movements
     const [assistEdit, setAssistEdit] = useState({});
     const [openPicker, setOpenPicker] = useState(null); // { templateKey, lift, index } or null
 
+    // Book-accurate BBB assistance defaults based on Wendler's "opposite movement pattern" guidance
+    function getBBBAssistanceDefaults() {
+        return {
+            'Press': [{ name: 'Chin-up', sets: 5, reps: 10, block: 'Pull' }],
+            'Bench': [{ name: 'DB Row', sets: 5, reps: 10, block: 'Pull' }],
+            'Squat': [{ name: 'Leg Curl', sets: 5, reps: 10, block: 'Single-Leg' }],
+            'Deadlift': [{ name: 'Hanging Leg Raise', sets: 5, reps: 15, block: 'Core' }]
+        };
+    }
+
     function initAssistanceForTemplate(templateKey, assistancePreview) {
         setAssistEdit(prev => {
             if (prev[templateKey]) return prev; // already initialized
             const mapped = {};
-            assistancePreview.forEach(ap => {
-                const limit = templateKey === TEMPLATE_KEYS.BBB ? 1 : 2;
-                mapped[ap.lift] = (ap.items || []).slice(0, limit).map(it => ({
-                    name: it.name,
-                    sets: it.sets || 3,
-                    reps: it.reps || 10,
-                    block: it.block || null
-                }));
-            });
+
+            // Pre-populate BBB with book-accurate assistance defaults
+            if (templateKey === TEMPLATE_KEYS.BBB) {
+                const bbbDefaults = getBBBAssistanceDefaults();
+                assistancePreview.forEach(ap => {
+                    const liftDefaults = bbbDefaults[ap.lift] || [];
+                    mapped[ap.lift] = liftDefaults.length > 0 ? liftDefaults :
+                        [{ name: '', sets: 5, reps: 10, block: null }]; // Empty slot with BBB defaults
+                });
+            } else {
+                // Other templates use their existing logic
+                assistancePreview.forEach(ap => {
+                    const limit = templateKey === TEMPLATE_KEYS.BBB ? 1 : 2;
+                    mapped[ap.lift] = (ap.items || []).slice(0, limit).map(it => ({
+                        name: it.name,
+                        sets: it.sets || 3,
+                        reps: it.reps || 10,
+                        block: it.block || null
+                    }));
+                });
+            }
             return { ...prev, [templateKey]: mapped };
         });
     }
@@ -120,7 +142,12 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
             const tpl = { ...(prev[templateKey] || {}) };
             const arr = [...(tpl[lift] || [])];
             if (arr.length >= limit) return prev;
-            arr.push({ name: '', sets: 3, reps: 10, block: null });
+
+            // Use BBB defaults (5x10) vs standard defaults (3x10)
+            const defaultSets = templateKey === TEMPLATE_KEYS.BBB ? 5 : 3;
+            const defaultReps = 10;
+
+            arr.push({ name: '', sets: defaultSets, reps: defaultReps, block: null });
             tpl[lift] = arr;
             return { ...prev, [templateKey]: tpl };
         });
@@ -138,10 +165,10 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
     function applyTemplate(templateKeyOverride) {
         const key = templateKeyOverride || selectedTemplate;
         if (!key || errors.length > 0) return;
-        
+
         setIsLoading(true);
         setErrors([]);
-        
+
         try {
             const opts = {};
             if (key === TEMPLATE_KEYS.BBB) {
@@ -152,14 +179,14 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                     progressTo: bbbVariant === 'standard' ? bbbProgressTo : 60
                 };
             }
-            
+
             const preset = getTemplatePreset(key, ctx, opts);
             if (!preset) {
                 throw new Error(`Template ${key} configuration not found`);
             }
-            
+
             const spec = getTemplateSpec(key);
-            
+
             // Inject custom assistance if user edited
             if (assistEdit[key]) {
                 const plan = assistEdit[key];
@@ -168,18 +195,18 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                     customPlan: plan
                 };
             }
-            
+
             dispatch({ type: 'SET_TEMPLATE_KEY', payload: preset.key });
             dispatch({ type: 'APPLY_TEMPLATE_CONFIG', payload: preset });
             logTemplate('apply', { key: preset.key, schedule: preset.schedule, assistanceMode: preset.assistance?.mode, hasCustomAssist: !!assistEdit[key] });
-            
+
             if (spec) {
                 dispatch({ type: 'SET_TEMPLATE_SPEC', payload: spec });
                 if (spec.assistanceHint) dispatch({ type: 'SET_ASSISTANCE_HINT', payload: spec.assistanceHint });
             }
-            
+
             dispatch({ type: 'SET_FLOW_MODE', payload: 'template' });
-            
+
             setTimeout(() => {
                 setIsLoading(false);
                 // post-dispatch state snapshot
@@ -187,12 +214,12 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                     const st = ctx.state;
                     logTemplate('postDispatchState', { order: st?.schedule?.order, days: st?.schedule?.days });
                 } catch { /* ignore */ }
-                
+
                 onChoose && onChoose('template');
                 onAutoNext && onAutoNext();
                 setExpandedTemplate(null);
             }, 300);
-            
+
         } catch (error) {
             console.error('Template application error:', error);
             setErrors([error.message]);
@@ -217,13 +244,19 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
         return block;
     }
 
-    function repSchemeDescriptor(templateKey, variant, row, blockAlias) {
+    function repSchemeDescriptor(templateKey, variant, row, blockAlias, isMainLiftSupplemental = false) {
         if (!templateKey) return '';
         const key = templateKey.toLowerCase();
         const blk = blockAlias || mapBlockAlias(row?.block);
+
         if (key === TEMPLATE_KEYS.BBB) {
-            if (variant === 'challenge') return `5×10 @ 30% TM (Cycle 1 of 30/45/60)`; // could evolve with cycle context
-            return `5×10 @ ${bbbStartPercent}% TM` + (bbbProgressTo && bbbProgressTo !== bbbStartPercent ? ` (progress toward ${bbbProgressTo}%)` : '');
+            // Only show percentages for BBB supplemental work (same lift), not assistance
+            if (isMainLiftSupplemental) {
+                return `5×10 @ ${bbbStartPercent}% TM` + (bbbProgressTo && bbbProgressTo !== bbbStartPercent ? ` (progress toward ${bbbProgressTo}%)` : '');
+            } else {
+                // BBB assistance exercises just show fixed reps
+                return '5×10';
+            }
         }
         if (key === TEMPLATE_KEYS.TRIUMVIRATE) {
             if (blk === 'Pull') return '5×10';
@@ -249,7 +282,7 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                     </div>
                 </div>
             )}
-            
+
             <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
                 <h2 className="text-2xl font-bold text-white mb-2">Step 2 — Template or Custom</h2>
                 <p className="text-gray-400">Select a proven Wendler template for instant configuration or continue with a fully custom build.</p>
@@ -286,7 +319,8 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                 {/* Template selection area */}
                 <div className="space-y-6">
                     <div>
-                        <h3 className="text-lg font-semibold text-white mb-3">Templates</h3>
+                        <h3 className="text-lg font-semibold text-white mb-3">Choose a Proven Template</h3>
+                        <p className="text-sm text-gray-400 mb-4">Each template provides complete configuration based on Jim Wendler's proven methodologies. Click to expand details and configure.</p>
                         <div className="flex flex-col gap-4">
                             {templateCards.map(card => {
                                 const active = selectedTemplate === card.key;
@@ -326,7 +360,7 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                                         `Supplemental: 5×10 @ ${suppPct || 50}% TM (same lift)`,
                                         'Assistance: ONE movement (classic BBB) – e.g. chins, dips, rows, back raises, abs'
                                     ] : spec?.structure;
-                                    const variantRecovery = isBBBVariant ? 'High supplemental volume – start lighter (50%) and progress cautiously (60–70% later cycles). Favor easy conditioning (LISS) and cap assistance at 25–50 quality reps per movement. Deload Week 4.' : spec?.recovery;
+                                    const variantRecovery = isBBBVariant ? 'High supplemental volume – start lighter (50%) and progress cautiously to 60% over time. Favor easy conditioning (LISS) and cap assistance at 25–50 quality reps per movement. Deload Week 4.' : spec?.recovery;
                                     const jackShitStructure = [
                                         'Main 5/3/1 sets only (Week 1–3 AMRAP, Week 4 deload)',
                                         'Optional: 1–2 easy assistance movements (chins / dips / core)'
@@ -345,66 +379,33 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                                             {/* BBB Variant Controls */}
                                             {spec.key === 'bbb' && (
                                                 <section className="bg-gray-800/60 border border-gray-700 rounded p-3 space-y-4 text-xs">
-                                                    <h6 className="text-[11px] font-semibold uppercase tracking-wide text-indigo-300">BBB Variants</h6>
-                                                    <div className="flex flex-wrap gap-3 items-center">
-                                                        <label className="inline-flex items-center gap-1 text-[11px]">
-                                                            <input
-                                                                type="radio"
-                                                                name="bbbVariant"
-                                                                value="standard"
-                                                                checked={bbbVariant === 'standard'}
-                                                                onChange={() => setBbbVariant('standard')}
-                                                            />
-                                                            <span>Standard (50→60%)</span>
-                                                        </label>
-                                                        <label className="inline-flex items-center gap-1 text-[11px]">
-                                                            <input
-                                                                type="radio"
-                                                                name="bbbVariant"
-                                                                value="challenge"
-                                                                checked={bbbVariant === 'challenge'}
-                                                                onChange={() => setBbbVariant('challenge')}
-                                                            />
-                                                            <span>3‑Month Challenge (30/45/60)</span>
-                                                        </label>
+                                                    <h6 className="text-[11px] font-semibold uppercase tracking-wide text-indigo-300">BBB Configuration</h6>
+                                                    <div className="text-[11px] text-gray-300 space-y-2">
+                                                        <p><span className="font-semibold text-indigo-300">Book-Accurate BBB:</span> Start at 50% of Training Max and work up to 60% over several cycles. Keep assistance minimal (1-2 exercises, 25-50 reps total).</p>
                                                     </div>
-                                                    {bbbVariant === 'standard' && (
-                                                        <div className="grid sm:grid-cols-3 gap-4">
-                                                            <div className="space-y-1">
-                                                                <label className="block text-[10px] uppercase text-gray-400">Start %</label>
-                                                                <select value={bbbStartPercent} onChange={e => setBbbStartPercent(Number(e.target.value))} className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5 text-[11px] text-white">
-                                                                    {[30, 40, 50, 60].map(p => <option key={p} value={p}>{p}%</option>)}
-                                                                </select>
-                                                            </div>
-                                                            <div className="space-y-1">
-                                                                <label className="block text-[10px] uppercase text-gray-400">Progress To</label>
-                                                                <select value={bbbProgressTo} onChange={e => setBbbProgressTo(Number(e.target.value))} className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5 text-[11px] text-white">
-                                                                    {[50, 55, 60, 65, 70].map(p => <option key={p} value={p}>{p}%</option>)}
-                                                                </select>
-                                                            </div>
-                                                            <div className="space-y-1">
-                                                                <label className="block text-[10px] uppercase text-gray-400">Pairing</label>
-                                                                <select value={bbbPairing} onChange={e => setBbbPairing(e.target.value)} className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5 text-[11px] text-white">
-                                                                    <option value="same">Same Lift</option>
-                                                                    <option value="opposite">Opposite Lift</option>
-                                                                </select>
-                                                            </div>
+                                                    <div className="grid sm:grid-cols-3 gap-4">
+                                                        <div className="space-y-1">
+                                                            <label className="block text-[10px] uppercase text-gray-400">Start %</label>
+                                                            <select value={bbbStartPercent} onChange={e => setBbbStartPercent(Number(e.target.value))} className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5 text-[11px] text-white">
+                                                                {[50, 55, 60].map(p => <option key={p} value={p}>{p}%</option>)}
+                                                            </select>
                                                         </div>
-                                                    )}
-                                                    {bbbVariant === 'challenge' && (
-                                                        <div className="space-y-2 text-[11px] text-gray-300">
-                                                            <p><span className="font-semibold text-indigo-300">Cycle % Progression:</span> 30% (Cycle 1) → 45% (Cycle 2) → 60% (Cycle 3). Keep assistance minimal. Opposite pairing optional but usually same-lift for practice.</p>
-                                                            <div className="flex items-center gap-2">
-                                                                <label className="block text-[10px] uppercase text-gray-400">Pairing</label>
-                                                                <select value={bbbPairing} onChange={e => setBbbPairing(e.target.value)} className="bg-gray-900 border border-gray-700 rounded px-2 py-1.5 text-[11px] text-white">
-                                                                    <option value="same">Same Lift</option>
-                                                                    <option value="opposite">Opposite Lift</option>
-                                                                </select>
-                                                            </div>
+                                                        <div className="space-y-1">
+                                                            <label className="block text-[10px] uppercase text-gray-400">Progress To</label>
+                                                            <select value={bbbProgressTo} onChange={e => setBbbProgressTo(Number(e.target.value))} className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5 text-[11px] text-white">
+                                                                {[55, 60].map(p => <option key={p} value={p}>{p}%</option>)}
+                                                            </select>
                                                         </div>
-                                                    )}
+                                                        <div className="space-y-1">
+                                                            <label className="block text-[10px] uppercase text-gray-400">Pairing</label>
+                                                            <select value={bbbPairing} onChange={e => setBbbPairing(e.target.value)} className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-1.5 text-[11px] text-white">
+                                                                <option value="same">Same Lift</option>
+                                                                <option value="opposite">Opposite Lift</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
                                                     <div className="text-[10px] text-gray-400 leading-snug">
-                                                        <p><strong className="text-gray-300">Guidance:</strong> Standard path: begin lighter (50%) and add volume only when recovery is solid—creeping toward {bbbProgressTo}% in later cycles. 3‑Month Challenge is aggressive; ensure nutrition and sleep, and reduce extra conditioning.</p>
+                                                        <p><strong className="text-gray-300">Book Guidance:</strong> Begin at 50% and only increase when recovery is solid. Most lifters should stay at 50-60% range as described in the original 5/3/1 manual.</p>
                                                     </div>
                                                 </section>
                                             )}
@@ -454,8 +455,8 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                                             )}
                                             <section className="bg-gray-800/50 border border-gray-700 rounded p-3 text-[11px] text-gray-300 space-y-1">
                                                 <h6 className="text-[10px] font-semibold uppercase tracking-wide text-indigo-300">Week 4 Deload</h6>
-                                                <p className="leading-snug">Main work: 40% ×5, 50% ×5, 60% ×5 of Training Max (no AMRAP). Keep supplemental volume <span className="text-gray-100 font-medium">off</span> (BBB paused) and perform only light, restorative assistance (pulls, easy core) if desired.</p>
-                                                <p className="leading-snug text-gray-400">Goal: Reduce fatigue, maintain groove, prepare for next cycle.</p>
+                                                <p className="leading-snug">Main work: 40% ×5, 50% ×5, 60% ×5 of Training Max (no AMRAP). Cut back on everything - reduce or skip supplemental work and keep assistance light and restorative (easy pulls, core work) if desired.</p>
+                                                <p className="leading-snug text-gray-400">Goal: "If you're deloading, DELOAD" - reduce all volume and intensity to prepare for the next cycle.</p>
                                             </section>
                                             <section>
                                                 <div className="flex items-center justify-between mb-2">
@@ -525,7 +526,7 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                                                                             </div>
                                                                             {/* Rep scheme descriptor */}
                                                                             {(() => {
-                                                                                const scheme = repSchemeDescriptor(card.key, bbbVariant, r, mapBlockAlias(r.block));
+                                                                                const scheme = repSchemeDescriptor(card.key, bbbVariant, r, mapBlockAlias(r.block), false); // assistance exercises are never main lift supplemental
                                                                                 if (!scheme) return null;
                                                                                 return <div className="text-[10px] text-gray-500 mt-1 pl-1">Scheme: {scheme}</div>;
                                                                             })()}
@@ -533,8 +534,17 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                                                                                 <div className="relative z-30 mb-2">
                                                                                     <AssistanceCatalogPicker
                                                                                         equipment={state.equipment || []}
-                                                                                        onPick={(x) => { updateAssist(card.key, liftName, openPicker.index, { name: x.name, block: x.block, sets: rows[openPicker.index].sets || (x.sets || 3), reps: rows[openPicker.index].reps || (Number(x.reps) || 10) }); setOpenPicker(null); }}
+                                                                                        onPick={(x) => {
+                                                                                            updateAssist(card.key, liftName, openPicker.index, {
+                                                                                                name: x.name,
+                                                                                                block: x.block,
+                                                                                                sets: rows[openPicker.index].sets || (x.sets || 5), // Default 5 sets for BBB assistance 
+                                                                                                reps: rows[openPicker.index].reps || (Number(x.reps) || 10) // Default 10 reps for BBB assistance
+                                                                                            });
+                                                                                            // Keep modal open for easier multi-selection
+                                                                                        }}
                                                                                         onClose={() => setOpenPicker(null)}
+                                                                                        keepOpen={true}
                                                                                     />
                                                                                 </div>
                                                                             )}
@@ -548,7 +558,7 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                                                         );
                                                     })}
                                                 </div>
-                                                <p className="mt-3 text-[10px] text-gray-500 leading-snug">Adjust assistance now to skip the Design step. BBB variants typically keep assistance to ONE simple movement (25–50 quality reps total). 3‑Month Challenge: favor the low end (20–30 reps). Jack Shit: leave blank or add one easy core / pull if very fresh.</p>
+                                                <p className="mt-3 text-[10px] text-gray-500 leading-snug">Adjust assistance now to skip the Design step. BBB keeps assistance to ONE simple movement (25–50 quality reps total). Jack Shit: leave blank or add one easy core / pull if very fresh.</p>
                                             </section>
                                             <section>
                                                 <h6 className="text-[11px] font-semibold uppercase tracking-wide text-gray-400 mb-2">Example Day (Week 1 – {exampleLift})</h6>
@@ -622,26 +632,59 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                                     <div
                                         key={card.key}
                                         className={[
-                                            'relative rounded-lg border group transition p-4 flex flex-col justify-between outline-none',
-                                            expanded ? 'border-indigo-500 bg-indigo-600/5 ring-2 ring-indigo-400' : (active ? 'border-indigo-500 bg-indigo-600/10' : 'border-gray-700 bg-gray-800/40 hover:border-gray-500')
+                                            'relative rounded-lg border group transition-all duration-200 p-6 flex flex-col justify-between outline-none cursor-pointer',
+                                            expanded ? 'border-indigo-500 bg-indigo-600/10 ring-2 ring-indigo-400 shadow-lg' : (active ? 'border-green-500 bg-green-600/10 ring-1 ring-green-400' : 'border-gray-700 bg-gray-800/40 hover:border-gray-500 hover:bg-gray-800/60')
                                         ].join(' ')}
+                                        onClick={() => handleSelectTemplate(card.key)}
                                     >
                                         <div className="flex flex-col flex-1">
-                                            <div className="flex items-start justify-between mb-2">
-                                                <h4 className="font-semibold text-white text-sm leading-snug pr-6">{card.title}</h4>
-                                                {active && <CheckCircle2 className="w-5 h-5 text-green-400" />}
+                                            <div className="flex items-start justify-between mb-3">
+                                                <h4 className="font-bold text-white text-base leading-snug pr-6">{card.title}</h4>
+                                                {active && <CheckCircle2 className="w-6 h-6 text-green-400" />}
                                             </div>
-                                            <div className="flex flex-wrap gap-1 mb-2">
+                                            <div className="flex flex-wrap gap-2 mb-3">
                                                 {orderedBadges.map(b => (
                                                     <span key={b.key} className={badgeClasses(b.label, b.value)} title={b.tip}>{b.value}</span>
                                                 ))}
                                             </div>
-                                            <p className="text-xs text-gray-400 leading-snug mb-3 flex-1">{card.blurb}</p>
-                                            <ToggleButton
-                                                on={expanded}
-                                                className="mt-auto self-start text-xs"
-                                                onClick={() => handleSelectTemplate(card.key)}
-                                            >{expanded ? 'Expanded' : (active ? 'Selected – View' : 'Select')}</ToggleButton>
+                                            <p className="text-sm text-gray-300 leading-relaxed mb-4 flex-1">{card.blurb}</p>
+
+                                            {/* Template benefits/key features */}
+                                            <div className="mb-4">
+                                                <h5 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Key Features</h5>
+                                                <ul className="text-xs text-gray-400 space-y-1">
+                                                    {spec?.structure?.slice(0, 3).map((feature, idx) => (
+                                                        <li key={idx} className="flex items-start gap-2">
+                                                            <span className="text-indigo-400 mt-0.5">•</span>
+                                                            <span>{feature}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+
+                                            <div className="flex items-center gap-3 mt-auto">
+                                                <ToggleButton
+                                                    on={expanded}
+                                                    className="text-sm px-4 py-2"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleSelectTemplate(card.key);
+                                                    }}
+                                                >{expanded ? 'Collapse Details' : (active ? 'View Details' : 'Select & Configure')}</ToggleButton>
+
+                                                {active && !expanded && (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            applyTemplate(card.key);
+                                                        }}
+                                                        disabled={errors.length > 0}
+                                                        className="text-sm px-4 py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                                                    >
+                                                        Use This Template →
+                                                    </button>
+                                                )}
+                                            </div>
                                         </div>
                                         {expanded && expandedContent}
                                     </div>
@@ -651,10 +694,135 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                     </div>
 
                     {/* Custom build card */}
-                    <div className="bg-gray-800/40 border border-gray-700 rounded-lg p-6">
-                        <h3 className="text-lg font-semibold text-white mb-2">Want Full Control?</h3>
-                        <p className="text-sm text-gray-400 mb-4">Skip presets and design every layer yourself: supplemental strategy, assistance volume, conditioning, and advanced options.</p>
-                        <ToggleButton on={false} onClick={chooseCustom} className="text-xs px-5">Customize Manually →</ToggleButton>
+                    <div className="bg-gradient-to-br from-blue-900/20 to-purple-900/20 border border-blue-700/50 rounded-lg p-6 hover:border-blue-600/70 transition-all duration-200">
+                        <div className="flex items-start gap-4">
+                            <div className="bg-blue-600/20 rounded-lg p-3 flex-shrink-0">
+                                <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+                                </svg>
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="text-lg font-bold text-white mb-2">Want Full Control?</h3>
+                                <p className="text-sm text-gray-300 mb-4 leading-relaxed">Skip presets and design every layer yourself: supplemental strategy, assistance volume, conditioning, and advanced options. Perfect for experienced lifters with specific needs.</p>
+
+                                <div className="mb-4">
+                                    <h5 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">You'll Configure</h5>
+                                    <ul className="text-xs text-gray-400 space-y-1">
+                                        <li className="flex items-start gap-2">
+                                            <span className="text-blue-400 mt-0.5">•</span>
+                                            <span>Training schedule (3-day, 4-day splits)</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <span className="text-blue-400 mt-0.5">•</span>
+                                            <span>Supplemental work (BBB, FSL, etc.)</span>
+                                        </li>
+                                        <li className="flex items-start gap-2">
+                                            <span className="text-blue-400 mt-0.5">•</span>
+                                            <span>Assistance exercises & volume</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <ToggleButton
+                                    on={false}
+                                    onClick={chooseCustom}
+                                    className="text-sm px-6 py-3 bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-600 hover:to-blue-500"
+                                >
+                                    Continue with Custom Design →
+                                </ToggleButton>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Enhanced Navigation - More Prominent */}
+                    <div className="bg-gradient-to-r from-gray-800/80 to-gray-700/80 border border-gray-600 rounded-lg p-6 shadow-lg">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="bg-indigo-600/20 rounded-lg p-2">
+                                <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                </svg>
+                            </div>
+                            <h4 className="text-lg font-bold text-white">Ready to Continue?</h4>
+                        </div>
+
+                        <div className="space-y-4">
+                            {selectedTemplate ? (
+                                <div className="space-y-4">
+                                    {/* Template Selected State */}
+                                    <div className="bg-green-900/30 border border-green-500/50 rounded-lg p-4">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <CheckCircle2 className="w-5 h-5 text-green-400" />
+                                            <span className="text-green-300 font-semibold">
+                                                Template Selected: {TEMPLATE_SPECS[selectedTemplate]?.name}
+                                            </span>
+                                        </div>
+                                        <p className="text-green-200 text-sm leading-relaxed">
+                                            This template will automatically configure your schedule, supplemental work, and assistance exercises
+                                            based on Jim Wendler's proven methodology. You can review and adjust everything before generating your program.
+                                        </p>
+                                    </div>
+
+                                    {errors.length > 0 && (
+                                        <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-4">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <AlertTriangle className="w-4 h-4 text-red-400" />
+                                                <span className="text-red-300 font-medium">Issues to Fix</span>
+                                            </div>
+                                            <ul className="text-red-200 text-sm space-y-1">
+                                                {errors.map((error, idx) => (
+                                                    <li key={idx}>• {error}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    <div className="flex items-center gap-4">
+                                        <ToggleButton
+                                            on={true}
+                                            disabled={errors.length > 0}
+                                            onClick={() => applyTemplate(selectedTemplate)}
+                                            className="text-base px-8 py-4 bg-gradient-to-r from-green-700 to-green-600 hover:from-green-600 hover:to-green-500 disabled:from-gray-700 disabled:to-gray-600 disabled:cursor-not-allowed"
+                                        >
+                                            {errors.length > 0 ? 'Fix Issues Above First' : `Use ${TEMPLATE_SPECS[selectedTemplate]?.name} Template →`}
+                                        </ToggleButton>
+
+                                        {!errors.length && (
+                                            <span className="text-xs text-gray-400">
+                                                Will jump to Step 4 (Review & Export)
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {/* No Template Selected State */}
+                                    <div className="bg-blue-900/30 border border-blue-500/50 rounded-lg p-4">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <Info className="w-5 h-5 text-blue-400" />
+                                            <span className="text-blue-300 font-semibold">Choose Your Path</span>
+                                        </div>
+                                        <p className="text-blue-200 text-sm leading-relaxed">
+                                            Select a proven template above for instant configuration, or continue with custom design
+                                            to build your program step-by-step with full control over every detail.
+                                        </p>
+                                    </div>
+
+                                    <div className="flex items-center gap-4">
+                                        <ToggleButton
+                                            on={false}
+                                            onClick={chooseCustom}
+                                            className="text-base px-8 py-4 bg-gradient-to-r from-blue-700 to-blue-600 hover:from-blue-600 hover:to-blue-500"
+                                        >
+                                            Continue with Custom Design →
+                                        </ToggleButton>
+
+                                        <span className="text-xs text-gray-400">
+                                            Will proceed to Step 3 (Design Custom)
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
 

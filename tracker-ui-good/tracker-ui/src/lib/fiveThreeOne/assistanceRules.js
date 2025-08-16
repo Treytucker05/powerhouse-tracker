@@ -113,21 +113,13 @@ export function buildAssistanceForDay(templateId, mainLift, opts = {}) {
                 { name: 'DB Row', sets: 5, reps: '10-12', displayName: 'DB Row 5×10-12' },
                 { name: 'Dips', sets: 5, reps: '12-15', displayName: 'Dips 5×12-15' },
             ],
-            squat: [
-                { name: 'Leg Press', sets: 5, reps: '12-15', displayName: 'Leg Press 5×12-15' },
-                { name: 'Leg Curl', sets: 5, reps: '10-12', displayName: 'Leg Curl 5×10-12' },
-            ],
-        };
-        return { kind: 'triumvirate', blocks: [{ type: 'Triumvirate', items: recsByLift[mainLift] || [] }] };
-    }
-            ],
-    squat: [
-        { name: 'Leg Press', sets: 5, reps: '12-15' },
-        { name: 'Leg Curl', sets: 5, reps: '10-12' },
-    ],
-        };
-return { kind: 'triumvirate', blocks: [{ type: 'Triumvirate', items: recsByLift[mainLift] || [] }] };
-    }
+        squat: [
+            { name: 'Leg Press', sets: 5, reps: '12-15', displayName: 'Leg Press 5×12-15' },
+            { name: 'Leg Curl', sets: 5, reps: '10-12', displayName: 'Leg Curl 5×10-12' },
+        ],
+    };
+    return { kind: 'triumvirate', blocks: [{ type: 'Triumvirate', items: recsByLift[mainLift] || [] }] };
+}
 
 if (templateId === TEMPLATE_IDS.PERIODIZATION_BIBLE) {
     // Dave Tate pattern: each day 3 assistance categories, each 5x10-20 (user chooses specific lifts later)
@@ -152,7 +144,7 @@ if (templateId === TEMPLATE_IDS.PERIODIZATION_BIBLE) {
                 sets: 5,
                 reps: '10-20'
             }]
-        }))
+    }))
     };
 }
 
@@ -169,11 +161,11 @@ if (templateId === TEMPLATE_IDS.BODYWEIGHT) {
             { name: 'Single-Leg Squat/Lunge', targetReps: bwTarget, displayName: `Single-Leg Squat/Lunge (${bwTarget} total reps)` },
             { name: 'Sit-Ups/Ab Wheel', targetReps: bwTarget, displayName: `Sit-Ups/Ab Wheel (${bwTarget} total reps)` }
         ];
-    return { kind: 'bodyweight', blocks: [{ type: 'Bodyweight', items: bwList }] };
-}
+        return { kind: 'bodyweight', blocks: [{ type: 'Bodyweight', items: bwList }] };
+    }
 
-// Fallback
-return { kind: 'custom', blocks: [] };
+    // Fallback
+    return { kind: 'custom', blocks: [] };
 }
 
 /**

@@ -162,7 +162,19 @@ export function buildMainSetsForLift({ tm, weekIndex, option = 1, roundingIncrem
     const sets = percents.map((p, i) => {
         const raw = tm * (p / 100);
         const weight = roundToIncrement(raw, roundingIncrement, roundingMode);
-        const baseReps = isDeload ? [5, 5, 5][i] : [5, 3, 1][i];
+
+        // Week-specific rep schemes: Week 1=[5,5,5], Week 2=[3,3,3], Week 3=[5,3,1]
+        let baseReps;
+        if (isDeload) {
+            baseReps = [5, 5, 5][i]; // Deload is always 5 reps per set
+        } else if (week === 1) {
+            baseReps = [5, 5, 5][i]; // Week 1: all sets for 5 reps (5+ on last)
+        } else if (week === 2) {
+            baseReps = [3, 3, 3][i]; // Week 2: all sets for 3 reps (3+ on last) 
+        } else {
+            baseReps = [5, 3, 1][i]; // Week 3: 5/3/1 scheme (1+ on last)
+        }
+
         const reps = (i === 2 && !isDeload) ? (baseReps + "+") : baseReps;
         return { percent: p, reps, weight, units };
     });

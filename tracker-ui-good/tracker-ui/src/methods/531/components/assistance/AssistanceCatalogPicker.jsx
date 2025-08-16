@@ -18,20 +18,51 @@ function useFlatCatalog() {
     }, []);
 }
 
-export default function AssistanceCatalogPicker({ block, equipment = [], onPick, onClose, limitIds = null }) {
+export default function AssistanceCatalogPicker({ block, equipment = [], onPick, onClose, limitIds = null, keepOpen = false }) {
     const [q, setQ] = useState("");
+    const [categoryFilter, setCategoryFilter] = useState('All');
     const flat = useFlatCatalog();
+
+    // Category mappings for book-accurate BBB assistance
+    const categories = {
+        'All': 'All Exercises',
+        'Push': 'Push Pattern',
+        'Pull': 'Pull Pattern',
+        'Core': 'Core/Abs',
+        'Single-Leg': 'Single-Leg/Unilateral'
+    };
+
     const filtered = useMemo(() => {
         return flat.filter(x => {
             if (limitIds && !limitIds.includes(x.id)) return false;
             const byBlock = block && block !== 'All' ? (x.block === block) : true;
+
+            // Category filter logic (book-accurate BBB patterns)
+            const byCategory = categoryFilter === 'All' ? true : (() => {
+                const exerciseBlock = (x.block || '').toLowerCase();
+                const exerciseName = (x.name || '').toLowerCase();
+
+                switch (categoryFilter) {
+                    case 'Push':
+                        return exerciseBlock.includes('push') || exerciseName.includes('dip') || exerciseName.includes('press') || exerciseName.includes('tricep');
+                    case 'Pull':
+                        return exerciseBlock.includes('pull') || exerciseName.includes('chin') || exerciseName.includes('pullup') || exerciseName.includes('row') || exerciseName.includes('curl');
+                    case 'Core':
+                        return exerciseBlock.includes('core') || exerciseName.includes('leg raise') || exerciseName.includes('hang') || exerciseName.includes('abs') || exerciseName.includes('plank');
+                    case 'Single-Leg':
+                        return exerciseBlock.includes('single') || exerciseName.includes('lunge') || exerciseName.includes('leg curl') || exerciseName.includes('step') || exerciseName.includes('unilateral');
+                    default:
+                        return true;
+                }
+            })();
+
             // Exercise is allowed if all its required equipment are contained in user equipment selection
             const req = x.equipment || [];
             const byEquip = req.every(tag => equipment.includes(tag));
             const byQuery = q ? (x.name.toLowerCase().includes(q.toLowerCase())) : true;
-            return byBlock && byEquip && byQuery;
+            return byBlock && byEquip && byQuery && byCategory;
         });
-    }, [q, block, equipment, flat, limitIds]);
+    }, [q, block, equipment, flat, limitIds, categoryFilter]);
 
     return (
         <div className="p-3 border border-gray-600 rounded bg-gray-900 shadow-xl space-y-2 text-xs max-w-md">
@@ -44,6 +75,29 @@ export default function AssistanceCatalogPicker({ block, equipment = [], onPick,
                 />
                 <button className="border border-gray-600 hover:border-gray-400 rounded px-2 py-1 text-gray-300" onClick={onClose} type="button">Close</button>
             </div>
+
+            {/* Category Filter Radio Buttons - Book-accurate BBB assistance patterns */}
+            <div className="space-y-1">
+                <div className="text-[10px] text-gray-400 font-medium">Filter by Movement Pattern:</div>
+                <div className="flex flex-wrap gap-1">
+                    {Object.entries(categories).map(([key, label]) => (
+                        <label key={key} className="flex items-center gap-1 cursor-pointer">
+                            <input
+                                type="radio"
+                                name="categoryFilter"
+                                value={key}
+                                checked={categoryFilter === key}
+                                onChange={e => setCategoryFilter(e.target.value)}
+                                className="w-3 h-3 text-indigo-600 bg-gray-800 border-gray-600 focus:ring-indigo-500"
+                            />
+                            <span className={`text-[10px] px-1 py-0.5 rounded ${categoryFilter === key ? 'bg-indigo-600/20 text-indigo-300' : 'text-gray-400'}`}>
+                                {label}
+                            </span>
+                        </label>
+                    ))}
+                </div>
+            </div>
+
             <div className="max-h-64 overflow-auto divide-y divide-gray-700">
                 {filtered.map(x => {
                     const note = EXERCISE_NOTES[x.id];
@@ -58,13 +112,19 @@ export default function AssistanceCatalogPicker({ block, equipment = [], onPick,
                             </div>
                             <button
                                 className="border border-indigo-600/60 hover:border-indigo-400 rounded px-2 py-1 text-[10px] text-indigo-300"
-                                onClick={() => onPick(x)}
+                                onClick={() => {
+                                    onPick(x);
+                                    // Only close modal if keepOpen is false (default behavior)
+                                    if (!keepOpen) {
+                                        onClose();
+                                    }
+                                }}
                                 type="button"
                             >Select</button>
                         </div>
                     );
                 })}
-                {!filtered.length && <div className="py-2 text-gray-500">No matches.</div>}
+                {!filtered.length && <div className="py-2 text-gray-500">No matches for "{categoryFilter}" category.</div>}
             </div>
         </div>
     );
