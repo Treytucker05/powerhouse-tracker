@@ -18,13 +18,13 @@ export default function AuthPage() {
     const checkUser = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
-        
+
         if (error) {
           console.warn('Auth session check error:', error);
           // Don't block the auth page if session check fails
           return;
         }
-        
+
         if (session?.user) {
           navigate('/');
         }
@@ -79,7 +79,7 @@ export default function AuthPage() {
     } catch (err) {
       // Enhanced error handling for common auth issues
       let errorMessage = err.message;
-      
+
       if (err.message?.includes('Invalid login credentials')) {
         errorMessage = 'Invalid email or password. Please check your credentials and try again.';
       } else if (err.message?.includes('Email not confirmed')) {
@@ -89,7 +89,7 @@ export default function AuthPage() {
       } else if (err.message?.includes('Rate limit')) {
         errorMessage = 'Too many attempts. Please wait a moment before trying again.';
       }
-      
+
       setError(errorMessage);
       console.error('Auth error:', err);
     } finally {

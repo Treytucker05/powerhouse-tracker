@@ -29,8 +29,8 @@ window.addEventListener('error', event => {
 if (typeof chrome !== 'undefined' && chrome.runtime) {
   const originalAddListener = chrome.runtime.onMessage?.addListener;
   if (originalAddListener) {
-    chrome.runtime.onMessage.addListener = function(listener) {
-      return originalAddListener.call(this, function(...args) {
+    chrome.runtime.onMessage.addListener = function (listener) {
+      return originalAddListener.call(this, function (...args) {
         try {
           return listener(...args);
         } catch (error) {
