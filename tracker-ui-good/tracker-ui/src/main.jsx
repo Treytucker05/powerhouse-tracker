@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { HashRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
 import { TrainingStateProvider } from './context/TrainingStateContext.jsx'
@@ -30,7 +31,9 @@ createRoot(document.getElementById('root')).render(
           <AppProvider>
             <TrainingStateProvider>
               <ToastProvider>
-                <App />
+                <HashRouter>
+                  <App />
+                </HashRouter>
               </ToastProvider>
             </TrainingStateProvider>
           </AppProvider>
