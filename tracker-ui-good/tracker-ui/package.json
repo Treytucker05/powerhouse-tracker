@@ -14,13 +14,13 @@
     "test": "vitest",
     "real:test:ci": "vitest run --coverage --reporter=basic",
     "real:lint": "eslint . --max-warnings 0",
-    "test:ci": "echo no tests && exit 0",
+    "test:ci": "echo 'Skipping tests for now' && exit 0",
     "test:unit": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:progressive": "node test-runner.mjs",
     "test:quick": "node test-checker.mjs",
     "clean": "rimraf node_modules/.vite .vite && echo 'vite cache cleared'",
-    "lint": "echo no lint && exit 0",
+    "lint": "echo 'Skipping lint for now' && exit 0",
     "lint:ci": "echo no lint && exit 0"
   },
   "dependencies": {

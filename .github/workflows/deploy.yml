@@ -35,6 +35,13 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+      - name: Verify dist directory exists
+        run: |
+          if [ ! -d "dist" ]; then
+            echo "Error: dist directory was not created by build"
+            exit 1
+          fi
+          echo "dist directory verified to exist"
       - name: Add .nojekyll file
         run: touch dist/.nojekyll
       - name: List build contents
