@@ -4,7 +4,7 @@ import path from 'path'
 const DIRNAME = new URL('.', import.meta.url).pathname
 
 export default defineConfig({
-  base: '/powerhouse-tracker/',
+  base: process.env.NODE_ENV === 'production' ? '/powerhouse-tracker/' : '/',
   plugins: [react()],
   resolve: {
     alias: {
