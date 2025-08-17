@@ -58,8 +58,38 @@ jobs:
       - name: Add .nojekyll file
         run: touch dist/.nojekyll
         
+      - name: Verify built index.html content
+        run: |
+          echo "Checking built index.html content to ensure it's the built version:"
+          echo "Looking for built asset references (should contain /powerhouse-tracker/assets/):"
+          if grep -q "/powerhouse-tracker/assets/" dist/index.html; then
+            echo "✅ Built index.html contains correct asset references"
+            grep "assets/" dist/index.html | head -3
+          else
+            echo "❌ Built index.html missing asset references - may be source template"
+            echo "First 10 lines of dist/index.html:"
+            head -10 dist/index.html
+            exit 1
+          fi
+          
+          echo "Checking for development script reference (should NOT contain /src/main.jsx):"
+          if grep -q "/src/main.jsx" dist/index.html; then
+            echo "❌ ERROR: Built index.html still contains development script reference!"
+            grep "/src/main.jsx" dist/index.html
+            exit 1
+          else
+            echo "✅ No development script references found"
+          fi
+        
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        
+      - name: List final upload contents
+        run: |
+          echo "Contents that will be uploaded to GitHub Pages:"
+          find dist -type f -name "*.html" -exec echo "HTML file: {}" \; -exec head -5 {} \; -exec echo "---" \;
+          echo "All files in dist:"
+          find dist -type f | sort
         
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
