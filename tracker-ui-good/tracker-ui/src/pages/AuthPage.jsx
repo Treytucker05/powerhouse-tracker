@@ -16,9 +16,21 @@ export default function AuthPage() {
   // Redirect if already authenticated
   useEffect(() => {
     const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        navigate('/');
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.warn('Auth session check error:', error);
+          // Don't block the auth page if session check fails
+          return;
+        }
+        
+        if (session?.user) {
+          navigate('/');
+        }
+      } catch (error) {
+        console.warn('Auth check failed, continuing to auth page:', error);
+        // Allow user to proceed to auth page even if session check fails
       }
     };
     checkUser();
@@ -65,7 +77,21 @@ export default function AuthPage() {
         navigate('/');
       }
     } catch (err) {
-      setError(err.message);
+      // Enhanced error handling for common auth issues
+      let errorMessage = err.message;
+      
+      if (err.message?.includes('Invalid login credentials')) {
+        errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+      } else if (err.message?.includes('Email not confirmed')) {
+        errorMessage = 'Please check your email and click the confirmation link before signing in.';
+      } else if (err.message?.includes('Failed to fetch') || err.message?.includes('network')) {
+        errorMessage = 'Network error. Please check your connection and try again.';
+      } else if (err.message?.includes('Rate limit')) {
+        errorMessage = 'Too many attempts. Please wait a moment before trying again.';
+      }
+      
+      setError(errorMessage);
+      console.error('Auth error:', err);
     } finally {
       setLoading(false);
     }
