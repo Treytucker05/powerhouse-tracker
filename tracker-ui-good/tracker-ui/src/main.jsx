@@ -60,7 +60,7 @@ createRoot(document.getElementById('root')).render(
             <AppProvider>
               <TrainingStateProvider>
                 <ToastProvider>
-                  <HashRouter>
+                  <HashRouter basename="/">
                     <App />
                   </HashRouter>
                 </ToastProvider>
