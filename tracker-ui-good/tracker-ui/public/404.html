@@ -8,9 +8,9 @@
     <title>NASM Program Design Tracker</title>
     <script>
         // GitHub Pages SPA fallback - redirect to index.html with hash routing
-        (function(l) {
-            if (l.search[1] === '/' ) {
-                var decoded = l.search.slice(1).split('&').map(function(s) { 
+        (function (l) {
+            if (l.search[1] === '/') {
+                var decoded = l.search.slice(1).split('&').map(function (s) {
                     return s.replace(/~and~/g, '&')
                 }).join('?');
                 window.history.replaceState(null, null,
@@ -25,13 +25,6 @@
     <script>
         // Immediate redirect to index.html for HashRouter
         window.location.replace('/powerhouse-tracker/#' + window.location.pathname + window.location.search);
-    </script>
-</body>
-
-</html>
-
-        // Send height periodically (fallback)
-        setInterval(sendHeight, 1000);
     </script>
 </body>
 
