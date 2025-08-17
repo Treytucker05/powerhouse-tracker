@@ -13,13 +13,16 @@ permissions:
 
 concurrency:
   group: pages-deploy
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     env:
       NODE_VERSION: 20
+      # Supabase env vars (set these in repo Settings > Secrets and variables > Actions)
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -36,6 +39,14 @@ jobs:
       - name: Install dependencies
         working-directory: tracker-ui-good/tracker-ui
         run: npm ci
+
+      - name: Lint
+        working-directory: tracker-ui-good/tracker-ui
+        run: npm run lint
+
+      - name: Run unit tests
+        working-directory: tracker-ui-good/tracker-ui
+        run: npm run test:ci
 
       - name: Build site
         working-directory: tracker-ui-good/tracker-ui
