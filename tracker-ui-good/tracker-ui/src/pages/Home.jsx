@@ -6,6 +6,7 @@ import VolumeTonnageCard from '../components/dashboard/VolumeTonnageCard';
 import DashboardCard from '../components/ui/DashboardCard';
 import HeroHeader from '../components/ui/HeroHeader';
 import AIInsightBar from '../components/ui/AIInsightBar';
+import AuthDebug from '../debug/AuthDebug.jsx';
 
 export default function Home() {
   // Sample data for the volume chart
@@ -102,6 +103,11 @@ export default function Home() {
             </div>
           </DashboardCard>
         </div>
+      </div>
+
+      {/* Temporary Auth Debug Component */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <AuthDebug />
       </div>
 
       {/* Sticky AI insight footer */}
