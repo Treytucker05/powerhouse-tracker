@@ -11,7 +11,7 @@
     href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
     rel="stylesheet">
   <title>NASM Program Design Tracker</title>
-  <script type="module" crossorigin src="/powerhouse-tracker/assets/index-IJKD4ygM.js"></script>
+  <script type="module" crossorigin src="/powerhouse-tracker/assets/index-DVfXjkeJ.js"></script>
   <link rel="modulepreload" crossorigin href="/powerhouse-tracker/assets/react-vendor-DoC2WAmd.js">
   <link rel="modulepreload" crossorigin href="/powerhouse-tracker/assets/ui-vendor-BLoy3R85.js">
   <link rel="modulepreload" crossorigin href="/powerhouse-tracker/assets/chart-vendor-DbvXzfx8.js">
@@ -22,7 +22,7 @@
 
 <body>
   <div id="root"></div>
-  
+
   <!-- Auto-height script for iframe embedding -->
   <script>
     function sendHeight() {
@@ -33,7 +33,7 @@
         document.documentElement.scrollHeight,
         document.documentElement.offsetHeight
       );
-      
+
       // Send height to parent window
       if (window.parent && window.parent !== window) {
         window.parent.postMessage({
@@ -42,10 +42,10 @@
         }, '*');
       }
     }
-    
+
     // Send height when page loads
     window.addEventListener('load', sendHeight);
-    
+
     // Send height when content changes
     const observer = new MutationObserver(sendHeight);
     observer.observe(document.body, {
@@ -53,7 +53,7 @@
       subtree: true,
       attributes: true
     });
-    
+
     // Send height periodically (fallback)
     setInterval(sendHeight, 1000);
   </script>

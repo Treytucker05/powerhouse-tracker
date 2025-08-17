@@ -1,1 +1,0 @@
-# PowerHouse Tracker v2.0.0**📖 Main Documentation**: See the [main README](../../README.md) for complete setup, usage, and technical documentation.## Quick Start```bash# From this directory (tracker-ui-good/tracker-ui/):npm install --legacy-peer-depsnpm run dev```**Development Server**: http://localhost:5173---**Full Documentation**: [../../README.md](../../README.md)
