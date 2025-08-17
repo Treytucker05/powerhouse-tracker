@@ -1,0 +1,51 @@
+name: Deploy PowerHouse Tracker to GitHub Pages
+
+on:
+  push:
+    branches:
+      - release/f531-v2-alpha
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      NODE_VERSION: 20
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'tracker-ui-good/tracker-ui/package-lock.json'
+
+      - name: Install dependencies
+        working-directory: tracker-ui-good/tracker-ui
+        run: npm ci
+
+      - name: Build site
+        working-directory: tracker-ui-good/tracker-ui
+        run: npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: tracker-ui-good/tracker-ui/dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
