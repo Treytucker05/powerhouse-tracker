@@ -67,9 +67,10 @@ function App() {
                 {/* Legacy program route (kept temporarily) */}
                 <Route path="program" element={<Program />} />
 
-                {/* 5/3/1 canonical - RESTORED ORIGINAL 5-STEP FLOW */}
-                <Route path="builder/531" element={<Navigate to="/builder/531/v2" replace />} />
-                <Route path="builder/531/v2" element={
+                {/* 5/3/1 canonical - ENHANCED with step-specific routing */}
+                <Route path="builder/531" element={<Navigate to="/builder/531/v2/step/1" replace />} />
+                <Route path="builder/531/v2" element={<Navigate to="/builder/531/v2/step/1" replace />} />
+                <Route path="builder/531/v2/step/:stepNumber" element={
                   <ProgramV2Provider>
                     <ProgramWizard531V2 />
                   </ProgramV2Provider>

@@ -13,7 +13,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { ChevronRight, CheckCircle2, Info, AlertTriangle, RotateCcw } from 'lucide-react';
 import ToggleButton from './ToggleButton.jsx';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useProgramV2 } from "../contexts/ProgramContextV2.jsx";
 import { buildMainSetsForLift, buildWarmupSets, roundToIncrement } from "../"; // barrel export
 // Conditioning planner (HIIT/LISS distribution)
@@ -66,6 +66,7 @@ import Step1Fundamentals from './steps/Step1Fundamentals.jsx';
 import Step2TemplateOrCustom from './steps/Step2TemplateOrCustom.jsx';
 import Step3DesignCustom from './steps/Step3DesignCustom.jsx';
 import Step4ReviewExport from './steps/Step4ReviewExport.jsx';
+import Step5ProgressionSmart from './steps/Step5ProgressionSmart.jsx';
 
 const STEPS = [
     { id: 'fundamentals', title: 'Fundamentals', description: 'Units, rounding, TM%, 1RM/rep tests' },
@@ -76,15 +77,55 @@ const STEPS = [
 ];
 
 function WizardShell() {
-    const [stepIndex, setStepIndex] = useState(0);
+    const { stepNumber } = useParams();
+    const navigate = useNavigate();
+
+    // Initialize stepIndex from URL parameter
+    const getStepIndexFromUrl = () => {
+        const step = parseInt(stepNumber, 10);
+        // Validate step number is in range [1-5], default to 1 if invalid
+        if (step >= 1 && step <= 5) {
+            return step - 1; // Convert 1-based to 0-based
+        } else {
+            // If invalid step number, redirect to step 1
+            if (stepNumber && (step < 1 || step > 5 || isNaN(step))) {
+                navigate('/builder/531/v2/step/1', { replace: true });
+            }
+            return 0; // Default to step 1 (index 0)
+        }
+    };
+
+    const [stepIndex, setStepIndex] = useState(getStepIndexFromUrl);
     const [stepValidation, setStepValidation] = useState({ fundamentals: false, design: false, review: false, progress: true });
     // Step1 feedback state
     const [step1Error, setStep1Error] = useState(null); // string message
     const [step1Missing, setStep1Missing] = useState([]); // array of lift keys / field labels
     const [step1FlashToken, setStep1FlashToken] = useState(0); // increment to trigger child highlight
-    const navigate = useNavigate();
     const { state, dispatch } = useProgramV2();
     const packRef = useRef(null);
+
+    // Sync stepIndex with URL parameter changes and update page title
+    useEffect(() => {
+        const urlStep = getStepIndexFromUrl();
+        if (urlStep !== stepIndex) {
+            setStepIndex(urlStep);
+        }
+
+        // Update page title based on current step
+        const currentStepData = STEPS[urlStep] || STEPS[0];
+        document.title = `${currentStepData.title} - 5/3/1 Builder V2`;
+
+        return () => {
+            // Reset title when component unmounts
+            document.title = '5/3/1 Program Builder';
+        };
+    }, [stepNumber]); // Re-run when URL step parameter changes
+
+    // Update URL when stepIndex changes programmatically
+    const updateStepUrl = (newStepIndex) => {
+        const stepNumber = newStepIndex + 1; // Convert 0-based to 1-based
+        navigate(`/builder/531/v2/step/${stepNumber}`, { replace: true });
+    };
     // Packs always on unless env kill-switch disables
 
     // Enhanced step validation helper functions
@@ -553,7 +594,9 @@ function WizardShell() {
                 setStep1Error(null);
                 setStep1Missing([]);
             }
-            setStepIndex(prev => prev + 1);
+            const nextStep = stepIndex + 1;
+            setStepIndex(nextStep);
+            updateStepUrl(nextStep);
             return;
         }
         // If user clicked while disabled on Step 1, surface guidance
@@ -582,7 +625,9 @@ function WizardShell() {
 
     const handleBack = () => {
         if (canGoBack) {
-            setStepIndex(prev => prev - 1);
+            const prevStep = stepIndex - 1;
+            setStepIndex(prevStep);
+            updateStepUrl(prevStep);
         }
     };
 
@@ -590,6 +635,7 @@ function WizardShell() {
         // Allow clicking on current or previous steps only
         if (index <= stepIndex) {
             setStepIndex(index);
+            updateStepUrl(index);
         }
     };
 
@@ -638,11 +684,13 @@ function WizardShell() {
                             markComplete('template');
                             if (mode === 'custom') {
                                 setStepIndex(2); // go to design
+                                updateStepUrl(2);
                             }
                         }}
                         onAutoNext={() => {
                             // Jump straight to review (index 3)
                             setStepIndex(3);
+                            updateStepUrl(3);
                         }}
                         extraControls={<div className="mt-4 space-y-4">
                             <div>
@@ -654,7 +702,7 @@ function WizardShell() {
                                     {[1, 2, 3, 4].map(d => (
                                         <ToggleButton
                                             key={d}
-                                            on={Number(state?.daysPerWeek || 3) === d}
+                                            on={Number(state?.daysPerWeek || 4) === d}
                                             aria-label={`${d} day${d > 1 ? 's' : ''}`}
                                             onClick={() => {
                                                 const val = d;
@@ -687,7 +735,7 @@ function WizardShell() {
                                                 const splitVal = code;
                                                 dispatch({ type: 'SET_ADVANCED', advanced: { ...(state?.advanced || {}), split4: splitVal } });
                                                 const split = splitVal === 'B' ? SPLIT_4DAY_B : SPLIT_4DAY_A;
-                                                const val = Number(state?.daysPerWeek || 3);
+                                                const val = Number(state?.daysPerWeek || 4);
                                                 const pack = packRef.current;
                                                 let sched;
                                                 if (val === 4) sched = buildSchedule4Day({ state: { ...state }, pack, split, weekLabel: '3x5' });
@@ -713,9 +761,32 @@ function WizardShell() {
                 );
             case 4:
                 return (
-                    <ProgressionStep state={state} onAdvance={(includeMap) => {
-                        onAdvanceCycle(state?.amrapWk3 || {}, includeMap);
-                    }} />
+                    <Step5ProgressionSmart
+                        onAdvance={(includeMap, customState) => {
+                            // Use custom progression logic if provided, otherwise use standard
+                            if (customState?.customIncrements) {
+                                // Apply custom increments using advanceCycleSelective
+                                const nextState = advanceCycleSelective(state, {
+                                    amrapWk3: state?.amrapWk3 || {},
+                                    include: includeMap,
+                                    customIncrements: customState.customIncrements
+                                });
+
+                                // Update the state with the new TMs and cycle info
+                                Object.entries(nextState.lifts || {}).forEach(([lift, liftData]) => {
+                                    dispatch({ type: 'SET_TM', lift, tm: liftData.tm });
+                                });
+
+                                // Update cycle and history
+                                dispatch({ type: 'SET_CYCLE', cycle: nextState.cycle });
+                                dispatch({ type: 'SET_WEEK', week: nextState.week });
+                                dispatch({ type: 'SET_HISTORY', history: nextState.history });
+                            } else {
+                                // Use standard progression
+                                onAdvanceCycle(state?.amrapWk3 || {}, includeMap);
+                            }
+                        }}
+                    />
                 );
             default:
                 return <div className="text-red-400">Unknown step</div>;
@@ -1212,7 +1283,10 @@ function WizardShell() {
                                     <ToggleButton
                                         on={stepValidation.review}
                                         disabled={!stepValidation.review}
-                                        onClick={() => setStepIndex(4)}
+                                        onClick={() => {
+                                            setStepIndex(4);
+                                            updateStepUrl(4);
+                                        }}
                                         className={`flex items-center gap-2 text-sm px-5 ${!stepValidation.review ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >Week 4 Complete → Progress TMs <ChevronRight className="w-4 h-4" /></ToggleButton>
                                 )}

@@ -7,6 +7,17 @@ import ToggleButton from '../ToggleButton.jsx';
 
 const CORE_LIFTS = ['Press', 'Deadlift', 'Bench', 'Squat'];
 
+// 3-day rotation pattern based on Wendler's methodology
+const THREE_DAY_ROTATION = [
+    { week: 1, days: ['Press', 'Deadlift', 'Bench'] },
+    { week: 2, days: ['Squat', 'Press', 'Deadlift'] },
+    { week: 3, days: ['Bench', 'Squat', 'Press'] },
+    { week: 4, days: ['Deadlift', 'Bench', 'Squat'] },
+    { week: 5, days: ['Deload All', 'Deload All', 'Deload All'] }
+];
+
+const DAY_LABELS = ['Monday', 'Wednesday', 'Friday'];
+
 function parseCsvNums(str) {
     if (!str) return [];
     return str.split(',').map(s => s.trim()).filter(s => s.length > 0).map(n => Number(n)).filter(n => Number.isFinite(n));
@@ -50,9 +61,28 @@ export default function Step3DesignCustom(props) {
     const [includeWarmups, setIncludeWarmups] = useState(sched.includeWarmups !== false);
     const [warmPctCsv, setWarmPctCsv] = useState((sched.warmupScheme?.percentages || [40, 50, 60]).join(','));
     const [warmRepsCsv, setWarmRepsCsv] = useState((sched.warmupScheme?.reps || [5, 5, 3]).join(','));
+    const [rotationWeek, setRotationWeek] = useState(1); // Track current week in 3-day rotation
 
     const [deadliftRepStyle, setDeadliftRepStyle] = useState(state?.deadliftRepStyle || 'dead_stop');
     const [activeLift, setActiveLift] = useState((sched?.order && sched.order[0]) || 'Press');
+
+    // Enhanced frequency handler for 3-day rotation
+    const handleFrequencyChange = (newFreq) => {
+        setFrequency(newFreq);
+        if (newFreq === '3day') {
+            // Reset rotation to week 1 when switching to 3-day
+            setRotationWeek(1);
+            // Update order to reflect the current week's rotation
+            setOrder(THREE_DAY_ROTATION[0].days);
+        } else if (newFreq === '4day') {
+            // Reset to standard 4-day order
+            setOrder(['Press', 'Deadlift', 'Bench', 'Squat']);
+        } else if (newFreq === '2day') {
+            // Set up for 2-day split (future implementation)
+            setOrder(['Press', 'Deadlift']); // Start with upper/lower
+        }
+    };
+
     // Track template-driven synchronization so we don't overwrite user edits repeatedly
     const syncedTemplateRef = useRef(null);
 
@@ -152,10 +182,19 @@ export default function Step3DesignCustom(props) {
     function setCanonical() {
         setFrequency('4day');
         setOrder(['Press', 'Deadlift', 'Bench', 'Squat']);
+        setRotationWeek(1); // Reset rotation week if switching away from 3-day
     }
+
     function resetOrder() {
-        const desired = frequency === '4day' ? 4 : frequency === '3day' ? 3 : 2;
-        setOrder(CORE_LIFTS.slice(0, desired));
+        if (frequency === '4day') {
+            setOrder(['Press', 'Deadlift', 'Bench', 'Squat']);
+        } else if (frequency === '3day') {
+            setRotationWeek(1);
+            setOrder(THREE_DAY_ROTATION[0].days);
+        } else {
+            // 2-day default
+            setOrder(['Press', 'Deadlift']);
+        }
     }
 
     // Assistance custom handlers
@@ -241,7 +280,7 @@ export default function Step3DesignCustom(props) {
         // Supplemental validation
         if (suppStrategy === 'bbb') {
             if (!(suppPct >= 50 && suppPct <= 70)) {
-                warnings.push('BBB percentage should typically be 50-70% of TM');
+                warnings.push('BBB percentage should be 50-60% of TM (book range)');
             }
             if (suppPct < 40) {
                 errors.push('BBB percentage too low (minimum 40%)');
@@ -347,7 +386,20 @@ export default function Step3DesignCustom(props) {
     // Dispatch to context (debounced-ish via effect on dependencies)
     useEffect(() => {
         const id = setTimeout(() => {
-            setSchedule(dispatch, { frequency, order, includeWarmups, warmupScheme: { percentages: parseCsvNums(warmPctCsv), reps: parseCsvNums(warmRepsCsv) } });
+            const scheduleData = {
+                frequency,
+                order,
+                includeWarmups,
+                warmupScheme: { percentages: parseCsvNums(warmPctCsv), reps: parseCsvNums(warmRepsCsv) }
+            };
+
+            // Add rotation data for 3-day schedules
+            if (frequency === '3day') {
+                scheduleData.rotationWeek = rotationWeek;
+                scheduleData.rotationPattern = THREE_DAY_ROTATION;
+            }
+
+            setSchedule(dispatch, scheduleData);
             dispatch({ type: 'SET_DEADLIFT_REP_STYLE', payload: deadliftRepStyle });
             if (suppStrategy === 'bbb') {
                 setSupplemental(dispatch, { strategy: 'bbb', pairing: suppPairing, percentOfTM: suppPct, sets: 5, reps: 10 });
@@ -361,7 +413,7 @@ export default function Step3DesignCustom(props) {
             }
         }, 250);
         return () => clearTimeout(id);
-    }, [frequency, order, includeWarmups, warmPctCsv, warmRepsCsv, deadliftRepStyle, suppStrategy, suppPairing, suppPct, assistMode, customPlan, dispatch]);
+    }, [frequency, order, includeWarmups, warmPctCsv, warmRepsCsv, deadliftRepStyle, suppStrategy, suppPairing, suppPct, assistMode, customPlan, rotationWeek, dispatch]);
 
     // Persist equipment selection (separate effect to avoid coupling with other debounce)
     useEffect(() => {
@@ -467,7 +519,7 @@ export default function Step3DesignCustom(props) {
                 <ul className="mt-3 space-y-1 text-sm list-disc pl-5 text-gray-300">
                     <li><strong>Warm-ups:</strong> 40/50/60% of TM ramps without fatigue.</li>
                     <li><strong>Main:</strong> Week 1–3 last set AMRAP; Week 4 deload (no AMRAP) <span className="text-gray-400">(can optionally skip below if running a longer Leader block).</span></li>
-                    <li><strong>Supplemental (BBB):</strong> 5×10 @ 50–70% (start 50–60% if new).</li>
+                    <li><strong>Supplemental (BBB):</strong> 5×10 @ 50–60% (book-accurate range).</li>
                 </ul>
                 <p className="text-xs text-gray-500 mt-3 flex flex-col gap-1">
                     <span>Change days/split in Step 2. Rounding set in Step 1.</span>
@@ -495,69 +547,192 @@ export default function Step3DesignCustom(props) {
             </div>
 
             {/* Schedule */}
-            <section className="bg-gray-800/50 border border-gray-700 rounded-lg p-6 space-y-5">
+            <section className="bg-gray-800/60 border border-gray-700 rounded-lg p-6 space-y-6 shadow-lg">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold text-white">A) Schedule</h3>
+                    <div>
+                        <h3 className="text-lg font-semibold text-white">A) Schedule</h3>
+                        <p className="text-xs text-gray-400 mt-1">Configure your training frequency and lift order</p>
+                    </div>
                     <div className="flex space-x-2">
-                        <ToggleButton on={false} onClick={setCanonical} className="text-xs">Canonical Order</ToggleButton>
-                        <ToggleButton on={false} onClick={resetOrder} className="text-xs">Reset Order</ToggleButton>
+                        <ToggleButton on={false} onClick={setCanonical} className="text-xs bg-gray-700/50 hover:bg-gray-700">Standard Order</ToggleButton>
+                        <ToggleButton on={false} onClick={resetOrder} className="text-xs bg-gray-700/50 hover:bg-gray-700">Reset Order</ToggleButton>
                     </div>
                 </div>
-                <div className="space-y-4">
-                    <div className="flex flex-wrap gap-2 items-center">
-                        {['4day', '3day', '2day'].map(f => (
-                            <ToggleButton key={f} on={frequency === f} onClick={() => setFrequency(f)}>{f.replace('day', '-day')}</ToggleButton>
-                        ))}
+                <div className="space-y-5">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-200 mb-3">Training Frequency</label>
+                        <div className="flex flex-wrap gap-3 items-center">
+                            {['4day', '3day', '2day'].map(f => (
+                                <ToggleButton
+                                    key={f}
+                                    on={frequency === f}
+                                    onClick={() => handleFrequencyChange(f)}
+                                    className="px-4 py-2 font-medium"
+                                >{f.replace('day', '-day')}</ToggleButton>
+                            ))}
+                        </div>
                     </div>
-                    <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
-                        {order.map((lift, idx) => (
-                            <div key={idx} className="space-y-1">
-                                <label className="text-xs uppercase tracking-wide text-gray-400">Slot {idx + 1}</label>
-                                <select
-                                    value={lift}
-                                    onFocus={() => setActiveLift(lift)}
-                                    onChange={(e) => { updateOrder(idx, e.target.value); setActiveLift(e.target.value); }}
-                                    className={`w-full bg-gray-800 border rounded px-2 py-2 text-sm text-white focus:border-red-500 ${activeLift === lift ? 'border-red-500' : 'border-gray-600'}`}
-                                >
-                                    {CORE_LIFTS.map(l => <option key={l} value={l}>{l}</option>)}
-                                </select>
-                                {activeLift === 'Deadlift' && lift === 'Deadlift' && (
-                                    <div className="mt-2 bg-gray-800/60 border border-gray-700 rounded p-2 space-y-1">
-                                        <label className="text-[11px] font-medium text-gray-200">Deadlift rep style</label>
-                                        <p className="text-[10px] text-gray-500">Affects how reps are performed.</p>
-                                        <div className="flex items-center gap-3 text-[11px]" role="radiogroup" aria-label="Deadlift rep style">
-                                            <label className="inline-flex items-center gap-1">
-                                                <input
-                                                    type="radio"
-                                                    name="dlRepStyle"
-                                                    value="dead_stop"
-                                                    checked={deadliftRepStyle === 'dead_stop'}
-                                                    onChange={() => setDeadliftRepStyle('dead_stop')}
-                                                />
-                                                <span>Reset each rep</span>
-                                            </label>
-                                            <label className="inline-flex items-center gap-1">
-                                                <input
-                                                    type="radio"
-                                                    name="dlRepStyle"
-                                                    value="touch_and_go"
-                                                    checked={deadliftRepStyle === 'touch_and_go'}
-                                                    onChange={() => setDeadliftRepStyle('touch_and_go')}
-                                                />
-                                                <span>Touch-and-go</span>
-                                            </label>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-200 mb-3">
+                            {frequency === '3day' ? 'Rotation Schedule' : 'Lift Order'}
+                        </label>
+
+                        {frequency === '4day' && (
+                            <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
+                                {order.map((lift, idx) => (
+                                    <div key={idx} className="space-y-1">
+                                        <label className="text-xs uppercase tracking-wide text-gray-400">Slot {idx + 1}</label>
+                                        <select
+                                            value={lift}
+                                            onFocus={() => setActiveLift(lift)}
+                                            onChange={(e) => { updateOrder(idx, e.target.value); setActiveLift(e.target.value); }}
+                                            className={`w-full bg-gray-800 border rounded px-2 py-2 text-sm text-white focus:border-red-500 ${activeLift === lift ? 'border-red-500' : 'border-gray-600'}`}
+                                        >
+                                            {CORE_LIFTS.map(l => <option key={l} value={l}>{l}</option>)}
+                                        </select>
+                                        {activeLift === 'Deadlift' && lift === 'Deadlift' && (
+                                            <div className="mt-2 bg-gray-800/60 border border-gray-700 rounded p-2 space-y-1">
+                                                <label className="text-[11px] font-medium text-gray-200">Deadlift rep style</label>
+                                                <p className="text-[10px] text-gray-500">Affects how reps are performed.</p>
+                                                <div className="flex items-center gap-3 text-[11px]" role="radiogroup" aria-label="Deadlift rep style">
+                                                    <label className="inline-flex items-center gap-1">
+                                                        <input
+                                                            type="radio"
+                                                            name="dlRepStyle"
+                                                            value="dead_stop"
+                                                            checked={deadliftRepStyle === 'dead_stop'}
+                                                            onChange={() => setDeadliftRepStyle('dead_stop')}
+                                                        />
+                                                        <span>Reset each rep</span>
+                                                    </label>
+                                                    <label className="inline-flex items-center gap-1">
+                                                        <input
+                                                            type="radio"
+                                                            name="dlRepStyle"
+                                                            value="touch_and_go"
+                                                            checked={deadliftRepStyle === 'touch_and_go'}
+                                                            onChange={() => setDeadliftRepStyle('touch_and_go')}
+                                                        />
+                                                        <span>Touch-and-go</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {frequency === '3day' && (
+                            <div className="space-y-4">
+                                {/* Current Week Summary */}
+                                <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <h4 className="text-sm font-semibold text-red-300">
+                                            Current Week {rotationWeek} Schedule
+                                        </h4>
+                                        {rotationWeek === 5 && (
+                                            <span className="text-xs bg-blue-800/40 border border-blue-500/40 text-blue-200 px-2 py-1 rounded">
+                                                Deload Week
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-3 text-sm">
+                                        {DAY_LABELS.map((day, idx) => (
+                                            <div key={day} className="text-center">
+                                                <div className="text-xs text-gray-400 mb-1">{day}</div>
+                                                <div className="text-white font-medium">
+                                                    {THREE_DAY_ROTATION[rotationWeek - 1].days[idx]}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="bg-gray-800/40 border border-gray-700 rounded-lg p-4">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <h4 className="text-sm font-semibold text-white">5-Week Rotation Pattern</h4>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs text-gray-400">Current Week:</span>
+                                            <select
+                                                value={rotationWeek}
+                                                onChange={(e) => {
+                                                    const week = parseInt(e.target.value);
+                                                    setRotationWeek(week);
+                                                    setOrder(THREE_DAY_ROTATION[week - 1].days);
+                                                }}
+                                                className="bg-gray-700 border border-gray-600 rounded px-2 py-1 text-xs text-white"
+                                            >
+                                                {THREE_DAY_ROTATION.map((week, idx) => (
+                                                    <option key={idx} value={week.week}>
+                                                        Week {week.week} {week.week === 5 ? '(Deload)' : ''}
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </div>
                                     </div>
-                                )}
+                                    <div className="overflow-x-auto">
+                                        <table className="w-full text-sm">
+                                            <thead>
+                                                <tr className="border-b border-gray-600">
+                                                    <th className="text-left py-2 px-3 text-gray-300 font-medium">Week</th>
+                                                    <th className="text-left py-2 px-3 text-gray-300 font-medium">Monday</th>
+                                                    <th className="text-left py-2 px-3 text-gray-300 font-medium">Wednesday</th>
+                                                    <th className="text-left py-2 px-3 text-gray-300 font-medium">Friday</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {THREE_DAY_ROTATION.map((week, idx) => (
+                                                    <tr
+                                                        key={week.week}
+                                                        className={`border-b border-gray-700/50 ${week.week === rotationWeek ? 'bg-red-900/20 border-red-500/30' : ''}`}
+                                                    >
+                                                        <td className="py-2 px-3">
+                                                            <span className={`font-medium ${week.week === rotationWeek ? 'text-red-300' : 'text-gray-200'}`}>
+                                                                Week {week.week}
+                                                            </span>
+                                                            {week.week === 5 && (
+                                                                <span className="ml-2 text-xs text-gray-400">(Deload)</span>
+                                                            )}
+                                                        </td>
+                                                        {week.days.map((lift, dayIdx) => (
+                                                            <td key={dayIdx} className="py-2 px-3">
+                                                                <span className={`text-sm ${week.week === rotationWeek ? 'text-white font-medium' : 'text-gray-300'}`}>
+                                                                    {lift}
+                                                                </span>
+                                                            </td>
+                                                        ))}
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div className="mt-3 text-xs text-gray-400">
+                                        <p>• Each lift follows the same 5/3/1 progression across the 4-week cycle</p>
+                                        <p>• All four lifts progress together, rotating through 3 training days</p>
+                                        <p>• Week 5 is optional deload for all lifts</p>
+                                    </div>
+                                </div>
                             </div>
-                        ))}
+                        )}
+
+                        {frequency === '2day' && (
+                            <div className="bg-gray-800/40 border border-gray-700 rounded-lg p-4">
+                                <div className="text-center text-gray-400">
+                                    <Info className="w-8 h-8 mx-auto mb-2" />
+                                    <p className="text-sm">2-Day Split Configuration</p>
+                                    <p className="text-xs mt-1">Coming soon - Upper/Lower split options</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {!validation.scheduleOk && frequency === '4day' && (
+                            <div className="flex items-start space-x-2 text-yellow-300 text-xs bg-yellow-900/20 border border-yellow-700/40 rounded p-3">
+                                <AlertTriangle className="w-4 h-4 mt-0.5" />
+                                <span>Schedule invalid: ensure unique lifts and correct number of slots.</span>
+                            </div>
+                        )}
                     </div>
-                    {!validation.scheduleOk && (
-                        <div className="flex items-start space-x-2 text-yellow-300 text-xs bg-yellow-900/20 border border-yellow-700/40 rounded p-3">
-                            <AlertTriangle className="w-4 h-4 mt-0.5" />
-                            <span>Schedule invalid: ensure unique lifts and correct number of slots.</span>
-                        </div>
-                    )}
                 </div>
             </section>
 
@@ -1224,7 +1399,7 @@ export default function Step3DesignCustom(props) {
                             title: 'BBB (Boring But Big)',
                             desc: '5×10 volume approach for hypertrophy',
                             best: 'Size-focused lifters, volume accumulation',
-                            note: 'Typically 5×10 @ 50-70% TM'
+                            note: 'Typically 5×10 @ 50-60% TM (book range)'
                         }, {
                             id: 'bbs',
                             title: 'BBS (Boring But Strong)',
@@ -1410,7 +1585,7 @@ export default function Step3DesignCustom(props) {
                                         <input
                                             type="range"
                                             min="50"
-                                            max="70"
+                                            max="60"
                                             step="5"
                                             value={suppPct}
                                             onChange={e => setSuppPct(Number(e.target.value))}
@@ -1420,13 +1595,13 @@ export default function Step3DesignCustom(props) {
                                             type="number"
                                             value={suppPct}
                                             min={50}
-                                            max={70}
+                                            max={60}
                                             onChange={e => setSuppPct(Number(e.target.value))}
                                             className="w-16 bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm text-white focus:border-red-500"
                                         />
                                         <span className="text-gray-400">%</span>
                                     </div>
-                                    {!validation.supplementalOk && <p className="text-xs text-yellow-300">Range 50-70%</p>}
+                                    {!validation.supplementalOk && <p className="text-xs text-yellow-300">Range 50-60% (book)</p>}
                                 </div>
                                 <div className="space-y-2">
                                     <label className="block text-xs uppercase text-gray-400">Sets × Reps</label>
@@ -1437,7 +1612,7 @@ export default function Step3DesignCustom(props) {
                             <div className="bg-blue-900/20 border border-blue-700/40 rounded p-3 text-[11px] text-blue-100 flex space-x-2 leading-snug">
                                 <Info className="w-4 h-4 mt-0.5" />
                                 <span>
-                                    BBB is a hypertrophy-focused protocol. Lower percentages (50-60%) work best for most lifters. Use 60-70% only if recovery is excellent and main work weight is conservative.
+                                    BBB is a hypertrophy-focused protocol. Book range is 50-60% TM. Start at 50% and progress slowly to 60% only when recovery is excellent.
                                 </span>
                             </div>
                         </div>

@@ -57,7 +57,7 @@ export default function TemplateExplainerModal({ spec, state, open, onClose, onA
         `Supplemental: 5×10 @ ${suppPct || 50}% TM (same lift)`,
         'Assistance: ONE movement (classic BBB) – e.g. chins, dips, rows, back raises, abs'
     ] : spec?.structure;
-    const variantRecovery = isBBBVariant ? 'High supplemental volume – start lighter (50%) and progress cautiously (60–70% later cycles). Favor easy conditioning (LISS) and cap assistance at 25–50 quality reps per movement. Deload Week 4.' : spec?.recovery;
+    const variantRecovery = isBBBVariant ? 'High supplemental volume – start lighter (50%) and progress cautiously to 60% only when recovery is excellent. Favor easy conditioning (LISS) and cap assistance at 25–50 quality reps per movement. Deload Week 4.' : spec?.recovery;
     const jackShitStructure = [
         'Main 5/3/1 sets only (Week 1–3 AMRAP, Week 4 deload)',
         'Optional: 1–2 easy assistance movements (chins / dips / core)'

@@ -187,13 +187,42 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
 
             const spec = getTemplateSpec(key);
 
-            // Inject custom assistance if user edited
-            if (assistEdit[key]) {
-                const plan = assistEdit[key];
-                preset.assistance = {
-                    mode: 'custom',
-                    customPlan: plan
+            // For BBB template, ensure all required fields are properly set
+            if (key === TEMPLATE_KEYS.BBB) {
+                // Ensure supplemental has percentage set
+                preset.supplemental = {
+                    ...preset.supplemental,
+                    percentOfTM: bbbStartPercent,
+                    percentage: bbbStartPercent, // Also set percentage field for compatibility
+                    strategy: 'bbb',
+                    sets: 5,
+                    reps: 10,
+                    pairing: bbbPairing
                 };
+                
+                // Ensure assistance is in template mode unless user customized
+                if (!assistEdit[key]) {
+                    preset.assistance = {
+                        mode: 'template',
+                        templateId: key
+                    };
+                } else {
+                    // User has customized - use custom mode
+                    const plan = assistEdit[key];
+                    preset.assistance = {
+                        mode: 'custom',
+                        customPlan: plan
+                    };
+                }
+            } else {
+                // Inject custom assistance if user edited (for non-BBB templates)
+                if (assistEdit[key]) {
+                    const plan = assistEdit[key];
+                    preset.assistance = {
+                        mode: 'custom',
+                        customPlan: plan
+                    };
+                }
             }
 
             dispatch({ type: 'SET_TEMPLATE_KEY', payload: preset.key });
@@ -205,7 +234,9 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                 if (spec.assistanceHint) dispatch({ type: 'SET_ASSISTANCE_HINT', payload: spec.assistanceHint });
             }
 
+            // Ensure we're in template mode
             dispatch({ type: 'SET_FLOW_MODE', payload: 'template' });
+            dispatch({ type: 'SET_ASSIST_MODE', payload: preset.assistance?.mode || 'template' });
 
             setTimeout(() => {
                 setIsLoading(false);
@@ -492,7 +523,14 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                                                                 <div className="flex items-center justify-between mb-3">
                                                                     <h4 className="text-xs font-semibold tracking-wide uppercase text-indigo-300">{liftName}</h4>
                                                                     {showAdd && rows.length === 0 && (
-                                                                        <button type="button" onClick={() => { ensureRow(); }} className="text-[10px] px-2 py-1 rounded bg-gray-700/60 hover:bg-gray-700 text-gray-200 border border-gray-600">Add</button>
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                ensureRow();
+                                                                            }}
+                                                                            className="text-[10px] px-2 py-1 rounded bg-gray-700/60 hover:bg-gray-700 text-gray-200 border border-gray-600"
+                                                                        >Add</button>
                                                                     )}
                                                                 </div>
                                                                 {warn && (
@@ -512,17 +550,44 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                                                                                     type="button"
                                                                                     className={`flex-shrink-0 flex-1 basis-[60%] text-left text-[11px] px-3 py-2 rounded border ${empty ? 'bg-gray-800/40 border-amber-500/40 text-amber-200' : 'bg-gray-900/70 border-gray-600 text-gray-100 hover:bg-gray-700/70'} truncate`}
                                                                                     title={r.name || 'Pick assistance movement'}
-                                                                                    onClick={() => setOpenPicker({ templateKey: card.key, lift: liftName, index: idx })}
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        setOpenPicker({ templateKey: card.key, lift: liftName, index: idx });
+                                                                                    }}
                                                                                 >{r.name || 'Select Movement'}</button>
                                                                                 <label className="flex items-center gap-1 basis-[15%] text-[10px] text-gray-400">
                                                                                     <span className="uppercase tracking-wide">Sets</span>
-                                                                                    <input type="number" min={1} max={10} value={r.sets} onChange={e => updateAssist(card.key, liftName, idx, { sets: Number(e.target.value) })} className="w-full bg-gray-900 border border-gray-600 rounded px-1 py-1 text-[10px] text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
+                                                                                    <input
+                                                                                        type="number"
+                                                                                        min={1}
+                                                                                        max={10}
+                                                                                        value={r.sets}
+                                                                                        onChange={e => updateAssist(card.key, liftName, idx, { sets: Number(e.target.value) })}
+                                                                                        onClick={(e) => e.stopPropagation()}
+                                                                                        className="w-full bg-gray-900 border border-gray-600 rounded px-1 py-1 text-[10px] text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                                                                                    />
                                                                                 </label>
                                                                                 <label className="flex items-center gap-1 basis-[15%] text-[10px] text-gray-400">
                                                                                     <span className="uppercase tracking-wide">Reps</span>
-                                                                                    <input type="number" min={1} max={50} value={r.reps} onChange={e => updateAssist(card.key, liftName, idx, { reps: Number(e.target.value) })} className="w-full bg-gray-900 border border-gray-600 rounded px-1 py-1 text-[10px] text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-400" />
+                                                                                    <input
+                                                                                        type="number"
+                                                                                        min={1}
+                                                                                        max={50}
+                                                                                        value={r.reps}
+                                                                                        onChange={e => updateAssist(card.key, liftName, idx, { reps: Number(e.target.value) })}
+                                                                                        onClick={(e) => e.stopPropagation()}
+                                                                                        className="w-full bg-gray-900 border border-gray-600 rounded px-1 py-1 text-[10px] text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-400"
+                                                                                    />
                                                                                 </label>
-                                                                                <button type="button" onClick={() => removeAssistRow(card.key, liftName, idx)} className="basis-[10%] text-right text-[12px] font-bold text-red-400 hover:text-red-300" aria-label="Remove assistance movement">✕</button>
+                                                                                <button
+                                                                                    type="button"
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        removeAssistRow(card.key, liftName, idx);
+                                                                                    }}
+                                                                                    className="basis-[10%] text-right text-[12px] font-bold text-red-400 hover:text-red-300"
+                                                                                    aria-label="Remove assistance movement"
+                                                                                >✕</button>
                                                                             </div>
                                                                             {/* Rep scheme descriptor */}
                                                                             {(() => {
@@ -531,7 +596,10 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                                                                                 return <div className="text-[10px] text-gray-500 mt-1 pl-1">Scheme: {scheme}</div>;
                                                                             })()}
                                                                             {openPicker && openPicker.templateKey === card.key && openPicker.lift === liftName && openPicker.index === idx && (
-                                                                                <div className="relative z-30 mb-2">
+                                                                                <div
+                                                                                    className="relative z-30 mb-2"
+                                                                                    onClick={(e) => e.stopPropagation()}
+                                                                                >
                                                                                     <AssistanceCatalogPicker
                                                                                         equipment={state.equipment || []}
                                                                                         onPick={(x) => {
@@ -552,7 +620,14 @@ export default function Step2TemplateOrCustom({ onChoose, onAutoNext }) {
                                                                     );
                                                                 })}
                                                                 {showAdd && rows.length > 0 && (
-                                                                    <button type="button" onClick={() => addAssistRow(card.key, liftName, limit)} className="text-[10px] px-2 py-1 rounded bg-gray-700/60 hover:bg-gray-700 text-gray-200 border border-gray-600">+ Add Movement</button>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            addAssistRow(card.key, liftName, limit);
+                                                                        }}
+                                                                        className="text-[10px] px-2 py-1 rounded bg-gray-700/60 hover:bg-gray-700 text-gray-200 border border-gray-600"
+                                                                    >+ Add Movement</button>
                                                                 )}
                                                             </div>
                                                         );

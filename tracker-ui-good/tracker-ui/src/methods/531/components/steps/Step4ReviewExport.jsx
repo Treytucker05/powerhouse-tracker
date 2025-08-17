@@ -162,21 +162,23 @@ export default function Step4ReviewExport({ onReadyChange }) {
             warnings.push('Assistance set to custom but using template mode');
         }
 
-        // Program readiness check
-        if (errors.length === 0 && !starting) {
-            setErrors([]);
-        } else {
-            setErrors(errors);
-        }
-        setWarnings(warnings);
-
         return {
             isValid: errors.length === 0,
             hasWarnings: warnings.length > 0,
             errors,
             warnings
         };
-    }, [effective, order, supplemental, assistance, assistMode, starting]);
+    }, [effective, order, supplemental, assistance, assistMode]);
+
+    // Update state based on validation results
+    useEffect(() => {
+        if (comprehensiveValidation.errors.length === 0 && !starting) {
+            setErrors([]);
+        } else {
+            setErrors(comprehensiveValidation.errors);
+        }
+        setWarnings(comprehensiveValidation.warnings);
+    }, [comprehensiveValidation, starting]);
 
     const roundingMode = typeof effective.rounding === 'string' ? effective.rounding : (effective.rounding?.mode || 'nearest');
     const roundingIncrement = typeof effective.rounding === 'object' ? (effective.rounding.increment || 5) : (effective.units === 'kg' ? 2.5 : 5);
@@ -754,7 +756,7 @@ export default function Step4ReviewExport({ onReadyChange }) {
                                                 </div>
                                                 {/* Legend (shown once per day card) */}
                                                 <div className="mt-1 text-[10px] text-gray-500 italic">
-                                                    Legend: ⚠ badge appears when a category exceeds ~100 reps (soft guardrail). Aim for roughly 50–100 assistance reps per block. BBB recommended 50–70% TM.
+                                                    Legend: ⚠ badge appears when a category exceeds ~100 reps (soft guardrail). Aim for roughly 50–100 assistance reps per block. BBB recommended 50–60% TM (book range).
                                                 </div>
                                             </div>
                                         )}
