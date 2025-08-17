@@ -47,17 +47,24 @@ function applyTemplateLocal(state, template) {
 
     // Attempt to pull preset for schedule normalization dynamically (safe guarded)
     try {
-        const presetModule = require('../../../lib/templates/531.presets.v2.js');
-        if (presetModule?.getTemplatePreset) {
-            const preset = presetModule.getTemplatePreset(template, { state });
-            if (preset?.schedule) {
-                const norm = normalizeTemplateSchedule(preset.schedule);
-                next.schedule = { ...(next.schedule || {}), ...norm };
-                logTemplateSync('applyTemplateLocal.appliedPresetSchedule', { template, order: norm.order });
-            }
-        }
+        // Dynamic ESM import (kept inside function, not top-level for optional loading)
+        // NOTE: intentionally not awaited to avoid making applyTemplateLocal async; we only sync if resolved quickly
+        import('../../../lib/templates/531.presets.v2.js')
+            .then(presetModule => {
+                if (presetModule?.getTemplatePreset) {
+                    const preset = presetModule.getTemplatePreset(template, { state });
+                    if (preset?.schedule) {
+                        const norm = normalizeTemplateSchedule(preset.schedule);
+                        next.schedule = { ...(next.schedule || {}), ...norm };
+                        logTemplateSync('applyTemplateLocal.appliedPresetSchedule', { template, order: norm.order });
+                    }
+                }
+            })
+            .catch(e => {
+                logTemplateSync('applyTemplateLocal.presetLoadFailed', { template, error: e.message });
+            });
     } catch (e) {
-        logTemplateSync('applyTemplateLocal.presetLoadFailed', { template, error: e.message });
+        logTemplateSync('applyTemplateLocal.presetImportException', { template, error: e.message });
     }
 
     // Normalize any existing schedule if still not normalized
