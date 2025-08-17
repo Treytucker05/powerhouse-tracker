@@ -4,11 +4,13 @@
   "private": true,
   "version": "2.0.0",
   "type": "module",
-  "homepage": "../../README.md",
+  "homepage": "https://treytucker05.github.io/powerhouse-tracker/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist --nojekyll",
     "test": "vitest",
     "test:ci": "vitest run --coverage --reporter=basic",
     "test:unit": "vitest run --coverage",
@@ -67,6 +69,7 @@
     "supabase": "^2.26.9",
     "tailwindcss": "^3.4.15",
     "vite": "^6.3.5",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "gh-pages": "latest"
   }
 }
