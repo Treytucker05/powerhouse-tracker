@@ -40,11 +40,40 @@ jobs:
       - name: Run tests
         run: npm run test:ci
         
+      - name: Debug working directory
+        run: |
+          echo "Current working directory:"
+          pwd
+          echo "Contents of current directory:"
+          ls -la
+          echo "Contents of package.json scripts:"
+          cat package.json | grep -A 10 '"scripts"'
+        
       - name: Build application
-        run: npm run build
+        run: |
+          echo "Starting build process..."
+          npm run build
+          echo "Build completed with exit code: $?"
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          
+      - name: Debug build output
+        run: |
+          echo "Checking for dist directory..."
+          if [ -d "dist" ]; then
+            echo "✅ dist directory exists"
+            echo "Contents of dist directory:"
+            ls -la dist/
+            echo "Size of dist directory:"
+            du -sh dist/
+          else
+            echo "❌ dist directory does not exist"
+            echo "Current directory contents:"
+            ls -la
+            echo "Checking if there are any other build outputs:"
+            find . -name "*.html" -o -name "*.js" -o -name "*.css" | head -10
+          fi
           
       - name: Verify dist directory exists
         run: |
