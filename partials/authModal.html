@@ -1,0 +1,75 @@
+<!-- Login Modal -->
+<div id="authModal" class="modal hidden">
+  <div class="modal-content">
+    <h2>Login / Sign-up</h2>
+    <form id="authForm" onsubmit="event.preventDefault(); handleSignIn();">
+      <input
+        id="authEmail"
+        type="email"
+        placeholder="Email"
+        autocomplete="email"
+      />
+      <input
+        id="authPass"
+        type="password"
+        placeholder="Password"
+        autocomplete="current-password"
+      />
+      <button type="submit" id="btnLogin">LOGIN</button>
+      <button type="button" id="btnSignUp" onclick="handleSignUp()">
+        SIGN UP
+      </button>
+      <span id="authSpinner" style="display: none; margin-left: 8px">⏳</span>
+    </form>
+  </div>
+</div>
+<style>
+  #authModal {
+    position: fixed;
+    inset: 0;
+    background: #000a; /* semi-transparent backdrop */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000; /* keep it above everything */
+  }
+
+  #authModal.hidden {
+    display: none;
+  }
+
+  .modal-content {
+    background: #222;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 300px;
+  }
+
+  #authForm {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  #authForm input,
+  #authForm button {
+    margin-bottom: 10px;
+  }
+  .modal-content input,
+  .modal-content button {
+    width: 100%;
+    margin: 6px 0;
+    padding: 8px;
+  }
+</style>
+
+<!-- Initialize auth modal on page load -->
+<!--
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initially show the auth modal until we know user is authenticated
+    document.getElementById("authModal").classList.remove("hidden");
+    // Auth state will be handled by onAuth in globals.js
+  });
+</script>
+-->

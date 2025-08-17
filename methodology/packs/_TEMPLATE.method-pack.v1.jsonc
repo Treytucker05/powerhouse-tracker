@@ -1,0 +1,29 @@
+{
+    "meta": {
+        "method": "<book/method>",
+        "variant": "<template/track>",
+        "author": "Trey",
+        "compatibility": {
+            "minCoreVersion": "1.0.0",
+            "maxCoreVersion": "1.x.x"
+        }
+    },
+    "defaults": {
+        "units": "lbs",
+        "rounding": {
+            "lbs": 5,
+            "kg": 2.5
+        }
+    },
+    "exerciseCatalog": [],
+    "templates": [],
+    "decisionTree": {
+        "questions": []
+    },
+    "program": {
+        "phases": []
+    },
+    "provenance": {
+        "source": "template"
+    }
+}
