@@ -2,20 +2,55 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
-    rel="stylesheet">
-  <title>NASM Program Design Tracker</title>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+        rel="stylesheet">
+    <title>NASM Program Design Tracker</title>
 </head>
 
 <body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.jsx"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+
+    <!-- Auto-height script for iframe embedding -->
+    <script>
+        function sendHeight() {
+            const height = Math.max(
+                document.body.scrollHeight,
+                document.body.offsetHeight,
+                document.documentElement.clientHeight,
+                document.documentElement.scrollHeight,
+                document.documentElement.offsetHeight
+            );
+
+            // Send height to parent window
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'iframe-height',
+                    height: height
+                }, '*');
+            }
+        }
+
+        // Send height when page loads
+        window.addEventListener('load', sendHeight);
+
+        // Send height when content changes
+        const observer = new MutationObserver(sendHeight);
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true
+        });
+
+        // Send height periodically (fallback)
+        setInterval(sendHeight, 1000);
+    </script>
 </body>
 
 </html>
