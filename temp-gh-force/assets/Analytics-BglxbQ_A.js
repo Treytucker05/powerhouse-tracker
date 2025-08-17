@@ -1,2 +1,0 @@
-import{j as s}from"./ui-vendor-BLoy3R85.js";import"./react-vendor-DoC2WAmd.js";function r(){return s.jsxs("div",{className:"space-y-6",children:[s.jsx("h1",{className:"text-3xl font-bold text-white",children:"Analytics"}),s.jsx("div",{className:"bg-gray-900 p-6 rounded-lg border border-gray-800",children:s.jsx("p",{className:"text-gray-300",children:"Coming soon - Training analytics and insights"})})]})}export{r as default};
-//# sourceMappingURL=Analytics-BglxbQ_A.js.map

@@ -51,7 +51,7 @@ function App() {
   return (
     <>
       <GlobalReset />
-      <Router>
+      <Router basename={import.meta.env.DEV ? "/" : "/powerhouse-tracker/"}>
         <ErrorBoundary>
           <Suspense fallback={<LoadingSpinner />}>
             {/* Temporary helper link removed to keep Dashboard clean */}
