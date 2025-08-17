@@ -1,5 +1,5 @@
 // removed duplicate import
-import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Suspense, lazy } from 'react';
@@ -51,15 +51,14 @@ function App() {
   return (
     <>
       <GlobalReset />
-      <Router basename={import.meta.env.DEV ? "/" : "/powerhouse-tracker/"}>
-        <ErrorBoundary>
-          <Suspense fallback={<LoadingSpinner />}>
-            {/* Temporary helper link removed to keep Dashboard clean */}
-            <Routes>
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/" element={<AppShell />}>
-                {/* Dashboard at root */}
-                <Route index element={<Home />} />
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingSpinner />}>
+          {/* Temporary helper link removed to keep Dashboard clean */}
+          <Routes>
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/" element={<AppShell />}>
+              {/* Dashboard at root */}
+              <Route index element={<Home />} />
 
                 {/* Program Design entry menu */}
                 <Route path="program-design" element={<MethodologySelection />} />
@@ -99,29 +98,28 @@ function App() {
                 <Route path="macrocycle/:id" element={<MacrocycleRedirect />} />
                 <Route path="builder" element={<MacrocycleRedirect />} />
               </Route>
-              {/* Fallback */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Suspense>
-        </ErrorBoundary>
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="dark"
-          toastStyle={{
-            background: '#111827',
-            color: '#ffffff',
-            border: '1px solid #374151'
-          }}
-        />
-      </Router>
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        toastStyle={{
+          background: '#111827',
+          color: '#ffffff',
+          border: '1px solid #374151'
+        }}
+      />
     </>
   );
 }
