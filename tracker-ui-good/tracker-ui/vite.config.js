@@ -5,13 +5,17 @@ const DIRNAME = new URL('.', import.meta.url).pathname
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/powerhouse-tracker/",
+  // ✅ Required for GitHub Pages deployment
+  base: '/powerhouse-tracker/',
   plugins: [react()],
   resolve: {
     alias: {
       "@": path.resolve(DIRNAME, "./src"),
     },
   },
+})
+
+
   build: {
     rollupOptions: {
       output: {
