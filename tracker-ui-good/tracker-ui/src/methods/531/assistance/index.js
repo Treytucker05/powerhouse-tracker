@@ -100,28 +100,32 @@ export function getExerciseMeta(id) {
 // These mirror classic book suggestions (curated; adjust as catalog grows)
 const TEMPLATE_DEFAULTS = {
     [TEMPLATE_KEYS.BBB]: {
-        Press: ['chinups', 'ab_wheel'],
-        Bench: ['chinups', 'ab_wheel'],
-        Deadlift: ['db_row', 'ab_wheel'],
-        Squat: ['db_row', 'hlr']
+        // Book-accurate BBB assistance from pages 46-47 (one movement per day)
+        Press: ['chinups'], // 5×10 chin-ups
+        Bench: ['db_row'], // 5×10 dumbbell rows  
+        Deadlift: ['hlr'], // 5×15 hanging leg raises
+        Squat: ['leg_curl'] // 5×10 leg curls
     },
     [TEMPLATE_KEYS.TRIUMVIRATE]: {
-        Press: ['dips', 'chinups'],
-        Bench: ['db_row', 'dips'],
-        Deadlift: ['good_morning', 'hlr'],
-        Squat: ['leg_curl', 'ab_wheel']
+        // Book-accurate Triumvirate from pages 47-49 (exactly 3 movements total per day)
+        Press: ['dips', 'chinups'], // 5×15 dips, 5×10 chin-ups
+        Bench: ['db_bench', 'db_row'], // 5×15 DB bench, 5×10 DB rows (p.48)
+        Deadlift: ['good_morning', 'hlr'], // 5×12 good mornings, 5×15 hanging leg raises
+        Squat: ['leg_press', 'leg_curl'] // 5×15 leg press, 5×10 leg curls (p.48)
     },
     [TEMPLATE_KEYS.PERIODIZATION_BIBLE]: {
-        Press: ['dips', 'db_row', 'hlr'],
-        Bench: ['dips', 'db_row', 'hlr'],
-        Deadlift: ['rdl_bb', 'back_ext', 'ab_wheel'],
-        Squat: ['leg_curl', 'db_split_squat', 'ab_wheel']
+        // Book-accurate categories (shoulders/chest + lats/upper back + triceps, etc.)
+        Press: ['dips', 'db_row', 'hlr'], // Shoulders, Lats, Triceps categories
+        Bench: ['dips', 'db_row', 'hlr'], // Chest, Upper Back, Triceps categories
+        Deadlift: ['rdl_bb', 'back_ext', 'ab_wheel'], // Hamstrings, Abs, Low Back categories
+        Squat: ['leg_curl', 'db_split_squat', 'ab_wheel'] // Quads, Hamstrings, Abs categories
     },
     [TEMPLATE_KEYS.BODYWEIGHT]: {
-        Press: ['chinups', 'pushups', 'plank'],
-        Bench: ['chinups', 'pushups', 'plank'],
-        Deadlift: ['chinups', 'db_split_squat', 'plank'],
-        Squat: ['chinups', 'db_split_squat', 'plank']
+        // Book-accurate bodyweight pairings from page 52 (75+ reps each)
+        Press: ['chinups', 'dips'], // Chin-ups, Dips (75+ each)
+        Bench: ['chinups', 'dips'], // Chin-ups, Dips (75+ each)
+        Deadlift: ['good_morning', 'hlr'], // Good Morning, Leg Raises (75+ each)
+        Squat: ['good_morning', 'hlr'] // Good Morning, Leg Raises (75+ each)
     },
     // Jack Shit intentionally empty
     [TEMPLATE_KEYS.JACK_SHIT]: {

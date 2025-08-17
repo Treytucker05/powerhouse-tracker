@@ -228,6 +228,8 @@ function reducerV2(state, action) {
         case 'SET_ADVANCED': return { ...state, advanced: { ...state.advanced, ...action.advanced } };
         case 'SET_AMRAP_WK3': return { ...state, amrapWk3: { ...(state.amrapWk3 || {}), ...(action.payload || {}) } };
         case 'SET_CYCLE': return { ...state, cycle: action.payload };
+        case 'SET_WEEK': return { ...state, week: action.payload };
+        case 'SET_HISTORY': return { ...state, history: action.history };
         case 'APPLY_TEMPLATE':
             return applyTemplate(state, action.key);
         case 'APPLY_TEMPLATE_CONFIG': {

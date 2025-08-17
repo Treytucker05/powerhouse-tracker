@@ -65,29 +65,47 @@ export default function AssistanceCatalogPicker({ block, equipment = [], onPick,
     }, [q, block, equipment, flat, limitIds, categoryFilter]);
 
     return (
-        <div className="p-3 border border-gray-600 rounded bg-gray-900 shadow-xl space-y-2 text-xs max-w-md">
+        <div
+            className="p-3 border border-gray-600 rounded bg-gray-900 shadow-xl space-y-2 text-xs max-w-md"
+            onClick={(e) => e.stopPropagation()}
+        >
             <div className="flex gap-2">
                 <input
                     className="flex-1 border border-gray-600 bg-gray-800 rounded px-2 py-1 text-xs text-gray-100"
                     placeholder="Search exercises…"
                     value={q}
                     onChange={e => setQ(e.target.value)}
+                    onClick={(e) => e.stopPropagation()}
                 />
-                <button className="border border-gray-600 hover:border-gray-400 rounded px-2 py-1 text-gray-300" onClick={onClose} type="button">Close</button>
+                <button
+                    className="border border-gray-600 hover:border-gray-400 rounded px-2 py-1 text-gray-300"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onClose();
+                    }}
+                    type="button"
+                >Close</button>
             </div>
+
+            {keepOpen && (
+                <div className="text-[10px] text-blue-300 bg-blue-900/20 border border-blue-500/40 rounded px-2 py-1">
+                    💡 Modal stays open - browse and select multiple exercises
+                </div>
+            )}
 
             {/* Category Filter Radio Buttons - Book-accurate BBB assistance patterns */}
             <div className="space-y-1">
                 <div className="text-[10px] text-gray-400 font-medium">Filter by Movement Pattern:</div>
                 <div className="flex flex-wrap gap-1">
                     {Object.entries(categories).map(([key, label]) => (
-                        <label key={key} className="flex items-center gap-1 cursor-pointer">
+                        <label key={key} className="flex items-center gap-1 cursor-pointer" onClick={(e) => e.stopPropagation()}>
                             <input
                                 type="radio"
                                 name="categoryFilter"
                                 value={key}
                                 checked={categoryFilter === key}
                                 onChange={e => setCategoryFilter(e.target.value)}
+                                onClick={(e) => e.stopPropagation()}
                                 className="w-3 h-3 text-indigo-600 bg-gray-800 border-gray-600 focus:ring-indigo-500"
                             />
                             <span className={`text-[10px] px-1 py-0.5 rounded ${categoryFilter === key ? 'bg-indigo-600/20 text-indigo-300' : 'text-gray-400'}`}>
@@ -112,7 +130,8 @@ export default function AssistanceCatalogPicker({ block, equipment = [], onPick,
                             </div>
                             <button
                                 className="border border-indigo-600/60 hover:border-indigo-400 rounded px-2 py-1 text-[10px] text-indigo-300"
-                                onClick={() => {
+                                onClick={(e) => {
+                                    e.stopPropagation();
                                     onPick(x);
                                     // Only close modal if keepOpen is false (default behavior)
                                     if (!keepOpen) {

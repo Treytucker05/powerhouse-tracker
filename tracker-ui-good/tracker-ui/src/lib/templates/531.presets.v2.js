@@ -52,22 +52,18 @@ export function getDefaultSchedule() {
 
 /**
  * presetBBB
- * Extended to support:
- *  - variant: 'standard' | 'challenge'
- *  - startPercent: number (30|40|50|60) – initial cycle % of TM for 5x10
- *  - progressTo: number (optional target % after several cycles for standard path)
+ * Book-accurate BBB template:
+ *  - startPercent: 50-60% only (book range)
  *  - pairing: 'same' | 'opposite'
- *  - challengeStages: [30,45,60] hard-coded progression (3-Month Challenge)
+ *  - progressTo: optional progression target within book range
+ *  - No 70% options (not in original book)
+ *  - No 3-Month Challenge (removed as requested)
  */
 export function presetBBB({ tmPct, units, options = {} }) {
-    const variant = options.variant || 'standard';
     const pairing = options.pairing || 'same'; // opposite allowed
-    const startPercent = (() => {
-        if (variant === 'challenge') return 30; // cycle 1
-        return options.startPercent || 50; // standard start
-    })();
-    const progressTo = variant === 'standard' ? (options.progressTo || 60) : 60; // end target for display
-    const challengeStages = [30, 45, 60];
+    const startPercent = options.startPercent || 50; // book-accurate start range: 50-60%
+    const progressTo = options.progressTo || 60; // book-accurate progression target
+
     return {
         key: TEMPLATE_KEYS.BBB,
         loadingOption: 1,
@@ -78,17 +74,15 @@ export function presetBBB({ tmPct, units, options = {} }) {
             percentOfTM: startPercent,
             sets: 5,
             reps: 10,
-            variant,
-            progressTo,
-            challengeStages
+            progressTo // optional progression within book range
         },
         assistance: {
             mode: 'minimal',
             suggestions: {
-                squat: ['Leg Curls', 'Hanging Leg Raises'],
-                bench: ['DB Rows', 'Dips'],
-                deadlift: ['Back Extensions', 'Hanging Leg Raises'],
-                press: ['Chin-ups', 'Face Pulls']
+                press: ['Chin-ups'], // Book-accurate from pages 46-47
+                bench: ['Dumbbell Row'], // Book-accurate from pages 46-47
+                deadlift: ['Hanging Leg Raise'], // Book-accurate from pages 46-47
+                squat: ['Leg Curl'] // Book-accurate from pages 46-47
             }
         },
         assistanceLoadMode: 'percentRules',
@@ -111,16 +105,16 @@ export function presetTriumvirate() {
                     { name: 'Chin-ups', sets: 5, reps: 10, rule: ASSISTANCE_LOAD_RULES.CHIN_UPS }
                 ],
                 deadlift: [
-                    { name: 'Good Mornings', sets: 5, reps: 10, rule: ASSISTANCE_LOAD_RULES.GOOD_MORNINGS },
+                    { name: 'Good Mornings', sets: 5, reps: 12, rule: ASSISTANCE_LOAD_RULES.GOOD_MORNINGS }, // Book-accurate reps
                     { name: 'Hanging Leg Raises', sets: 5, reps: 15, rule: ASSISTANCE_LOAD_RULES.LEG_RAISES }
                 ],
                 bench: [
-                    { name: 'DB Rows', sets: 5, reps: 10, rule: ASSISTANCE_LOAD_RULES.DB_ROWS },
-                    { name: 'Dips', sets: 5, reps: 15, rule: ASSISTANCE_LOAD_RULES.DIPS }
+                    { name: 'Dumbbell Bench Press', sets: 5, reps: 15, rule: ASSISTANCE_LOAD_RULES.DB_ROWS }, // Book-accurate p.48
+                    { name: 'Dumbbell Row', sets: 5, reps: 10, rule: ASSISTANCE_LOAD_RULES.DB_ROWS } // Book-accurate p.48
                 ],
                 squat: [
-                    { name: 'Leg Curls', sets: 5, reps: 10, rule: ASSISTANCE_LOAD_RULES.LEG_CURLS },
-                    { name: 'Leg Raises', sets: 5, reps: 15, rule: ASSISTANCE_LOAD_RULES.LEG_RAISES }
+                    { name: 'Leg Press', sets: 5, reps: 15, rule: ASSISTANCE_LOAD_RULES.LEG_CURLS }, // Book-accurate p.48
+                    { name: 'Leg Curl', sets: 5, reps: 10, rule: ASSISTANCE_LOAD_RULES.LEG_CURLS } // Book-accurate p.48
                 ]
             }
         },
