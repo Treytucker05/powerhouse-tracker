@@ -60,44 +60,44 @@ function App() {
               {/* Dashboard at root */}
               <Route index element={<Home />} />
 
-                {/* Program Design entry menu */}
-                <Route path="program-design" element={<MethodologySelection />} />
+              {/* Program Design entry menu */}
+              <Route path="program-design" element={<MethodologySelection />} />
 
-                {/* Legacy program route (kept temporarily) */}
-                <Route path="program" element={<Program />} />
+              {/* Legacy program route (kept temporarily) */}
+              <Route path="program" element={<Program />} />
 
-                {/* 5/3/1 canonical - ENHANCED with step-specific routing */}
-                <Route path="builder/531" element={<Navigate to="/builder/531/v2/step/1" replace />} />
-                <Route path="builder/531/v2" element={<Navigate to="/builder/531/v2/step/1" replace />} />
-                <Route path="builder/531/v2/step/:stepNumber" element={
-                  <ProgramV2Provider>
-                    <ProgramWizard531V2 />
-                  </ProgramV2Provider>
-                } />
-                <Route path="program/531/active" element={<Program531ActiveV2 />} />
-                <Route path="builder/review" element={<ProgramV2Provider><BuilderReviewPage /></ProgramV2Provider>} />
+              {/* 5/3/1 canonical - ENHANCED with step-specific routing */}
+              <Route path="builder/531" element={<Navigate to="/builder/531/v2/step/1" replace />} />
+              <Route path="builder/531/v2" element={<Navigate to="/builder/531/v2/step/1" replace />} />
+              <Route path="builder/531/v2/step/:stepNumber" element={
+                <ProgramV2Provider>
+                  <ProgramWizard531V2 />
+                </ProgramV2Provider>
+              } />
+              <Route path="program/531/active" element={<Program531ActiveV2 />} />
+              <Route path="builder/review" element={<ProgramV2Provider><BuilderReviewPage /></ProgramV2Provider>} />
 
-                {/* NASM placeholder */}
-                <Route path="builder/nasm" element={<div className='text-gray-300 p-8'>NASM Builder (stub)</div>} />
+              {/* NASM placeholder */}
+              <Route path="builder/nasm" element={<div className='text-gray-300 p-8'>NASM Builder (stub)</div>} />
 
-                {/* Other existing routes */}
-                <Route path="tracking" element={<Tracking />} />
-                <Route path="analytics" element={<Analytics />} />
-                <Route path="history" element={<History />} />
-                <Route path="settings" element={<Settings />} />
-                <Route path="print-week" element={<PrintWeek />} />
-                <Route path="exercises" element={<ExercisesPage />} />
-                <Route path="profile" element={<ProfilePage />} />
-                <Route path="resources" element={<ResourcesPage />} />
-                <Route path="train" element={<TrainToday />} />
+              {/* Other existing routes */}
+              <Route path="tracking" element={<Tracking />} />
+              <Route path="analytics" element={<Analytics />} />
+              <Route path="history" element={<History />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="print-week" element={<PrintWeek />} />
+              <Route path="exercises" element={<ExercisesPage />} />
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="resources" element={<ResourcesPage />} />
+              <Route path="train" element={<TrainToday />} />
 
-                {/* Redirect legacy builder paths */}
-                <Route path="mesocycle" element={<MacrocycleRedirect />} />
-                <Route path="microcycle" element={<MacrocycleRedirect />} />
-                <Route path="macrocycle" element={<MacrocycleRedirect />} />
-                <Route path="macrocycle/:id" element={<MacrocycleRedirect />} />
-                <Route path="builder" element={<MacrocycleRedirect />} />
-              </Route>
+              {/* Redirect legacy builder paths */}
+              <Route path="mesocycle" element={<MacrocycleRedirect />} />
+              <Route path="microcycle" element={<MacrocycleRedirect />} />
+              <Route path="macrocycle" element={<MacrocycleRedirect />} />
+              <Route path="macrocycle/:id" element={<MacrocycleRedirect />} />
+              <Route path="builder" element={<MacrocycleRedirect />} />
+            </Route>
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
