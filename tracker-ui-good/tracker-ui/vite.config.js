@@ -4,12 +4,17 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
+  // ✅ Required for GitHub Pages deployment
+  base: '/powerhouse-tracker/',
+
   plugins: [react()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },
+})
+
   build: {
     rollupOptions: {
       output: {
