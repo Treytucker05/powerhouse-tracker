@@ -9,6 +9,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(DIRNAME, "./src"),
+      "@lib": path.resolve(DIRNAME, './src/lib'),
+      "@packs": path.resolve(DIRNAME, './src/packs'),
     },
   },
   build: {

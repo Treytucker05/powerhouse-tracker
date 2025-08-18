@@ -1,0 +1,24 @@
+{
+    "version": "1.0.0",
+    "lastUpdated": "2025-08-18T00:00:00Z",
+    "progression": {
+        "upperLb": 5,
+        "lowerLb": 10,
+        "upperKg": 2.5,
+        "lowerKg": 5
+    },
+    "rounding": {
+        "lb": {
+            "default": 5,
+            "micro": 2.5
+        },
+        "kg": {
+            "default": 2.5,
+            "micro": 1
+        }
+    },
+    "features": {
+        "leaderAnchor": false,
+        "seventhWeek": false
+    }
+}

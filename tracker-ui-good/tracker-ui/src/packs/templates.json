@@ -1,0 +1,127 @@
+{
+    "version": "1.0.0",
+    "lastUpdated": "2025-08-18T00:00:00Z",
+    "templates": {
+        "bbb": {
+            "id": "bbb",
+            "name": "Boring But Big",
+            "supplemental": {
+                "type": "bbb",
+                "sets": 5,
+                "reps": 10,
+                "percentage": 50,
+                "contentReference": ""
+            },
+            "assistance": [
+                {
+                    "category": "Pull",
+                    "volume": "5x10-15",
+                    "contentReference": ""
+                }
+            ],
+            "compatibleSchemes": [
+                "scheme_531",
+                "scheme_351",
+                "scheme_5spro"
+            ],
+            "timePerSession": "60-75",
+            "deloadPolicy": "ON",
+            "why": "High-volume main-lift hypertrophy; start light for 5x10."
+        },
+        "triumvirate": {
+            "id": "triumvirate",
+            "name": "Triumvirate",
+            "supplemental": {
+                "type": "none"
+            },
+            "assistance": [
+                {
+                    "category": "Push",
+                    "volume": "3-5x10-15"
+                },
+                {
+                    "category": "Pull",
+                    "volume": "3-5x10-15"
+                }
+            ],
+            "compatibleSchemes": [
+                "scheme_531",
+                "scheme_351",
+                "scheme_5spro"
+            ],
+            "timePerSession": "45-60",
+            "deloadPolicy": "ON",
+            "why": "Main lift + two highly effective accessories; recovery-friendly."
+        },
+        "periodization_bible": {
+            "id": "periodization_bible",
+            "name": "Periodization Bible",
+            "supplemental": {
+                "type": "none"
+            },
+            "assistance": [
+                {
+                    "category": "Push",
+                    "volume": "5x10-20"
+                },
+                {
+                    "category": "Pull",
+                    "volume": "5x10-20"
+                },
+                {
+                    "category": "Single-leg/Core",
+                    "volume": "5x10-20"
+                }
+            ],
+            "compatibleSchemes": [
+                "scheme_531",
+                "scheme_351",
+                "scheme_5spro"
+            ],
+            "timePerSession": "70-90",
+            "deloadPolicy": "ON",
+            "why": "Comprehensive category work; high volume."
+        },
+        "bodyweight": {
+            "id": "bodyweight",
+            "name": "Bodyweight",
+            "supplemental": {
+                "type": "none"
+            },
+            "assistance": [
+                {
+                    "category": "Push",
+                    "volume": "75-100 reps"
+                },
+                {
+                    "category": "Pull",
+                    "volume": "75-100 reps"
+                }
+            ],
+            "compatibleSchemes": [
+                "scheme_531",
+                "scheme_351",
+                "scheme_5spro"
+            ],
+            "timePerSession": "45-60",
+            "deloadPolicy": "ON",
+            "why": "Joint-friendly; high-rep calisthenics after main lifts."
+        },
+        "jackshit": {
+            "id": "jackshit",
+            "name": "I’m Not Doing Jack Sh*t",
+            "supplemental": {
+                "type": "none"
+            },
+            "assistance": [],
+            "compatibleSchemes": [
+                "scheme_531",
+                "scheme_351",
+                "scheme_5spro"
+            ],
+            "timePerSession": "30-45",
+            "deloadPolicy": "ON",
+            "why": "Main lift only; maximal focus, minimal fatigue."
+        }
+    }
+}
