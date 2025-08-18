@@ -41,6 +41,14 @@ const LIFT_LABELS = {
 export default function Step1Fundamentals({ onValidChange, flashToken, missing = [] }) {
     const { state, dispatch } = useProgramV2();
 
+    // helper: accept 0.90/0.85 or 90/85, return integer percent
+    const readTmPercent = (s) => {
+        const raw = (s?.tmPercent ?? s?.tmPct ?? null);
+        if (raw == null) return null;
+        const val = raw <= 1 ? raw * 100 : raw;
+        return Math.round(val);
+    };
+
     // Local working state for smooth typing
     const [localState, setLocalState] = useState({
         units: state.units,
@@ -121,13 +129,16 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
 
     // Validation check
     const isValid = useMemo(() => {
-        return Object.keys(localState.lifts).every(liftKey => {
+        const pct = readTmPercent(state);
+        const tmOk = Number.isFinite(pct) && pct >= 80 && pct <= 95;
+        const liftsOk = Object.keys(localState.lifts).every(liftKey => {
             const lift = localState.lifts[liftKey];
             const hasOneRM = lift.oneRM && Number(lift.oneRM) > 0;
             const hasRepTest = lift.repWeight && lift.repCount && Number(lift.repWeight) > 0 && Number(lift.repCount) > 0;
             return hasOneRM || hasRepTest;
         });
-    }, [localState.lifts]);
+        return tmOk && liftsOk;
+    }, [localState.lifts, state]);
 
     const prevValidRef = useRef(isValid);
     useEffect(() => {

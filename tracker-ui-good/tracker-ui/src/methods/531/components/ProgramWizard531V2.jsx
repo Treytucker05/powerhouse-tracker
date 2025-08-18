@@ -39,13 +39,20 @@ const USE_METHOD_PACKS = envFlag == null ? true : String(envFlag).toLowerCase() 
 // Per spec: require 4 valid TMs, units, rounding, TM% (0.90 or 0.85). Allow dev bypass via env.
 const LIFTS = ["squat", "bench", "deadlift", "press"];
 
+// helper: accept 0.90/0.85 or 90/85, return integer percent
+const readTmPercent = (s) => {
+    const raw = (s?.tmPercent ?? s?.tmPct ?? null);
+    if (raw == null) return null;
+    const val = raw <= 1 ? raw * 100 : raw;
+    return Math.round(val);
+};
+
 function isStep1Complete(state) {
     if (!state) return false;
     // Accept both 'lb' and 'lbs' plus 'kg'
     const unitsOk = state?.units === "lbs" || state?.units === "lb" || state?.units === "kg";
     const roundingOk = !!state?.rounding;
-    const tmPctRaw = state?.tmPercent ?? state?.tmPct ?? 90; // fallback to 90 if undefined (matches legacy default)
-    const tmPct = Number(tmPctRaw);
+    const tmPct = readTmPercent(state) ?? 90; // fallback to 90 if undefined (matches legacy default)
     const tmPctOk = Number.isFinite(tmPct) && tmPct >= 80 && tmPct <= 95;
     // Build a tms object from current lifts if not already present
     const tmsSource = state?.tms || (() => {
@@ -139,13 +146,9 @@ function WizardShell() {
             case 0: // Fundamentals
                 if (!state?.units) errors.push("Units (lbs/kg) required");
                 if (!state?.rounding) errors.push("Rounding preference required");
-                {
-                    // Accept tmPercent (new) or tmPct (legacy); validate numeric range
-                    const tmPctRaw = state?.tmPercent ?? state?.tmPct;
-                    const tmPctNum = Number(tmPctRaw);
-                    if (!(Number.isFinite(tmPctNum) && tmPctNum >= 80 && tmPctNum <= 95)) {
-                        errors.push("Training max percentage (80-95%) required");
-                    }
+                const _tm = readTmPercent(state);
+                if (!(Number.isFinite(_tm) && _tm >= 80 && _tm <= 95)) {
+                    warnings.push('Training max percentage (80–95%) required');
                 }
 
                 const tmsSource = state?.tms || {};
