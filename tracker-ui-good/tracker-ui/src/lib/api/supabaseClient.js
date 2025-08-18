@@ -9,7 +9,7 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 // Explicit debug logging (will appear in built bundle console)
 console.log('[SupabaseClient][HARD-CODED TEST] Using fixed credentials (do not ship to production)');
 console.log('[SupabaseClient] URL:', supabaseUrl);
-console.log('[SupabaseClient] Key (first 12 chars):', supabaseAnonKey.substring(0,12) + '...');
+console.log('[SupabaseClient] Key (first 12 chars):', supabaseAnonKey.substring(0, 12) + '...');
 
 // Lightweight in-memory mock for test environment to avoid any network/filesystem flakiness
 export const supabase = (process.env.NODE_ENV === 'test') ? {
