@@ -1,15 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
 
-// TEMPORARY HARD-CODE FOR DEBUG ISOLATION
-// This bypasses import.meta.env to confirm if env injection is the root cause.
-// IMPORTANT: Remove before committing production code.
-const supabaseUrl = 'https://cqjzvbvmpcqohjarcydg.supabase.co'
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxanp2YnZtcGNxb2hqYXJjeWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3NzExNzksImV4cCI6MjA2NTM0NzE3OX0.wioeITJitSKZ9HrZ2iRPmC3xHHj-bL4xDYtT1iXws44'
+// Environment-based configuration (expected in production build via secrets)
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://cqjzvbvmpcqohjarcydg.supabase.co'
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxanp2YnZtcGNxb2hqYXJjeWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3NzExNzksImV4cCI6MjA2NTM0NzE3OX0.wioeITJitSKZ9HrZ2iRPmC3xHHj-bL4xDYtT1iXws44'
 
-// Explicit debug logging (will appear in built bundle console)
-console.log('[SupabaseClient][HARD-CODED TEST] Using fixed credentials (do not ship to production)');
-console.log('[SupabaseClient] URL:', supabaseUrl);
-console.log('[SupabaseClient] Key (first 12 chars):', supabaseAnonKey.substring(0, 12) + '...');
+// Debug logging (safe subset) – remove or gate behind dev flag later if noisy
+console.log('[SupabaseClient] mode=env');
+console.log('[SupabaseClient] import.meta.env keys:', Object.keys(import.meta.env).filter(k=>k.startsWith('VITE_')));
+console.log('[SupabaseClient] URL resolved:', supabaseUrl);
+console.log('[SupabaseClient] Key prefix:', supabaseAnonKey.substring(0,12) + '...');
 
 // Lightweight in-memory mock for test environment to avoid any network/filesystem flakiness
 export const supabase = (process.env.NODE_ENV === 'test') ? {
