@@ -35,13 +35,16 @@ document.documentElement.classList.add('dark');
             const sameOrigin = (() => {
               try { return url.startsWith(location.origin) || (!/^https?:/i.test(url)); } catch { return false; }
             })();
-            console.warn('[AUTH FETCH DEBUG] Intercepted fetch to /auth', {
-              url,
-              method,
-              sameOrigin,
-              time: new Date().toISOString(),
-              stack,
-            });
+            // Print a concise header + serialized details, then stack as plain text for immediate readability
+            const when = new Date().toISOString();
+            const header = `[AUTH FETCH DEBUG] ${when} -> ${method} ${url}`;
+            const details = `sameOrigin=${sameOrigin}`;
+            console.warn(header + ' ' + details);
+            if (stack) {
+              // Clean the stack: remove the first line (error message) for brevity
+              const cleaned = stack.split('\n').filter((l, i) => i !== 0).join('\n');
+              console.log('[AUTH FETCH DEBUG][STACK BEGIN]\n' + cleaned + '\n[AUTH FETCH DEBUG][STACK END]');
+            }
           }
         }
         const response = await originalFetch.apply(this, args);
