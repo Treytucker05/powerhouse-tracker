@@ -161,7 +161,8 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
         // mode: 'convert' | 'keep'
         setLocalState(prev => {
             if (prev.units === unit) return prev;
-            const factor = unit === 'kg' ? 0.45359237 : 2.20462262; // LB -> KG or KG -> LB
+            // Use constants for comparison to avoid stray literals
+            const factor = unit === UNITS.KG ? 0.45359237 : 2.20462262; // LB -> KG or KG -> LB
             const nextLifts = { ...prev.lifts };
             Object.keys(nextLifts).forEach(k => {
                 ['oneRM', 'repWeight', 'tmOverride'].forEach(field => {

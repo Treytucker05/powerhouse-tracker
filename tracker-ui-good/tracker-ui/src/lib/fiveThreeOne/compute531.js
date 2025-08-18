@@ -4,6 +4,7 @@
 
 import { roundToIncrement, roundUpToIncrement } from '../math/rounding.ts';
 import { getTmPct } from '../tm.ts';
+import { UNITS, incrementFor } from '../units.ts';
 
 // Internal array form used by buildProgram/mainSetsFor
 const LOADING_OPTIONS_ARRAY = {
@@ -76,13 +77,13 @@ export function effectiveTM(lift, state) {
         : getTmPct(state);
     const base = l.tm ?? (l.oneRM ? l.oneRM * tmPct : null); // tmPct already decimal
     if (!base) return null;
-    const inc = state?.rounding?.increment ?? (state?.units === 'kg' ? 2.5 : 5);
+    const inc = state?.rounding?.increment ?? (state?.units === UNITS.KG ? 2.5 : 5);
     const mode = state?.rounding?.mode ?? 'nearest';
     return roundToIncrement(base, inc, mode);
 }
 
 function warmupsFor(tm, state) {
-    const inc = state?.rounding?.increment ?? (state?.units === 'kg' ? 2.5 : 5);
+    const inc = state?.rounding?.increment ?? (state?.units === UNITS.KG ? 2.5 : 5);
     const mode = state?.rounding?.mode ?? 'nearest';
     return WARMUP_SCHEME.jumps.map((p, i) => ({
         pct: p,
@@ -95,7 +96,7 @@ function mainSetsFor(tm, loadingOption, targetWeek, state) {
     const table = LOADING_OPTIONS_ARRAY[loadingOption] || LOADING_OPTIONS_ARRAY[1];
     const entry = table.find((w) => w.week === targetWeek);
     if (!entry) return [];
-    const inc = state?.rounding?.increment ?? (state?.units === 'kg' ? 2.5 : 5);
+    const inc = state?.rounding?.increment ?? (state?.units === UNITS.KG ? 2.5 : 5);
     const mode = state?.rounding?.mode ?? 'nearest';
     return entry.sets.map((s) => ({
         pct: s.pct,
@@ -131,7 +132,7 @@ export function calcMainSets(tm, optionOrOpts = 1, week = 1, rounding = { increm
 
 function supplementalFor(lift, week, state) {
     const template = state?.template?.id || null;
-    const inc = state?.rounding?.increment ?? (state?.units === 'kg' ? 2.5 : 5);
+    const inc = state?.rounding?.increment ?? (state?.units === UNITS.KG ? 2.5 : 5);
     const mode = state?.rounding?.mode ?? 'nearest';
     const tm = effectiveTM(lift, state);
     if (!template || !tm) return null;
@@ -247,7 +248,7 @@ function scheduleWeeks(state) {
 }
 
 export function buildProgram(state) {
-    const units = state?.units || 'lb';
+    const units = state?.units || UNITS.LBS;
     const loadingOption = state?.loading?.option || 1;
     const includeDeload = state?.loading?.includeDeload !== false; // default true
     const weeksOrder = scheduleWeeks(state);
@@ -276,7 +277,7 @@ export function buildProgram(state) {
             template: state?.template?.id || null,
             frequency: state?.schedule?.frequency || '4day',
             order: state?.schedule?.order || ['press', 'deadlift', 'bench', 'squat'],
-            rounding: state?.rounding || { increment: units === 'kg' ? 2.5 : 5, mode: 'nearest' },
+            rounding: state?.rounding || { increment: units === UNITS.KG ? 2.5 : 5, mode: 'nearest' },
             increments: state?.progression || { upper: 5, lower: 10, roundingMode: 'ceiling' },
         },
         tms: tmTable,
