@@ -8,6 +8,7 @@ All other folders are legacy and ignored by tools (ESLint/Prettier/CI).
 ![React](https://img.shields.io/badge/React-19-blue)
 ![Vite](https://img.shields.io/badge/Vite-6-yellow)
 ![Design System](https://img.shields.io/badge/Design%20System-Complete-brightgreen)
+![Deploy](https://github.com/Treytucker05/powerhouse-tracker/actions/workflows/deploy.yml/badge.svg)
 
 A modern React-based training tracker with **complete program design system**, **centralized design system**, **7-step periodization methodology**, and **cross-browser compatibility**.
 
@@ -297,6 +298,23 @@ Create a `.env` file with your Supabase credentials:
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
+
+## 🔄 Automatic Deployment
+
+Changes pushed to the `release/f531-v2-alpha` branch now automatically build and deploy to **GitHub Pages** via the workflow at `.github/workflows/deploy.yml`.
+
+Pipeline summary:
+- Trigger: Push (or manual dispatch) on `release/f531-v2-alpha`
+- Environment: Node 20, npm cache
+- Steps: checkout → install (npm ci) → build (`vite build`) → upload artifact → deploy (GitHub Pages)
+- Output: `dist/` published to Pages (no manual worktree push required anymore)
+
+To force a redeploy without code changes:
+```
+git commit --allow-empty -m "chore: trigger redeploy" && git push origin release/f531-v2-alpha
+```
+
+If a deployment seems stuck, check the Actions tab for the latest run logs. The badge at the top of this README reflects current workflow status.
 
 ### Database Schema (Optional Cloud Features)
 Run in Supabase SQL Editor if using cloud synchronization:

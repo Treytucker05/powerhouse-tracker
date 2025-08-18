@@ -1,0 +1,2 @@
+const t=c=>c.replace(/\/\*[\s\S]*?\*\//g,"").replace(/(^|[^:])\/\/.*$/gm,"$1");async function e(){const c="/methodology/packs/531.bbb.v1.jsonc";try{const o=await fetch(c,{cache:"no-store"});if(!o.ok)return null;const n=await o.text();return JSON.parse(t(n))}catch(o){return console.warn("Pack load failed:",o),null}}export{e as loadPack531BBB,t as stripJsonc};
+//# sourceMappingURL=loadPack-BvEMKa-T.js.map

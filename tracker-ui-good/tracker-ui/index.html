@@ -16,6 +16,41 @@
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
+
+  <!-- Auto-height script for iframe embedding -->
+  <script>
+    function sendHeight() {
+      const height = Math.max(
+        document.body.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.clientHeight,
+        document.documentElement.scrollHeight,
+        document.documentElement.offsetHeight
+      );
+
+      // Send height to parent window
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({
+          type: 'iframe-height',
+          height: height
+        }, '*');
+      }
+    }
+
+    // Send height when page loads
+    window.addEventListener('load', sendHeight);
+
+    // Send height when content changes
+    const observer = new MutationObserver(sendHeight);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true
+    });
+
+    // Send height periodically (fallback)
+    setInterval(sendHeight, 1000);
+  </script>
 </body>
 
 </html>

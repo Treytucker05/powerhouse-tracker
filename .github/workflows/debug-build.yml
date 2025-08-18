@@ -1,0 +1,62 @@
+name: Debug Build Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  debug-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: tracker-ui-good/tracker-ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: tracker-ui-good/tracker-ui/package-lock.json
+          
+      - name: Show environment info
+        run: |
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          echo "Working directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Test build command directly
+        run: |
+          echo "Testing vite build directly..."
+          npx vite build --mode production
+          echo "Build command completed"
+          
+      - name: Check for any dist-like directories
+        run: |
+          echo "Looking for any build output directories..."
+          find . -type d -name "dist*" -o -name "build*" -o -name "out*" 2>/dev/null || echo "No build directories found"
+          echo "All files in current directory:"
+          ls -la
+          
+      - name: Try npm run build
+        run: |
+          echo "Trying npm run build..."
+          npm run build
+          echo "npm run build completed"
+          
+      - name: Final check
+        run: |
+          echo "Final directory check:"
+          ls -la
+          if [ -d "dist" ]; then
+            echo "✅ dist directory found!"
+            ls -la dist/
+          else
+            echo "❌ dist directory still missing"
+          fi

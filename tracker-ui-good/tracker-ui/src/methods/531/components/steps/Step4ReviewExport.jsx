@@ -1,8 +1,7 @@
-import { buildAssistanceForDay } from "../.."; // barrel export
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProgramV2 } from '../../contexts/ProgramContextV2.jsx';
-import { buildMainSetsForLift, buildWarmupSets, roundToIncrement, getWeekScheme } from '../..'; // barrel export
+import { buildMainSetsForLift, buildWarmupSets, roundToIncrement } from '../..'; // barrel export
 import { Info, AlertTriangle, Download, Copy, Printer, CheckCircle2, BookOpen } from 'lucide-react';
 import TemplateExplainerModal from '../../components/TemplateExplainerModal.jsx';
 import { getTemplateSpec, TEMPLATE_SPECS } from '../../../../lib/templates/531.templateSpecs.js';
@@ -17,7 +16,7 @@ import AssistanceCatalogPicker from '../assistance/AssistanceCatalogPicker.jsx';
 import ToggleButton from '../ToggleButton.jsx';
 import { CardioTemplates, pickCardio } from '../../cardioTemplates.js';
 // New planner (hiit/liss distribution + weekday placement logic)
-import { buildConditioningPlan, planConditioningFromState, normalizeConditioningModalities } from '../../../../lib/fiveThreeOne/conditioningPlanner.js';
+import { planConditioningFromState, normalizeConditioningModalities } from '../../../../lib/fiveThreeOne/conditioningPlanner.js';
 
 const LIFT_KEY_MAP = {
     Squat: 'squat',
@@ -98,8 +97,7 @@ export default function Step4ReviewExport({ onReadyChange }) {
     const [exportError, setExportError] = useState(null);
     const [copied, setCopied] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [errors, setErrors] = useState([]);
-    const [warnings, setWarnings] = useState([]);
+    // Removed local errors/warnings state in favor of using comprehensiveValidation directly
 
     const effective = useMemo(() => deriveEffectiveConfig(state), [state]);
 
@@ -171,14 +169,7 @@ export default function Step4ReviewExport({ onReadyChange }) {
     }, [effective, order, supplemental, assistance, assistMode]);
 
     // Update state based on validation results
-    useEffect(() => {
-        if (comprehensiveValidation.errors.length === 0 && !starting) {
-            setErrors([]);
-        } else {
-            setErrors(comprehensiveValidation.errors);
-        }
-        setWarnings(comprehensiveValidation.warnings);
-    }, [comprehensiveValidation, starting]);
+    // Validation side-effects collapsed (was only mirroring comprehensiveValidation into local state)
 
     const roundingMode = typeof effective.rounding === 'string' ? effective.rounding : (effective.rounding?.mode || 'nearest');
     const roundingIncrement = typeof effective.rounding === 'object' ? (effective.rounding.increment || 5) : (effective.units === 'kg' ? 2.5 : 5);
@@ -254,7 +245,7 @@ export default function Step4ReviewExport({ onReadyChange }) {
 
     useEffect(() => { onReadyChange && onReadyChange(validation.valid); }, [validation, onReadyChange]);
 
-    const percentMatrix = useMemo(() => getWeekScheme(loadingOption), [loadingOption]);
+    // Removed unused percentMatrix
 
     function mapLiftDisplayName(liftDisplay) {
         const key = LIFT_KEY_MAP[liftDisplay] || liftDisplay.toLowerCase();
@@ -286,7 +277,6 @@ export default function Step4ReviewExport({ onReadyChange }) {
     // Build weeks JSON for export (optionally omit Deload week if user skipped)
     const weeksData = useMemo(() => {
         const skipDeload = state?.advanced?.skipDeload === true;
-        const assistancePack = state.templateKey || state.assistance?.templateId || (assistance.mode === 'jack_shit' ? 'jack_shit' : 'triumvirate');
         const indexes = skipDeload ? [0, 1, 2] : [0, 1, 2, 3];
         const weeks = indexes.map(wi => {
             const daysData = order.map((displayLift) => {
@@ -505,7 +495,9 @@ export default function Step4ReviewExport({ onReadyChange }) {
             const totalReps = mainReps + suppReps + assistReps;
             const totalTonnage = mainTonnage + suppTonnage; // assistance tonnage ignored (no load data)
             const byBlock = sumRepsByBlock(day);
-            const blockWarnings = Object.entries(byBlock).filter(([_, v]) => v > 100).map(([blk]) => `High ${blk} volume (>100 reps)`);
+            const blockWarnings = Object.entries(byBlock)
+                .filter(entry => entry[1] > 100)
+                .map(([blk]) => `High ${blk} volume (>100 reps)`);
             const warnings = [];
             if (blockWarnings.length) warnings.push(...blockWarnings);
             if (suppPctWarning) warnings.push('BBB >50% TM');
@@ -515,17 +507,12 @@ export default function Step4ReviewExport({ onReadyChange }) {
     }, [previewWeek, supplemental.percentOfTM, supplemental.strategy]);
 
     // Assistance editing (custom mode only)
-    const [showAssistEditor, setShowAssistEditor] = useState(false);
-    useEffect(() => {
-        if (assistMode === 'custom') setShowAssistEditor(true);
-    }, [assistMode]);
+    // Removed showAssistEditor (unused)
 
-    async function onStartCycle() {
+    async function handleStartProgram() {
         setStarting(true);
         try {
-            // Reuse exportJson as payload (already structured)
-            const programPayload = exportJson;
-            // Persist using existing helper for consistency with TrainToday
+            const programPayload = exportJson; // already structured
             try {
                 const { persistActiveCycle } = await import('../../../../lib/fiveThreeOne/persistCycle.js');
                 persistActiveCycle(programPayload);
@@ -869,7 +856,6 @@ export default function Step4ReviewExport({ onReadyChange }) {
 }
 
 function TemplateChangeOverlay({ open, onClose, state, dispatch, currentKey, pendingKey, setPendingKey, assistMode, confirmSwitch, setConfirmSwitch }) {
-    const [tab, setTab] = useState('pick');
     if (!open) return null;
     const specs = Object.values(TEMPLATE_SPECS);
 

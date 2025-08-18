@@ -197,7 +197,7 @@ const GoalsAndNeeds = ({ assessmentData, onNext, canGoNext }) => {
                         <p className="text-gray-300 mb-4">No assessment data available</p>
                         <button
                             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                            onClick={() => window.location.href = '/assessment'}
+                            onClick={() => window.location.href = `${import.meta.env.BASE_URL}assessment`}
                         >
                             Complete Assessment First
                         </button>

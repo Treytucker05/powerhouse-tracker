@@ -1,0 +1,6 @@
+// Public copy of core schema (JSONC)
+// Synchronized from /methodology/core/core.schema.v1.jsonc
+{
+    "$schema": "// Core Schema v1 (JSONC)",
+    "coreVersion": "1.0.0"
+}
