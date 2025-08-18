@@ -26,7 +26,7 @@ document.documentElement.classList.add('dark');
         const url = typeof input === 'string' ? input : (input && input.url) || '';
         if (url.includes('/auth')) {
           const method = (init && init.method) || (typeof input === 'object' && input.method) || 'GET';
-            // Build a stable key to avoid duplicate noisy logs
+          // Build a stable key to avoid duplicate noisy logs
           const key = method + ' ' + url;
           if (!loggedOnce.has(key)) {
             loggedOnce.add(key);

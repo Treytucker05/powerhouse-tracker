@@ -6,9 +6,9 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIU
 
 // Debug logging (safe subset) – remove or gate behind dev flag later if noisy
 console.log('[SupabaseClient] mode=env');
-console.log('[SupabaseClient] import.meta.env keys:', Object.keys(import.meta.env).filter(k=>k.startsWith('VITE_')));
+console.log('[SupabaseClient] import.meta.env keys:', Object.keys(import.meta.env).filter(k => k.startsWith('VITE_')));
 console.log('[SupabaseClient] URL resolved:', supabaseUrl);
-console.log('[SupabaseClient] Key prefix:', supabaseAnonKey.substring(0,12) + '...');
+console.log('[SupabaseClient] Key prefix:', supabaseAnonKey.substring(0, 12) + '...');
 
 // Lightweight in-memory mock for test environment to avoid any network/filesystem flakiness
 export const supabase = (process.env.NODE_ENV === 'test') ? {
