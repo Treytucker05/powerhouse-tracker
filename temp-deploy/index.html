@@ -21,7 +21,8 @@
 </head>
 
 <body>
-  <div id="root"></div>
+  <div id="root"></div>
+
 
   <script>
 (function () {
@@ -31,7 +32,9 @@
         document.body.scrollHeight,
         document.documentElement.scrollHeight,
         document.documentElement.offsetHeight
-      );
+      // TODO: Replace with your actual allowed parent origin
+      const ALLOWED_PARENT_ORIGIN = 'https://your-allowed-domain.com';
+      window.parent.postMessage({ phxHeight: h }, ALLOWED_PARENT_ORIGIN);
       window.parent.postMessage({ phxHeight: h }, '*');
     }
   }
