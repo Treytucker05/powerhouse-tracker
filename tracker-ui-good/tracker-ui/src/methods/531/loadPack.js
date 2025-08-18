@@ -1,5 +1,5 @@
 // Minimal JSONC strip (handles // and /* */ comments)
-import { assetUrl } from '../lib/assetUrl.js';
+import { assetUrl } from '../../lib/assetUrl.js';
 const stripJsonc = (s) =>
     s
         .replace(/\/\*[\s\S]*?\*\//g, "") // block comments
