@@ -119,12 +119,13 @@ export default function Step4ReviewExport({ onReadyChange }) {
     const includeWarmups = scheduleDesign.includeWarmups !== false;
     const warmupScheme = scheduleDesign.warmupScheme || { percentages: [40, 50, 60], reps: [5, 5, 3] };
 
-    const trainingMaxes = {
-        squat: effective.lifts?.squat?.tm || 0,
-        bench: effective.lifts?.bench?.tm || 0,
-        deadlift: effective.lifts?.deadlift?.tm || 0,
-        press: effective.lifts?.press?.tm || 0
-    };
+    // Unified training max map: prefer explicit state.trainingMaxes (kept in sync by reducer) then per-lift tm values
+    const trainingMaxes = useMemo(() => ({
+        squat: (state.trainingMaxes?.squat ?? effective.lifts?.squat?.tm) || 0,
+        bench: (state.trainingMaxes?.bench ?? effective.lifts?.bench?.tm) || 0,
+        deadlift: (state.trainingMaxes?.deadlift ?? effective.lifts?.deadlift?.tm) || 0,
+        press: (state.trainingMaxes?.press ?? effective.lifts?.press?.tm) || 0
+    }), [state.trainingMaxes, effective.lifts?.squat?.tm, effective.lifts?.bench?.tm, effective.lifts?.deadlift?.tm, effective.lifts?.press?.tm]);
 
     // Declare variables before useMemo to avoid "Cannot access before initialization" error
     const supplemental = effective.supplemental || { strategy: 'none' };
@@ -138,9 +139,9 @@ export default function Step4ReviewExport({ onReadyChange }) {
         const warnings = [];
 
         // Training maxes validation
-        const trainingMaxes = effective.trainingMax || {};
+        const tmMap = state.trainingMaxes || effective.trainingMax || trainingMaxes || {};
         order.forEach(lift => {
-            if (!trainingMaxes[lift.toLowerCase()] || trainingMaxes[lift.toLowerCase()] <= 0) {
+            if (!tmMap[lift.toLowerCase()] || tmMap[lift.toLowerCase()] <= 0) {
                 errors.push(`Training max for ${lift} is required`);
             }
         });

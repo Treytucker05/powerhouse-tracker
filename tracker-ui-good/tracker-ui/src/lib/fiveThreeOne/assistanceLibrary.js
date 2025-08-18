@@ -63,7 +63,8 @@ export const TRIUMVIRATE_DEFAULTS = {
         { ref: 'rows', sets: 5, reps: 10 }      // Fixed: DB Rows per p. 48
     ],
     deadlift: [
-        { ref: 'goodmornings', sets: 5, reps: 10 },
+        // Book p.47–48 specifies 5×12 for Good Mornings in Triumvirate (was 5×10 here)
+        { ref: 'goodmornings', sets: 5, reps: 12 },
         { ref: 'hlr', sets: 5, reps: 15 }
     ],
     squat: [

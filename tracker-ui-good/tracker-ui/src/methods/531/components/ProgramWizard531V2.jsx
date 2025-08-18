@@ -685,7 +685,7 @@ function WizardShell() {
         // Apply updated lift TMs
         for (const lift of Object.keys(nextState.lifts || {})) {
             const tmVal = nextState.lifts[lift].tm;
-            dispatch({ type: 'SET_TM', lift, tm: tmVal });
+            dispatch({ type: 'SET_TRAINING_MAX', lift, tm: tmVal });
         }
         dispatch({ type: 'SET_ADVANCED', advanced: { ...(state.advanced || {}), cycle: nextState.cycle } });
         console.info('Cycle advanced:', { cycle: nextState.cycle, nextTms: nextState.tms });
@@ -797,7 +797,7 @@ function WizardShell() {
 
                                 // Update the state with the new TMs and cycle info
                                 Object.entries(nextState.lifts || {}).forEach(([lift, liftData]) => {
-                                    dispatch({ type: 'SET_TM', lift, tm: liftData.tm });
+                                    dispatch({ type: 'SET_TRAINING_MAX', lift, tm: liftData.tm });
                                 });
 
                                 // Update cycle and history

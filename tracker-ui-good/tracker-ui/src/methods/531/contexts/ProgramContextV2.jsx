@@ -98,6 +98,7 @@ export const initialProgramV2 = {
         deadlift: { name: 'deadlift', oneRM: null, tm: null },
         press: { name: 'press', oneRM: null, tm: null }
     },
+    trainingMaxes: {}, // flat per-lift TM map kept in sync via SET_TRAINING_MAX / SET_TM
     // Legacy schedule structure retained (variant + object days) PLUS enhanced design fields
     schedule: {
         variant: '4day',
@@ -171,9 +172,19 @@ function reducerV2(state, action) {
             ...state,
             lifts: { ...state.lifts, [action.lift]: { ...state.lifts[action.lift], oneRM: action.oneRM } }
         };
+        case 'SET_TRAINING_MAX': { // unified TM writer (lifts + flat map)
+            const { lift, tm } = action;
+            return {
+                ...state,
+                lifts: { ...state.lifts, [lift]: { ...state.lifts[lift], tm } },
+                trainingMaxes: { ...(state.trainingMaxes || {}), [lift]: tm }
+            };
+        }
         case 'SET_TM': return {
             ...state,
-            lifts: { ...state.lifts, [action.lift]: { ...state.lifts[action.lift], tm: action.tm } }
+            // Back-compat: keep legacy action updating both shapes to avoid drift
+            lifts: { ...state.lifts, [action.lift]: { ...state.lifts[action.lift], tm: action.tm } },
+            trainingMaxes: { ...(state.trainingMaxes || {}), [action.lift]: action.tm }
         };
         case 'SET_DAYS_PER_WEEK': return { ...state, daysPerWeek: Number(action.payload) };
         case 'BULK_SET_LIFTS': return { ...state, lifts: { ...state.lifts, ...action.lifts } };

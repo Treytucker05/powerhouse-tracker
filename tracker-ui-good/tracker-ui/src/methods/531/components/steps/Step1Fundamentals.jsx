@@ -117,6 +117,12 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
             });
 
             dispatch({ type: 'BULK_SET_LIFTS', lifts: liftData });
+            // Explicitly persist each TM into unified trainingMaxes map for downstream steps
+            Object.entries(liftData).forEach(([liftKey, data]) => {
+                if (Number(data.tm) > 0) {
+                    dispatch({ type: 'SET_TRAINING_MAX', lift: liftKey, tm: data.tm });
+                }
+            });
 
             // Trigger auto-saved flash
             setAutoSaved(true);
