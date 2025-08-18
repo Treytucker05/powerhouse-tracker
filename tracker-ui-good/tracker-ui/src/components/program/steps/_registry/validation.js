@@ -12,9 +12,11 @@ export function validateFundamentals(state) {
         const L = state?.lifts?.[k] || {};
         const haveTM = isNum(L.tm);
         const have1RM = isNum(L.oneRM);
-        const tmPct = L.tmPercent ?? state?.tmPercent ?? 90;
+        const tmPctDec = (typeof L.tmPct === 'number' && L.tmPct <= 1)
+            ? L.tmPct
+            : (typeof state?.tmPct === 'number' && state.tmPct > 0 && state.tmPct <= 1 ? state.tmPct : 0.90);
         if (!(haveTM || have1RM)) errs.push(`Enter TM or 1RM for ${k}`);
-        if (!(tmPct >= 80 && tmPct <= 95)) errs.push(`TM% for ${k} should be 85–90 (got ${tmPct || 'unset'})`);
+        if (!(tmPctDec >= 0.80 && tmPctDec <= 0.95)) errs.push(`TM% for ${k} should be 85–90 (got ${Math.round(tmPctDec * 100) || 'unset'})`);
     }
     const roundingInc = state?.rounding?.increment;
     if (!isNum(roundingInc)) errs.push('Set a weight rounding increment (e.g., 5 lb or 2.5 kg)');

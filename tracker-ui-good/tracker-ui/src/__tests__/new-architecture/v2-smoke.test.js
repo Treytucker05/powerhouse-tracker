@@ -5,7 +5,8 @@
 
 import { describe, test, expect } from 'vitest';
 import { initialProgramV2 } from '../../methods/531/contexts/ProgramContextV2.jsx';
-import { generateCycle, getWeekScheme, roundToIncrement, calcSetWeight } from '../../methods/531';
+import { generateCycle, getWeekScheme, calcSetWeight } from '../../methods/531';
+import { roundToIncrement, roundUpToIncrement } from '../../lib/math/rounding.ts';
 
 describe('5/3/1 V2 Architecture Smoke Test', () => {
     test('initialProgramV2 has correct structure', () => {
@@ -18,9 +19,12 @@ describe('5/3/1 V2 Architecture Smoke Test', () => {
     });
 
     test('roundToIncrement works correctly', () => {
-        expect(roundToIncrement(267, 'lb', 'ceil')).toBe(270); // rounds up to nearest 5
-        expect(roundToIncrement(267, 'kg', 'ceil')).toBe(267.5); // rounds up to nearest 2.5
-        expect(roundToIncrement(267, 'lb', 'nearest')).toBe(265); // rounds to nearest 5
+        // Nearest (default) with 5 increment
+        expect(roundToIncrement(267, 5)).toBe(265);
+        // Explicit ceiling via wrapper
+        expect(roundUpToIncrement(267, 5)).toBe(270);
+        // kg style increment 2.5
+        expect(roundUpToIncrement(267, 2.5)).toBe(267.5);
     });
 
     test('getWeekScheme returns correct percentages', () => {

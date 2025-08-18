@@ -1,5 +1,9 @@
 // src/lib/fiveThreeOne/compute531.js
 // Pure functions to build a 4-week 5/3/1 plan from wizard state
+// NOTE: Rounding utilities consolidated in lib/math/rounding.ts
+
+import { roundToIncrement, roundUpToIncrement } from '../math/rounding.ts';
+import { getTmPct } from '../tm.ts';
 
 // Internal array form used by buildProgram/mainSetsFor
 const LOADING_OPTIONS_ARRAY = {
@@ -57,22 +61,20 @@ export function getMainSetScheme(option = 1, week = 1) {
     return PERCENT_SCHEMES[opt][w];
 }
 
-export function roundToIncrement(value, inc = 5, mode = 'nearest') {
-    if (!inc || inc <= 0) return Math.round(value);
-    const x = value / inc;
-    if (mode === 'floor') return Math.floor(x) * inc;
-    if (mode === 'ceiling') return Math.ceil(x) * inc;
-    return Math.round(x) * inc;
-}
+// Legacy local implementation removed; imported version supports (value, inc, mode?)
 
 function pctOfTM(tm, pct) {
     return tm * (pct / 100);
 }
 
+// getTmPct now sourced from central tm.ts (returns decimal 0.xx)
+
 export function effectiveTM(lift, state) {
     const l = state?.lifts?.[lift] || {};
-    const tmPct = l.tmPercent ?? state?.tmPercent ?? 90;
-    const base = l.tm ?? (l.oneRM ? l.oneRM * (tmPct / 100) : null);
+    const tmPct = (typeof l.tmPct === 'number' && l.tmPct > 0 && l.tmPct <= 1)
+        ? l.tmPct
+        : getTmPct(state);
+    const base = l.tm ?? (l.oneRM ? l.oneRM * tmPct : null); // tmPct already decimal
     if (!base) return null;
     const inc = state?.rounding?.increment ?? (state?.units === 'kg' ? 2.5 : 5);
     const mode = state?.rounding?.mode ?? 'nearest';

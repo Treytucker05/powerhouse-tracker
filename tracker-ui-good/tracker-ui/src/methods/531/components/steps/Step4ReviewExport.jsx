@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProgramV2 } from '../../contexts/ProgramContextV2.jsx';
-import { buildMainSetsForLift, buildWarmupSets, roundToIncrement } from '../..'; // barrel export
+import { buildMainSetsForLift, buildWarmupSets } from '../..'; // barrel export
+import { roundToIncrement } from '../../../../lib/math/rounding.ts';
 import { Info, AlertTriangle, Download, Copy, Printer, CheckCircle2, BookOpen } from 'lucide-react';
 import TemplateExplainerModal from '../../components/TemplateExplainerModal.jsx';
 import { getTemplateSpec, TEMPLATE_SPECS } from '../../../../lib/templates/531.templateSpecs.js';

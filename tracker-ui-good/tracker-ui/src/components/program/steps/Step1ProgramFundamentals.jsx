@@ -3,7 +3,9 @@ import React, { useMemo } from 'react';
 import { Info, AlertTriangle, CheckCircle, Calculator, Wand2, Sliders, Ruler } from 'lucide-react';
 import StepStatusPill from './_shared/StepStatusPill.jsx';
 import { STEP_IDS } from './_registry/stepRegistry.js';
-import { estimate1RM, roundToIncrement } from '../../../lib/fiveThreeOne/compute531.js';
+import { estimate1RM } from '../../../lib/fiveThreeOne/compute531.js';
+import { roundToIncrement } from '../../../lib/math/rounding.ts';
+import { getTmPct } from '../../../lib/tm.ts';
 
 const LIFT_ORDER = ['press', 'deadlift', 'bench', 'squat'];
 const LIFT_LABEL = { press: 'Overhead Press', bench: 'Bench Press', deadlift: 'Deadlift', squat: 'Back Squat' };
@@ -19,13 +21,14 @@ export default function Step1ProgramFundamentals({ data, updateData }) {
     // ----- GLOBAL CONTROLS -----
     const units = state.units ?? 'lb';
     const rounding = state.rounding || { increment: units === 'kg' ? 2.5 : 5, mode: 'nearest' };
-    const tmPercentGlobal = state.tmPercent ?? 90;
+    const tmPctDecimal = getTmPct(state); // canonical decimal (0.80–0.95 typical)
+    const tmPctGlobalInt = Math.round(tmPctDecimal * 100); // integer 80-95
 
     const lifts = state.lifts || {
-        squat: { oneRM: null, tm: null, tmPercent: 90 },
-        bench: { oneRM: null, tm: null, tmPercent: 90 },
-        deadlift: { oneRM: null, tm: null, tmPercent: 90 },
-        press: { oneRM: null, tm: null, tmPercent: 90 },
+        squat: { oneRM: null, tm: null, tmPct: tmPctDecimal },
+        bench: { oneRM: null, tm: null, tmPct: tmPctDecimal },
+        deadlift: { oneRM: null, tm: null, tmPct: tmPctDecimal },
+        press: { oneRM: null, tm: null, tmPct: tmPctDecimal },
     };
     const enabled = state.coreLiftsEnabled || { squat: true, bench: true, deadlift: true, press: true };
 
@@ -45,12 +48,13 @@ export default function Step1ProgramFundamentals({ data, updateData }) {
         updateData({ ...state, coreLiftsEnabled: { ...enabled, [lift]: on } });
     };
 
-    const applyTMPercentToAll = (pct) => {
+    const applyTmPctToAll = (pctInt) => {
+        const pctDecimal = pctInt / 100;
         const next = { ...lifts };
         for (const k of Object.keys(next)) {
-            next[k] = { ...(next[k] || {}), tmPercent: pct };
+            next[k] = { ...(next[k] || {}), tmPct: pctDecimal };
         }
-        updateData({ ...state, tmPercent: pct, lifts: next });
+        updateData({ ...state, tmPct: pctDecimal, lifts: next });
     };
 
     const computeTM = (oneRM, tmPct, inc, mode) => {
@@ -75,10 +79,13 @@ export default function Step1ProgramFundamentals({ data, updateData }) {
         for (const k of Object.keys(next)) {
             if (!enabled[k]) continue;
             const lo = next[k] || {};
-            const tmPct = numOrNull(lo.tmPercent) ?? tmPercentGlobal ?? 90;
+            // Prefer per-lift decimal if present, else global
+            const tmPctPercent = (typeof lo.tmPct === 'number' && lo.tmPct <= 1)
+                ? Math.round(lo.tmPct * 100)
+                : tmPctGlobalInt;
             const one = inferOneRM(lo);
-            const tm = computeTM(one, tmPct, inc, mode);
-            next[k] = { ...lo, oneRM: one, tm };
+            const tm = computeTM(one, tmPctPercent, inc, mode);
+            next[k] = { ...lo, oneRM: one, tm, tmPct: tmPctPercent / 100 };
         }
         updateData({ ...state, lifts: next });
     };
@@ -142,7 +149,7 @@ export default function Step1ProgramFundamentals({ data, updateData }) {
                         <Sliders className="w-5 h-5" /> Global Settings
                     </div>
                     <button
-                        onClick={() => applyTMPercentToAll(tmPercentGlobal)}
+                        onClick={() => applyTmPctToAll(tmPctGlobalInt)}
                         className="inline-flex items-center gap-2 text-sm px-3 py-1 border border-red-500 rounded hover:bg-red-600/10"
                         title="Apply this TM% to all lifts"
                     >
@@ -202,8 +209,11 @@ export default function Step1ProgramFundamentals({ data, updateData }) {
                             type="number"
                             min="80"
                             max="95"
-                            value={tmPercentGlobal}
-                            onChange={(e) => setGlobal({ tmPercent: Math.max(80, Math.min(95, Number(e.target.value) || 90)) })}
+                            value={tmPctGlobalInt}
+                            onChange={(e) => {
+                                const pct = Math.max(80, Math.min(95, Number(e.target.value) || 90));
+                                setGlobal({ tmPct: pct / 100 });
+                            }}
                             className="bg-gray-800 border border-gray-600 text-white rounded px-2 py-1"
                         />
                         <span className="text-xs text-gray-500 mt-1">Wendler default: 90%</span>
@@ -216,9 +226,8 @@ export default function Step1ProgramFundamentals({ data, updateData }) {
                 {LIFT_ORDER.map((lift) => {
                     const L = lifts[lift] || {};
                     const on = enabled[lift] ?? true;
-                    const tmPct = numOrNull(L.tmPercent) ?? tmPercentGlobal ?? 90;
-
                     const oneRM = inferOneRM(L);
+                    const tmPct = (typeof L.tmPct === 'number' && L.tmPct <= 1) ? L.tmPct : (tmPctGlobalInt / 100);
                     const inc = rounding?.increment ?? (units === 'kg' ? 2.5 : 5);
                     const mode = rounding?.mode ?? 'nearest';
                     const suggestedTM = oneRM ? roundToIncrement(oneRM * (tmPct / 100), inc, mode) : null;
@@ -283,8 +292,11 @@ export default function Step1ProgramFundamentals({ data, updateData }) {
                                                 type="number"
                                                 min="80"
                                                 max="95"
-                                                value={tmPct}
-                                                onChange={(e) => setLift(lift, { tmPercent: Math.max(80, Math.min(95, Number(e.target.value) || tmPct)) })}
+                                                value={Math.round(tmPct * 100)}
+                                                onChange={(e) => {
+                                                    const pctVal = Math.max(80, Math.min(95, Number(e.target.value) || Math.round(tmPct * 100)));
+                                                    setLift(lift, { tmPct: pctVal / 100 });
+                                                }}
                                                 className="bg-gray-800 border border-gray-600 text-white rounded px-2 py-1"
                                             />
                                             <span className="text-xs text-gray-500 mt-1">Default comes from Global TM% above.</span>
@@ -326,8 +338,8 @@ export default function Step1ProgramFundamentals({ data, updateData }) {
                                         <button
                                             onClick={() => {
                                                 const one = inferOneRM(L);
-                                                const tm = computeTM(one, tmPct, inc, mode);
-                                                setLift(lift, { oneRM: one, tm });
+                                                const tm = computeTM(one, Math.round(tmPct * 100), inc, mode);
+                                                setLift(lift, { oneRM: one, tm, tmPct });
                                             }}
                                             className="inline-flex items-center gap-2 px-3 py-1 border border-blue-500 rounded hover:bg-blue-600/10"
                                         >

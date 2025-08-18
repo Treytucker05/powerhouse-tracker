@@ -1,5 +1,5 @@
 // src/lib/fiveThreeOne/warmup.js
-import { roundToIncrement } from './compute531.js';
+import { roundToIncrement } from '../math/rounding.ts';
 
 /**
  * Default 5/3/1 warm-up per Wendler:

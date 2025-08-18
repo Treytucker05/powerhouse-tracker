@@ -7,8 +7,9 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import ToggleButton from '../ToggleButton.jsx';
 import { Info, AlertTriangle, Calculator, Copy, CheckCircle2 } from 'lucide-react';
 import { useProgramV2 } from '../../contexts/ProgramContextV2.jsx';
-import { roundToIncrement } from '../..'; // barrel export
+import { roundToIncrement } from '../../../../lib/math/rounding.ts';
 import { UNITS, incrementFor } from '../../../../lib/units.ts';
+import { getTmPct } from '../../../../lib/tm.ts';
 
 // Wendler e1RM formula: e1RM = weight * (1 + 0.0333 * reps)
 const calculateE1RM = (weight, reps) => {
@@ -42,8 +43,8 @@ const LIFT_LABELS = {
 export default function Step1Fundamentals({ onValidChange, flashToken, missing = [] }) {
     const { state, dispatch } = useProgramV2();
 
-    // helper: accept 0.90/0.85 or 90/85, return integer percent
-    const readTmPercent = (s) => s?.tmPct ? Math.round(s.tmPct * 100) : null;
+    // Helper: read canonical tmPct (decimal) from state
+    const readTmPctInt = (s) => Math.round(getTmPct(s) * 100);
 
     // Local working state for smooth typing
     const [showUnitConvert, setShowUnitConvert] = useState(false);
@@ -51,7 +52,7 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
     const [localState, setLocalState] = useState({
         units: state.units === 'lb' ? UNITS.LBS : state.units,
         rounding: state.rounding,
-        tmPct: state.tmPct,
+        tmPct: getTmPct(state),
         lifts: {
             squat: { oneRM: state.lifts.squat.oneRM || '', repWeight: '', repCount: '', tmOverride: '', activeMethod: 'oneRM' },
             bench: { oneRM: state.lifts.bench.oneRM || '', repWeight: '', repCount: '', tmOverride: '', activeMethod: 'oneRM' },
@@ -88,7 +89,7 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
         const timeoutId = setTimeout(() => {
             dispatch({ type: 'SET_UNITS', units: localState.units });
             dispatch({ type: 'SET_ROUNDING', rounding: localState.rounding });
-            dispatch({ type: 'SET_TM_PCT', tmPct: localState.tmPct });
+            dispatch({ type: 'SET_TM_PCT', tmPct: localState.tmPct }); // canonical decimal
 
             // Calculate and dispatch final lift data
             const liftData = {};
@@ -133,7 +134,7 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
 
     // Validation check
     const isValid = useMemo(() => {
-        const pct = readTmPercent(state);
+        const pct = readTmPctInt(state);
         const tmOk = Number.isFinite(pct) && pct >= 80 && pct <= 95;
         const liftsOk = Object.keys(localState.lifts).every(liftKey => {
             const lift = localState.lifts[liftKey];
@@ -444,7 +445,7 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
                             {[90, 85].map(p => (
                                 <ToggleButton
                                     key={p}
-                                    on={readTmPercent(localState) === p}
+                                    on={readTmPctInt(localState) === p}
                                     onClick={() => {
                                         updateLocalState({ tmPct: p / 100 });
                                         dispatch({ type: 'SET_TM_PCT', tmPct: p / 100 });

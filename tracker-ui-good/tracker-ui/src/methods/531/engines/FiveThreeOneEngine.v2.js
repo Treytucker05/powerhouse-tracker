@@ -3,26 +3,12 @@
  * Pure utility functions for 5/3/1 calculations and cycle generation.
  * Legacy FiveThreeOneEngine.js remains for existing pages compatibility.
  */
+import { roundToIncrement, roundUpToIncrement, roundDownToIncrement } from '../../../lib/math/rounding.ts';
 
 // Rounds to increment (overloaded for backward compatibility)
 // New signature expectation: roundToIncrement(value, increment = 5, mode = 'nearest')
 // Legacy calls used: roundToIncrement(value, units('lb'|'kg'), mode)
-export function roundToIncrement(value, increment = 5, mode = 'nearest') {
-    if (!Number.isFinite(value)) return 0;
-    let inc = 5;
-    let roundingMode = mode || 'nearest';
-    // Backward compat: if second arg is a string treat it as units
-    if (typeof increment === 'string') {
-        const units = increment;
-        inc = units === 'kg' ? 2.5 : 5;
-    } else if (typeof increment === 'number') {
-        inc = increment > 0 ? increment : 5;
-    }
-    if (roundingMode === 'ceil') return Math.ceil(value / inc) * inc;
-    if (roundingMode === 'floor') return Math.floor(value / inc) * inc;
-    // default nearest
-    return Math.round(value / inc) * inc;
-}
+// Centralized rounding imported (legacy local implementation removed)
 
 // Returns [{pct, reps, amrap}, ...] for weekIndex 0..3
 export function getWeekScheme(option = 1, weekIndex = 0) {
