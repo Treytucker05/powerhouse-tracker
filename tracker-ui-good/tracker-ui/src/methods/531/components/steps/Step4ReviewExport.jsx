@@ -15,8 +15,8 @@ import AssistanceRow from '../assistance/AssistanceRow.jsx';
 import AssistanceCatalogPicker from '../assistance/AssistanceCatalogPicker.jsx';
 import ToggleButton from '../ToggleButton.jsx';
 import { CardioTemplates, pickCardio } from '../../cardioTemplates.js';
-// New planner (hiit/liss distribution + weekday placement logic)
 import { planConditioningFromState, normalizeConditioningModalities } from '../../../../lib/fiveThreeOne/conditioningPlanner.js';
+import { selectTrainingMax } from '../../../../lib/selectors/programSelectors.js';
 
 const LIFT_KEY_MAP = {
     Squat: 'squat',
@@ -121,10 +121,10 @@ export default function Step4ReviewExport({ onReadyChange }) {
 
     // Unified training max map: prefer explicit state.trainingMaxes (kept in sync by reducer) then per-lift tm values
     const trainingMaxes = useMemo(() => ({
-        squat: (state.trainingMaxes?.squat ?? effective.lifts?.squat?.tm) || 0,
-        bench: (state.trainingMaxes?.bench ?? effective.lifts?.bench?.tm) || 0,
-        deadlift: (state.trainingMaxes?.deadlift ?? effective.lifts?.deadlift?.tm) || 0,
-        press: (state.trainingMaxes?.press ?? effective.lifts?.press?.tm) || 0
+        squat: selectTrainingMax(state, 'squat'),
+        bench: selectTrainingMax(state, 'bench'),
+        deadlift: selectTrainingMax(state, 'deadlift'),
+        press: selectTrainingMax(state, 'press')
     }), [state.trainingMaxes, effective.lifts?.squat?.tm, effective.lifts?.bench?.tm, effective.lifts?.deadlift?.tm, effective.lifts?.press?.tm]);
 
     // Declare variables before useMemo to avoid "Cannot access before initialization" error

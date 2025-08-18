@@ -113,6 +113,15 @@ function WizardShell() {
     const { state, dispatch } = useProgramV2();
     const packRef = useRef(null);
 
+    // TEMP debug: mirror unified training max map to localStorage so we can verify persistence outside primary storage
+    useEffect(() => {
+        try {
+            if (state?.trainingMaxes) {
+                localStorage.setItem('ph531.tm.debug', JSON.stringify(state.trainingMaxes));
+            }
+        } catch { /* ignore quota / access errors */ }
+    }, [state?.trainingMaxes]);
+
     // Sync stepIndex with URL parameter changes and update page title
     useEffect(() => {
         const urlStep = getStepIndexFromUrl();
@@ -612,6 +621,17 @@ function WizardShell() {
             if (stepIndex === 0) {
                 setStep1Error(null);
                 setStep1Missing([]);
+                // Explicitly persist current training maxes using unified action before leaving Fundamentals
+                try {
+                    const liftsMap = state?.lifts || {};
+                    const order = ['press', 'deadlift', 'bench', 'squat']; // dispatch order not critical, but stable
+                    order.forEach(lift => {
+                        const tmVal = liftsMap?.[lift]?.tm;
+                        if (Number.isFinite(tmVal) && tmVal > 0) {
+                            dispatch({ type: 'SET_TRAINING_MAX', lift, tm: tmVal });
+                        }
+                    });
+                } catch { /* no-op safeguard */ }
             }
             const nextStep = stepIndex + 1;
             setStepIndex(nextStep);
