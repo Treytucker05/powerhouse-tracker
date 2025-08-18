@@ -30,3 +30,7 @@ export function toDisplayWeight(value, mode = 'nearest') {
     // Assuming storage is already in user unit. Extend later if needed.
     return roundToIncrement(Number(value || 0), getIncrementForUnit(), mode);
 }
+
+// Backward compatibility: legacy modules imported roundToIncrement from this file.
+// Re-export the centralized implementations so existing callers continue to work.
+export { roundToIncrement, roundUpToIncrement, roundDownToIncrement } from '../math/rounding.ts';

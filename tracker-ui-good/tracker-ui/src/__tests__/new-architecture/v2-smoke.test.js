@@ -10,8 +10,9 @@ import { roundToIncrement, roundUpToIncrement } from '../../lib/math/rounding.ts
 
 describe('5/3/1 V2 Architecture Smoke Test', () => {
     test('initialProgramV2 has correct structure', () => {
-        expect(initialProgramV2.units).toBe('lb');
-        expect(initialProgramV2.rounding).toBe('ceil');
+        // Current canonical defaults: units 'lbs' (plural) and rounding 'nearest'
+        expect(initialProgramV2.units).toBe('lbs');
+        expect(initialProgramV2.rounding).toBe('nearest');
         expect(initialProgramV2.tmPct).toBe(0.90);
         expect(initialProgramV2.lifts.squat.name).toBe('squat');
         expect(initialProgramV2.schedule.variant).toBe('4day');

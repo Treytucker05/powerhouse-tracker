@@ -1,0 +1,41 @@
+{
+    "id": "template.bbs",
+    "type": "template",
+    "name": "Boring But Strong (BBS)",
+    "version": "1.0.0",
+    "params": {
+        "definition": "10×5 at ~FSL weight after main lift",
+        "percentages": {
+            "start": 0.65,
+            "progression": [
+                0.70,
+                0.75,
+                0.80,
+                0.85
+            ],
+            "citations": [
+                "oaicite:42",
+                "oaicite:43"
+            ]
+        },
+        "volume": {
+            "sets": 10,
+            "reps": 5,
+            "total": 50,
+            "citations": [
+                "oaicite:41",
+                "oaicite:44"
+            ]
+        },
+        "useCase": {
+            "population": "intermediate_advanced",
+            "citations": [
+                "oaicite:45",
+                "oaicite:46"
+            ]
+        },
+        "deload": {
+            "note": "mid-cycle deload recommended due to fatigue"
+        }
+    }
+}

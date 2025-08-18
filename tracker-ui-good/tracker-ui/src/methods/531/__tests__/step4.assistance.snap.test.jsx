@@ -32,10 +32,10 @@ function renderStep(statePatch) {
 }
 
 const TEMPLATE_CASES = [
-    ['BBB', TEMPLATE_KEYS.BBB, 2],
+    ['BBB', TEMPLATE_KEYS.BBB, 2], // chinups + ab_wheel
     ['Triumvirate', TEMPLATE_KEYS.TRIUMVIRATE, 2],
     ['Periodization Bible', TEMPLATE_KEYS.PERIODIZATION_BIBLE, 3],
-    ['Bodyweight', TEMPLATE_KEYS.BODYWEIGHT, 3],
+    ['Bodyweight', TEMPLATE_KEYS.BODYWEIGHT, 3], // chinups + dips + hlr
     ['Jack Shit', TEMPLATE_KEYS.JACK_SHIT, 0],
 ];
 

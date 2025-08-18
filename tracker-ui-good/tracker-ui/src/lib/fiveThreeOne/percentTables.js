@@ -1,4 +1,6 @@
 // src/lib/fiveThreeOne/percentTables.js
+// NOTE: Rounding now delegated to centralized roundToIncrement in lib/math/rounding.ts
+import { roundToIncrement } from '../math/rounding.ts';
 
 // Warm-ups used every day before main work sets
 export const WARMUP_SET_PCTS = [40, 50, 60]; // of TM
@@ -19,29 +21,34 @@ export const LOADING_TABLES = {
     }
 };
 
-export const ROUND_TO = (inc = 5) => (w) => Math.round(w / inc) * inc;
+// Deprecated local rounding helper (was ROUND_TO). All callers now use roundToIncrement.
+// Keeping no-op export (removed) would encourage drift; remove and migrate call sites instead.
 
 /** Build warmups (40/50/60% x 5/5/3) for a given TM */
-export function buildWarmups(tm, include = true, roundInc = 5) {
+export function buildWarmups(tm, include = true, roundInc = 5, mode = 'nearest') {
     if (!include) return [];
-    const round = ROUND_TO(roundInc);
     const reps = [5, 5, 3];
-    return WARMUP_SET_PCTS.map((pct, i) => ({
-        type: 'warmup',
-        pct,
-        weight: round(tm * pct / 100),
-        reps: String(reps[i])
-    }));
+    return WARMUP_SET_PCTS.map((pct, i) => {
+        const raw = tm * pct / 100;
+        return {
+            type: 'warmup',
+            pct,
+            weight: roundToIncrement(raw, roundInc, mode),
+            reps: String(reps[i])
+        };
+    });
 }
 
 /** Build main 3 sets for week & loading option */
-export function buildMainSets(tm, loadingOption = 1, week = 1, roundInc = 5) {
-    const round = ROUND_TO(roundInc);
+export function buildMainSets(tm, loadingOption = 1, week = 1, roundInc = 5, mode = 'nearest') {
     const rows = LOADING_TABLES[String(loadingOption)]?.[week] || [];
-    return rows.map(r => ({
-        type: 'main',
-        pct: r.pct,
-        weight: round(tm * r.pct / 100),
-        reps: r.reps
-    }));
+    return rows.map(r => {
+        const raw = tm * r.pct / 100;
+        return {
+            type: 'main',
+            pct: r.pct,
+            weight: roundToIncrement(raw, roundInc, mode),
+            reps: r.reps
+        };
+    });
 }

@@ -1,0 +1,30 @@
+{
+    "id": "template.jackshit",
+    "type": "template",
+    "name": "I'm Not Doing Jack Sh*t",
+    "version": "1.0.0",
+    "params": {
+        "structure": "main lift only, no assistance",
+        "useCase": {
+            "notFor": "beginners",
+            "citations": [
+                "oaicite:31"
+            ]
+        },
+        "advantages": {
+            "citations": [
+                "oaicite:32",
+                "oaicite:33"
+            ]
+        },
+        "deload": {
+            "policy": "standard",
+            "citations": [
+                "oaicite:34"
+            ]
+        }
+    },
+    "citations": [
+        "oaicite:30"
+    ]
+}

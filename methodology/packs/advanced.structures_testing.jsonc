@@ -1,0 +1,226 @@
+{
+    "id": "advanced.structures_testing",
+    "type": "structure",
+    "name": "Advanced 5/3/1 Structures & Testing",
+    "version": "1.0.0",
+    "leaderAnchor": [
+        {
+            "phase": "Leader",
+            "cycleCount": "Typically 2–3 consecutive cycles (often 2 back-to-back).",
+            "cycleCount_citations": [
+                "oaicite:0",
+                "oaicite:1"
+            ],
+            "focus": "Volume accumulation with increased barbell volume via supplemental lifts; fewer all-out sets. Assistance and intense conditioning reduced to prioritize volume and recovery.",
+            "focus_citations": [
+                "oaicite:2",
+                "oaicite:3"
+            ],
+            "deloadPolicy": "No deload during Leader cycles; run Leaders consecutively, then insert a 7th-week deload before starting the Anchor phase.",
+            "deloadPolicy_citations": [
+                "oaicite:4",
+                "oaicite:5"
+            ],
+            "sequencingNotes": "Plan the number of Leader cycles in advance (e.g., 2). Do not push PR sets in Leaders—use fixed-rep work (e.g., 5’s PRO) to build momentum. Avoid extending high-volume Leaders beyond 2–3 cycles to prevent burnout and stagnation.",
+            "sequencingNotes_citations": [
+                "oaicite:6",
+                "oaicite:7",
+                "oaicite:8"
+            ],
+            "citations": [
+                "oaicite:9",
+                "oaicite:10",
+                "oaicite:11",
+                "oaicite:12",
+                "oaicite:13",
+                "oaicite:14",
+                "oaicite:15",
+                "oaicite:16"
+            ]
+        },
+        {
+            "phase": "Anchor",
+            "cycleCount": "Usually 1 cycle (realization/peaking). Sometimes 2 for a longer peak.",
+            "cycleCount_citations": [
+                "oaicite:17",
+                "oaicite:18"
+            ],
+            "focus": "Higher intensity with all-out rep PR sets (and optionally Joker singles). Assistance volume can rise since barbell volume is lower.",
+            "focus_citations": [
+                "oaicite:19",
+                "oaicite:20"
+            ],
+            "deloadPolicy": "Use the 7th Week protocol after Anchor to deload or test TMs before the next block. Insert a deload/test week between Leader and Anchor, and test/adjust TMs after the Anchor.",
+            "deloadPolicy_citations": [
+                "oaicite:21",
+                "oaicite:22"
+            ],
+            "sequencingNotes": "Anchors follow Leaders to realize gains. Push for rep PRs on 5/3/1 weeks and consider Jokers only if performance is strong. After Anchor, adjust TMs based on 7th week test results, then begin the next Leaders.",
+            "sequencingNotes_citations": [
+                "oaicite:23",
+                "oaicite:24"
+            ],
+            "citations": [
+                "oaicite:25",
+                "oaicite:26",
+                "oaicite:27",
+                "oaicite:28",
+                "oaicite:29",
+                "oaicite:30",
+                "oaicite:31",
+                "oaicite:32"
+            ]
+        }
+    ],
+    "anchorTesting": [
+        {
+            "testType": "AMRAP (Rep Max Set)",
+            "guidelines": "On the final work set, perform as many reps as possible beyond the prescribed minimum. Only the last set is AMRAP; earlier sets are not.",
+            "guidelines_citations": [
+                "oaicite:33",
+                "oaicite:34"
+            ],
+            "contraindications": "Do not go to absolute failure; leave a rep in the tank. Skip during deload weeks. If fatigued or having a bad day, do only the required reps. For especially taxing lifts (e.g., deadlift), consider 5’s PRO with no rep-out.",
+            "contraindications_citations": [
+                "oaicite:35",
+                "oaicite:36",
+                "oaicite:37",
+                "oaicite:38"
+            ],
+            "allowedIn": "Primarily in Anchor phases; Leaders often omit AMRAP to prioritize volume/recovery.",
+            "allowedIn_citations": [
+                "oaicite:39"
+            ],
+            "citations": [
+                "oaicite:40",
+                "oaicite:41",
+                "oaicite:42",
+                "oaicite:43",
+                "oaicite:44",
+                "oaicite:45",
+                "oaicite:46"
+            ]
+        },
+        {
+            "testType": "Training Max (TM) Testing",
+            "guidelines": "Performed during the 7th Week protocol (usually after an Anchor) to verify TM. Work up to TM; 85% TM ≈ 5 reps, 90% TM ≈ 3 reps. If you can lift TM with good speed/form, it’s correct for the next cycle.",
+            "guidelines_citations": [
+                "oaicite:47",
+                "oaicite:48"
+            ],
+            "contraindications": "Do not test too frequently—wait at least 3–4 cycles before re-testing true 1RM/TM. Avoid grinding/failing; if TM is a grinder, lower it. TM should be a weight you can hit for 5 clean reps any day.",
+            "contraindications_citations": [
+                "oaicite:49",
+                "oaicite:50"
+            ],
+            "allowedIn": "Designated 7th Week phases (between Leader/Anchor or after Anchor).",
+            "allowedIn_citations": [
+                "oaicite:51"
+            ],
+            "citations": [
+                "oaicite:52",
+                "oaicite:53",
+                "oaicite:54",
+                "oaicite:55",
+                "oaicite:56"
+            ]
+        },
+        {
+            "testType": "Joker Sets (Heavy Singles)",
+            "guidelines": "Optional sets after the top scheduled set. Typically 1–2 sets of 1–3 reps, adding ~5–10% above the day’s heaviest set; use on appropriate heavy weeks.",
+            "guidelines_citations": [
+                "oaicite:57",
+                "oaicite:58",
+                "oaicite:59"
+            ],
+            "contraindications": "Not mandatory; only when performance is excellent. Never miss on Jokers. Limit to 1–2 quality sets; avoid in high-volume Leaders or when recovery is poor.",
+            "contraindications_citations": [
+                "oaicite:60",
+                "oaicite:61"
+            ],
+            "allowedIn": "Almost exclusively in Anchor phases during heavy weeks.",
+            "allowedIn_citations": [
+                "oaicite:62"
+            ],
+            "citations": [
+                "oaicite:63",
+                "oaicite:64",
+                "oaicite:65",
+                "oaicite:66",
+                "oaicite:67"
+            ]
+        }
+    ],
+    "periodizationStrategies": [
+        {
+            "strategyName": "Block Periodization (Leader/Anchor Blocks)",
+            "targetPopulation": "Intermediate to advanced lifters; useful for athletes (off-season vs in-season).",
+            "focus": "Leaders = accumulation (high volume, submax work); Anchors = intensification/realization (higher intensity, PR attempts).",
+            "focus_citations": [
+                "oaicite:68",
+                "oaicite:69"
+            ],
+            "timeFrame": "Common: 2 Leader cycles followed by 1 Anchor cycle (2:1 ratio) as one mesocycle; deload week between blocks. Macrocycle length adjustable (e.g., 2:1 or 3:2).",
+            "timeFrame_citations": [
+                "oaicite:70",
+                "oaicite:71"
+            ],
+            "notes": "Program blocks ahead (3–5 cycles) based on experience. During Leaders emphasize volume/technique; during Anchors reduce volume and raise intensity to realize gains. Always include a 7th Week deload/test between blocks.",
+            "notes_citations": [
+                "oaicite:72",
+                "oaicite:73"
+            ],
+            "citations": [
+                "oaicite:74",
+                "oaicite:75",
+                "oaicite:76",
+                "oaicite:77",
+                "oaicite:78",
+                "oaicite:79"
+            ]
+        },
+        {
+            "strategyName": "Competition Prep (Peak for Meet)",
+            "targetPopulation": "Powerlifters or strength athletes prepping for competition/1RM test.",
+            "focus": "Shift from general volume to specific heavy work approaching the meet; reduce assistance, increase intensity; use competition lifts; practice heavy singles (e.g., Jokers/openers).",
+            "focus_citations": [
+                "oaicite:80"
+            ],
+            "timeFrame": "Typically 6–12 weeks. Build with Leaders, then an Anchor peak. Wait at least 3–4 cycles before testing a true max.",
+            "timeFrame_citations": [
+                "oaicite:81"
+            ],
+            "notes": "Never sacrifice scheduled training to test a max; if testing, do it after the prescribed work. Avoid exotic lifts when peaking—training should mirror the meet. Use the 7th Week to deload or run a mock meet/test as needed.",
+            "notes_citations": [
+                "oaicite:82",
+                "oaicite:83"
+            ],
+            "citations": [
+                "oaicite:84",
+                "oaicite:85",
+                "oaicite:86"
+            ]
+        },
+        {
+            "strategyName": "Physique Emphasis (Hypertrophy Block)",
+            "targetPopulation": "Bodybuilders/physique athletes or anyone prioritizing size/symmetry.",
+            "focus": "High volume, moderate intensity, broad assistance selection (e.g., BBB 5×10) to drive hypertrophy; main lifts progress but volume is the spotlight.",
+            "focus_citations": [
+                "oaicite:87",
+                "oaicite:88"
+            ],
+            "timeFrame": "Often multiple cycles back-to-back (e.g., 3-cycle BBB challenge) with minimal intensity phases; deloads inserted as needed.",
+            "notes": "Use BBB for mass; eat adequately (e.g., high-calorie strategies for hard gainers). Keep TM conservative to allow volume. Minimize hard conditioning to avoid interference; emphasize recovery and steady workload increases.",
+            "notes_citations": [
+                "oaicite:89",
+                "oaicite:90"
+            ],
+            "citations": [
+                "oaicite:91",
+                "oaicite:92",
+                "oaicite:93",
+                "oaicite:94"
+            ]
+        }
+    ]
+}

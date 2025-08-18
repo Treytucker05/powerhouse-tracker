@@ -1,0 +1,29 @@
+{
+    "id": "template.fsl",
+    "type": "template",
+    "name": "First Set Last (FSL)",
+    "version": "1.0.0",
+    "params": {
+        "definition": "Use weight from first work set for extra volume",
+        "percentages": [
+            0.65,
+            0.70,
+            0.75
+        ],
+        "volume": {
+            "common": "5×5",
+            "alt": [
+                "3–5 sets",
+                "1 high-rep set"
+            ],
+            "citations": [
+                "oaicite:37"
+            ]
+        },
+        "purpose": "Technique + volume without top-set strain"
+    },
+    "citations": [
+        "oaicite:35",
+        "oaicite:36"
+    ]
+}

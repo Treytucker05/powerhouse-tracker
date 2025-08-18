@@ -1,0 +1,162 @@
+{
+    "id": "scheme.5spro",
+    "type": "scheme",
+    "name": "5s Pro",
+    "version": "1.0.0",
+    "trainingMax": {
+        "pct": 0.90,
+        "citations": [
+            "oaicite:0"
+        ]
+    },
+    "weeks": [
+        {
+            "index": 0,
+            "name": "Week 1",
+            "sets": [
+                {
+                    "pctOfTM": 0.65,
+                    "reps": 5,
+                    "amrap": false,
+                    "citations": [
+                        "oaicite:22",
+                        "oaicite:23"
+                    ]
+                },
+                {
+                    "pctOfTM": 0.75,
+                    "reps": 5,
+                    "amrap": false,
+                    "citations": [
+                        "oaicite:22",
+                        "oaicite:23"
+                    ]
+                },
+                {
+                    "pctOfTM": 0.85,
+                    "reps": 5,
+                    "amrap": false,
+                    "citations": [
+                        "oaicite:22",
+                        "oaicite:23"
+                    ]
+                }
+            ]
+        },
+        {
+            "index": 1,
+            "name": "Week 2",
+            "sets": [
+                {
+                    "pctOfTM": 0.70,
+                    "reps": 5,
+                    "amrap": false,
+                    "citations": [
+                        "oaicite:24",
+                        "oaicite:25"
+                    ]
+                },
+                {
+                    "pctOfTM": 0.80,
+                    "reps": 5,
+                    "amrap": false,
+                    "citations": [
+                        "oaicite:24",
+                        "oaicite:25"
+                    ]
+                },
+                {
+                    "pctOfTM": 0.90,
+                    "reps": 5,
+                    "amrap": false,
+                    "citations": [
+                        "oaicite:24",
+                        "oaicite:25"
+                    ]
+                }
+            ]
+        },
+        {
+            "index": 2,
+            "name": "Week 3",
+            "sets": [
+                {
+                    "pctOfTM": 0.75,
+                    "reps": 5,
+                    "amrap": false,
+                    "citations": [
+                        "oaicite:26",
+                        "oaicite:27"
+                    ]
+                },
+                {
+                    "pctOfTM": 0.85,
+                    "reps": 5,
+                    "amrap": false,
+                    "citations": [
+                        "oaicite:26",
+                        "oaicite:27"
+                    ]
+                },
+                {
+                    "pctOfTM": 0.95,
+                    "reps": 5,
+                    "amrap": false,
+                    "citations": [
+                        "oaicite:26",
+                        "oaicite:27"
+                    ]
+                }
+            ]
+        },
+        {
+            "index": 3,
+            "name": "Week 4 (Deload)",
+            "deload": true,
+            "sets": [
+                {
+                    "pctOfTM": 0.40,
+                    "reps": 5,
+                    "amrap": false,
+                    "citations": [
+                        "oaicite:28",
+                        "oaicite:29"
+                    ]
+                },
+                {
+                    "pctOfTM": 0.50,
+                    "reps": 5,
+                    "amrap": false,
+                    "citations": [
+                        "oaicite:28",
+                        "oaicite:29"
+                    ]
+                },
+                {
+                    "pctOfTM": 0.60,
+                    "reps": 5,
+                    "amrap": false,
+                    "citations": [
+                        "oaicite:28",
+                        "oaicite:29"
+                    ]
+                }
+            ]
+        }
+    ],
+    "deload": {
+        "weekIndex": 3,
+        "citations": [
+            "oaicite:28",
+            "oaicite:29"
+        ]
+    },
+    "notes": [
+        {
+            "text": "All main sets are fixed 5 reps; no PR/AMRAP; weekly percentages follow 5/3/1 order.",
+            "citations": [
+                "oaicite:30"
+            ]
+        }
+    ]
+}

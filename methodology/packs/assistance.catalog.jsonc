@@ -1,0 +1,280 @@
+{
+    "id": "assistance.catalog",
+    "type": "assistance",
+    "name": "5/3/1 Assistance Categories",
+    "version": "1.0.0",
+    "categories": {
+        "Push": {
+            "primary": [
+                {
+                    "exercise": "Dips",
+                    "citations": [
+                        "oaicite:0"
+                    ]
+                },
+                {
+                    "exercise": "Push-Ups",
+                    "citations": [
+                        "oaicite:1"
+                    ]
+                },
+                {
+                    "exercise": "Dumbbell Bench Press",
+                    "citations": [
+                        "oaicite:2"
+                    ]
+                },
+                {
+                    "exercise": "Barbell Incline Press",
+                    "citations": [
+                        "oaicite:3"
+                    ]
+                },
+                {
+                    "exercise": "Dumbbell Incline Press",
+                    "citations": [
+                        "oaicite:4"
+                    ]
+                },
+                {
+                    "exercise": "Dumbbell Military Press",
+                    "citations": [
+                        "oaicite:5"
+                    ]
+                },
+                {
+                    "exercise": "Triceps Pushdowns",
+                    "citations": [
+                        "oaicite:6"
+                    ]
+                },
+                {
+                    "exercise": "Triceps Extensions",
+                    "citations": [
+                        "oaicite:7"
+                    ]
+                }
+            ],
+            "substitutions": [
+                {
+                    "exercise": "Close-Grip Bench Press",
+                    "reason": "injury (shoulder)"
+                },
+                {
+                    "exercise": "Push-Ups",
+                    "reason": "equipment (no bench or dip bar)"
+                }
+            ],
+            "volumeTarget": {
+                "range": "50–100 reps",
+                "citations": [
+                    "oaicite:8"
+                ]
+            }
+        },
+        "Pull": {
+            "primary": [
+                {
+                    "exercise": "Chin-Ups/Pull-Ups",
+                    "citations": [
+                        "oaicite:9"
+                    ]
+                },
+                {
+                    "exercise": "Dumbbell Rows",
+                    "citations": [
+                        "oaicite:10"
+                    ]
+                },
+                {
+                    "exercise": "Bent-Over Barbell Rows",
+                    "citations": [
+                        "oaicite:11"
+                    ]
+                },
+                {
+                    "exercise": "T-Bar Rows",
+                    "citations": [
+                        "oaicite:12"
+                    ]
+                },
+                {
+                    "exercise": "Lat Pulldowns",
+                    "citations": [
+                        "oaicite:13"
+                    ]
+                },
+                {
+                    "exercise": "Face Pulls",
+                    "citations": [
+                        "oaicite:14"
+                    ]
+                },
+                {
+                    "exercise": "Shrugs",
+                    "citations": [
+                        "oaicite:15"
+                    ]
+                }
+            ],
+            "substitutions": [
+                {
+                    "exercise": "Dumbbell Rows",
+                    "reason": "injury (back)"
+                },
+                {
+                    "exercise": "Lat Pulldowns",
+                    "reason": "equipment (no pull-up bar)"
+                }
+            ],
+            "volumeTarget": {
+                "range": "50–100 reps",
+                "citations": [
+                    "oaicite:16"
+                ]
+            }
+        },
+        "Single-leg": {
+            "primary": [
+                {
+                    "exercise": "Lunges",
+                    "citations": [
+                        "oaicite:17"
+                    ]
+                },
+                {
+                    "exercise": "Step-Ups",
+                    "citations": [
+                        "oaicite:18"
+                    ]
+                },
+                {
+                    "exercise": "Leg Press",
+                    "citations": [
+                        "oaicite:19"
+                    ]
+                },
+                {
+                    "exercise": "Hack Squats",
+                    "citations": [
+                        "oaicite:20"
+                    ]
+                },
+                {
+                    "exercise": "Leg Curls",
+                    "citations": [
+                        "oaicite:21"
+                    ]
+                },
+                {
+                    "exercise": "Glute-Ham Raise (GHR)",
+                    "citations": [
+                        "oaicite:22"
+                    ]
+                },
+                {
+                    "exercise": "One-Leg Squat (pistol)",
+                    "citations": [
+                        "oaicite:23"
+                    ]
+                }
+            ],
+            "substitutions": [
+                {
+                    "exercise": "Lunges",
+                    "reason": "injury (knee)"
+                },
+                {
+                    "exercise": "Glute-Ham Raise",
+                    "reason": "equipment (no leg curl machine)"
+                }
+            ],
+            "volumeTarget": {
+                "range": "50–100 reps",
+                "citations": [
+                    "oaicite:24"
+                ]
+            }
+        },
+        "Core": {
+            "primary": [
+                {
+                    "exercise": "Sit-Ups",
+                    "citations": [
+                        "oaicite:25"
+                    ]
+                },
+                {
+                    "exercise": "Hanging Leg Raises",
+                    "citations": [
+                        "oaicite:26"
+                    ]
+                },
+                {
+                    "exercise": "Ab Wheel Rollouts",
+                    "citations": [
+                        "oaicite:27"
+                    ]
+                },
+                {
+                    "exercise": "Dumbbell Side Bends",
+                    "citations": [
+                        "oaicite:28"
+                    ]
+                },
+                {
+                    "exercise": "Back Raises",
+                    "citations": [
+                        "oaicite:29"
+                    ]
+                },
+                {
+                    "exercise": "Good Mornings",
+                    "citations": [
+                        "oaicite:30"
+                    ]
+                },
+                {
+                    "exercise": "Reverse Hyperextensions",
+                    "citations": [
+                        "oaicite:31"
+                    ]
+                }
+            ],
+            "substitutions": [
+                {
+                    "exercise": "Planks",
+                    "reason": "injury (back)"
+                }
+            ],
+            "volumeTarget": {
+                "range": "50–100 reps",
+                "citations": [
+                    "oaicite:32"
+                ]
+            }
+        }
+    },
+    "extras": {
+        "Push": [
+            "Machine Chest Press (Hammer Strength)"
+        ],
+        "Pull": [
+            "Inverted Rows (bodyweight rows)"
+        ],
+        "Single-leg": [
+            "Hip Thrusts",
+            "Goblet Squats",
+            "Bulgarian Split Squats"
+        ],
+        "Core": [
+            "Planks"
+        ]
+    },
+    "citations": [
+        {
+            "source": "Wendler, 5/3/1 (2009)",
+            "pages": "33–42, 51–52"
+        }
+    ]
+}

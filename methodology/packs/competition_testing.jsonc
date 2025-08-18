@@ -1,0 +1,143 @@
+{
+    "id": "competition_and_testing",
+    "type": "testing",
+    "name": "5/3/1 Competition Prep & Strength Testing",
+    "version": "1.0.0",
+    "competitionPrep": {
+        "timeline": [
+            {
+                "week": "3–4 weeks out",
+                "percentGuide": "Train with ~85–95% of TM, no PR sets.",
+                "notes": "Final month: keep reps fast, no failure. Work up to opener (~85% 1RM) for practice singles.",
+                "citations": [
+                    "oaicite:0",
+                    "oaicite:1"
+                ]
+            },
+            {
+                "week": "1–2 weeks out",
+                "percentGuide": "Deload (~50–60% load) or rest.",
+                "notes": "Deload before meet. Last heavy deadlift ~10–14 days out, last heavy squat ~7–10 days out. Minimal lifting or rest.",
+                "citations": [
+                    "oaicite:2",
+                    "oaicite:3",
+                    "oaicite:4"
+                ]
+            },
+            {
+                "week": "Meet week",
+                "percentGuide": "No heavy training.",
+                "notes": "Do not lift heavy. Focus on mobility, stretching, mental prep. Know commands (e.g. squat rack command). Prepare gear/logistics early.",
+                "citations": [
+                    "oaicite:5",
+                    "oaicite:6"
+                ]
+            }
+        ],
+        "attemptSelection": {
+            "opener": {
+                "percentGuide": "≈85% of target 1RM",
+                "notes": "Safe weight you can triple any day. About 85% of meet goal.",
+                "citations": [
+                    "oaicite:7"
+                ]
+            },
+            "second": {
+                "percentGuide": "≈92–95% of target 1RM",
+                "notes": "Challenging but reliable. Often near gym PR."
+            },
+            "third": {
+                "percentGuide": "≈100%+ (PR territory)",
+                "notes": "All-out. Attempt meet goal or new PR (~100–102%+)."
+            }
+        },
+        "psychologicalStrategies": [
+            {
+                "cue": "Visualization",
+                "notes": "Mentally rehearse lifts and commands to build confidence."
+            },
+            {
+                "cue": "Command practice",
+                "notes": "Train with competition commands (e.g. 'Squat!') to avoid errors.",
+                "citations": [
+                    "oaicite:8"
+                ]
+            },
+            {
+                "cue": "Meet day routine",
+                "notes": "Pack early, bring handler for logistics and calmness.",
+                "citations": [
+                    "oaicite:9"
+                ]
+            }
+        ],
+        "contraindications": [
+            "No Joker sets or unscheduled maxes in peaking.",
+            "Do not add volume or new lifts during taper.",
+            "Pre-meet = Anchor phase (no PR sets, volume reduced).",
+            "Never neglect recovery final week."
+        ]
+    },
+    "strengthTesting": {
+        "trainingMaxTest": {
+            "definition": "Training Max (TM) = ~90% of actual 1RM.",
+            "citations": [
+                "oaicite:10",
+                "oaicite:11"
+            ],
+            "when": "Set at start; recalc only after long breaks or stalls. Otherwise increase TM slowly each cycle.",
+            "citations_when": [
+                "oaicite:12"
+            ],
+            "protocol": "Use rep-max test if unknown. Example: lift ~80–85% for max reps, apply formula (Weight × Reps × 0.0333 + Weight). Take 90% of estimated 1RM as TM.",
+            "citations_protocol": [
+                "oaicite:13",
+                "oaicite:14",
+                "oaicite:15"
+            ],
+            "notes": "TM ensures submaximal, optimal training. Be honest—use current, not past, max.",
+            "citations_notes": [
+                "oaicite:16",
+                "oaicite:17"
+            ]
+        },
+        "true1RMTest": {
+            "when": "Only occasionally, e.g. after 3–4 cycles or for competition.",
+            "citations_when": [
+                "oaicite:18"
+            ],
+            "protocol": "Do not skip workout. Perform scheduled sets (skip AMRAP), then work up in singles until max.",
+            "citations_protocol": [
+                "oaicite:19"
+            ],
+            "notes": "Testing 1RM is taxing and risky. Rep PRs and estimated maxes track progress well.",
+            "citations_notes": [
+                "oaicite:20",
+                "oaicite:21",
+                "oaicite:22"
+            ],
+            "safety": "Use spotters/safety, belt, chalk. Do not max with poor form.",
+            "contraindications": [
+                "Do not test mid-cycle when fatigued.",
+                "Never skip training to max out.",
+                "Do not test 1RM repeatedly in short spans.",
+                "Novices should avoid true 1RM testing."
+            ],
+            "citations_contra": [
+                "oaicite:23",
+                "oaicite:24",
+                "oaicite:25",
+                "oaicite:26"
+            ]
+        },
+        "estimated1RM": {
+            "formula": "Weight × Reps × 0.0333 + Weight",
+            "notes": "Provides progress tracking without risky singles. Not exact but useful. Example: 200×5 vs 205×6 shows progress.",
+            "citations": [
+                "oaicite:27",
+                "oaicite:28",
+                "oaicite:29"
+            ]
+        }
+    }
+}

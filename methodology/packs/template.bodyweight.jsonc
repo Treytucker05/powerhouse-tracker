@@ -1,0 +1,39 @@
+{
+    "id": "template.bodyweight",
+    "type": "template",
+    "name": "Bodyweight Assistance",
+    "version": "1.0.0",
+    "params": {
+        "structure": {
+            "pattern": "main lift + 2 bodyweight moves",
+            "citations": [
+                "oaicite:24",
+                "oaicite:25"
+            ]
+        },
+        "volume": {
+            "targetRepsPerExercise": 75,
+            "citations": [
+                "oaicite:26"
+            ]
+        },
+        "benefits": {
+            "tags": [
+                "joints",
+                "recovery",
+                "beginners",
+                "older_lifters"
+            ],
+            "citations": [
+                "oaicite:27",
+                "oaicite:28"
+            ]
+        },
+        "deload": {
+            "policy": "lower_volume_or_skip",
+            "citations": [
+                "oaicite:29"
+            ]
+        }
+    }
+}

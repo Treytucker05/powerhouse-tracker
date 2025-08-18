@@ -1,0 +1,36 @@
+{
+    "id": "template.triumvirate",
+    "type": "template",
+    "name": "Triumvirate",
+    "version": "1.0.0",
+    "params": {
+        "structure": "main_lift + 2 assistance lifts",
+        "assistanceVolume": {
+            "sets": "3–5",
+            "reps": "10–15",
+            "citations": [
+                "oaicite:9",
+                "oaicite:10"
+            ]
+        },
+        "exerciseSelection": {
+            "examples": [
+                "push + pull",
+                "core + main lift"
+            ],
+            "citations": [
+                "oaicite:11",
+                "oaicite:12"
+            ]
+        },
+        "deload": {
+            "policy": "standard",
+            "citations": [
+                "oaicite:13"
+            ]
+        }
+    },
+    "citations": [
+        "oaicite:8"
+    ]
+}
