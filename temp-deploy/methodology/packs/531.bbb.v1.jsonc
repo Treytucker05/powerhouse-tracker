@@ -3,7 +3,7 @@
 {
     "meta": {
         "method": "531",
-        "variant": "bbb",
+        "variant": "BBB",
         "author": "Trey",
         "compatibility": {
             "minCoreVersion": "1.0.0",
