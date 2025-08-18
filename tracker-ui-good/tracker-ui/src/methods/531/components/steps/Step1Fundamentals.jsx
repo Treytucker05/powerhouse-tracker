@@ -392,8 +392,8 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
                             {[0.90, 0.85].map(pct => (
                                 <ToggleButton
                                     key={pct}
-                                    on={localState.tmPct === pct}
-                                    onClick={() => updateLocalState({ tmPct: pct })}
+                                    on={localState.tmPct === pct || localState.tmPercent === Math.round(pct * 100)}
+                                    onClick={() => updateLocalState({ tmPct: pct, tmPercent: Math.round(pct * 100) })}
                                     className="text-xs px-4"
                                 >{Math.round(pct * 100)}%</ToggleButton>
                             ))}

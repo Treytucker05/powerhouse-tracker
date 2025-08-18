@@ -505,6 +505,10 @@ function WizardShell() {
                         units
                     };
                 }
+                // Remove BBB supplemental during deload (Week 4, zero-based index 3)
+                if (w === 3) {
+                    supplementalOut = null;
+                }
 
                 let assistanceOut = { mode: assistance?.mode || "minimal" };
                 if (assistanceOut.mode === "custom" && assistance?.customPlan?.[liftKey]) {
@@ -531,17 +535,17 @@ function WizardShell() {
                     }
                 }
 
-                return {
+                const dayObj = {
                     day: idx + 1,
                     liftKey,
                     lift: humanLiftName(liftKey),
                     warmups,
                     main,
-                    // Always provide a supplemental object (prevents downstream undefined access)
-                    supplemental: supplementalOut || { type: 'none', sets: 0, reps: 0, percentOfTM: null },
                     assistance: assistanceOut,
                     conditioning: conditioningBlock
                 };
+                if (supplementalOut) dayObj.supplemental = supplementalOut;
+                return dayObj;
             });
             weeks.push({ week: w + 1, days: daysOut });
         }
