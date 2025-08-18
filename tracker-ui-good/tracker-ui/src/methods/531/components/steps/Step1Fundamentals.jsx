@@ -455,6 +455,13 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
                                 >{p}%</ToggleButton>
                             ))}
                         </div>
+                        {/* Helper copy (responsive truncated on small screens) */}
+                        <span
+                            className="block text-[12px] text-gray-400 mt-1 md:hidden"
+                            style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                            title="Wendler default: 90% TM. Conservative: 85%."
+                        >Wendler default: 90% TM. Conservative: 85%.</span>
+                        <span className="hidden md:block text-[12px] text-gray-400 mt-1">Wendler default: 90% TM. Conservative: 85%.</span>
                         <ul className="text-[12px] leading-snug text-gray-400 space-y-0.5">
                             <li><span className="text-gray-400 font-medium">90%:</span> Standard starting point for most lifters.</li>
                             <li><span className="text-gray-400 font-medium">85%:</span> Conservative (new lifters, return from layoff/injury).</li>
@@ -487,6 +494,13 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
                 <div className="grid md:grid-cols-2 gap-4 md:gap-5">
                     {Object.keys(localState.lifts).map(renderLiftRow)}
                 </div>
+                {/* Rounding helper copy under TM table */}
+                <p
+                    className="mt-3 text-[12px] text-gray-400 md:hidden"
+                    style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                    title="Weights are rounded to 5 lb / 2.5 kg after % calculations."
+                >Weights are rounded to 5 lb / 2.5 kg after % calculations.</p>
+                <p className="mt-3 text-[12px] text-gray-400 hidden md:block">Weights are rounded to 5 lb / 2.5 kg after % calculations.</p>
             </div>
 
             {/* Info Boxes */}
