@@ -30,6 +30,23 @@ const initialState = {
     authRedirectNeeded: false
 };
 
+// Centralized auth redirect helper for HashRouter environments.
+// Uses hash navigation instead of full path reload to avoid unnecessary network requests.
+function goToAuth() {
+    try {
+        const base = import.meta.env.BASE_URL || '/';
+        const target = base.replace(/\/$/, '') + '/#/auth';
+        const alreadyOnAuth = location.hash === '#/auth';
+        if (!alreadyOnAuth) {
+            console.log('[Auth Redirect] Navigating to', target, 'from', location.href);
+            // Use replace to avoid polluting history stack with repeated redirects
+            location.replace(target);
+        }
+    } catch (e) {
+        console.warn('goToAuth failed:', e);
+    }
+}
+
 // Reducer
 function appReducer(state, action) {
     switch (action.type) {
@@ -246,7 +263,7 @@ export function AppProvider({ children }) {
                             dispatch({ type: APP_ACTIONS.CLEAR_USER });
                             // Direct navigation to login page
                             console.log('Redirecting to login page - session refresh failed after auth error');
-                            { const authPath = `${import.meta.env.BASE_URL}auth`; if (location.pathname !== authPath) { location.replace(authPath); } }
+                            goToAuth();
                             return;
                         }
 
@@ -264,7 +281,7 @@ export function AppProvider({ children }) {
                     loadLocalData();
                     dispatch({ type: APP_ACTIONS.CLEAR_USER });
                     console.log('Redirecting to login page - session refresh failed');
-                    { const authPath = `${import.meta.env.BASE_URL}auth`; if (location.pathname !== authPath) { location.replace(authPath); } }
+                    goToAuth();
                     return;
                 }
 
@@ -283,7 +300,7 @@ export function AppProvider({ children }) {
                             dispatch({ type: APP_ACTIONS.CLEAR_USER });
                             // Direct navigation to login page
                             console.log('Redirecting to login page - no user session found');
-                            { const authPath = `${import.meta.env.BASE_URL}auth`; if (location.pathname !== authPath) { location.replace(authPath); } }
+                            goToAuth();
                             return;
                         }
 
@@ -297,7 +314,7 @@ export function AppProvider({ children }) {
                             dispatch({ type: APP_ACTIONS.CLEAR_USER });
                             // Direct navigation to login page
                             console.log('Redirecting to login page - no user found after session refresh');
-                            { const authPath = `${import.meta.env.BASE_URL}auth`; if (location.pathname !== authPath) { location.replace(authPath); } }
+                            goToAuth();
                         }
                     } catch (refreshError) {
                         console.error('Session refresh exception:', refreshError);
@@ -305,7 +322,7 @@ export function AppProvider({ children }) {
                         dispatch({ type: APP_ACTIONS.CLEAR_USER });
                         // Direct navigation to login page
                         console.log('Redirecting to login page - session refresh exception');
-                        { const authPath = `${import.meta.env.BASE_URL}auth`; if (location.pathname !== authPath) { location.replace(authPath); } }
+                        goToAuth();
                     }
                 }
             } catch (error) {
@@ -330,7 +347,7 @@ export function AppProvider({ children }) {
                 loadLocalData();
                 dispatch({ type: APP_ACTIONS.CLEAR_USER });
                 console.log('Redirecting to login page - user initialization failed');
-                { const authPath = `${import.meta.env.BASE_URL}auth`; if (location.pathname !== authPath) { location.replace(authPath); } }
+                goToAuth();
             } finally {
                 dispatch({ type: APP_ACTIONS.SET_LOADING, payload: { key: 'user', value: false } });
             }
@@ -358,7 +375,7 @@ export function AppProvider({ children }) {
                         dispatch({ type: APP_ACTIONS.CLEAR_USER });
                         // Direct navigation to login page
                         console.log('Redirecting to login page - session refresh failed');
-                        { const authPath = `${import.meta.env.BASE_URL}auth`; if (location.pathname !== authPath) { location.replace(authPath); } }
+                        goToAuth();
                         return;
                     }
 
@@ -376,7 +393,7 @@ export function AppProvider({ children }) {
                         dispatch({ type: APP_ACTIONS.CLEAR_USER });
                         // Direct navigation to login page
                         console.log('Redirecting to login page - failed to restore session');
-                        { const authPath = `${import.meta.env.BASE_URL}auth`; if (location.pathname !== authPath) { location.replace(authPath); } }
+                        goToAuth();
                     } else {
                         console.log('Session restored successfully on focus');
                         dispatch({ type: APP_ACTIONS.SET_USER, payload: refreshData.user });
