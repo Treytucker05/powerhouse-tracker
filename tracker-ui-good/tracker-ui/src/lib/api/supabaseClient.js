@@ -1,22 +1,15 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://cqjzvbvmpcqohjarcydg.supabase.co'
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxanp2YnZtcGNxb2hqYXJjeWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3NzExNzksImV4cCI6MjA2NTM0NzE3OX0.wioeITJitSKZ9HrZ2iRPmC3xHHj-bL4xDYtT1iXws44'
+// TEMPORARY HARD-CODE FOR DEBUG ISOLATION
+// This bypasses import.meta.env to confirm if env injection is the root cause.
+// IMPORTANT: Remove before committing production code.
+const supabaseUrl = 'https://cqjzvbvmpcqohjarcydg.supabase.co'
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxanp2YnZtcGNxb2hqYXJjeWRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk3NzExNzksImV4cCI6MjA2NTM0NzE3OX0.wioeITJitSKZ9HrZ2iRPmC3xHHj-bL4xDYtT1iXws44'
 
-// Debug logging for build-time environment variable resolution
-console.log('=== Supabase Client Debug ===');
-console.log('import.meta.env.VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL);
-console.log('import.meta.env.VITE_SUPABASE_ANON_KEY (first 20 chars):', import.meta.env.VITE_SUPABASE_ANON_KEY?.substring(0, 20) + '...');
-console.log('Resolved supabaseUrl:', supabaseUrl);
-console.log('Resolved supabaseAnonKey (first 20 chars):', supabaseAnonKey?.substring(0, 20) + '...');
-console.log('Using fallback URL:', !import.meta.env.VITE_SUPABASE_URL);
-console.log('Using fallback key:', !import.meta.env.VITE_SUPABASE_ANON_KEY);
-console.log('All VITE_ env vars:', Object.keys(import.meta.env).filter(key => key.startsWith('VITE_')));
-console.log('=== End Supabase Client Debug ===');
-
-if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn('Missing Supabase environment variables. Using fallback values.')
-}
+// Explicit debug logging (will appear in built bundle console)
+console.log('[SupabaseClient][HARD-CODED TEST] Using fixed credentials (do not ship to production)');
+console.log('[SupabaseClient] URL:', supabaseUrl);
+console.log('[SupabaseClient] Key (first 12 chars):', supabaseAnonKey.substring(0,12) + '...');
 
 // Lightweight in-memory mock for test environment to avoid any network/filesystem flakiness
 export const supabase = (process.env.NODE_ENV === 'test') ? {
