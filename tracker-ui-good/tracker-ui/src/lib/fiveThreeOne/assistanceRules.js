@@ -102,65 +102,69 @@ export function buildAssistanceForDay(templateId, mainLift, opts = {}) {
         // Exactly 3 exercises: main 5/3/1 is assumed; provide two recs by main lift
         const recsByLift = {
             press: [
+                // Book p.47–49: Dips 5×15, Chin-Ups 5×10
                 { name: 'Dips', sets: 5, reps: '15', displayName: 'Dips 5×15' },
                 { name: 'Chin-Ups', sets: 5, reps: '10', displayName: 'Chin-Ups 5×10' },
             ],
             deadlift: [
-                { name: 'Good Morning', sets: 5, reps: '10-12', displayName: 'Good Morning 5×10-12' },
-                { name: 'Hanging Leg Raise', sets: 5, reps: '12-15', displayName: 'Hanging Leg Raise 5×12-15' },
+                // Book: Good Mornings 5×12, Hanging Leg Raises 5×15
+                { name: 'Good Morning', sets: 5, reps: '12', displayName: 'Good Morning 5×12' },
+                { name: 'Hanging Leg Raise', sets: 5, reps: '15', displayName: 'Hanging Leg Raise 5×15' },
             ],
             bench: [
-                { name: 'DB Row', sets: 5, reps: '10-12', displayName: 'DB Row 5×10-12' },
-                { name: 'Dips', sets: 5, reps: '12-15', displayName: 'Dips 5×12-15' },
+                // Book: DB Row 5×10, Dips 5×15
+                { name: 'DB Row', sets: 5, reps: '10', displayName: 'DB Row 5×10' },
+                { name: 'Dips', sets: 5, reps: '15', displayName: 'Dips 5×15' },
             ],
-        squat: [
-            { name: 'Leg Press', sets: 5, reps: '12-15', displayName: 'Leg Press 5×12-15' },
-            { name: 'Leg Curl', sets: 5, reps: '10-12', displayName: 'Leg Curl 5×10-12' },
-        ],
-    };
-    return { kind: 'triumvirate', blocks: [{ type: 'Triumvirate', items: recsByLift[mainLift] || [] }] };
-}
+            squat: [
+                // Book: Leg Press 5×15, Leg Curl 5×10
+                { name: 'Leg Press', sets: 5, reps: '15', displayName: 'Leg Press 5×15' },
+                { name: 'Leg Curl', sets: 5, reps: '10', displayName: 'Leg Curl 5×10' },
+            ],
+        };
+        return { kind: 'triumvirate', blocks: [{ type: 'Triumvirate', items: recsByLift[mainLift] || [] }] };
+    }
 
-if (templateId === TEMPLATE_IDS.PERIODIZATION_BIBLE) {
-    // Dave Tate pattern: each day 3 assistance categories, each 5x10-20 (user chooses specific lifts later)
-    const upperCats = [
-        { category: 'Shoulders/Chest', displayName: 'Shoulders/Chest 5×10-20' },
-        { category: 'Lats/Upper Back', displayName: 'Lats/Upper Back 5×10-20' },
-        { category: 'Triceps', displayName: 'Triceps 5×10-20' }
-    ];
-    const lowerCats = [
-        { category: 'Hamstrings', displayName: 'Hamstrings 5×10-20' },
-        { category: 'Quads', displayName: 'Quads 5×10-20' },
-        { category: 'Abs', displayName: 'Abs 5×10-20' }
-    ];
-    const chosen = (mainLift === 'press' || mainLift === 'bench') ? upperCats : lowerCats;
-    return {
-        kind: 'pb',
-        blocks: chosen.map(cat => ({
-            category: cat.category,
-            items: [{
-                name: cat.category + ' (choose exercise)',
-                displayName: cat.displayName,
-                sets: 5,
-                reps: '10-20'
-            }]
-    }))
-    };
-}
-
-if (templateId === TEMPLATE_IDS.BODYWEIGHT) {
-    const upper = (mainLift === 'bench' || mainLift === 'press');
-    const bwList = upper
-        ? [
-            { name: 'Chin-Ups', targetReps: bwTarget, displayName: `Chin-Ups (${bwTarget} total reps)` },
-            { name: 'Dips', targetReps: bwTarget, displayName: `Dips (${bwTarget} total reps)` },
-            { name: 'Push-Ups', targetReps: bwTarget, displayName: `Push-Ups (${bwTarget} total reps)` }
-        ]
-        : [
-            { name: 'Chin-Ups', targetReps: bwTarget, displayName: `Chin-Ups (${bwTarget} total reps)` },
-            { name: 'Single-Leg Squat/Lunge', targetReps: bwTarget, displayName: `Single-Leg Squat/Lunge (${bwTarget} total reps)` },
-            { name: 'Sit-Ups/Ab Wheel', targetReps: bwTarget, displayName: `Sit-Ups/Ab Wheel (${bwTarget} total reps)` }
+    if (templateId === TEMPLATE_IDS.PERIODIZATION_BIBLE) {
+        // Dave Tate pattern: each day 3 assistance categories, each 5x10-20 (user chooses specific lifts later)
+        const upperCats = [
+            { category: 'Shoulders/Chest', displayName: 'Shoulders/Chest 5×10-20' },
+            { category: 'Lats/Upper Back', displayName: 'Lats/Upper Back 5×10-20' },
+            { category: 'Triceps', displayName: 'Triceps 5×10-20' }
         ];
+        const lowerCats = [
+            { category: 'Hamstrings', displayName: 'Hamstrings 5×10-20' },
+            { category: 'Quads', displayName: 'Quads 5×10-20' },
+            { category: 'Abs', displayName: 'Abs 5×10-20' }
+        ];
+        const chosen = (mainLift === 'press' || mainLift === 'bench') ? upperCats : lowerCats;
+        return {
+            kind: 'pb',
+            blocks: chosen.map(cat => ({
+                category: cat.category,
+                items: [{
+                    name: cat.category + ' (choose exercise)',
+                    displayName: cat.displayName,
+                    sets: 5,
+                    reps: '10-20'
+                }]
+            }))
+        };
+    }
+
+    if (templateId === TEMPLATE_IDS.BODYWEIGHT) {
+        const upper = (mainLift === 'bench' || mainLift === 'press');
+        const bwList = upper
+            ? [
+                { name: 'Chin-Ups', targetReps: bwTarget, displayName: `Chin-Ups (${bwTarget} total reps)` },
+                { name: 'Dips', targetReps: bwTarget, displayName: `Dips (${bwTarget} total reps)` },
+                { name: 'Push-Ups', targetReps: bwTarget, displayName: `Push-Ups (${bwTarget} total reps)` }
+            ]
+            : [
+                { name: 'Chin-Ups', targetReps: bwTarget, displayName: `Chin-Ups (${bwTarget} total reps)` },
+                { name: 'Single-Leg Squat/Lunge', targetReps: bwTarget, displayName: `Single-Leg Squat/Lunge (${bwTarget} total reps)` },
+                { name: 'Sit-Ups/Ab Wheel', targetReps: bwTarget, displayName: `Sit-Ups/Ab Wheel (${bwTarget} total reps)` }
+            ];
         return { kind: 'bodyweight', blocks: [{ type: 'Bodyweight', items: bwList }] };
     }
 

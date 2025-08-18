@@ -6,6 +6,7 @@
 
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { applyTemplate } from '../../../lib/templates/index.js';
+import { UNITS } from '../../../lib/units.ts';
 // Assistance normalization (used for convert-to-custom action)
 import { normalizeAssistance } from '../assistance/index.js';
 
@@ -82,10 +83,10 @@ function applyTemplateLocal(state, template) {
 // Initial program state (serializable only - exact spec)
 export const initialProgramV2 = {
     pack: null, // active assistance/template pack key (mirrors templateKey when in template mode)
-    units: 'lb',
-    rounding: 'ceil',
-    tmPct: 0.90,
-    tmPercent: 90, // integer form kept in sync with tmPct
+    units: UNITS.LBS,
+    // Rounding stored as mode string (nearest|ceil|floor). Default per spec should be neutral/standard.
+    rounding: 'nearest',
+    tmPct: 0.90, // decimal canonical (0.85-1.00)
     // Flow / template selection additions
     flowMode: 'custom', // 'custom' | 'template'
     templateKey: null,  // one of TEMPLATE_KEYS or null
@@ -149,6 +150,29 @@ export const initialProgramV2 = {
 
 const ProgramContextV2 = createContext();
 
+// Migration: ensure trainingMax alias present & tmPct canonical decimal & remove tmPercent
+export function migrateProgramV2(p) {
+    if (!p || typeof p !== 'object') return p;
+    const next = { ...p };
+    if (next.tmPercent != null && (next.tmPct == null || next.tmPct > 1)) {
+        const num = Number(next.tmPercent);
+        if (Number.isFinite(num) && num > 1) next.tmPct = num / 100;
+    }
+    if (typeof next.tmPct === 'number' && next.tmPct > 1) next.tmPct = next.tmPct / 100;
+    if (typeof next.tmPct !== 'number' || !(next.tmPct > 0.5 && next.tmPct <= 1.05)) next.tmPct = 0.9;
+    delete next.tmPercent;
+    if (next.lifts) {
+        const lifts = { ...next.lifts };
+        Object.keys(lifts).forEach(k => {
+            const rec = { ...lifts[k] };
+            if (rec.tm != null && rec.trainingMax == null) rec.trainingMax = rec.tm;
+            lifts[k] = rec;
+        });
+        next.lifts = lifts;
+    }
+    return next;
+}
+
 function reducerV2(state, action) {
     switch (action.type) {
         case 'SET_ASSISTANCE_LOAD_MODE':
@@ -158,11 +182,7 @@ function reducerV2(state, action) {
         case 'SET_UNITS': return { ...state, units: action.units };
         case 'SET_ROUNDING': return { ...state, rounding: action.rounding };
         case 'SET_TM_PCT': return { ...state, tmPct: action.tmPct };
-        case 'SET_TM_PERCENT': {
-            const tmPercent = Number(action.value);
-            if (!Number.isFinite(tmPercent)) return state;
-            return { ...state, tmPercent, tmPct: tmPercent / 100 };
-        }
+        // Removed SET_TM_PERCENT - tmPct is canonical
         case 'SET_FLOW_MODE': return { ...state, flowMode: action.payload };
         case 'SET_TEMPLATE_KEY': return { ...state, templateKey: action.payload };
         case 'SET_TEMPLATE_SPEC': return { ...state, templateSpec: action.payload };
@@ -172,20 +192,18 @@ function reducerV2(state, action) {
             ...state,
             lifts: { ...state.lifts, [action.lift]: { ...state.lifts[action.lift], oneRM: action.oneRM } }
         };
-        case 'SET_TRAINING_MAX': { // unified TM writer (lifts + flat map)
+        case 'SET_TRAINING_MAX': { // unified TM writer (lifts + flat map + alias)
             const { lift, tm } = action;
             return {
                 ...state,
-                lifts: { ...state.lifts, [lift]: { ...state.lifts[lift], tm } },
+                lifts: { ...state.lifts, [lift]: { ...state.lifts[lift], tm, trainingMax: tm } },
                 trainingMaxes: { ...(state.trainingMaxes || {}), [lift]: tm }
             };
         }
-        case 'SET_TM': return {
-            ...state,
-            // Back-compat: keep legacy action updating both shapes to avoid drift
-            lifts: { ...state.lifts, [action.lift]: { ...state.lifts[action.lift], tm: action.tm } },
-            trainingMaxes: { ...(state.trainingMaxes || {}), [action.lift]: action.tm }
-        };
+        case 'SET_TM': {
+            // Hard delegate to single writer to maintain one source of truth.
+            return reducerV2(state, { type: 'SET_TRAINING_MAX', lift: action.lift, tm: action.tm });
+        }
         case 'SET_DAYS_PER_WEEK': return { ...state, daysPerWeek: Number(action.payload) };
         case 'BULK_SET_LIFTS': return { ...state, lifts: { ...state.lifts, ...action.lifts } };
         case 'SET_TEMPLATE': { // unified template application + assistance reset
@@ -290,7 +308,7 @@ function useProgramReducerV2() {
         try {
             if (typeof window !== 'undefined' && window.localStorage) {
                 const raw = window.localStorage.getItem('ph_program_v2');
-                return raw ? { ...init, ...JSON.parse(raw) } : init;
+                return raw ? migrateProgramV2({ ...init, ...JSON.parse(raw) }) : init;
             }
             return init;
         } catch { return init; }

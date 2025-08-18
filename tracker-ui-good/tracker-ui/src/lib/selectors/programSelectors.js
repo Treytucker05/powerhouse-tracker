@@ -17,6 +17,8 @@ export function selectTrainingMax(program, liftKey) {
     if (!liftKey) return 0;
     const canonical = program?.trainingMaxes?.[liftKey];
     if (canonical != null && canonical > 0) return canonical;
+    const legacyAlias = program?.lifts?.[liftKey]?.trainingMax; // future-proof alias
+    if (legacyAlias != null && legacyAlias > 0) return legacyAlias;
     const legacy = program?.lifts?.[liftKey]?.tm;
     if (legacy != null && legacy > 0) return legacy;
     // Debug fallback (non-critical): safe parse

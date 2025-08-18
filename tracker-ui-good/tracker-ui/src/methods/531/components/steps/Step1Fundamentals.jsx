@@ -8,6 +8,7 @@ import ToggleButton from '../ToggleButton.jsx';
 import { Info, AlertTriangle, Calculator, Copy, CheckCircle2 } from 'lucide-react';
 import { useProgramV2 } from '../../contexts/ProgramContextV2.jsx';
 import { roundToIncrement } from '../..'; // barrel export
+import { UNITS, incrementFor } from '../../../../lib/units.ts';
 
 // Wendler e1RM formula: e1RM = weight * (1 + 0.0333 * reps)
 const calculateE1RM = (weight, reps) => {
@@ -42,16 +43,13 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
     const { state, dispatch } = useProgramV2();
 
     // helper: accept 0.90/0.85 or 90/85, return integer percent
-    const readTmPercent = (s) => {
-        const raw = (s?.tmPercent ?? s?.tmPct ?? null);
-        if (raw == null) return null;
-        const val = raw <= 1 ? raw * 100 : raw;
-        return Math.round(val);
-    };
+    const readTmPercent = (s) => s?.tmPct ? Math.round(s.tmPct * 100) : null;
 
     // Local working state for smooth typing
+    const [showUnitConvert, setShowUnitConvert] = useState(false);
+    const [pendingUnit, setPendingUnit] = useState(null);
     const [localState, setLocalState] = useState({
-        units: state.units,
+        units: state.units === 'lb' ? UNITS.LBS : state.units,
         rounding: state.rounding,
         tmPct: state.tmPct,
         lifts: {
@@ -108,9 +106,9 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
 
                 // Calculate TM
                 if (lift.tmOverride && Number(lift.tmOverride) > 0) {
-                    tm = roundToIncrement(Number(lift.tmOverride), localState.units, localState.rounding);
+                    tm = roundToIncrement(Number(lift.tmOverride), incrementFor(localState.units));
                 } else if (oneRM) {
-                    tm = roundToIncrement(calculateTM(oneRM, localState.tmPct), localState.units, localState.rounding);
+                    tm = roundToIncrement(calculateTM(oneRM, localState.tmPct), incrementFor(localState.units));
                 }
 
                 liftData[liftKey] = { name: liftKey, oneRM, tm };
@@ -158,6 +156,29 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
         setLocalState(prev => ({ ...prev, ...updates }));
     }, []);
 
+    const applyUnitChange = useCallback((unit, mode) => {
+        // mode: 'convert' | 'keep'
+        setLocalState(prev => {
+            if (prev.units === unit) return prev;
+            const factor = unit === 'kg' ? 0.45359237 : 2.20462262; // LB -> KG or KG -> LB
+            const nextLifts = { ...prev.lifts };
+            Object.keys(nextLifts).forEach(k => {
+                ['oneRM', 'repWeight', 'tmOverride'].forEach(field => {
+                    const raw = nextLifts[k][field];
+                    if (!raw) return; // skip empty
+                    if (mode === 'convert') {
+                        const num = Number(raw);
+                        if (Number.isFinite(num)) {
+                            const converted = num * factor;
+                            nextLifts[k][field] = String(Math.round(converted * 100) / 100);
+                        }
+                    } // keep: do nothing
+                });
+            });
+            return { ...prev, units: unit, lifts: nextLifts };
+        });
+    }, []);
+
     const updateLift = useCallback((liftKey, updates) => {
         setLocalState(prev => ({
             ...prev,
@@ -197,8 +218,8 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
         const hasOverride = lift.tmOverride && Number(lift.tmOverride) > 0;
         let e1rm = null;
         if (hasOneRM) e1rm = Number(lift.oneRM); else if (hasRepTest) e1rm = calculateE1RM(Number(lift.repWeight), Number(lift.repCount));
-        const suggestedTM = e1rm ? roundToIncrement(calculateTM(e1rm, localState.tmPct), localState.units, localState.rounding) : null;
-        const finalTM = hasOverride ? roundToIncrement(Number(lift.tmOverride), localState.units, localState.rounding) : suggestedTM;
+        const suggestedTM = e1rm ? roundToIncrement(calculateTM(e1rm, localState.tmPct), incrementFor(localState.units)) : null;
+        const finalTM = hasOverride ? roundToIncrement(Number(lift.tmOverride), incrementFor(localState.units)) : suggestedTM;
         const validation = validateTM(finalTM, e1rm);
         const needsAttention = (missing.includes(`${liftKey} TM`) || missing.includes(liftKey)) && flashToken > 0;
 
@@ -371,16 +392,30 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
                     <div>
                         <label className="block text-[12px] font-semibold text-gray-300 mb-1 uppercase tracking-wide">Units</label>
                         <div className="flex gap-2 mb-1">
-                            {['lb', 'kg'].map(unit => (
+                            {[UNITS.LBS, UNITS.KG].map(unit => (
                                 <ToggleButton
                                     key={unit}
                                     on={localState.units === unit}
-                                    onClick={() => updateLocalState({ units: unit })}
+                                    onClick={() => {
+                                        if (unit === localState.units) return;
+                                        setPendingUnit(unit);
+                                        setShowUnitConvert(true);
+                                    }}
                                     className="text-xs px-4"
                                 >{unit.toUpperCase()}</ToggleButton>
                             ))}
                         </div>
                         <p className="text-[12px] leading-snug text-gray-400">Choose weight units. <span className="font-medium text-gray-300">LB</span> uses 2.5 / 5 lb increments, <span className="font-medium text-gray-300">KG</span> uses 1.25 / 2.5 kg increments.</p>
+                        {showUnitConvert && (
+                            <div className="mt-2 p-3 rounded-md bg-gray-900/80 border border-gray-700 space-y-2">
+                                <p className="text-[12px] text-gray-300">Convert existing numbers to {pendingUnit?.toUpperCase()} or keep values as typed?</p>
+                                <div className="flex gap-2">
+                                    <button type="button" className="px-3 py-1.5 rounded bg-red-600/70 text-white text-[12px]" onClick={() => { applyUnitChange(pendingUnit, 'convert'); setShowUnitConvert(false); }}>Convert</button>
+                                    <button type="button" className="px-3 py-1.5 rounded bg-gray-700 text-gray-200 text-[12px]" onClick={() => { applyUnitChange(pendingUnit, 'keep'); setShowUnitConvert(false); }}>Keep</button>
+                                    <button type="button" className="px-3 py-1.5 rounded bg-gray-800 text-gray-400 text-[12px]" onClick={() => { setShowUnitConvert(false); setPendingUnit(null); }}>Cancel</button>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Rounding */}
@@ -409,12 +444,10 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
                             {[90, 85].map(p => (
                                 <ToggleButton
                                     key={p}
-                                    on={readTmPercent({ tmPercent: localState.tmPercent, tmPct: localState.tmPct }) === p}
+                                    on={readTmPercent(localState) === p}
                                     onClick={() => {
-                                        // update local UI state
-                                        updateLocalState({ tmPct: p / 100, tmPercent: p });
-                                        // dispatch canonical percent (syncs tmPercent + tmPct in store)
-                                        dispatch({ type: 'SET_TM_PERCENT', value: p });
+                                        updateLocalState({ tmPct: p / 100 });
+                                        dispatch({ type: 'SET_TM_PCT', tmPct: p / 100 });
                                     }}
                                     className="text-xs px-4"
                                 >{p}%</ToggleButton>

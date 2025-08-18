@@ -113,11 +113,15 @@ function WizardShell() {
     const { state, dispatch } = useProgramV2();
     const packRef = useRef(null);
 
-    // TEMP debug: mirror unified training max map to localStorage so we can verify persistence outside primary storage
+    // Optional debug mirror of training maxes (disabled by default). Enable via Vite env VITE_531_TM_DEBUG=true
     useEffect(() => {
         try {
-            if (state?.trainingMaxes) {
+            const debugEnabled = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_531_TM_DEBUG === 'true');
+            if (debugEnabled && state?.trainingMaxes) {
                 localStorage.setItem('ph531.tm.debug', JSON.stringify(state.trainingMaxes));
+            } else if (!debugEnabled) {
+                // Clean up stale mirror when flag off
+                localStorage.removeItem('ph531.tm.debug');
             }
         } catch { /* ignore quota / access errors */ }
     }, [state?.trainingMaxes]);
