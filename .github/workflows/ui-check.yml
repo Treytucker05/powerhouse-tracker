@@ -1,7 +1,21 @@
 name: UI Check
+
 on:
   push:
+    branches-ignore:
+      - release/f531-v2-alpha   # Avoid competing with deploy workflow
+    paths:
+      - 'tracker-ui-good/tracker-ui/**'
+      - '.github/workflows/ui-check.yml'
   pull_request:
+    paths:
+      - 'tracker-ui-good/tracker-ui/**'
+      - '.github/workflows/ui-check.yml'
+
+concurrency:
+  group: ui-check-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,5 +24,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: npm --prefix tracker-ui-good/tracker-ui ci
-      - run: npm --prefix tracker-ui-good/tracker-ui run build
+          cache: npm
+          cache-dependency-path: tracker-ui-good/tracker-ui/package-lock.json
+      - name: Install deps
+        run: npm --prefix tracker-ui-good/tracker-ui ci
+      - name: Build (no deploy)
+        run: npm --prefix tracker-ui-good/tracker-ui run build

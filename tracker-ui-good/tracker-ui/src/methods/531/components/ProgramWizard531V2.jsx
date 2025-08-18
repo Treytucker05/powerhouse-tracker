@@ -44,7 +44,9 @@ function isStep1Complete(state) {
     // Accept both 'lb' and 'lbs' plus 'kg'
     const unitsOk = state?.units === "lbs" || state?.units === "lb" || state?.units === "kg";
     const roundingOk = !!state?.rounding;
-    const tmPctOk = state?.tmPct === 0.9 || state?.tmPct === 0.85 || state?.tmPct === 0.90 || state?.tmPct === 0.850; // tolerate float formats
+    const tmPctRaw = state?.tmPercent ?? state?.tmPct ?? 90; // fallback to 90 if undefined (matches legacy default)
+    const tmPct = Number(tmPctRaw);
+    const tmPctOk = Number.isFinite(tmPct) && tmPct >= 80 && tmPct <= 95;
     // Build a tms object from current lifts if not already present
     const tmsSource = state?.tms || (() => {
         const out = {}; LIFTS.forEach(k => { out[k] = state?.lifts?.[k]?.tm; }); return out;
@@ -137,7 +139,14 @@ function WizardShell() {
             case 0: // Fundamentals
                 if (!state?.units) errors.push("Units (lbs/kg) required");
                 if (!state?.rounding) errors.push("Rounding preference required");
-                if (!state?.tmPct) errors.push("Training max percentage required");
+                {
+                    // Accept tmPercent (new) or tmPct (legacy); validate numeric range
+                    const tmPctRaw = state?.tmPercent ?? state?.tmPct;
+                    const tmPctNum = Number(tmPctRaw);
+                    if (!(Number.isFinite(tmPctNum) && tmPctNum >= 80 && tmPctNum <= 95)) {
+                        errors.push("Training max percentage (80-95%) required");
+                    }
+                }
 
                 const tmsSource = state?.tms || {};
                 LIFTS.forEach(lift => {
@@ -537,13 +546,16 @@ function WizardShell() {
             weeks.push({ week: w + 1, days: daysOut });
         }
 
+        const tmPctRaw = state?.tmPercent ?? state?.tmPct ?? 90;
+        const tmPct = Number(tmPctRaw);
         const payload = {
             meta: {
                 createdAt: new Date().toISOString(),
                 templateKey: templateKey || null,
                 flowMode: flowMode || "custom",
                 units,
-                loadingOption
+                loadingOption,
+                tmPercent: tmPct
             },
             trainingMaxes,
             rounding: { increment: roundingConfig.increment, mode: roundingConfig.mode },
@@ -604,7 +616,11 @@ function WizardShell() {
             const missing = [];
             if (!(state?.units === 'lbs' || state?.units === 'lb' || state?.units === 'kg')) missing.push('units');
             if (!state?.rounding) missing.push('rounding');
-            if (!(state?.tmPct === 0.9 || state?.tmPct === 0.85 || state?.tmPct === 0.90 || state?.tmPct === 0.850)) missing.push('TM %');
+            {
+                const _tmPctRaw = state?.tmPercent ?? state?.tmPct ?? 90;
+                const _tmPct = Number(_tmPctRaw);
+                if (!(Number.isFinite(_tmPct) && _tmPct >= 80 && _tmPct <= 95)) missing.push('TM %');
+            }
             const liftsMissing = [];
             for (const k of LIFTS) {
                 const tm = state?.lifts?.[k]?.tm;
@@ -798,7 +814,10 @@ function WizardShell() {
         // eslint-disable-next-line no-console
         console.debug("Step1 validation:", {
             canNext: allowStep1Next(state), stateSnapshot: {
-                units: state?.units, rounding: state?.rounding, tmPct: state?.tmPct,
+                units: state?.units,
+                rounding: state?.rounding,
+                tmPct: state?.tmPct,
+                tmPercent: state?.tmPercent,
                 tms: LIFTS.reduce((acc, k) => { acc[k] = state?.lifts?.[k]?.tm || null; return acc; }, {})
             }
         });
