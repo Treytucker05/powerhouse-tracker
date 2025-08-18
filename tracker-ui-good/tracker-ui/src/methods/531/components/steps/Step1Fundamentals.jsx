@@ -400,13 +400,18 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
                     <div>
                         <label className="block text-[12px] font-semibold text-gray-300 mb-1 uppercase tracking-wide">Training Max %</label>
                         <div className="flex gap-2 mb-1">
-                            {[0.90, 0.85].map(pct => (
+                            {[90, 85].map(p => (
                                 <ToggleButton
-                                    key={pct}
-                                    on={localState.tmPct === pct || localState.tmPercent === Math.round(pct * 100)}
-                                    onClick={() => updateLocalState({ tmPct: pct, tmPercent: Math.round(pct * 100) })}
+                                    key={p}
+                                    on={readTmPercent({ tmPercent: localState.tmPercent, tmPct: localState.tmPct }) === p}
+                                    onClick={() => {
+                                        // update local UI state
+                                        updateLocalState({ tmPct: p / 100, tmPercent: p });
+                                        // dispatch canonical percent (syncs tmPercent + tmPct in store)
+                                        dispatch({ type: 'SET_TM_PERCENT', value: p });
+                                    }}
                                     className="text-xs px-4"
-                                >{Math.round(pct * 100)}%</ToggleButton>
+                                >{p}%</ToggleButton>
                             ))}
                         </div>
                         <ul className="text-[12px] leading-snug text-gray-400 space-y-0.5">

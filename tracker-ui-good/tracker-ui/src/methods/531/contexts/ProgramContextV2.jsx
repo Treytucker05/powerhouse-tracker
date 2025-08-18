@@ -85,6 +85,7 @@ export const initialProgramV2 = {
     units: 'lb',
     rounding: 'ceil',
     tmPct: 0.90,
+    tmPercent: 90, // integer form kept in sync with tmPct
     // Flow / template selection additions
     flowMode: 'custom', // 'custom' | 'template'
     templateKey: null,  // one of TEMPLATE_KEYS or null
@@ -156,6 +157,11 @@ function reducerV2(state, action) {
         case 'SET_UNITS': return { ...state, units: action.units };
         case 'SET_ROUNDING': return { ...state, rounding: action.rounding };
         case 'SET_TM_PCT': return { ...state, tmPct: action.tmPct };
+        case 'SET_TM_PERCENT': {
+            const tmPercent = Number(action.value);
+            if (!Number.isFinite(tmPercent)) return state;
+            return { ...state, tmPercent, tmPct: tmPercent / 100 };
+        }
         case 'SET_FLOW_MODE': return { ...state, flowMode: action.payload };
         case 'SET_TEMPLATE_KEY': return { ...state, templateKey: action.payload };
         case 'SET_TEMPLATE_SPEC': return { ...state, templateSpec: action.payload };
