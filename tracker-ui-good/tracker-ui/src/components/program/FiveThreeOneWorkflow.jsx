@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, CheckCircle, Target, Calendar, TrendingUp, Zap, Settings, Play, RefreshCw, RotateCcw } from 'lucide-react';
 import * as EngineModule from '../../lib/engines/FiveThreeOneEngine.js';
-import { supabase } from '../../lib/api/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import { syncToSupabase, loadFromSupabase } from '../../context/appHelpers';
 import { toast } from 'react-toastify';
 

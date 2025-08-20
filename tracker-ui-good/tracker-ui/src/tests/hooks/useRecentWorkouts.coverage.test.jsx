@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-vi.mock('@/lib/api/supabaseClient', () => {
+vi.mock('@/lib/supabaseClient', () => {
     const chain = () => ({
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
@@ -16,7 +16,7 @@ vi.mock('@/lib/api/supabaseClient', () => {
 });
 
 import useRecentWorkouts from '@/hooks/useRecentWorkouts';
-import * as supabaseApi from '@/lib/api/supabaseClient';
+import * as supabaseApi from '@/lib/supabaseClient';
 
 const createWrapper = () => {
     const qc = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: Infinity, staleTime: 0 } } });

@@ -1,7 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
-const DIRNAME = new URL('.', import.meta.url).pathname
+import { fileURLToPath } from 'url'
+
+// Windows-safe __dirname equivalent
+const DIRNAME = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
   base: '/powerhouse-tracker/',

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { supabase } from '../lib/api/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import { APP_ACTIONS } from './appActions';
 import {
     syncToSupabase,
@@ -241,184 +241,38 @@ function appReducer(state, action) {
 export function AppProvider({ children }) {
     const [state, dispatch] = useReducer(appReducer, initialState);
 
-    // Initialize user on mount
     useEffect(() => {
-        const initializeUser = async () => {
+        let active = true;
+        (async () => {
             dispatch({ type: APP_ACTIONS.SET_LOADING, payload: { key: 'user', value: true } });
-
             try {
-                const { data: { user }, error } = await supabase.auth.getUser();
-
-                if (error) {
-                    console.error('Auth error:', error);
-
-                    // Try to refresh session if initial auth fails
-                    console.log('Attempting to refresh Supabase session...');
-                    try {
-                        const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
-
-                        if (refreshError) {
-                            console.error('Session refresh failed:', refreshError);
-                            loadLocalData();
-                            dispatch({ type: APP_ACTIONS.CLEAR_USER });
-                            // Direct navigation to login page
-                            console.log('Redirecting to login page - session refresh failed after auth error');
-                            goToAuth();
-                            return;
-                        }
-
-                        if (refreshData?.user) {
-                            console.log('Session refreshed successfully');
-                            dispatch({ type: APP_ACTIONS.SET_USER, payload: refreshData.user });
-                            await loadUserData(refreshData.user.id);
-                            return;
-                        }
-                    } catch (refreshError) {
-                        console.error('Session refresh exception:', refreshError);
-                    }
-
-                    // If refresh fails, navigate to login
-                    loadLocalData();
-                    dispatch({ type: APP_ACTIONS.CLEAR_USER });
-                    console.log('Redirecting to login page - session refresh failed');
-                    goToAuth();
-                    return;
-                }
-
-                if (user) {
-                    dispatch({ type: APP_ACTIONS.SET_USER, payload: user });
-                    await loadUserData(user.id);
+                const { data: { session } } = await supabase.auth.getSession();
+                if (!active) return;
+                if (session?.user) {
+                    dispatch({ type: APP_ACTIONS.SET_USER, payload: session.user });
+                    await loadUserData(session.user.id);
                 } else {
-                    // No user found, try refreshing session before setting redirect flag
-                    console.log('No user found, attempting session refresh...');
-                    try {
-                        const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
-
-                        if (refreshError) {
-                            console.log('Session refresh failed, will redirect to login:', refreshError.message);
-                            loadLocalData();
-                            dispatch({ type: APP_ACTIONS.CLEAR_USER });
-                            // Direct navigation to login page
-                            console.log('Redirecting to login page - no user session found');
-                            goToAuth();
-                            return;
-                        }
-
-                        if (refreshData?.user) {
-                            console.log('Session refresh successful, user authenticated');
-                            dispatch({ type: APP_ACTIONS.SET_USER, payload: refreshData.user });
-                            await loadUserData(refreshData.user.id);
-                        } else {
-                            console.log('No user after session refresh, will redirect to login');
-                            loadLocalData();
-                            dispatch({ type: APP_ACTIONS.CLEAR_USER });
-                            // Direct navigation to login page
-                            console.log('Redirecting to login page - no user found after session refresh');
-                            goToAuth();
-                        }
-                    } catch (refreshError) {
-                        console.error('Session refresh exception:', refreshError);
-                        loadLocalData();
-                        dispatch({ type: APP_ACTIONS.CLEAR_USER });
-                        // Direct navigation to login page
-                        console.log('Redirecting to login page - session refresh exception');
-                        goToAuth();
-                    }
+                    loadLocalData();
                 }
-            } catch (error) {
-                console.error('User initialization error:', error);
-
-                // Try session refresh as last resort before setting redirect flag
-                try {
-                    console.log('Attempting session refresh after initialization error...');
-                    const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
-
-                    if (!refreshError && refreshData?.user) {
-                        console.log('Session refresh successful after error recovery');
-                        dispatch({ type: APP_ACTIONS.SET_USER, payload: refreshData.user });
-                        await loadUserData(refreshData.user.id);
-                        return;
-                    }
-                } catch (refreshError) {
-                    console.error('Final session refresh attempt failed:', refreshError);
-                }
-
-                // Final fallback - navigate to login
+            } catch (e) {
+                console.warn('Initial session fetch failed', e);
                 loadLocalData();
-                dispatch({ type: APP_ACTIONS.CLEAR_USER });
-                console.log('Redirecting to login page - user initialization failed');
-                goToAuth();
             } finally {
                 dispatch({ type: APP_ACTIONS.SET_LOADING, payload: { key: 'user', value: false } });
             }
-        };
-
-        initializeUser();
+        })();
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+            if (!active) return;
+            if (session?.user) {
+                dispatch({ type: APP_ACTIONS.SET_USER, payload: session.user });
+            } else {
+                dispatch({ type: APP_ACTIONS.CLEAR_USER });
+            }
+        });
+        return () => { active = false; subscription.unsubscribe(); };
     }, []);
 
-    // Handle window focus to refresh session
-    useEffect(() => {
-        const handleFocus = async () => {
-            console.log('Window focused - checking session validity...');
-
-            try {
-                // Check if we have a current session
-                const { data: { session }, error } = await supabase.auth.getSession();
-
-                if (error) {
-                    console.log('Session check error on focus, attempting refresh:', error);
-                    // Try to refresh session
-                    const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
-
-                    if (refreshError) {
-                        console.log('Session refresh failed on focus:', refreshError);
-                        dispatch({ type: APP_ACTIONS.CLEAR_USER });
-                        // Direct navigation to login page
-                        console.log('Redirecting to login page - session refresh failed');
-                        goToAuth();
-                        return;
-                    }
-
-                    if (refreshData?.user) {
-                        console.log('Session refreshed successfully on focus');
-                        dispatch({ type: APP_ACTIONS.SET_USER, payload: refreshData.user });
-                    }
-                } else if (!session?.user) {
-                    console.log('No session found on focus, attempting refresh...');
-                    // Try to refresh session
-                    const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
-
-                    if (refreshError || !refreshData?.user) {
-                        console.log('Failed to restore session on focus');
-                        dispatch({ type: APP_ACTIONS.CLEAR_USER });
-                        // Direct navigation to login page
-                        console.log('Redirecting to login page - failed to restore session');
-                        goToAuth();
-                    } else {
-                        console.log('Session restored successfully on focus');
-                        dispatch({ type: APP_ACTIONS.SET_USER, payload: refreshData.user });
-                    }
-                } else {
-                    // Session exists and is valid
-                    console.log('Valid session found on focus');
-                    if (!state.user || state.user.id !== session.user.id) {
-                        dispatch({ type: APP_ACTIONS.SET_USER, payload: session.user });
-                    }
-                }
-            } catch (error) {
-                console.error('Error checking session on window focus:', error);
-                // Don't clear user state for focus errors unless it's critical
-            }
-        };
-
-        // Add event listener for window focus
-        window.addEventListener('focus', handleFocus);
-
-        // Cleanup event listener
-        return () => {
-            window.removeEventListener('focus', handleFocus);
-        };
-    }, [state.user]);
+    // Removed window focus refresh logic – Supabase auto refresh covers most cases.
 
     // Load user data from Supabase
     const loadUserData = async (userId) => {
@@ -566,6 +420,15 @@ export function AppProvider({ children }) {
         dispatch({ type: APP_ACTIONS.SET_AUTH_REDIRECT_NEEDED, payload: false });
     };
 
+    // Simple setters used in tests and for potential future direct manipulation needs
+    const setAssessment = (assessmentData) => {
+        dispatch({ type: APP_ACTIONS.SET_ASSESSMENT, payload: assessmentData });
+    };
+
+    const clearAssessment = () => {
+        dispatch({ type: APP_ACTIONS.CLEAR_ASSESSMENT });
+    };
+
     const value = {
         // State
         ...state,
@@ -576,6 +439,8 @@ export function AppProvider({ children }) {
         updateTimeline,
         clearUserData,
         clearAuthRedirect,
+        setAssessment, // exposed for tests / direct use
+        clearAssessment,
 
         // Direct dispatch for advanced usage
         dispatch,

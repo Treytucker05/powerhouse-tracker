@@ -3,7 +3,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Mock supabase client module
-vi.mock('@/lib/api/supabaseClient', () => {
+vi.mock('@/lib/supabaseClient', () => {
     return {
         supabase: {
             from: vi.fn(() => ({
@@ -34,7 +34,7 @@ describe('useWeekStatus (coverage)', () => {
     });
 
     it('returns fallback data when user not authenticated', async () => {
-        const mod = await import('@/lib/api/supabaseClient');
+        const mod = await import('@/lib/supabaseClient');
         mod.getCurrentUserId.mockResolvedValueOnce(null);
         const { result } = renderHook(() => useWeekStatus(), { wrapper: createWrapper() });
         await waitFor(() => expect(result.current.data).toBeTruthy());

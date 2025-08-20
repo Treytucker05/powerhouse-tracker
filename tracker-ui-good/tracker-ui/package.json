@@ -23,6 +23,11 @@
     "test:e2e": "playwright test",
     "test:progressive": "node test-runner.mjs",
     "test:quick": "node test-checker.mjs",
+    "test:run": "vitest run -c vitest.local.js",
+    "test:stable": "vitest run -c vitest.stable.js",
+    "test:safe": "node run-tests-safe.js",
+    "test:ui": "vitest -c vitest.local.js",
+    "test:serial": "vitest run -c vitest.local.js --sequence=serial",
     "clean": "rimraf node_modules/.vite .vite && echo 'vite cache cleared'",
     "lint": "echo 'Skipping lint for now' && exit 0",
     "lint:ci": "echo no lint && exit 0"
@@ -67,6 +72,7 @@
     "eslint": "^9.25.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
+    "gh-pages": "latest",
     "globals": "^16.0.0",
     "identity-obj-proxy": "^3.0.0",
     "postcss": "^8.5.6",
@@ -74,7 +80,7 @@
     "supabase": "^2.26.9",
     "tailwindcss": "^3.4.15",
     "vite": "^6.3.5",
-    "vitest": "^3.2.4",
-    "gh-pages": "latest"
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.4"
   }
 }

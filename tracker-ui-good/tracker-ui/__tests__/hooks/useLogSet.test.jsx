@@ -3,8 +3,8 @@ import { renderHook, waitFor, act } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useLogSet } from '../../src/hooks/useLogSet'
 
-// Mock the supabase client
-vi.mock('../../src/lib/api/supabaseClient', () => ({
+// Mock the supabase client (updated path)
+vi.mock('../../src/lib/supabaseClient', () => ({
   supabase: {
     from: vi.fn(() => ({
       select: vi.fn(() => ({

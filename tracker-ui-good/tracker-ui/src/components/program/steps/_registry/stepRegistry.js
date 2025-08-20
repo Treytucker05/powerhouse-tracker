@@ -107,7 +107,8 @@ const steps = [
         id: STEP_IDS.PROGRAM_FUNDAMENTALS,
         title: 'Program Fundamentals',
         description: 'Enter 1RMs → set Training Max (85–90%) → choose core lifts & units.',
-        component: lazy(() => import('../Step1ProgramFundamentals.jsx')),
+        // Temporary swap to new lightweight fundamentals component (pure step1 domain wiring)
+        component: lazy(() => import('../ProgramFundamentals.tsx')),
         visibleIf: () => true,
         group: 'Basics',
         validate: validateFundamentals

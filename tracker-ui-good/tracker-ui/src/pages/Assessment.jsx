@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { supabase } from '../lib/api/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import { useApp } from '../context';
 import { APP_ACTIONS } from '../context/appActions';
 import StepWizard from '../components/assessment/StepWizard';

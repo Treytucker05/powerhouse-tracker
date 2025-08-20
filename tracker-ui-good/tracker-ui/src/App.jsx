@@ -8,6 +8,12 @@ import { MacrocycleBuilderProvider } from './contexts/MacrocycleBuilderContext.t
 // removed duplicate import
 // 5/3/1 V2 barrel imports
 import { Program531ActiveV2, ProgramV2Provider } from "./methods/531";
+import ProgramFundamentals from './components/program/steps/ProgramFundamentals.tsx';
+import TemplateAndScheme from './components/program/steps/TemplateAndScheme.tsx';
+import DesignCustomize from './components/program/steps/DesignCustomize.tsx';
+import ProgramPreview from './components/program/steps/ProgramPreview.tsx';
+import ProgramProgression from './components/program/steps/ProgramProgression.tsx';
+import { BuilderStateProvider } from './context/BuilderState';
 import FiveThreeOneWorkflow from './components/program/FiveThreeOneWorkflow';
 // RESTORED - Using the original ProgramWizard531V2 for the 5-step workflow
 const ProgramWizard531V2 = lazy(() => import("./methods/531/components/ProgramWizard531V2.jsx"));
@@ -25,6 +31,9 @@ import MethodologySelection from './components/program/tabs/MethodologySelection
 const Program = lazy(() => import("./pages/Program.jsx"));
 const Analytics = lazy(() => import("./pages/Analytics.jsx"));
 const AuthPage = lazy(() => import("./pages/AuthPage.jsx"));
+const AuthCallback = lazy(() => import('./pages/AuthCallback.jsx'));
+const AuthUpdatePassword = lazy(() => import('./pages/AuthUpdatePassword.jsx'));
+import { ProtectRoute } from '@/components/auth/ProtectRoute';
 const MacrocycleRedirect = lazy(() => import("./pages/MacrocycleRedirect.jsx"));
 const TrainToday = lazy(() => import('./pages/TrainToday.jsx'));
 const History = lazy(() => import('./pages/History.jsx'));
@@ -55,13 +64,16 @@ function App() {
         <Suspense fallback={<LoadingSpinner />}>
           {/* Temporary helper link removed to keep Dashboard clean */}
           <Routes>
-            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/login" element={<AuthPage />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/auth/update-password" element={<AuthUpdatePassword />} />
             <Route path="/" element={<AppShell />}>
               {/* Dashboard at root */}
               <Route index element={<Home />} />
+              <Route path="hub" element={<ProtectRoute><Home /></ProtectRoute>} />
 
-              {/* Program Design entry menu */}
-              <Route path="program-design" element={<MethodologySelection />} />
+              {/* Program Design entry now routes to unified Program component (includes methodology selection + 5/3/1) */}
+              <Route path="program-design" element={<ProtectRoute><Program /></ProtectRoute>} />
 
               {/* Legacy program route (kept temporarily) */}
               <Route path="program" element={<Program />} />
@@ -69,27 +81,47 @@ function App() {
               {/* 5/3/1 canonical - ENHANCED with step-specific routing */}
               <Route path="builder/531" element={<Navigate to="/builder/531/v2/step/1" replace />} />
               <Route path="builder/531/v2" element={<Navigate to="/builder/531/v2/step/1" replace />} />
-              <Route path="builder/531/v2/step/:stepNumber" element={
-                <ProgramV2Provider>
-                  <ProgramWizard531V2 />
-                </ProgramV2Provider>
-              } />
-              <Route path="program/531/active" element={<Program531ActiveV2 />} />
-              <Route path="builder/review" element={<ProgramV2Provider><BuilderReviewPage /></ProgramV2Provider>} />
+              <Route path="builder/531/v2/step/:stepNumber" element={<ProtectRoute><ProgramV2Provider><ProgramWizard531V2 /></ProgramV2Provider></ProtectRoute>} />
+              {/* New spec-aligned build routes (UI-first scaffold) with a single persistent provider */}
+              <Route
+                path="build/*"
+                element={
+                  <ProtectRoute>
+                    <BuilderStateProvider>
+                      <Routes>
+                        <Route path="step1" element={<ProgramFundamentals />} />
+                        <Route path="step2" element={<TemplateAndScheme />} />
+                        <Route path="step3" element={<DesignCustomize />} />
+                        <Route path="step4" element={<ProgramPreview />} />
+                        <Route path="step5" element={<ProgramProgression />} />
+                        <Route path="*" element={<Navigate to="/build/step1" replace />} />
+                      </Routes>
+                    </BuilderStateProvider>
+                  </ProtectRoute>
+                }
+              />
+              {/* Legacy alias redirects to new spec routes */}
+              <Route path="builder/531/v2/step/1" element={<Navigate to="/build/step1" replace />} />
+              <Route path="builder/531/v2/step/2" element={<Navigate to="/build/step2" replace />} />
+              <Route path="builder/531/v2/step/3" element={<Navigate to="/build/step3" replace />} />
+              <Route path="builder/531/v2/step/4" element={<Navigate to="/build/step4" replace />} />
+              <Route path="builder/531/v2/step/5" element={<Navigate to="/build/step5" replace />} />
+              <Route path="program/531/active" element={<ProtectRoute><Program531ActiveV2 /></ProtectRoute>} />
+              <Route path="builder/review" element={<ProtectRoute><ProgramV2Provider><BuilderReviewPage /></ProgramV2Provider></ProtectRoute>} />
 
               {/* NASM placeholder */}
               <Route path="builder/nasm" element={<div className='text-gray-300 p-8'>NASM Builder (stub)</div>} />
 
               {/* Other existing routes */}
-              <Route path="tracking" element={<Tracking />} />
-              <Route path="analytics" element={<Analytics />} />
-              <Route path="history" element={<History />} />
-              <Route path="settings" element={<Settings />} />
-              <Route path="print-week" element={<PrintWeek />} />
-              <Route path="exercises" element={<ExercisesPage />} />
-              <Route path="profile" element={<ProfilePage />} />
+              <Route path="tracking" element={<ProtectRoute><Tracking /></ProtectRoute>} />
+              <Route path="analytics" element={<ProtectRoute><Analytics /></ProtectRoute>} />
+              <Route path="history" element={<ProtectRoute><History /></ProtectRoute>} />
+              <Route path="settings" element={<ProtectRoute><Settings /></ProtectRoute>} />
+              <Route path="print-week" element={<ProtectRoute><PrintWeek /></ProtectRoute>} />
+              <Route path="exercises" element={<ProtectRoute><ExercisesPage /></ProtectRoute>} />
+              <Route path="profile" element={<ProtectRoute><ProfilePage /></ProtectRoute>} />
               <Route path="resources" element={<ResourcesPage />} />
-              <Route path="train" element={<TrainToday />} />
+              <Route path="train" element={<ProtectRoute><TrainToday /></ProtectRoute>} />
 
               {/* Redirect legacy builder paths */}
               <Route path="mesocycle" element={<MacrocycleRedirect />} />

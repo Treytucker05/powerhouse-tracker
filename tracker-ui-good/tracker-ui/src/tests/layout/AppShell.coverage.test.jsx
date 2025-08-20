@@ -2,8 +2,9 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import AppShell from '@/layout/AppShell';
+import { AppProvider } from '@/context/AppContext';
 
-vi.mock('@/lib/api/supabaseClient', () => ({
+vi.mock('@/lib/supabaseClient', () => ({
     supabase: {
         auth: {
             getSession: vi.fn(async () => ({ data: { session: { user: { id: 'u1', email: 'user@test.com' } } } })),
@@ -20,7 +21,9 @@ describe('AppShell (coverage)', () => {
     it('renders navigation links', () => {
         render(
             <MemoryRouter initialEntries={['/']}>
-                <AppShell />
+                <AppProvider>
+                    <AppShell />
+                </AppProvider>
             </MemoryRouter>
         );
         expect(screen.getAllByText(/Dashboard/i).length).toBeGreaterThan(0);
@@ -31,7 +34,9 @@ describe('AppShell (coverage)', () => {
     it('handles auth state change without crashing', () => {
         render(
             <MemoryRouter>
-                <AppShell />
+                <AppProvider>
+                    <AppShell />
+                </AppProvider>
             </MemoryRouter>
         );
         expect(true).toBe(true);

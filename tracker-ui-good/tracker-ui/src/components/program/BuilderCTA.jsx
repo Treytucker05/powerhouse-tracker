@@ -11,7 +11,8 @@ export default function BuilderCTA() {
                     <div className="text-gray-400 text-sm">Seven-step flow with templates first, then schedule, loading and assistance.</div>
                 </div>
                 <Link
-                    to="/program/builder/531"
+                    // Corrected path: previous /program/builder/531 was not a defined route and fell back to dashboard
+                    to="/builder/531/v2"
                     className="px-4 py-2 rounded border border-red-500 hover:bg-red-600/10"
                 >
                     Open Builder

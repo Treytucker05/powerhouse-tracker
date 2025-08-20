@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useWeekStatus } from '../../hooks/useWeekStatus'
 
 // Mock the entire supabase module
-vi.mock('../../lib/api/supabaseClient', () => {
+vi.mock('@/lib/supabaseClient', () => {
   const mockOrder = vi.fn()
   const mockLte = vi.fn().mockReturnValue({ order: mockOrder })
   const mockGte = vi.fn().mockReturnValue({ lte: mockLte })
@@ -38,12 +38,16 @@ describe('useWeekStatus', () => {
         },
       },
     })
-    mockSupabaseModule = await import('../../lib/api/supabaseClient')
+    mockSupabaseModule = await import('@/lib/supabaseClient')
     vi.clearAllMocks()
   })
 
   afterEach(() => {
     queryClient.clear()
+    queryClient.cancelQueries()
+    queryClient.removeQueries()
+    // Force close any remaining queries/cache
+    queryClient.setQueryData([], undefined)
   })
 
   const wrapper = ({ children }) => (

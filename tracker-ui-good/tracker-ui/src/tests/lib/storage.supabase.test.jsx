@@ -31,7 +31,7 @@ describe('storage.js supabase success paths', () => {
                 })
             })
         };
-        vi.doMock('@/lib/api/supabaseClient', () => ({ supabase: mockSupabase }));
+        vi.doMock('@/lib/supabaseClient', () => ({ supabase: mockSupabase }));
         const { saveMacrocycle } = await import('@/lib/storage.js');
         const id = await saveMacrocycle({ id: 'sup-123', name: 'Test' });
         expect(id).toBe('sup-123');
@@ -50,7 +50,7 @@ describe('storage.js supabase success paths', () => {
                 })
             })
         };
-        vi.doMock('@/lib/api/supabaseClient', () => ({ supabase: mockSupabase }));
+        vi.doMock('@/lib/supabaseClient', () => ({ supabase: mockSupabase }));
         const { loadAllMacrocycles } = await import('@/lib/storage.js');
         const list = await loadAllMacrocycles();
         expect(list).toEqual(mockData);
@@ -64,7 +64,7 @@ describe('storage.js supabase success paths', () => {
                 })
             })
         };
-        vi.doMock('@/lib/api/supabaseClient', () => ({ supabase: mockSupabase }));
+        vi.doMock('@/lib/supabaseClient', () => ({ supabase: mockSupabase }));
         const { deleteMacrocycle } = await import('@/lib/storage.js');
         const ok = await deleteMacrocycle('x1');
         expect(ok).toBe(true);
@@ -81,7 +81,7 @@ describe('storage.js supabase success paths', () => {
                 })
             })
         };
-        vi.doMock('@/lib/api/supabaseClient', () => ({ supabase: mockSupabase }));
+        vi.doMock('@/lib/supabaseClient', () => ({ supabase: mockSupabase }));
         const { loadMacrocycle } = await import('@/lib/storage.js');
         const rec = await loadMacrocycle('abc');
         expect(rec).toEqual(mockRecord);

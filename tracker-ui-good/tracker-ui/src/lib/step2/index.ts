@@ -3,25 +3,9 @@
 import schemesPack from '@/packs/schemes.json';
 import templatesPack from '@/packs/templates.json';
 import logicPack from '@/packs/logic.json';
+import type { SchemeId, TemplateId, SchemeWeek, SchemeCard, TemplateCard } from './types';
 
-type SchemeId = 'scheme_531' | 'scheme_351' | 'scheme_5spro';
-type TemplateId =
-    | 'bbb'
-    | 'triumvirate'
-    | 'periodization_bible'
-    | 'bodyweight'
-    | 'jackshit';
-
-type SchemeSet = {
-    reps: number;
-    percentage: number; // percent of TM, e.g. 65
-    isAmrap: boolean;
-};
-
-type SchemeWeek = {
-    isDeload: boolean;
-    sets: SchemeSet[];
-};
+// ...existing code...
 
 type SchemePack = {
     version: string;
@@ -76,27 +60,24 @@ type LogicPack = {
     features: { leaderAnchor: boolean; seventhWeek: boolean };
 };
 
-export type SchemeCard = {
-    id: SchemeId;
-    name: string;
-    weeks: SchemeWeek[];
-    amrapPolicy: {
-        amrapOnDeload: false;
-        amrapOnWorkWeeks: boolean; // false for 5s Pro, true otherwise
-    };
-    notes?: string;
+// Legacy human-readable AMRAP policy strings (kept for backward compatibility with older UI/tests)
+const AMRAP_POLICY_LABEL: Record<SchemeId, string> = {
+    scheme_531: 'AMRAP on last set; NO AMRAP on deload (40/50/60)',
+    scheme_351: 'AMRAP on last set; NO AMRAP on deload (40/50/60)',
+    scheme_5spro: 'NO AMRAP (5s Pro); all sets prescribed; deload has no AMRAP'
 };
 
-export type TemplateCard = {
-    id: TemplateId;
-    name: string;
-    timePerSession: string;
-    difficulty: 'easy' | 'moderate' | 'hard';
-    defaultAssistance: string[]; // category labels only
-    supplementalSummary: string; // e.g., "BBB 5×10 @ 50% TM" or "None"
-    deloadPolicy: 'ON' | 'OFF';
-    why?: string;
+// Structured flags for new deterministic logic usage
+const AMRAP_FLAGS: Record<
+    SchemeId,
+    { lastSet: boolean; deload: false; scheme5spro: boolean; seventhWeek: false }
+> = {
+    scheme_531: { lastSet: true, deload: false, scheme5spro: false, seventhWeek: false },
+    scheme_351: { lastSet: true, deload: false, scheme5spro: false, seventhWeek: false },
+    scheme_5spro: { lastSet: false, deload: false, scheme5spro: true, seventhWeek: false }
 };
+
+// Types moved to types.ts for reuse
 
 const _schemes = schemesPack as unknown as SchemePack;
 const _templates = templatesPack as unknown as TemplatePack;
@@ -122,19 +103,14 @@ function supplementalToSummary(t: TemplatePack['templates'][TemplateId]['supplem
 }
 
 export function step2_scheme_cards(): SchemeCard[] {
-    const out: SchemeCard[] = Object.values(_schemes.schemes).map((s) => {
-        const is5sPro = s.id === 'scheme_5spro';
-        return {
-            id: s.id,
-            name: s.name,
-            weeks: s.weeks,
-            amrapPolicy: {
-                amrapOnDeload: false,
-                amrapOnWorkWeeks: is5sPro ? false : true
-            }
-        };
-    });
-    // Determinism guard: ensure deload week sets have isAmrap=false; do not mutate source packs
+    const out: SchemeCard[] = Object.values(_schemes.schemes).map((s) => ({
+        id: s.id,
+        name: s.name,
+        weeks: s.weeks,
+        amrapPolicy: AMRAP_POLICY_LABEL[s.id],
+        amrapFlags: AMRAP_FLAGS[s.id]
+    }));
+    // Determinism guard: ensure deload week sets have isAmrap=false
     return out.map((card) => ({
         ...card,
         weeks: card.weeks.map((w) =>

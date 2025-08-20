@@ -26,6 +26,15 @@ export const packs = {
 } as const;
 
 export const getSchemes = () => packs.schemes;
+// Flexible accessor that tolerates nested shape (schemes.schemes[id]) or flat (schemes[id])
+export const getScheme = (id: string) => {
+    const root: any = packs.schemes as any;
+    if (root && typeof root === 'object') {
+        if (root.schemes && root.schemes[id]) return root.schemes[id];
+        if (root[id]) return root[id];
+    }
+    return undefined;
+};
 export const getTemplates = () => packs.templates;
 export const getCatalogs = () => packs.catalogs;
 export const getLogic = () => packs.logic;

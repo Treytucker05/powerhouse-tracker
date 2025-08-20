@@ -1,77 +1,64 @@
-import type { Step1State, Step1Result, TMRow, Unit, LiftId } from './types';
+import type { Step1State, Step1Result, TMRow, LiftId } from './types';
 
-const LIFTS: LiftId[] = ['press', 'deadlift', 'bench', 'squat'] as const;
+const LIFTS: LiftId[] = ['press', 'deadlift', 'bench', 'squat'];
 
-export function calcTrainingMax(oneRm: number, tmPercent: number): number {
-    return oneRm * tmPercent;
+// Epley (simple) for reps based estimate: 1RM ≈ w * (1 + r/30)
+function epley(weight: number, reps: number): number {
+    return weight * (1 + reps / 30);
 }
 
-export function chooseIncrement(unit: Unit, microplates?: boolean, override?: number): number {
-    if (override && override > 0) return override;
-    if (unit === 'lb') return microplates ? 2.5 : 5;
-    return microplates ? 1 : 2.5; // kg
+export function calcTrainingMax(oneRm: number, tmPct: number): number {
+    return oneRm * tmPct;
 }
 
-export function roundWeight(value: number, unit: Unit, increment: number): number {
-    // Deterministic banker's rounding is unnecessary here; classic half-up to nearest increment is expected by lifters.
-    return Math.round(value / increment) * increment;
+export function roundWeight(val: number, increment: number): number {
+    return Math.round(val / increment) * increment;
 }
 
-function validateTm(tm: number | null, unit: Unit): string[] {
-    const warns: string[] = [];
-    if (tm == null || !isFinite(tm)) {
-        warns.push('Missing TM');
-        return warns;
+function deriveOneRm(input: Step1State['lifts'][LiftId], tmPct: number): { tmRaw: number | null; source: 'tested' | 'reps' | 'manual' | 'none'; } {
+    if (!input) return { tmRaw: null, source: 'none' };
+    switch (input.method) {
+        case 'tested':
+            if (!isFinite(input.oneRM)) return { tmRaw: null, source: 'tested' };
+            return { tmRaw: calcTrainingMax(input.oneRM, tmPct), source: 'tested' };
+        case 'reps':
+            if (!isFinite(input.weight) || !isFinite(input.reps) || input.reps <= 0) return { tmRaw: null, source: 'reps' };
+            return { tmRaw: calcTrainingMax(epley(input.weight, input.reps), tmPct), source: 'reps' };
+        case 'manual':
+            if (!isFinite(input.manualTM)) return { tmRaw: null, source: 'manual' };
+            return { tmRaw: input.manualTM, source: 'manual' }; // already a TM value
+        default:
+            return { tmRaw: null, source: 'none' };
     }
-    if (tm <= 0) warns.push('TM must be > 0');
-    // Extremely permissive range to avoid false positives; UI can apply tighter heuristics if desired.
-    const maxKg = unit === 'kg' ? 500 : 1102.3; // parity marker only
-    if (tm > maxKg) warns.push('TM unrealistically high');
-    return warns;
 }
 
-function toNumberOrNull(v: unknown): number | null {
-    return typeof v === 'number' && isFinite(v) ? v : null;
+function validate(tmRaw: number | null): string[] {
+    const w: string[] = [];
+    if (tmRaw == null) w.push('Missing TM');
+    else if (tmRaw <= 0) w.push('TM must be > 0');
+    return w;
 }
 
-export function buildTmRow(
-    lift: LiftId,
-    state: Step1State
-): TMRow {
-    const inc = chooseIncrement(state.unit, state.microplates, state.roundingIncrement);
-    const input = state.lifts[lift] || {};
-    const oneRm = toNumberOrNull(input.oneRm);
-    const tmDirect = toNumberOrNull(input.tm);
-
-    let tmRaw: number | null = null;
-
-    if (state.entryMode === 'tm') {
-        tmRaw = tmDirect;
-    } else {
-        tmRaw = oneRm != null ? calcTrainingMax(oneRm, state.tmPercent) : null;
-    }
-
-    const warnings = validateTm(tmRaw, state.unit);
-    const tmDisplay = tmRaw != null ? roundWeight(tmRaw, state.unit, inc) : null;
-
+function buildRow(lift: LiftId, state: Step1State): TMRow {
+    const { tmRaw } = deriveOneRm(state.lifts[lift], state.tmPct);
+    const inc = state.rounding.increment;
+    const tmDisplay = tmRaw != null ? roundWeight(tmRaw, inc) : null;
     return {
         lift,
         tmRaw,
         tmDisplay,
-        unit: state.unit,
+        unit: state.units,
         increment: inc,
-        warnings
+        warnings: validate(tmRaw)
     };
 }
 
 export function step1_fundamentals(state: Step1State): Step1Result {
-    const rows = LIFTS.map((lift) => buildTmRow(lift, state));
-
-    const helper =
-        'Wendler default: 90% TM. Conservative: 85%. Weights are rounded to the nearest increment.';
-
-    return {
-        tmTable: rows,
-        helper
-    };
+    const tmTable: TMRow[] = LIFTS.map(lift => buildRow(lift, state));
+    const inc = state.rounding.increment;
+    const hint = `Training max = ${Math.round(state.tmPct * 100)}% of estimated 1RM unless manual. Rounded to nearest ${inc}${state.units}.`;
+    return { tmTable, helper: { roundingHint: hint } };
 }
+
+// Legacy named exports kept for tests that still import them (can adjust tests later)
+// roundWeight already exported via function declaration above

@@ -15,7 +15,8 @@ export function percentOfTM(tm, pct, inc = 5, mode = 'nearest') {
 
 // minimal unit helpers (reads user pref from localStorage)
 export function getUnit() {
-    return (typeof localStorage !== 'undefined' ? localStorage.getItem('unit') : 'lb' || 'lb').toLowerCase();
+    const raw = (typeof localStorage !== 'undefined' ? localStorage.getItem('unit') : 'lb') || 'lb';
+    return typeof raw === 'string' ? raw.toLowerCase() : 'lb';
 }
 
 export function setUnit(unit) {

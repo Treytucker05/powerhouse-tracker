@@ -16,13 +16,14 @@ describe('step2_scheme_cards', () => {
         const amrapFlags = deload.sets.map((s) => s.isAmrap);
         expect(pcts).toEqual([40, 50, 60]);
         expect(amrapFlags).toEqual([false, false, false]);
-        expect(s531.amrapPolicy.amrapOnDeload).toBe(false);
-        expect(s531.amrapPolicy.amrapOnWorkWeeks).toBe(true);
+        expect(typeof s531.amrapPolicy).toBe('string');
+        expect(s531.amrapPolicy).toMatch(/NO AMRAP on deload/);
+        expect(s531.amrapFlags.lastSet).toBe(true);
     });
 
     it('disables all AMRAP on 5s Pro work weeks', () => {
         const sp = cards.find((c) => c.id === 'scheme_5spro')!;
-        expect(sp.amrapPolicy.amrapOnWorkWeeks).toBe(false);
+        expect(sp.amrapFlags.scheme5spro).toBe(true);
         sp.weeks
             .filter((w) => !w.isDeload)
             .forEach((w) => w.sets.forEach((set) => expect(set.isAmrap).toBe(false)));

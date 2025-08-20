@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { supabase } from '../../lib/api/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import { useApp } from '../../context';
 import PersonalInfoStep from './PersonalInfoStep';
 import TrainingExperienceStep from './TrainingExperienceStep';

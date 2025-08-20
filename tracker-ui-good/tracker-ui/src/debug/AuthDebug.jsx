@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../lib/api/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function AuthDebug() {
     const [debugInfo, setDebugInfo] = useState({});

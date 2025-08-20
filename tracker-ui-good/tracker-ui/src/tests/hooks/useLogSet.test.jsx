@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useLogSet } from '../../hooks/useLogSet'
 
 // Mock the supabase client
-vi.mock('../../lib/api/supabaseClient', () => ({
+vi.mock('@/lib/supabaseClient', () => ({
   supabase: {
     from: vi.fn(() => ({
       select: vi.fn(() => ({
@@ -197,7 +197,7 @@ describe('useLogSet', () => {
     })
 
     // Mock Supabase to return only partial completion
-    const { supabase } = await import('../../lib/api/supabaseClient')
+    const { supabase } = await import('@/lib/supabaseClient')
     supabase.from.mockReturnValue({
       select: vi.fn(() => ({
         eq: vi.fn(() => Promise.resolve({

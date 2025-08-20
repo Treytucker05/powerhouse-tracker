@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { step1_fundamentals, calcTrainingMax, roundWeight, chooseIncrement } from '../index';
+import { step1_fundamentals, calcTrainingMax, roundWeight } from '../index';
 import type { Step1State } from '../types';
 
 describe('calcTrainingMax', () => {
@@ -9,39 +9,25 @@ describe('calcTrainingMax', () => {
     });
 });
 
-describe('rounding & increments', () => {
-    it('lb default rounds to 5 lb', () => {
-        const inc = chooseIncrement('lb', false, undefined);
-        expect(inc).toBe(5);
-        expect(roundWeight(271, 'lb', inc)).toBe(270);
-        expect(roundWeight(272.6, 'lb', inc)).toBe(275);
-    });
-
-    it('lb microplates rounds to 2.5 lb', () => {
-        const inc = chooseIncrement('lb', true, undefined);
-        expect(inc).toBe(2.5);
-        expect(roundWeight(271, 'lb', inc)).toBe(272.5);
-    });
-
-    it('kg default rounds to 2.5 kg; microplates to 1 kg', () => {
-        expect(chooseIncrement('kg', false)).toBe(2.5);
-        expect(chooseIncrement('kg', true)).toBe(1);
-        expect(roundWeight(99.4, 'kg', 2.5)).toBe(100);
-        expect(roundWeight(99.4, 'kg', 1)).toBe(99);
+describe('rounding', () => {
+    it('roundWeight rounds to nearest increment', () => {
+        expect(roundWeight(271, 5)).toBe(270);
+        expect(roundWeight(272.6, 5)).toBe(275);
+        expect(roundWeight(99.4, 2.5)).toBe(100);
+        expect(roundWeight(99.4, 1)).toBe(99);
     });
 });
 
 describe('step1_fundamentals', () => {
     const base: Step1State = {
-        unit: 'lb',
-        microplates: false,
-        tmPercent: 0.9,
-        entryMode: 'oneRm',
+        units: 'lb',
+        tmPct: 0.9,
+        rounding: { strategy: 'nearest', increment: 5 },
         lifts: {
-            press: { oneRm: 150 },
-            deadlift: { oneRm: 405 },
-            bench: { oneRm: 250 },
-            squat: { oneRm: 365 }
+            press: { method: 'tested', oneRM: 150 },
+            deadlift: { method: 'tested', oneRM: 405 },
+            bench: { method: 'tested', oneRM: 250 },
+            squat: { method: 'tested', oneRM: 365 }
         }
     };
 
@@ -58,24 +44,21 @@ describe('step1_fundamentals', () => {
     it('supports 85% conservative TM and kg microplate rounding', () => {
         const res = step1_fundamentals({
             ...base,
-            unit: 'kg',
-            microplates: true,
-            tmPercent: 0.85
+            units: 'kg',
+            tmPct: 0.85,
+            rounding: { strategy: 'nearest', increment: 1 }
         });
         const rows = Object.fromEntries(res.tmTable.map(r => [r.lift, r]));
-        // Example check: 150 lb ≈ 68.04 kg if user typed kg already we just use kg;
-        // Here we only assert increment & null-safe behavior
         expect(rows.press.increment).toBe(1);
-        expect(res.helper.length).toBeGreaterThan(10);
+        expect(res.helper.roundingHint.length).toBeGreaterThan(10);
     });
 
     it('flags missing or invalid inputs', () => {
         const res = step1_fundamentals({
-            unit: 'lb',
-            microplates: false,
-            tmPercent: 0.9,
-            entryMode: 'oneRm',
-            lifts: { press: {}, deadlift: {}, bench: {}, squat: {} }
+            units: 'lb',
+            tmPct: 0.9,
+            rounding: { strategy: 'nearest', increment: 5 },
+            lifts: { press: { method: 'tested', oneRM: NaN as any }, deadlift: { method: 'tested', oneRM: NaN as any }, bench: { method: 'tested', oneRM: NaN as any }, squat: { method: 'tested', oneRM: NaN as any } }
         });
         res.tmTable.forEach(r => {
             expect(r.tmRaw).toBeNull();

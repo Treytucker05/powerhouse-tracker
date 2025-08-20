@@ -1,3 +1,4 @@
+import { test, expect } from 'vitest';
 import { incrementFor, UNITS } from '../units';
 
 test('incrementFor kg', () => {

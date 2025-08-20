@@ -91,6 +91,7 @@ if (typeof process !== 'undefined') {
         });
     }
 
+    // @ts-ignore non-standard global caretaker property
     if (watchdogMs > 0 && !globalThis.__vitestWatchdog) {
         // @ts-ignore store handle
         globalThis.__vitestWatchdog = setInterval(() => {
@@ -107,6 +108,7 @@ if (typeof process !== 'undefined') {
 
 // Ensure any instrumentation intervals are cleared so test run can exit cleanly
 afterAll(() => {
+    try { vi.useRealTimers(); } catch { /* ignore */ }
     // @ts-ignore
     if (globalThis.__vitestHeartbeat) {
         // @ts-ignore

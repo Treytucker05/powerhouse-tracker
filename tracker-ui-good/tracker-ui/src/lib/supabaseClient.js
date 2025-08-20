@@ -9,3 +9,17 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true
   }
 })
+
+// Helper used by builder steps & hooks to safely obtain a user id.
+// Returns a stable mock id during tests / SSR so persistence logic can no-op gracefully.
+export const getCurrentUserId = async () => {
+  if (typeof window === 'undefined' || window?.process?.env?.NODE_ENV === 'test') {
+    return 'test-user-id'
+  }
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    return user?.id || null
+  } catch {
+    return null
+  }
+}

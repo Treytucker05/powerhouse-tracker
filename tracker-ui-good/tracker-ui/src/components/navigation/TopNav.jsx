@@ -1,4 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
+import HeaderAuthButton from '@/components/auth/HeaderAuthButton';
 import { Avatar } from "../ui/avatar";
 import {
   Dumbbell,
@@ -15,7 +16,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-export default function TopNav({ user, onSignOut }) {
+export default function TopNav({ user }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
@@ -96,15 +97,7 @@ export default function TopNav({ user, onSignOut }) {
           )}
 
           {/* Logout Button */}
-          {user && onSignOut && (
-            <button
-              onClick={onSignOut}
-              className="p-2 bg-red-600 rounded-full transition-colors hover:bg-red-700"
-              title="Sign Out"
-            >
-              <LogOut className="w-4 h-4 text-white" />
-            </button>
-          )}
+          <HeaderAuthButton />
         </div>
 
         {/* Mobile Hamburger Menu */}
@@ -159,18 +152,7 @@ export default function TopNav({ user, onSignOut }) {
             </NavLink>
 
             {/* Mobile Logout */}
-            {user && onSignOut && (
-              <button
-                onClick={() => {
-                  onSignOut();
-                  setIsMobileMenuOpen(false);
-                }}
-                className="flex items-center gap-3 w-full px-3 py-2 text-gray-300 hover:text-white hover:bg-red-600 rounded-md transition-colors"
-              >
-                <LogOut className="w-5 h-5" />
-                Sign Out
-              </button>
-            )}
+            <HeaderAuthButton />
           </div>
         </div>
       )}

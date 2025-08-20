@@ -83,6 +83,8 @@ export const EXERCISE_NOTES = {
     hanging_windshield: 'Controlled rotation; no swing.',
     stir_pot: 'Small circles; stay braced.',
     farmer_carry: 'Tall posture; steady steps.'
+    ,
+    leg_press: 'Controlled depth; drive evenly through feet.'
 };
 
 // Quick lookup map for flattened items

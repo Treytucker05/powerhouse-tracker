@@ -12,9 +12,12 @@ describe('step2 scheme/template cards', () => {
         expect(Object.keys(schemes)).toEqual(expect.arrayContaining(['scheme_531', 'scheme_351', 'scheme_5spro']));
     });
 
-    it('classifies amrap policy with deload correctly', () => {
-        expect(schemes.scheme_531.amrapPolicy).toMatch(/amrap/);
-        expect(schemes.scheme_531.amrapPolicy).toContain('deload');
+    it('classifies AMRAP flags correctly (legacy string retained)', () => {
+        expect(typeof schemes.scheme_531.amrapPolicy).toBe('string');
+        expect(schemes.scheme_531.amrapFlags.lastSet).toBe(true);
+        expect(schemes.scheme_531.amrapFlags.deload).toBe(false);
+        expect(schemes.scheme_5spro.amrapFlags.lastSet).toBe(false);
+        expect(schemes.scheme_5spro.amrapFlags.scheme5spro).toBe(true);
     });
 
     it('includes expected template ids', () => {

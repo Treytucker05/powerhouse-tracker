@@ -1,4 +1,4 @@
-import { supabase } from '../lib/api/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'react-toastify';
 
 // Cache for table existence checks to avoid repeated queries

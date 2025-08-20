@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useUnsavedChanges } from '../hooks/useUnsavedChanges.js';
 import BuilderCTA from '../components/program/BuilderCTA.jsx';
-import MethodologySelection from '../components/program/tabs/MethodologySelection';
+import MethodologySelection from '../components/program/tabs/MethodologySelection.jsx';
 import FiveThreeOneWorkflow from '../components/program/FiveThreeOneWorkflow';
 import StreamlinedProgram from './StreamlinedProgram';
 import { Link } from 'react-router-dom';
@@ -28,10 +28,11 @@ const Program = () => {
 
   // Debug logging
   console.log('Current selectedMethodology:', selectedMethodology);
-  console.log('Should show 5/3/1 workflow?', selectedMethodology?.id === 'fivethreeone');
+  console.log('Should show 5/3/1 workflow?', selectedMethodology?.id === '531');
 
   // If 5/3/1 is selected, show the 5/3/1 workflow
-  if (selectedMethodology?.id === 'fivethreeone') {
+  // Updated: internal ID for 5/3/1 now '531' (was 'fivethreeone') to match MethodologySelection
+  if (selectedMethodology?.id === '531') {
     return (
       <div className="min-h-screen bg-gray-900">
         <div className="container mx-auto px-6 py-8">
@@ -63,7 +64,7 @@ const Program = () => {
   }
 
   // If other methodology is selected, use existing system
-  if (selectedMethodology && selectedMethodology.id !== 'fivethreeone') {
+  if (selectedMethodology && selectedMethodology.id !== '531') {
     return (
       <div className="min-h-screen bg-gray-900">
         <div className="container mx-auto px-6 py-8">
@@ -98,10 +99,7 @@ const Program = () => {
             Print Week
           </Link>
         </div>
-        <MethodologySelection
-          onMethodologySelect={handleMethodologySelect}
-          selectedMethodology={selectedMethodology}
-        />
+        <MethodologySelection onMethodologySelect={handleMethodologySelect} selectedMethodology={selectedMethodology} />
       </div>
     </div>
   );
