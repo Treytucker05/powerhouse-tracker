@@ -89,7 +89,7 @@ const Input = (props: React.InputHTMLAttributes<HTMLInputElement>) => {
                 // Prevent scientific notation or minus signs for these fields
                 if (['e', 'E', '+', '-'].includes(e.key)) e.preventDefault();
             }}
-            className={`mt-1 w-full rounded-md border border-gray-700 bg-gray-900/60 px-2 py-1 text-sm text-gray-100 placeholder-gray-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/40 ${props.className || ''}`.trim()}
+            className={`mt-1 w-full rounded-md border border-gray-700 bg-gray-800/60 px-2 py-1 text-sm text-gray-100 placeholder-gray-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/40 ${props.className || ''}`.trim()}
             type={props.type || 'number'}
         />
     );
@@ -350,20 +350,7 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
     const setManualTM = (lift: LiftKey, manualTM: number) => setState(s => ({ ...s, lifts: { ...s.lifts, [lift]: { ...s.lifts[lift], method: 'manual', manualTM } } }));
     const setMethod = (lift: LiftKey, method: 'tested' | 'reps' | 'manual') => setState(s => ({ ...s, lifts: { ...s.lifts, [lift]: { ...s.lifts[lift], method } } }));
 
-    // Unified vertical red stacked buttons selector as requested
-    const renderMethodSelector = (_variant: any, lift: LiftKey, method: string) => {
-        const change = (m: 'tested' | 'reps' | 'manual') => setMethod(lift, m);
-        const base = 'w-full text-[12px] tracking-wide font-medium px-3 py-2 rounded-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900';
-        const activeCls = 'bg-red-700 text-white shadow-sm';
-        const inactiveCls = 'bg-red-800 text-red-100 hover:bg-red-700/90';
-        return (
-            <div className="flex flex-col gap-2">
-                <button type="button" onClick={() => change('tested')} aria-label={`${lift} input method Tested 1RM`} aria-pressed={method === 'tested'} className={`${base} ${method === 'tested' ? activeCls : inactiveCls}`}>Tested 1RM</button>
-                <button type="button" onClick={() => change('reps')} aria-label={`${lift} input method Reps × Weight`} aria-pressed={method === 'reps'} className={`${base} ${method === 'reps' ? activeCls : inactiveCls}`}>Reps x Weight</button>
-                <button type="button" onClick={() => change('manual')} aria-label={`${lift} input method Direct TM`} aria-pressed={method === 'manual'} className={`${base} ${method === 'manual' ? activeCls : inactiveCls}`}>Direct TM</button>
-            </div>
-        );
-    };
+    // (removed) legacy stacked-button method selector; radios are used per-lift now.
 
     const onNext = () => {
         if (tmTable.some(r => (r.tmDisplay ?? 0) <= 0)) return; // guard
@@ -420,24 +407,10 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                 <BuilderProgress current={1} />
                 <header className="flex flex-col gap-4">
                     <div className="flex items-center gap-3">
-                        <h1 className="text-2xl font-semibold tracking-tight">Step 1 · Program Fundamentals</h1>
-                        <span aria-live="polite" className={`px-2 py-1 rounded text-[11px] border ${tmReadyCount === 4 ? 'bg-emerald-700/30 border-emerald-500 text-emerald-100' : 'bg-gray-800/60 border-gray-700 text-gray-300'}`}>
-                            TMs ready: {tmReadyCount}/4
-                        </span>
+                        <h1 className="text-2xl font-bold tracking-tight text-gray-100">Step 1 · Program Fundamentals</h1>
                     </div>
                     {/* Toggle container */}
-                    <style>{`
-                        .toggle-container { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; display: flex; justify-content: space-between; gap: 1rem; }
-                        .toggle-selected { background: #ef4444 !important; color: white; border: 2px solid white; font-weight: bold; padding: 0.5rem 1rem; border-radius: 6px; }
-                        .toggle-unselected { background: transparent; color: #999; border: 1px solid #666; padding: 0.5rem 1rem; border-radius: 6px; }
-                        .method-selection { display: flex; gap: 2rem; justify-content: center; }
-                        @media (max-width: 640px) {
-                            .method-selection { flex-direction: column !important; }
-                            .toggle-container { flex-direction: column; }
-                            .exercise-card input { width: 100% !important; }
-                        }
-                    `}</style>
-                    <div className="toggle-container">
+                    <div className="w-full flex flex-wrap items-center gap-4 bg-gray-800/60 border border-gray-700 p-4 rounded-md">
                         <div className="flex items-center gap-2">
                             <span className="text-xs uppercase tracking-wide text-gray-400">Units</span>
                             <div className="flex gap-1.5">
@@ -485,21 +458,16 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                         const currentVariant = state.variants ? state.variants[id as LiftId] : undefined;
                         const method = liftState.method;
                         return (
-                            <div key={id} className="exercise-card" style={{ background: '#1a1a2e', border: '1px solid #333', borderLeft: isComplete ? '4px solid #10b981' : '1px solid #333', padding: '1.5rem', marginBottom: '1rem', borderRadius: 8 }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                        {isComplete && <span style={{ color: '#10b981', fontSize: '1.5rem' }}>✓</span>}
+                            <div key={id} className="exercise-card bg-gray-800/60 border border-gray-700 p-5 mb-3 rounded-[10px]">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        {isComplete && <span className="text-white text-2xl">✓</span>}
                                         <h3 className="capitalize">{title}</h3>
                                     </div>
-                                    <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>
-                                        <span style={{
-                                            display: 'inline-block',
-                                            padding: '0.25rem 0.5rem',
-                                            borderRadius: 6,
-                                            background: isComplete ? '#10b981' : 'transparent',
-                                            color: isComplete ? 'white' : '#10b981',
-                                            border: '1px solid #10b981'
-                                        }}>TM: {typeof tm === 'number' ? tm : '---'} {state.units}</span>
+                                    <div className="text-[0.9rem] font-bold">
+                                        <span className={`inline-block px-2 py-1 rounded-md border ${isComplete ? 'bg-red-500 border-red-500 text-white' : 'bg-gray-700 border-gray-700 text-gray-200'}`}>
+                                            TM: {typeof tm === 'number' ? tm : '---'} {state.units}
+                                        </span>
                                     </div>
                                 </div>
 
@@ -516,7 +484,7 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                                             <span className="text-gray-300">Variant</span>
                                         </label>
                                         {currentVariant && currentVariant !== VARIANT_OPTIONS[id as LiftKey][0].code && (
-                                            <select className="ml-2 flex-1 rounded-md border border-gray-700 bg-gray-900/60 px-2 py-1 text-[11px] text-gray-100 focus:border-red-500 focus:ring-2 focus:ring-red-500/40" value={currentVariant} data-testid={`variant-${id}`} onChange={e => setVariant(id as LiftKey, e.target.value)} aria-label={`${title} variant options`}>
+                                            <select className="ml-2 flex-1 rounded-md border border-gray-700 bg-gray-800/60 px-2 py-1 text-[11px] text-gray-100 focus:border-red-500 focus:ring-2 focus:ring-red-500/40" value={currentVariant} data-testid={`variant-${id}`} onChange={e => setVariant(id as LiftKey, e.target.value)} aria-label={`${title} variant options`}>
                                                 {VARIANT_OPTIONS[id as LiftKey].filter((_, i) => i > 0).map(opt => (
                                                     <option key={opt.code} value={opt.code}>{opt.label}</option>
                                                 ))}
@@ -525,8 +493,23 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                                     </div>
                                 </label>
 
-                                {/* Per-lift method selector and inputs */}
-                                {renderMethodSelector('stacked', id as any, method)}
+                                {/* Per-lift method selection (radio row) */}
+                                <div className="mt-3 text-sm">
+                                    <div className="flex flex-wrap items-center gap-4">
+                                        <label className="inline-flex items-center gap-2 cursor-pointer">
+                                            <input type="radio" name={`method-${id}`} value="tested" checked={method === 'tested'} onChange={() => setMethod(id as any, 'tested')} />
+                                            <span>Tested 1RM</span>
+                                        </label>
+                                        <label className="inline-flex items-center gap-2 cursor-pointer">
+                                            <input type="radio" name={`method-${id}`} value="reps" checked={method === 'reps'} onChange={() => setMethod(id as any, 'reps')} />
+                                            <span>Reps × Weight</span>
+                                        </label>
+                                        <label className="inline-flex items-center gap-2 cursor-pointer">
+                                            <input type="radio" name={`method-${id}`} value="manual" checked={method === 'manual'} onChange={() => setMethod(id as any, 'manual')} />
+                                            <span>Direct TM</span>
+                                        </label>
+                                    </div>
+                                </div>
                                 {method === 'tested' && (
                                     <label className="block text-[11px] font-medium text-gray-300 mt-3">
                                         Enter 1RM ({state.units})
@@ -554,7 +537,7 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
 
                                 {/* Deadlift-only style */}
                                 {id === 'deadlift' && (
-                                    <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #444' }}>
+                                    <div className="mt-4 pt-4 border-t border-gray-700">
                                         <label className="mr-3">Style:</label>
                                         <label className="mr-4"><input type="radio" name="deadliftStyle" checked={(state as any).deadliftRepStyle === 'dead_stop'} onChange={() => setState(s => ({ ...(s as any), deadliftRepStyle: 'dead_stop' }))} />{' '}Dead Stop</label>
                                         <label><input type="radio" name="deadliftStyle" checked={(state as any).deadliftRepStyle === 'touch_and_go'} onChange={() => setState(s => ({ ...(s as any), deadliftRepStyle: 'touch_and_go' }))} />{' '}Touch & Go</label>
@@ -566,17 +549,20 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                 </section>
 
                 {/* Progress bar & status */}
-                <section style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '1rem', borderRadius: 8, marginTop: '2rem' }}>
-                    <div style={{ background: '#333', height: 8, borderRadius: 4, overflow: 'hidden' }}>
-                        <div style={{ background: '#10b981', height: '100%', width: `${(tmReadyCount / 4) * 100}%`, transition: 'width 0.3s' }} />
+                <section className="bg-gray-800/60 border border-gray-700 p-4 rounded-md mt-8">
+                    <div className="bg-gray-800 h-2 rounded overflow-hidden">
+                        <div className="progress-bar-fill" style={{ background: '#ef4444', height: '100%', width: `${(tmReadyCount / 4) * 100}%`, transition: 'width 0.3s' }} />
                     </div>
-                    <div style={{ display: 'flex', gap: '2rem', marginTop: '1rem', fontSize: '0.9rem' }}>
+                    <div className="flex flex-wrap gap-2 mt-4 text-[0.8rem]">
                         {(['press', 'bench', 'squat', 'deadlift'] as LiftId[]).map((id) => {
                             const label = id === 'press' ? 'OHP' : id.charAt(0).toUpperCase() + id.slice(1);
                             const tm = tmLookup[id];
                             const done = typeof tm === 'number' && tm > 0;
                             return (
-                                <span key={id} style={{ color: done ? '#10b981' : '#666' }}>
+                                <span
+                                    key={id}
+                                    className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border bg-transparent ${done ? 'text-white' : 'text-gray-400'} border-gray-700`}
+                                >
                                     {done ? '✓' : '○'} {label}: {typeof tm === 'number' ? tm : '---'}
                                 </span>
                             );
