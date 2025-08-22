@@ -6,38 +6,46 @@ import { useBuilder } from '@/context/BuilderState';
 import { supabase, getCurrentUserId } from '@/lib/supabaseClient';
 import BuilderProgress from './BuilderProgress';
 // Lightweight local UI primitives (placeholder until design system integration)
-type PillVariant = 'indigo' | 'emerald' | 'amber' | 'neutral';
+type PillVariant = 'indigo' | 'emerald' | 'amber' | 'neutral' | 'red';
 type PillProps = React.PropsWithChildren<{ active?: boolean; onClick?: () => void; label?: string; variant?: PillVariant }>;
 const variantStyles: Record<PillVariant, { active: string; inactive: string; focus: string }> = {
     indigo: {
-        active: 'bg-indigo-600/25 text-indigo-200 border-indigo-400 shadow-sm',
-        inactive: 'bg-gray-800/60 text-gray-300 border-gray-700 hover:border-indigo-500 hover:text-indigo-200',
-        focus: 'focus:ring-indigo-500/60'
+        active: 'bg-indigo-600/25 text-indigo-200 border-2 border-indigo-400 shadow-sm',
+        inactive: 'bg-gray-800/60 text-gray-300 border border-gray-700 hover:border-indigo-500 hover:text-indigo-200',
+        focus: 'focus-visible:ring-1 focus-visible:ring-gray-500/30 focus-visible:ring-offset-0'
     },
     emerald: {
-        active: 'bg-emerald-600/20 text-emerald-200 border-emerald-400 shadow-sm',
-        inactive: 'bg-gray-800/60 text-gray-300 border-gray-700 hover:border-emerald-500 hover:text-emerald-200',
-        focus: 'focus:ring-emerald-500/60'
+        active: 'bg-emerald-600/20 text-emerald-200 border-2 border-emerald-400 shadow-sm',
+        inactive: 'bg-gray-800/60 text-gray-300 border border-gray-700 hover:border-emerald-500 hover:text-emerald-200',
+        focus: 'focus-visible:ring-1 focus-visible:ring-gray-500/30 focus-visible:ring-offset-0'
     },
     amber: {
-        active: 'bg-amber-600/25 text-amber-200 border-amber-400 shadow-sm',
-        inactive: 'bg-gray-800/60 text-gray-300 border-gray-700 hover:border-amber-500 hover:text-amber-200',
-        focus: 'focus:ring-amber-500/60'
+        active: 'bg-amber-600/25 text-amber-200 border-2 border-amber-400 shadow-sm',
+        inactive: 'bg-gray-800/60 text-gray-300 border border-gray-700 hover:border-amber-500 hover:text-amber-200',
+        focus: 'focus-visible:ring-1 focus-visible:ring-gray-500/30 focus-visible:ring-offset-0'
     },
     neutral: {
-        active: 'bg-gray-700 text-gray-100 border-gray-400 shadow-sm',
-        inactive: 'bg-gray-800/60 text-gray-300 border-gray-700 hover:border-gray-500 hover:text-gray-200',
-        focus: 'focus:ring-gray-500/60'
+        active: 'bg-gray-700 text-gray-100 border-2 border-gray-400 shadow-sm',
+        inactive: 'bg-gray-800/60 text-gray-300 border border-gray-700 hover:border-gray-500 hover:text-gray-200',
+        focus: 'focus-visible:ring-1 focus-visible:ring-gray-500/30 focus-visible:ring-offset-0'
+    },
+    red: {
+        // Make active state highly distinct vs. inactive and independent of focus
+        active: 'bg-red-600 text-white border-2 border-red-300 shadow-md ring-2 ring-red-400/70 ring-offset-1 ring-offset-gray-900',
+        inactive: 'bg-gray-900/40 text-red-200 border border-red-700/70 hover:border-red-500/70 hover:bg-red-900/20',
+        focus: 'focus-visible:ring-1 focus-visible:ring-gray-500/30 focus-visible:ring-offset-0'
     }
 };
-const Pill = ({ active, onClick, children, variant = 'neutral' }: PillProps) => {
+const Pill = ({ active, onClick, children, variant = 'red' }: PillProps) => {
     const v = variantStyles[variant];
     return (
         <button
             type="button"
             onClick={onClick}
-            className={`px-3 py-1 text-[11px] rounded-md border transition select-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 ${v.focus} ${active ? v.active : v.inactive}`}
+            aria-pressed={!!active}
+            className={`px-3 py-1 text-[11px] rounded-md border transition select-none font-semibold outline-none ${v.focus} ${active ? v.active : v.inactive}`}
         >
+            {active ? <span className="mr-1">✓</span> : null}
             {children}
         </button>
     );
@@ -146,11 +154,15 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
             }
             return { method: 'tested', oneRM: 0 } as any;
         };
+        // Normalize potential aliases coming from persisted builder meta
+        const normalizeUnits = (u: any): 'lb' | 'kg' => (u === 'kg' || u === 'kilogram' || u === 'kilograms') ? 'kg' : 'lb';
+        const normalizePct = (p: any): 0.85 | 0.90 => (p === 0.85 ? 0.85 : 0.90);
+        const normalizeStrategy = (s: any): 'nearest' | 'down' | 'up' => (s === 'down' || s === 'up') ? s : 'nearest';
         return {
             ...defaultStep1State,
-            units: step1?.units || 'lb',
-            tmPct: (step1?.tmPct === 0.85 ? 0.85 : 0.90),
-            rounding: { strategy: 'nearest', increment: step1?.rounding || 5 },
+            units: normalizeUnits(step1?.units),
+            tmPct: normalizePct(step1?.tmPct),
+            rounding: { strategy: normalizeStrategy((step1 as any)?.rounding?.strategy), increment: (typeof (step1?.rounding) === 'number' ? (step1?.rounding as any) : (step1 as any)?.rounding?.increment) || 5 },
             lifts: {
                 squat: deriveLift('squat'),
                 bench: deriveLift('bench'),
@@ -164,8 +176,10 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                 press: step1?.variants?.press || 'overhead_press'
             },
             deadliftRepStyle: (step1 as any)?.deadliftRepStyle || 'touch_and_go'
-        };
+        } as LocalStep1;
     });
+
+    // (debug logging removed)
 
     // If builder meta later gains values (e.g., restored from localStorage) while internal lifts are still empty, sync once.
     React.useEffect(() => {
@@ -275,7 +289,30 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
     }, []);
 
     // compute once per render
-    const { tmTable, helper } = step1_fundamentals(state);
+    const { tmTable } = step1_fundamentals(state);
+    const tmReadyCount = React.useMemo(() => tmTable.filter(r => (r.tmDisplay ?? 0) > 0).length, [tmTable]);
+
+    // Enforce valid selections at all times (one per toggle group)
+    React.useEffect(() => {
+        setState(prev => {
+            let changed = false;
+            let units: 'lb' | 'kg' = (prev.units === 'kg' || prev.units === 'lb') ? prev.units : 'lb';
+            if (units !== prev.units) changed = true;
+            let tmPct: 0.85 | 0.90 = (prev.tmPct === 0.85 ? 0.85 : 0.90);
+            if (tmPct !== prev.tmPct) changed = true;
+            const prevStrategy = (prev.rounding as any)?.strategy;
+            const strategy: any = (prevStrategy === 'down' || prevStrategy === 'up' || prevStrategy === 'nearest') ? prevStrategy : 'nearest';
+            if (strategy !== prev.rounding.strategy) changed = true;
+            const deadliftRepStyle: any = (prev as any).deadliftRepStyle === 'dead_stop' || (prev as any).deadliftRepStyle === 'touch_and_go' ? (prev as any).deadliftRepStyle : 'touch_and_go';
+            if (deadliftRepStyle !== (prev as any).deadliftRepStyle) changed = true;
+            if (!changed) return prev;
+            // adjust increment if current value illegal for unit
+            let increment = prev.rounding.increment;
+            if (units === 'lb' && (increment !== 5 && increment !== 2.5)) increment = 5;
+            if (units === 'kg' && (increment !== 2.5 && increment !== 1.0)) increment = 2.5;
+            return { ...prev, units, tmPct, deadliftRepStyle, rounding: { ...prev.rounding, strategy, increment } } as any;
+        });
+    }, []);
 
     const onUnits = (units: 'lb' | 'kg') => {
         setState(s => ({
@@ -321,9 +358,9 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
         const inactiveCls = 'bg-red-800 text-red-100 hover:bg-red-700/90';
         return (
             <div className="flex flex-col gap-2">
-                <button type="button" onClick={() => change('tested')} aria-pressed={method === 'tested'} className={`${base} ${method === 'tested' ? activeCls : inactiveCls}`}>Tested 1RM</button>
-                <button type="button" onClick={() => change('reps')} aria-pressed={method === 'reps'} className={`${base} ${method === 'reps' ? activeCls : inactiveCls}`}>Reps x Weight</button>
-                <button type="button" onClick={() => change('manual')} aria-pressed={method === 'manual'} className={`${base} ${method === 'manual' ? activeCls : inactiveCls}`}>Direct TM</button>
+                <button type="button" onClick={() => change('tested')} aria-label={`${lift} input method Tested 1RM`} aria-pressed={method === 'tested'} className={`${base} ${method === 'tested' ? activeCls : inactiveCls}`}>Tested 1RM</button>
+                <button type="button" onClick={() => change('reps')} aria-label={`${lift} input method Reps × Weight`} aria-pressed={method === 'reps'} className={`${base} ${method === 'reps' ? activeCls : inactiveCls}`}>Reps x Weight</button>
+                <button type="button" onClick={() => change('manual')} aria-label={`${lift} input method Direct TM`} aria-pressed={method === 'manual'} className={`${base} ${method === 'manual' ? activeCls : inactiveCls}`}>Direct TM</button>
             </div>
         );
     };
@@ -381,123 +418,105 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
         <div className="min-h-screen bg-gray-900 text-gray-100 px-6 py-8">
             <div className="max-w-7xl mx-auto flex flex-col gap-8">
                 <BuilderProgress current={1} />
-                <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <h1 className="text-2xl font-semibold tracking-tight">Step 1 · Program Fundamentals</h1>
-                    <div className="flex flex-wrap items-center gap-4">
-                        <label className="flex items-center gap-2">
+                <header className="flex flex-col gap-4">
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-2xl font-semibold tracking-tight">Step 1 · Program Fundamentals</h1>
+                        <span aria-live="polite" className={`px-2 py-1 rounded text-[11px] border ${tmReadyCount === 4 ? 'bg-emerald-700/30 border-emerald-500 text-emerald-100' : 'bg-gray-800/60 border-gray-700 text-gray-300'}`}>
+                            TMs ready: {tmReadyCount}/4
+                        </span>
+                    </div>
+                    {/* Toggle container */}
+                    <style>{`
+                        .toggle-container { background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; display: flex; justify-content: space-between; gap: 1rem; }
+                        .toggle-selected { background: #ef4444 !important; color: white; border: 2px solid white; font-weight: bold; padding: 0.5rem 1rem; border-radius: 6px; }
+                        .toggle-unselected { background: transparent; color: #999; border: 1px solid #666; padding: 0.5rem 1rem; border-radius: 6px; }
+                        .method-selection { display: flex; gap: 2rem; justify-content: center; }
+                        @media (max-width: 640px) {
+                            .method-selection { flex-direction: column !important; }
+                            .toggle-container { flex-direction: column; }
+                            .exercise-card input { width: 100% !important; }
+                        }
+                    `}</style>
+                    <div className="toggle-container">
+                        <div className="flex items-center gap-2">
                             <span className="text-xs uppercase tracking-wide text-gray-400">Units</span>
                             <div className="flex gap-1.5">
-                                <Pill active={state.units === 'lb'} onClick={() => onUnits('lb')}>LBS</Pill>
-                                <Pill active={state.units === 'kg'} onClick={() => onUnits('kg')}>KG</Pill>
+                                <Pill variant="red" active={state.units === 'lb'} onClick={() => onUnits('lb')}>LBS</Pill>
+                                <Pill variant="red" active={state.units === 'kg'} onClick={() => onUnits('kg')}>KG</Pill>
                             </div>
-                        </label>
-
-                        <label className="flex items-center gap-2">
+                        </div>
+                        <div className="flex items-center gap-2">
                             <span className="text-xs uppercase tracking-wide text-gray-400">TM %</span>
                             <div className="flex gap-1.5">
-                                <Pill active={state.tmPct === 0.90} onClick={() => onTmPct(0.90)}>90%</Pill>
-                                <Pill active={state.tmPct === 0.85} onClick={() => onTmPct(0.85)}>85%</Pill>
+                                <Pill variant="red" active={state.tmPct === 0.90} onClick={() => onTmPct(0.90)}>90%</Pill>
+                                <Pill variant="red" active={state.tmPct === 0.85} onClick={() => onTmPct(0.85)}>85%</Pill>
                             </div>
-                        </label>
-
-                        <label className="flex items-center gap-3">
+                        </div>
+                        <div className="flex items-center gap-3">
                             <Switch
                                 checked={state.rounding.increment === (state.units === 'lb' ? 2.5 : 1.0)}
                                 onCheckedChange={onToggleMicro}
                                 label="Use microplates"
                             />
                             <HelperText>
-                                LB increments: {state.units === 'lb' ? '2.5 / 5' : '—'} · KG increments: {state.units === 'kg' ? '1.0 / 2.5' : '—'}
+                                LB inc: {state.units === 'lb' ? '2.5 / 5' : '—'} · KG inc: {state.units === 'kg' ? '1.0 / 2.5' : '—'}
                             </HelperText>
-                        </label>
-                        <label className="flex items-center gap-2">
+                        </div>
+                        <div className="flex items-center gap-2">
                             <span className="text-xs uppercase tracking-wide text-gray-400">Rounding</span>
                             <div className="flex gap-1.5">
                                 {(['nearest', 'down', 'up'] as const).map(r => (
-                                    <Pill key={r} active={state.rounding.strategy === r} onClick={() => setState(s => ({ ...s, rounding: { ...s.rounding, strategy: r as any, increment: s.rounding.increment } }))}>{r}</Pill>
+                                    <Pill key={r} variant="red" active={state.rounding.strategy === r} onClick={() => setState(s => ({ ...s, rounding: { ...s.rounding, strategy: r as any } }))}>{r}</Pill>
                                 ))}
                             </div>
-                        </label>
+                        </div>
                     </div>
                 </header>
 
-                {/* TM Info Boxes */}
-                <section className="grid sm:grid-cols-3 gap-4">
-                    <div className="rounded-md border border-red-600/30 bg-gradient-to-br from-red-900/40 via-red-800/20 to-red-900/10 p-4 text-[11px] leading-relaxed shadow-sm">
-                        <h4 className="text-xs font-semibold mb-1 tracking-wide text-red-300">Training Max</h4>
-                        <p className="text-red-100/80">Use <span className="font-mono text-red-200">{Math.round(state.tmPct * 100)}%</span> of a real or estimated 1RM. Drop to 85% if recovery or technique is off.</p>
-                    </div>
-                    <div className="rounded-md border border-indigo-600/30 bg-gradient-to-br from-indigo-900/40 via-indigo-800/20 to-indigo-900/10 p-4 text-[11px] leading-relaxed shadow-sm">
-                        <h4 className="text-xs font-semibold mb-1 tracking-wide text-indigo-300">Cycle Increments</h4>
-                        <p className="text-indigo-100/80">Each new cycle: <span className="font-mono">+5 lb (upper) / +10 lb (lower)</span> or <span className="font-mono">+2.5 / +5 kg</span>.</p>
-                    </div>
-                    <div className="rounded-md border border-cyan-600/30 bg-gradient-to-br from-cyan-900/40 via-cyan-800/20 to-cyan-900/10 p-4 text-[11px] leading-relaxed shadow-sm">
-                        <h4 className="text-xs font-semibold mb-1 tracking-wide text-cyan-300">Rounding & Microplates</h4>
-                        <p className="text-cyan-100/80">Increment {state.rounding.increment}{state.units}. Microplates {state.rounding.increment < (state.units === 'lb' ? 5 : 2.5) ? 'enabled' : 'off'}.</p>
-                        <p className="text-cyan-200/60 italic mt-1">{helper.roundingHint}</p>
-                    </div>
-                </section>
-                <section className="rounded-md border border-gray-800 bg-gray-800/40 p-4 text-[11px] leading-relaxed text-gray-300">
-                    <strong className="block mb-1 text-gray-200">How to enter Training Max</strong>
-                    <ul className="list-disc pl-5 space-y-1">
-                        <li><span className="text-gray-200">Tested 1RM:</span> Enter a recent single. We multiply by TM%.</li>
-                        <li><span className="text-gray-200">Reps x Weight:</span> Enter any multi‑rep PR (e.g. 5 reps @ 200). We estimate 1RM and apply TM%.</li>
-                        <li><span className="text-gray-200">Direct TM:</span> Override and enter the exact Training Max you want to use.</li>
-                    </ul>
-                    <p className="mt-2 text-[10px] text-gray-400">Pick ONE method per lift. Switching methods preserves prior values so you can compare.</p>
-                </section>
+                {/* (global method selection removed; each lift has its own) */}
 
-                {/* One-RM Inputs */}
-                <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    {(['press', 'bench', 'squat', 'deadlift'] as LiftId[]).map((id, idx) => {
-                        const tmVal = tmLookup[id];
-                        const title = id === 'press' ? 'Overhead Press' : id;
+                {/* Exercise cards (stacked) */}
+                <section>
+                    {(['press', 'bench', 'squat', 'deadlift'] as LiftId[]).map((id) => {
+                        const title = id === 'press' ? 'Overhead Press' : id.charAt(0).toUpperCase() + id.slice(1);
+                        const tm = tmLookup[id];
+                        const isComplete = typeof tm === 'number' && tm > 0;
                         const liftState: any = state.lifts[id];
-                        const method = liftState.method;
-                        const variant = 'stacked';
                         const currentVariant = state.variants ? state.variants[id as LiftId] : undefined;
+                        const method = liftState.method;
                         return (
-                            <div key={id} className="relative border border-gray-800/70 bg-gray-800/50 backdrop-blur rounded-md p-4 shadow-sm flex flex-col gap-3">
-                                <div className="flex items-start justify-between">
-                                    <div className="text-[10px] uppercase tracking-wide text-gray-300 font-semibold">{title}</div>
-                                    <div className="text-[10px] px-2 py-1 rounded bg-gray-900/70 border border-gray-700 font-mono text-gray-200" aria-label={`${title} training max`}>
-                                        {tmVal}
+                            <div key={id} className="exercise-card" style={{ background: '#1a1a2e', border: '1px solid #333', borderLeft: isComplete ? '4px solid #10b981' : '1px solid #333', padding: '1.5rem', marginBottom: '1rem', borderRadius: 8 }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                        {isComplete && <span style={{ color: '#10b981', fontSize: '1.5rem' }}>✓</span>}
+                                        <h3 className="capitalize">{title}</h3>
+                                    </div>
+                                    <div style={{ fontSize: '0.9rem', fontWeight: 700 }}>
+                                        <span style={{
+                                            display: 'inline-block',
+                                            padding: '0.25rem 0.5rem',
+                                            borderRadius: 6,
+                                            background: isComplete ? '#10b981' : 'transparent',
+                                            color: isComplete ? 'white' : '#10b981',
+                                            border: '1px solid #10b981'
+                                        }}>TM: {typeof tm === 'number' ? tm : '---'} {state.units}</span>
                                     </div>
                                 </div>
-                                <label className="block text-[10px] text-gray-400">
-                                    Use Variant?
+
+                                {/* Variant selector (keep light) */}
+                                <label className="block mt-2 text-[11px] text-gray-300" aria-label={`Select ${title} variant`}>
+                                    <span className="text-gray-400">Use Variant?</span>
                                     <div className="mt-1 flex items-center gap-3 text-[11px]">
                                         <label className="inline-flex items-center gap-1">
-                                            <input
-                                                type="radio"
-                                                name={`variant-mode-${id}`}
-                                                value="base"
-                                                checked={!currentVariant || currentVariant === VARIANT_OPTIONS[id as LiftKey][0].code}
-                                                onChange={() => setVariant(id as LiftKey, VARIANT_OPTIONS[id as LiftKey][0].code)}
-                                            />
+                                            <input type="radio" name={`variant-mode-${id}`} value="base" checked={!currentVariant || currentVariant === VARIANT_OPTIONS[id as LiftKey][0].code} onChange={() => setVariant(id as LiftKey, VARIANT_OPTIONS[id as LiftKey][0].code)} aria-label={`${title} base variant`} />
                                             <span className="text-gray-300">Base</span>
                                         </label>
                                         <label className="inline-flex items-center gap-1">
-                                            <input
-                                                type="radio"
-                                                name={`variant-mode-${id}`}
-                                                value="variant"
-                                                checked={!!currentVariant && currentVariant !== VARIANT_OPTIONS[id as LiftKey][0].code}
-                                                onChange={() => {
-                                                    // if switching to variant and currently base, pick second option as default
-                                                    const list = VARIANT_OPTIONS[id as LiftKey];
-                                                    setVariant(id as LiftKey, list[1]?.code || list[0].code);
-                                                }}
-                                            />
+                                            <input type="radio" name={`variant-mode-${id}`} value="variant" checked={!!currentVariant && currentVariant !== VARIANT_OPTIONS[id as LiftKey][0].code} onChange={() => { const list = VARIANT_OPTIONS[id as LiftKey]; setVariant(id as LiftKey, list[1]?.code || list[0].code); }} aria-label={`${title} choose alternate variant`} />
                                             <span className="text-gray-300">Variant</span>
                                         </label>
                                         {currentVariant && currentVariant !== VARIANT_OPTIONS[id as LiftKey][0].code && (
-                                            <select
-                                                className="ml-2 flex-1 rounded-md border border-gray-700 bg-gray-900/60 px-2 py-1 text-[11px] text-gray-100 focus:border-red-500 focus:ring-2 focus:ring-red-500/40"
-                                                value={currentVariant}
-                                                data-testid={`variant-${id}`}
-                                                onChange={e => setVariant(id as LiftKey, e.target.value)}
-                                            >
+                                            <select className="ml-2 flex-1 rounded-md border border-gray-700 bg-gray-900/60 px-2 py-1 text-[11px] text-gray-100 focus:border-red-500 focus:ring-2 focus:ring-red-500/40" value={currentVariant} data-testid={`variant-${id}`} onChange={e => setVariant(id as LiftKey, e.target.value)} aria-label={`${title} variant options`}>
                                                 {VARIANT_OPTIONS[id as LiftKey].filter((_, i) => i > 0).map(opt => (
                                                     <option key={opt.code} value={opt.code}>{opt.label}</option>
                                                 ))}
@@ -505,51 +524,40 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                                         )}
                                     </div>
                                 </label>
-                                {renderMethodSelector(variant, id, method)}
+
+                                {/* Per-lift method selector and inputs */}
+                                {renderMethodSelector('stacked', id as any, method)}
                                 {method === 'tested' && (
-                                    <label className="block text-[11px] font-medium text-gray-300">
+                                    <label className="block text-[11px] font-medium text-gray-300 mt-3">
                                         Enter 1RM ({state.units})
-                                        <Input value={(liftState.oneRM ?? 0) === 0 ? '' : liftState.oneRM} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTested1RM(id, +e.target.value || 0)} />
+                                        <Input className="exercise-input" aria-label={`${title} tested one rep max in ${state.units}`} value={(liftState.oneRM ?? 0) === 0 ? '' : liftState.oneRM} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTested1RM(id as any, +e.target.value || 0)} />
                                     </label>
                                 )}
                                 {method === 'reps' && (
-                                    <div className="grid grid-cols-2 gap-2 text-[11px]">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] mt-3">
                                         <label className="font-medium text-gray-300">
                                             Weight ({state.units})
-                                            <Input value={(liftState.weight ?? 0) === 0 ? '' : liftState.weight} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRepCalc(id, +e.target.value || 0, liftState.reps || 0)} />
+                                            <Input className="exercise-input" aria-label={`${title} reps method weight in ${state.units}`} value={(liftState.weight ?? 0) === 0 ? '' : liftState.weight} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRepCalc(id as any, +e.target.value || 0, liftState.reps || 0)} />
                                         </label>
                                         <label className="font-medium text-gray-300">
                                             Reps
-                                            <Input value={(liftState.reps ?? 0) === 0 ? '' : liftState.reps} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRepCalc(id, liftState.weight || 0, +e.target.value || 0)} />
+                                            <Input className="exercise-input" aria-label={`${title} reps method reps`} value={(liftState.reps ?? 0) === 0 ? '' : liftState.reps} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRepCalc(id as any, liftState.weight || 0, +e.target.value || 0)} />
                                         </label>
                                     </div>
                                 )}
                                 {method === 'manual' && (
-                                    <label className="block text-[11px] font-medium text-gray-300">
+                                    <label className="block text-[11px] font-medium text-gray-300 mt-3">
                                         Training Max ({state.units})
-                                        <Input value={(liftState.manualTM ?? 0) === 0 ? '' : liftState.manualTM} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setManualTM(id, +e.target.value || 0)} />
+                                        <Input className="exercise-input" aria-label={`${title} direct training max in ${state.units}`} value={(liftState.manualTM ?? 0) === 0 ? '' : liftState.manualTM} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setManualTM(id as any, +e.target.value || 0)} />
                                     </label>
                                 )}
-                                {/* Deadlift Rep Style (belongs in fundamentals – global technical preference) */}
+
+                                {/* Deadlift-only style */}
                                 {id === 'deadlift' && (
-                                    <div className="flex flex-col gap-1 mt-1" data-testid="deadlift-rep-style-picker">
-                                        <div className="text-[10px] uppercase tracking-wide text-gray-500">Rep Style</div>
-                                        <div className="flex gap-2">
-                                            {(['dead_stop', 'touch_and_go'] as const).map(style => {
-                                                const active = (state as any).deadliftRepStyle === style || ((state as any).deadliftRepStyle == null && style === 'touch_and_go');
-                                                return (
-                                                    <button
-                                                        key={style}
-                                                        type="button"
-                                                        aria-pressed={active}
-                                                        onClick={() => setState(s => ({ ...(s as any), deadliftRepStyle: style }))}
-                                                        data-testid={`deadlift-style-${style}`}
-                                                        className={`px-2.5 py-1 rounded border text-[10px] font-medium ${active ? 'border-red-500 bg-red-700/30 text-red-200' : 'border-gray-600 text-gray-300 hover:bg-gray-700'}`}
-                                                    >{style === 'dead_stop' ? 'Dead Stop' : 'Touch & Go'}</button>
-                                                );
-                                            })}
-                                        </div>
-                                        <div className="text-[10px] text-gray-500">Sets expectation for main & supplemental pulling tempo.</div>
+                                    <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #444' }}>
+                                        <label className="mr-3">Style:</label>
+                                        <label className="mr-4"><input type="radio" name="deadliftStyle" checked={(state as any).deadliftRepStyle === 'dead_stop'} onChange={() => setState(s => ({ ...(s as any), deadliftRepStyle: 'dead_stop' }))} />{' '}Dead Stop</label>
+                                        <label><input type="radio" name="deadliftStyle" checked={(state as any).deadliftRepStyle === 'touch_and_go'} onChange={() => setState(s => ({ ...(s as any), deadliftRepStyle: 'touch_and_go' }))} />{' '}Touch & Go</label>
                                     </div>
                                 )}
                             </div>
@@ -557,61 +565,30 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                     })}
                 </section>
 
-                {/* (Legacy combined TM tips replaced by info boxes above) */}
-
-                {/* TM Table */}
-                <section>
-                    <div className="overflow-x-auto rounded-md border border-gray-800 bg-gray-900/40">
-                        <table className="w-full text-xs border-collapse">
-                            <thead className="bg-gray-800/70">
-                                <tr className="text-left">
-                                    <th className="py-2 pl-3 pr-4 font-semibold text-gray-300">Lift</th>
-                                    <th className="py-2 pr-4 font-semibold text-gray-300">1RM ({state.units})</th>
-                                    <th className="py-2 pr-4 font-semibold text-gray-300">TM {Math.round(state.tmPct * 100)}%</th>
-                                    <th className="py-2 pr-4 font-semibold text-gray-300">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-800/60">
-                                {tmTable.map(row => {
-                                    const liftInput = state.lifts[row.lift];
-                                    let baseVal: number | string = '—';
-                                    if (liftInput) {
-                                        switch (liftInput.method) {
-                                            case 'tested':
-                                                baseVal = liftInput.oneRM;
-                                                break;
-                                            case 'reps':
-                                                baseVal = liftInput.weight;
-                                                break;
-                                            case 'manual':
-                                                baseVal = liftInput.manualTM;
-                                                break;
-                                        }
-                                    }
-                                    return (
-                                        <tr key={row.lift} className="hover:bg-gray-800/30 transition">
-                                            <td className="py-2 pl-3 pr-4 capitalize text-gray-200">{
-                                                (() => {
-                                                    const code = state.variants?.[row.lift];
-                                                    if (!code) return (row.lift === 'press' ? 'Overhead Press' : row.lift);
-                                                    const list = VARIANT_OPTIONS[row.lift as LiftKey];
-                                                    const found = list.find(o => o.code === code);
-                                                    return found ? found.label : code.replace(/_/g, ' ');
-                                                })()
-                                            }</td>
-                                            <td className="py-2 pr-4 text-gray-300">{baseVal}</td>
-                                            <td className="py-2 pr-4 font-mono text-gray-100">{row.tmDisplay ?? '—'}</td>
-                                            <td className={`py-2 pr-4 text-[10px] ${row.warnings.length ? 'text-amber-400' : 'text-emerald-400'}`}>{row.warnings.length ? row.warnings.join(', ') : 'OK'}</td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
+                {/* Progress bar & status */}
+                <section style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '1rem', borderRadius: 8, marginTop: '2rem' }}>
+                    <div style={{ background: '#333', height: 8, borderRadius: 4, overflow: 'hidden' }}>
+                        <div style={{ background: '#10b981', height: '100%', width: `${(tmReadyCount / 4) * 100}%`, transition: 'width 0.3s' }} />
+                    </div>
+                    <div style={{ display: 'flex', gap: '2rem', marginTop: '1rem', fontSize: '0.9rem' }}>
+                        {(['press', 'bench', 'squat', 'deadlift'] as LiftId[]).map((id) => {
+                            const label = id === 'press' ? 'OHP' : id.charAt(0).toUpperCase() + id.slice(1);
+                            const tm = tmLookup[id];
+                            const done = typeof tm === 'number' && tm > 0;
+                            return (
+                                <span key={id} style={{ color: done ? '#10b981' : '#666' }}>
+                                    {done ? '✓' : '○'} {label}: {typeof tm === 'number' ? tm : '---'}
+                                </span>
+                            );
+                        })}
                     </div>
                 </section>
 
+                {/* Continue button */}
                 <div className="pt-2">
-                    <Button onClick={onNext} className="w-full" data-testid="step1-next" disabled={tmTable.some(r => (r.tmDisplay ?? 0) <= 0)}>Next</Button>
+                    <button onClick={onNext} data-testid="step1-next" style={{ width: '100%', padding: '1.25rem', fontSize: '1.1rem', background: tmReadyCount === 4 ? '#ef4444' : '#f59e0b', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 'bold', marginTop: '2rem' }}>
+                        {tmReadyCount === 4 ? 'Continue to Template →' : `Continue → (${tmReadyCount} of 4 lifts entered)`}
+                    </button>
                 </div>
             </div>
         </div>
