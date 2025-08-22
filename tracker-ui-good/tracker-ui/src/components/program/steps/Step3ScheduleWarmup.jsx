@@ -20,8 +20,8 @@ import { buildDaysByFrequency, resetToCanonical, liftOptions } from '../../../li
 import { useExerciseDB } from '../../../contexts/ExerciseDBContext.jsx';
 
 export default function Step3ScheduleWarmup({ data, updateData }) {
-    alert('STEP3SCHEDULEWARMUP IS LOADING!');
-    console.log('STEP3SCHEDULEWARMUP IS RENDERING - This should show Sections C and E', { data });
+    // Debug messages removed to keep tests stable
+    // console.debug('Step3ScheduleWarmup render', { data });
     const st = data || {};
     const schedule = st.schedule || {};
     const warm = st.warmup || {};

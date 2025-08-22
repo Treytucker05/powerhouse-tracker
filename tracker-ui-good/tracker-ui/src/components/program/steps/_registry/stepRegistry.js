@@ -130,7 +130,7 @@ const steps = [
         id: STEP_IDS.SCHEDULE_WARMUP,
         title: 'Schedule & Warm‑up Overview',
         description: 'Choose 4/3/2/1‑day split & lift order; set global warm‑up policy.',
-        component: lazy(() => import('../Step3ScheduleWarmup.jsx')),
+        component: lazy(() => import('../Step3CustomizeDesign.jsx')),
         visibleIf: (state) => {
             const t = state || {};
             return !!(t?.templateChoice?.id || t?.template?.id || t?.template);

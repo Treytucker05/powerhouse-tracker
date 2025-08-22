@@ -17,6 +17,8 @@ export interface Step1State {
     tmPct: number; // 0.85 | 0.90
     rounding: RoundingStrategy;
     lifts: Record<LiftId, LiftInput>;
+    // Selected lift variant (does not yet affect TM math; informational / future logic hook)
+    variants?: Record<LiftId, string>;
 }
 
 export interface TMRow {

@@ -28,6 +28,11 @@ describe('ProgramFundamentals (Step 1)', () => {
         });
         // Verify TM percent column header present
         expect(screen.getByText(/TM 90%/i)).toBeInTheDocument();
+        // Variant radio buttons should be present for each lift
+        const baseRadios = screen.getAllByDisplayValue('base');
+        const variantRadios = screen.getAllByDisplayValue('variant');
+        expect(baseRadios).toHaveLength(4); // one for each lift
+        expect(variantRadios).toHaveLength(4); // one for each lift
     });
 
     it('Next button disabled initially', () => {

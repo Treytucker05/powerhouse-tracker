@@ -2,8 +2,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBuilder } from '@/context/BuilderState';
 import { supabase, getCurrentUserId } from '@/lib/supabaseClient';
-import { TEMPLATES as templates, SCHEMES as schemes, TEMPLATE_DETAILS, TEMPLATE_META, getSchemeDescriptor } from '@/lib/builder/templates';
+import { TEMPLATES as templates, TEMPLATE_DETAILS, TEMPLATE_META } from '@/lib/builder/templates';
 import BuilderProgress from './BuilderProgress';
+import { WorkoutPreview } from './WorkoutPreview';
 
 // --- Detailed Workout Definitions (UI only, not final programming engine) ---
 // Each template maps to 4 training days (classic) with main lift emphasis ordering.
@@ -55,7 +56,141 @@ function renderTemplateDetail(id: string) {
                     </div>
                 ))}
             </div>
+
+            {/* Add workout preview */}
+            <WorkoutPreview templateId={id} expanded={true} />
+
             <p className="text-[10px] text-gray-500">Click "Use This Template" to lock it in and proceed to scheme selection.</p>
+        </div>
+    );
+}
+
+// Template comparison component
+function TemplateComparisonTable({ templateIds, onRemove, onSelect }: {
+    templateIds: string[],
+    onRemove: (id: string) => void,
+    onSelect: (id: string) => void
+}) {
+    const compareTemplates = templateIds.map(id => templates.find(t => t.id === id)).filter(Boolean);
+
+    if (compareTemplates.length === 0) {
+        return (
+            <div className="text-center py-8" data-testid="comparison-empty">
+                <div className="text-gray-400 text-sm">
+                    <div className="mb-2">📊 Template Comparison</div>
+                    <p>Click on template cards to add them to comparison (max 3)</p>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="overflow-x-auto" data-testid="comparison-table">
+            <table className="w-full border border-gray-700 rounded-lg">
+                <thead>
+                    <tr className="bg-gray-800/60">
+                        <th className="text-left p-3 border-b border-gray-700 text-sm font-medium">Template</th>
+                        {compareTemplates.map(template => (
+                            <th key={template!.id} className="text-center p-3 border-b border-gray-700 min-w-[200px]">
+                                <div className="space-y-2">
+                                    <div className="font-medium">{template!.title}</div>
+                                    <div className="flex gap-2 justify-center">
+                                        <button
+                                            onClick={() => onSelect(template!.id)}
+                                            className="px-2 py-1 text-xs bg-red-600 hover:bg-red-700 rounded text-white transition"
+                                        >
+                                            Select
+                                        </button>
+                                        <button
+                                            onClick={() => onRemove(template!.id)}
+                                            className="px-2 py-1 text-xs bg-gray-600 hover:bg-gray-700 rounded text-white transition"
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            </th>
+                        ))}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td className="p-3 border-b border-gray-700 text-sm font-medium text-gray-400">Description</td>
+                        {compareTemplates.map(template => (
+                            <td key={template!.id} className="p-3 border-b border-gray-700 text-xs">
+                                {template!.desc}
+                            </td>
+                        ))}
+                    </tr>
+                    <tr>
+                        <td className="p-3 border-b border-gray-700 text-sm font-medium text-gray-400">Session Time</td>
+                        {compareTemplates.map(template => {
+                            const meta = (TEMPLATE_META as any)[template!.id];
+                            return (
+                                <td key={template!.id} className="p-3 border-b border-gray-700 text-xs">
+                                    {meta?.time || '—'}
+                                </td>
+                            );
+                        })}
+                    </tr>
+                    <tr>
+                        <td className="p-3 border-b border-gray-700 text-sm font-medium text-gray-400">Difficulty</td>
+                        {compareTemplates.map(template => {
+                            const meta = (TEMPLATE_META as any)[template!.id];
+                            return (
+                                <td key={template!.id} className="p-3 border-b border-gray-700 text-xs">
+                                    <span className={`px-2 py-1 rounded text-xs ${meta?.difficulty === 'Beginner' ? 'bg-green-600/20 text-green-200' :
+                                        meta?.difficulty === 'Intermediate' ? 'bg-yellow-600/20 text-yellow-200' :
+                                            meta?.difficulty === 'Advanced' ? 'bg-red-600/20 text-red-200' :
+                                                'bg-gray-600/20 text-gray-200'
+                                        }`}>
+                                        {meta?.difficulty || '—'}
+                                    </span>
+                                </td>
+                            );
+                        })}
+                    </tr>
+                    <tr>
+                        <td className="p-3 border-b border-gray-700 text-sm font-medium text-gray-400">Focus Areas</td>
+                        {compareTemplates.map(template => {
+                            const meta = (TEMPLATE_META as any)[template!.id];
+                            return (
+                                <td key={template!.id} className="p-3 border-b border-gray-700 text-xs">
+                                    <div className="space-y-1">
+                                        {meta?.focus?.map((focus: string, i: number) => (
+                                            <div key={i} className="px-2 py-1 bg-blue-600/20 text-blue-200 rounded text-xs">
+                                                {focus}
+                                            </div>
+                                        )) || '—'}
+                                    </div>
+                                </td>
+                            );
+                        })}
+                    </tr>
+                    <tr>
+                        <td className="p-3 border-b border-gray-700 text-sm font-medium text-gray-400">Best For</td>
+                        {compareTemplates.map(template => {
+                            const meta = (TEMPLATE_META as any)[template!.id];
+                            return (
+                                <td key={template!.id} className="p-3 border-b border-gray-700 text-xs">
+                                    {meta?.suitability || '—'}
+                                </td>
+                            );
+                        })}
+                    </tr>
+                    <tr>
+                        <td className="p-3 text-sm font-medium text-gray-400">Cautions</td>
+                        {compareTemplates.map(template => {
+                            const meta = (TEMPLATE_META as any)[template!.id];
+                            return (
+                                <td key={template!.id} className="p-3 text-xs text-orange-200">
+                                    {meta?.caution || '—'}
+                                </td>
+                            );
+                        })}
+                    </tr>
+                </tbody>
+            </table>
         </div>
     );
 }
@@ -67,12 +202,41 @@ export default function TemplateAndScheme() {
     const { step2, setStep2 } = useBuilder();
     const navigate = useNavigate();
     const [expanded, setExpanded] = React.useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = React.useState('');
+    const [difficultyFilter, setDifficultyFilter] = React.useState<string>('');
+    const [focusFilter, setFocusFilter] = React.useState<string>('');
+    const [compareMode, setCompareMode] = React.useState(false);
+    const [compareTemplates, setCompareTemplates] = React.useState<string[]>([]);
     const detailsRef = React.useRef<HTMLDivElement | null>(null);
     const prevExpanded = React.useRef<string | null>(null);
 
     const onTemplate = (id: string) => {
-        // Toggle expansion only; selection now happens via the detail panel action button
-        setExpanded(prev => (prev === id ? null : id));
+        if (compareMode) {
+            // In compare mode, toggle template in comparison list
+            setCompareTemplates(prev => {
+                if (prev.includes(id)) {
+                    return prev.filter(t => t !== id);
+                } else if (prev.length < 3) {
+                    return [...prev, id];
+                }
+                return prev; // Max 3 templates
+            });
+        } else {
+            // Normal mode: toggle expansion only; selection happens via detail panel action button
+            setExpanded(prev => (prev === id ? null : id));
+        }
+    };
+
+    const toggleCompareMode = () => {
+        setCompareMode(prev => !prev);
+        if (compareMode) {
+            setCompareTemplates([]);
+        }
+        setExpanded(null);
+    };
+
+    const removeFromComparison = (id: string) => {
+        setCompareTemplates(prev => prev.filter(t => t !== id));
     };
 
     // When a template becomes expanded, scroll Template Details panel into view.
@@ -80,16 +244,15 @@ export default function TemplateAndScheme() {
         if (expanded && expanded !== prevExpanded.current && detailsRef.current) {
             // smooth scroll; fallback to instant if unsupported
             try {
-                detailsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } catch {
-                detailsRef.current.scrollIntoView();
-            }
+                if (typeof detailsRef.current.scrollIntoView === 'function') {
+                    detailsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            } catch { /* ignore in non-browser env */ }
         }
         prevExpanded.current = expanded;
     }, [expanded]);
-    const onScheme = (id: string) => setStep2({ schemeId: id });
-
-    const canNext = !!step2.templateId && !!step2.schemeId;
+    // Scheme selection moved to Step 3 (Customize)
+    const canNext = !!step2.templateId;
 
     // Persist Step2 (template + scheme) debounced
     React.useEffect(() => {
@@ -130,49 +293,203 @@ export default function TemplateAndScheme() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // Filter templates based on search and filter criteria
+    const filteredTemplates = React.useMemo(() => {
+        return templates.filter(template => {
+            const meta = (TEMPLATE_META as any)[template.id];
+
+            // Search query filter (matches title or description)
+            if (searchQuery) {
+                const query = searchQuery.toLowerCase();
+                const matchesTitle = template.title.toLowerCase().includes(query);
+                const matchesDesc = template.desc.toLowerCase().includes(query);
+                if (!matchesTitle && !matchesDesc) return false;
+            }
+
+            // Difficulty filter
+            if (difficultyFilter && meta?.difficulty !== difficultyFilter) {
+                return false;
+            }
+
+            // Focus filter
+            if (focusFilter && meta?.focus && !meta.focus.includes(focusFilter)) {
+                return false;
+            }
+
+            return true;
+        });
+    }, [searchQuery, difficultyFilter, focusFilter]);
+
+    // Get unique filter options
+    const difficulties = React.useMemo(() => {
+        const allDifficulties = templates.map(t => (TEMPLATE_META as any)[t.id]?.difficulty).filter(Boolean);
+        return [...new Set(allDifficulties)];
+    }, []);
+
+    const focusOptions = React.useMemo(() => {
+        const allFocus = templates.flatMap(t => (TEMPLATE_META as any)[t.id]?.focus || []);
+        return [...new Set(allFocus)];
+    }, []);
+
     return (
         <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col" data-testid="step2-container">
             <div className="px-8 pt-6"><BuilderProgress current={2} /></div>
             <header className="px-8 pt-8 pb-4 border-b border-gray-800 flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-semibold mb-1">Template & Core Scheme</h1>
-                    <p className="text-sm text-gray-400">Choose a template then pick the loading / AMRAP scheme.</p>
+                    <h1 className="text-2xl font-semibold mb-1">Select Template</h1>
+                    <p className="text-sm text-gray-400">Choose the structural template. You'll fine‑tune scheme & loading in Step 3.</p>
                 </div>
                 <div data-testid="selection-summary" className="text-xs text-gray-300">
                     <div>Template: {step2.templateId || '—'}</div>
-                    <div>Scheme: {step2.schemeId || '—'}</div>
-                    {step2.schemeId && (
-                        <div className="mt-1">AMRAP: {schemes.find(s => s.id === step2.schemeId)?.amrap}</div>
-                    )}
-                    {step2.schemeId && (
-                        <div className="mt-2 text-[11px] font-mono tracking-tight inline-block px-2 py-1 rounded bg-red-700/30 border border-red-500/50 text-red-100 shadow-sm" data-testid="scheme-descriptor">
-                            Wave Pattern: {getSchemeDescriptor(step2.schemeId)}
-                        </div>
-                    )}
+                    <div>Scheme: (choose next step)</div>
                 </div>
             </header>
             <div className="flex-1 grid grid-cols-12 gap-6 px-8 py-6">
                 <section className="col-span-12 lg:col-span-8 space-y-8">
                     <div>
-                        <h2 className="text-lg font-semibold mb-3">Templates</h2>
+                        <div className="flex items-center justify-between mb-3">
+                            <h2 className="text-lg font-semibold">Templates</h2>
+                            <button
+                                onClick={toggleCompareMode}
+                                data-testid="compare-mode-toggle"
+                                className={`px-3 py-1.5 text-xs font-medium rounded transition ${compareMode
+                                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                    }`}
+                            >
+                                {compareMode ? '📊 Exit Compare' : '📊 Compare Templates'}
+                            </button>
+                        </div>
+
+                        {/* Compare Mode Info */}
+                        {compareMode && (
+                            <div className="mb-4 p-3 bg-blue-600/10 border border-blue-600/30 rounded-md" data-testid="compare-mode-info">
+                                <div className="text-xs text-blue-200">
+                                    <div className="font-medium">Compare Mode Active</div>
+                                    <div>Click template cards to add them to comparison ({compareTemplates.length}/3 selected)</div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Search and Filter Controls */}
+                        <div className="mb-6 space-y-4">
+                            {/* Search Input */}
+                            <div>
+                                <input
+                                    type="text"
+                                    placeholder="Search templates..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    data-testid="template-search"
+                                    className="w-full px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent placeholder-gray-400"
+                                />
+                            </div>
+
+                            {/* Filter Controls */}
+                            <div className="flex flex-wrap gap-4">
+                                <div className="flex-1 min-w-[150px]">
+                                    <label className="block text-xs text-gray-400 mb-1">Difficulty</label>
+                                    <select
+                                        value={difficultyFilter}
+                                        onChange={(e) => setDifficultyFilter(e.target.value)}
+                                        data-testid="difficulty-filter"
+                                        className="w-full px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                    >
+                                        <option value="">All Difficulties</option>
+                                        {difficulties.map(difficulty => (
+                                            <option key={difficulty} value={difficulty}>{difficulty}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="flex-1 min-w-[150px]">
+                                    <label className="block text-xs text-gray-400 mb-1">Focus</label>
+                                    <select
+                                        value={focusFilter}
+                                        onChange={(e) => setFocusFilter(e.target.value)}
+                                        data-testid="focus-filter"
+                                        className="w-full px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                    >
+                                        <option value="">All Focus Areas</option>
+                                        {focusOptions.map(focus => (
+                                            <option key={focus} value={focus}>{focus}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* Clear Filters Button */}
+                                {(searchQuery || difficultyFilter || focusFilter) && (
+                                    <div className="flex items-end">
+                                        <button
+                                            onClick={() => {
+                                                setSearchQuery('');
+                                                setDifficultyFilter('');
+                                                setFocusFilter('');
+                                            }}
+                                            data-testid="clear-filters"
+                                            className="px-3 py-2 text-xs text-gray-400 hover:text-gray-200 border border-gray-600 hover:border-gray-500 rounded-md transition"
+                                        >
+                                            Clear Filters
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Results Summary */}
+                            <div className="text-xs text-gray-400">
+                                Showing {filteredTemplates.length} of {templates.length} templates
+                                {(searchQuery || difficultyFilter || focusFilter) && (
+                                    <span className="ml-2">
+                                        {searchQuery && `• Search: "${searchQuery}"`}
+                                        {difficultyFilter && `• Difficulty: ${difficultyFilter}`}
+                                        {focusFilter && `• Focus: ${focusFilter}`}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+
                         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {templates.map(t => {
+                            {filteredTemplates.map(t => {
                                 const isSelected = step2.templateId === t.id;
                                 const isExpanded = expanded === t.id;
+                                const isInComparison = compareTemplates.includes(t.id);
                                 const meta = (TEMPLATE_META as any)[t.id];
+
+                                let borderClass = 'border-gray-700 hover:border-gray-500 bg-gray-800/50';
+                                if (compareMode) {
+                                    borderClass = isInComparison
+                                        ? 'border-blue-500 bg-blue-600/10'
+                                        : compareTemplates.length >= 3
+                                            ? 'border-gray-600 bg-gray-800/30 opacity-50 cursor-not-allowed'
+                                            : 'border-gray-700 hover:border-blue-400 bg-gray-800/50';
+                                } else {
+                                    borderClass = isSelected
+                                        ? 'border-red-500 bg-gray-800'
+                                        : isExpanded
+                                            ? 'border-indigo-500 bg-gray-800/70'
+                                            : 'border-gray-700 hover:border-gray-500 bg-gray-800/50';
+                                }
+
                                 return (
                                     <button
                                         key={t.id}
                                         type="button"
                                         data-testid={`template-${t.id}`}
                                         onClick={() => onTemplate(t.id)}
-                                        className={`text-left rounded-lg border p-4 transition h-full flex flex-col ${isSelected ? 'border-red-500 bg-gray-800' : isExpanded ? 'border-indigo-500 bg-gray-800/70' : 'border-gray-700 hover:border-gray-500 bg-gray-800/50'}`}
+                                        disabled={compareMode && compareTemplates.length >= 3 && !isInComparison}
+                                        className={`text-left rounded-lg border p-4 transition h-full flex flex-col ${borderClass}`}
                                     >
                                         <div className="flex-1">
                                             <div className="font-medium mb-1 flex items-center gap-2">
                                                 <span>{t.title}</span>
-                                                {isSelected && <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-600/70 text-white">Selected</span>}
-                                                {!isSelected && isExpanded && <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-600/60 text-white">Viewing</span>}
+                                                {compareMode ? (
+                                                    isInComparison && <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-600/70 text-white">Compare</span>
+                                                ) : (
+                                                    <>
+                                                        {isSelected && <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-600/70 text-white">Selected</span>}
+                                                        {!isSelected && isExpanded && <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-600/60 text-white">Viewing</span>}
+                                                    </>
+                                                )}
                                             </div>
                                             <p className="text-xs text-gray-300 leading-snug mb-2">{t.desc}</p>
                                             {meta && (
@@ -192,66 +509,73 @@ export default function TemplateAndScheme() {
                                 );
                             })}
                         </div>
+
+                        {/* Empty State */}
+                        {filteredTemplates.length === 0 && (
+                            <div className="col-span-full text-center py-12" data-testid="no-templates-found">
+                                <div className="text-gray-400 text-sm">
+                                    <div className="mb-2">🔍 No templates found</div>
+                                    <p>Try adjusting your search or filter criteria</p>
+                                    {(searchQuery || difficultyFilter || focusFilter) && (
+                                        <button
+                                            onClick={() => {
+                                                setSearchQuery('');
+                                                setDifficultyFilter('');
+                                                setFocusFilter('');
+                                            }}
+                                            className="mt-3 text-red-400 hover:text-red-300 text-xs underline"
+                                        >
+                                            Clear all filters
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
                         <div className="mt-5" ref={detailsRef} data-testid="template-details-panel">
                             <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-4">
-                                <h3 className="font-semibold mb-2 text-sm">Template Details</h3>
-                                {!expanded && <p className="text-xs text-gray-500">Select a template card above to view its full structure, focus and guidance.</p>}
-                                {expanded && (
-                                    <div className="space-y-3">
-                                        <div className="flex items-center gap-2">
-                                            <h4 className="text-sm font-medium">{templates.find(t => t.id === expanded)?.title}</h4>
-                                            {step2.templateId === expanded && <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-600/70 text-white">Selected</span>}
-                                        </div>
-                                        {renderTemplateDetail(expanded)}
-                                        <div className="flex gap-2 pt-1">
-                                            {step2.templateId !== expanded && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setStep2({ templateId: expanded })}
-                                                    className="text-xs px-3 py-1.5 rounded bg-red-600 hover:bg-red-500 text-white font-medium"
-                                                >Use This Template</button>
-                                            )}
-                                            <button
-                                                type="button"
-                                                onClick={() => setExpanded(null)}
-                                                className="text-xs px-3 py-1.5 rounded border border-gray-600 text-gray-300 hover:bg-gray-800"
-                                            >Close</button>
-                                        </div>
-                                    </div>
+                                {compareMode ? (
+                                    <>
+                                        <h3 className="font-semibold mb-4 text-sm">Template Comparison</h3>
+                                        <TemplateComparisonTable
+                                            templateIds={compareTemplates}
+                                            onRemove={removeFromComparison}
+                                            onSelect={(id) => setStep2({ templateId: id })}
+                                        />
+                                    </>
+                                ) : (
+                                    <>
+                                        <h3 className="font-semibold mb-2 text-sm">Template Details</h3>
+                                        {!expanded && <p className="text-xs text-gray-500">Select a template card above to view its full structure, focus and guidance.</p>}
+                                        {expanded && (
+                                            <div className="space-y-3">
+                                                <div className="flex items-center gap-2">
+                                                    <h4 className="text-sm font-medium">{templates.find(t => t.id === expanded)?.title}</h4>
+                                                    {step2.templateId === expanded && <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-600/70 text-white">Selected</span>}
+                                                </div>
+                                                {renderTemplateDetail(expanded)}
+                                                <div className="flex gap-2 pt-1">
+                                                    {step2.templateId !== expanded && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setStep2({ templateId: expanded })}
+                                                            className="text-xs px-3 py-1.5 rounded bg-red-600 hover:bg-red-500 text-white font-medium"
+                                                        >Use This Template</button>
+                                                    )}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setExpanded(null)}
+                                                        className="text-xs px-3 py-1.5 rounded border border-gray-600 text-gray-300 hover:bg-gray-800"
+                                                    >Close</button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </>
                                 )}
                             </div>
                         </div>
                     </div>
-                    <div>
-                        <h2 className="text-lg font-semibold mb-3">Schemes</h2>
-                        <div className="grid sm:grid-cols-3 gap-4" role="radiogroup" aria-label="Choose loading / AMRAP scheme">
-                            {schemes.map(s => {
-                                const selected = step2.schemeId === s.id;
-                                return (
-                                    <button
-                                        key={s.id}
-                                        type="button"
-                                        role="radio"
-                                        aria-checked={selected}
-                                        data-testid={`scheme-${s.id}`}
-                                        onClick={() => onScheme(s.id)}
-                                        className={`relative text-left rounded-lg border p-4 transition focus:outline-none focus:ring-2 focus:ring-red-500/50 ${selected ? 'border-red-400 bg-red-700/15 ring-1 ring-red-500/40 shadow-sm' : 'border-gray-700 hover:border-gray-500 bg-gray-800/50'}`}
-                                    >
-                                        <div className="font-medium mb-1 flex items-center gap-2">
-                                            <span>{s.title}</span>
-                                            {selected && <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-600 text-white">Selected</span>}
-                                        </div>
-                                        <div className="text-xs text-gray-300 mb-1">AMRAP: {s.amrap}</div>
-                                        {selected && (
-                                            <div className="mt-1 text-[10px] leading-snug text-red-100 font-mono px-2 py-1 rounded bg-red-900/40 border border-red-600/40" data-testid={`scheme-descriptor-inline-${s.id}`}>
-                                                {getSchemeDescriptor(s.id)}
-                                            </div>
-                                        )}
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
+                    {/* Scheme selection moved to Step 3 */}
                     {/* Cycle overview removed per latest request; detail now lives in the side panel */}
                 </section>
                 <aside className="col-span-12 lg:col-span-4 space-y-4">
@@ -260,10 +584,7 @@ export default function TemplateAndScheme() {
                         <p className="text-xs text-gray-400 mb-2">These choices determine default assistance, deload policy and AMRAP flags.</p>
                         <ul className="text-xs space-y-1">
                             <li>Template: <span className="font-mono">{step2.templateId || '—'}</span></li>
-                            <li>Scheme: <span className="font-mono">{step2.schemeId || '—'}</span></li>
-                            {step2.schemeId && (
-                                <li>AMRAP: <span className="font-mono">{schemes.find(s => s.id === step2.schemeId)?.amrap}</span></li>
-                            )}
+                            <li>Scheme: <span className="font-mono">(select in Step 3)</span></li>
                         </ul>
                         {step2.templateId && (
                             <div className="mt-3 text-[11px] text-gray-400 space-y-1">
@@ -275,7 +596,7 @@ export default function TemplateAndScheme() {
             </div>
             <footer className="px-8 py-4 border-t border-gray-800 flex items-center justify-end gap-4">
                 <button onClick={() => navigate('/build/step1')} className="px-4 py-2 rounded border border-gray-600 text-sm hover:bg-gray-800">Back</button>
-                <button data-testid="step2-next" disabled={!canNext} onClick={() => navigate('/build/step3')} className={`px-4 py-2 rounded border text-sm ${canNext ? 'border-red-500 hover:bg-red-600/10' : 'border-gray-700 text-gray-500 cursor-not-allowed'}`}>Next</button>
+                <button data-testid="step2-next" disabled={!canNext} onClick={() => navigate('/build/step3')} className={`px-4 py-2 rounded border text-sm ${canNext ? 'border-red-500 hover:bg-red-600/10' : 'border-gray-700 text-gray-500 cursor-not-allowed'}`}>Next: Customize</button>
             </footer>
         </div>
     );

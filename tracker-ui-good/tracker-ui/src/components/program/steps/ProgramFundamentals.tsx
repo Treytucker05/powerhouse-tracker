@@ -98,7 +98,9 @@ const Button: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement>> = ({ child
 );
 
 // NEW: single source of truth for Step 1 (default mirrors current UI defaults)
-const defaultStep1State: Step1State = {
+// Type widening: augment Step1State locally with deadliftRepStyle & rounding.strategy variants until global type updated.
+type LocalStep1 = Step1State & { deadliftRepStyle?: 'dead_stop' | 'touch_and_go'; rounding: { strategy: 'nearest' | 'down' | 'up'; increment: number } };
+const defaultStep1State: LocalStep1 = {
     units: 'lb',                 // 'lb' | 'kg'
     tmPct: 0.90,                 // 0.85 or 0.90
     rounding: { strategy: 'nearest', increment: 5 }, // LB default 5; KG default 2.5
@@ -107,7 +109,9 @@ const defaultStep1State: Step1State = {
         bench: { method: 'tested', oneRM: 0 },
         deadlift: { method: 'tested', oneRM: 0 },
         press: { method: 'tested', oneRM: 0 }
-    }
+    },
+    variants: { squat: 'back_squat', bench: 'bench_press', deadlift: 'conventional_deadlift', press: 'overhead_press' },
+    deadliftRepStyle: 'touch_and_go'
 };
 
 interface Props {
@@ -127,7 +131,7 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
     }
     const { step1, setStep1 } = useBuilder();
     // Adapt builder's Step1 meta shape to this component's richer state shape; keep internal but sync outward.
-    const [state, setState] = React.useState<Step1State>(() => {
+    const [state, setState] = React.useState<LocalStep1>(() => {
         // Derive initial lift method/values from builder meta (if any) so data persists without waiting on Supabase hydration.
         const deriveLift = (key: string) => {
             const input = (step1?.inputs || {})[key] || {} as any;
@@ -152,7 +156,14 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                 bench: deriveLift('bench'),
                 deadlift: deriveLift('deadlift'),
                 press: deriveLift('press'),
-            }
+            },
+            variants: {
+                squat: step1?.variants?.squat || 'back_squat',
+                bench: step1?.variants?.bench || 'bench_press',
+                deadlift: step1?.variants?.deadlift || 'conventional_deadlift',
+                press: step1?.variants?.press || 'overhead_press'
+            },
+            deadliftRepStyle: (step1 as any)?.deadliftRepStyle || 'touch_and_go'
         };
     });
 
@@ -177,7 +188,14 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                     bench: deriveLift('bench'),
                     deadlift: deriveLift('deadlift'),
                     press: deriveLift('press'),
-                }
+                },
+                variants: {
+                    squat: step1?.variants?.squat || prev.variants?.squat || 'back_squat',
+                    bench: step1?.variants?.bench || prev.variants?.bench || 'bench_press',
+                    deadlift: step1?.variants?.deadlift || prev.variants?.deadlift || 'conventional_deadlift',
+                    press: step1?.variants?.press || prev.variants?.press || 'overhead_press'
+                },
+                deadliftRepStyle: (step1 as any)?.deadliftRepStyle || prev.deadliftRepStyle || 'touch_and_go'
             };
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -186,7 +204,7 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
     // Push condensed snapshot back to builder meta on every calc change & debounce persist
     React.useEffect(() => {
         const { tmTable } = step1_fundamentals(state);
-        const condensed = {
+        const condensed: any = {
             units: state.units as any,
             tmPct: (state.tmPct === 0.85 ? 0.85 : 0.9) as 0.85 | 0.9,
             microplates: state.rounding.increment < (state.units === 'lb' ? 5 : 2.5),
@@ -199,6 +217,9 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
             }])) as any,
             tmTable: Object.fromEntries(tmTable.map(r => [r.lift, r.tmDisplay || 0])) as any
         };
+        // include variants for persistence
+        (condensed as any).variants = state.variants;
+        condensed.deadliftRepStyle = state.deadliftRepStyle;
         setStep1(condensed);
 
         // Debounced persistence (skip during tests / SSR)
@@ -321,6 +342,41 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
 
     const tmLookup = React.useMemo(() => Object.fromEntries(tmTable.map(r => [r.lift, r.tmDisplay ?? '—'])), [tmTable]);
 
+    // Variant options per lift (MVP list; codes stable for persistence)
+    const VARIANT_OPTIONS: Record<LiftKey, { code: string; label: string }[]> = {
+        squat: [
+            { code: 'back_squat', label: 'Back Squat' },
+            { code: 'front_squat', label: 'Front Squat' },
+            { code: 'safety_bar_squat', label: 'Safety Bar' }
+        ],
+        bench: [
+            { code: 'bench_press', label: 'Flat Bench' },
+            { code: 'close_grip_bench', label: 'Close Grip' },
+            { code: 'incline_bench', label: 'Incline' }
+        ],
+        deadlift: [
+            { code: 'conventional_deadlift', label: 'Conventional' },
+            { code: 'sumo_deadlift', label: 'Sumo' },
+            { code: 'trap_bar_deadlift', label: 'Trap Bar' }
+        ],
+        press: [
+            { code: 'overhead_press', label: 'Overhead Press' },
+            { code: 'push_press', label: 'Push Press' },
+            { code: 'log_press', label: 'Log Press' }
+        ]
+    };
+
+    const setVariant = (lift: LiftKey, code: string) => setState(s => {
+        const next = {
+            squat: s.variants?.squat || 'back_squat',
+            bench: s.variants?.bench || 'bench_press',
+            deadlift: s.variants?.deadlift || 'conventional_deadlift',
+            press: s.variants?.press || 'overhead_press'
+        };
+        next[lift] = code;
+        return { ...s, variants: next };
+    });
+
     return (
         <div className="min-h-screen bg-gray-900 text-gray-100 px-6 py-8">
             <div className="max-w-7xl mx-auto flex flex-col gap-8">
@@ -353,6 +409,14 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                             <HelperText>
                                 LB increments: {state.units === 'lb' ? '2.5 / 5' : '—'} · KG increments: {state.units === 'kg' ? '1.0 / 2.5' : '—'}
                             </HelperText>
+                        </label>
+                        <label className="flex items-center gap-2">
+                            <span className="text-xs uppercase tracking-wide text-gray-400">Rounding</span>
+                            <div className="flex gap-1.5">
+                                {(['nearest', 'down', 'up'] as const).map(r => (
+                                    <Pill key={r} active={state.rounding.strategy === r} onClick={() => setState(s => ({ ...s, rounding: { ...s.rounding, strategy: r as any, increment: s.rounding.increment } }))}>{r}</Pill>
+                                ))}
+                            </div>
                         </label>
                     </div>
                 </header>
@@ -391,6 +455,7 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                         const liftState: any = state.lifts[id];
                         const method = liftState.method;
                         const variant = 'stacked';
+                        const currentVariant = state.variants ? state.variants[id as LiftId] : undefined;
                         return (
                             <div key={id} className="relative border border-gray-800/70 bg-gray-800/50 backdrop-blur rounded-md p-4 shadow-sm flex flex-col gap-3">
                                 <div className="flex items-start justify-between">
@@ -399,6 +464,47 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                                         {tmVal}
                                     </div>
                                 </div>
+                                <label className="block text-[10px] text-gray-400">
+                                    Use Variant?
+                                    <div className="mt-1 flex items-center gap-3 text-[11px]">
+                                        <label className="inline-flex items-center gap-1">
+                                            <input
+                                                type="radio"
+                                                name={`variant-mode-${id}`}
+                                                value="base"
+                                                checked={!currentVariant || currentVariant === VARIANT_OPTIONS[id as LiftKey][0].code}
+                                                onChange={() => setVariant(id as LiftKey, VARIANT_OPTIONS[id as LiftKey][0].code)}
+                                            />
+                                            <span className="text-gray-300">Base</span>
+                                        </label>
+                                        <label className="inline-flex items-center gap-1">
+                                            <input
+                                                type="radio"
+                                                name={`variant-mode-${id}`}
+                                                value="variant"
+                                                checked={!!currentVariant && currentVariant !== VARIANT_OPTIONS[id as LiftKey][0].code}
+                                                onChange={() => {
+                                                    // if switching to variant and currently base, pick second option as default
+                                                    const list = VARIANT_OPTIONS[id as LiftKey];
+                                                    setVariant(id as LiftKey, list[1]?.code || list[0].code);
+                                                }}
+                                            />
+                                            <span className="text-gray-300">Variant</span>
+                                        </label>
+                                        {currentVariant && currentVariant !== VARIANT_OPTIONS[id as LiftKey][0].code && (
+                                            <select
+                                                className="ml-2 flex-1 rounded-md border border-gray-700 bg-gray-900/60 px-2 py-1 text-[11px] text-gray-100 focus:border-red-500 focus:ring-2 focus:ring-red-500/40"
+                                                value={currentVariant}
+                                                data-testid={`variant-${id}`}
+                                                onChange={e => setVariant(id as LiftKey, e.target.value)}
+                                            >
+                                                {VARIANT_OPTIONS[id as LiftKey].filter((_, i) => i > 0).map(opt => (
+                                                    <option key={opt.code} value={opt.code}>{opt.label}</option>
+                                                ))}
+                                            </select>
+                                        )}
+                                    </div>
+                                </label>
                                 {renderMethodSelector(variant, id, method)}
                                 {method === 'tested' && (
                                     <label className="block text-[11px] font-medium text-gray-300">
@@ -423,6 +529,28 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                                         Training Max ({state.units})
                                         <Input value={(liftState.manualTM ?? 0) === 0 ? '' : liftState.manualTM} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setManualTM(id, +e.target.value || 0)} />
                                     </label>
+                                )}
+                                {/* Deadlift Rep Style (belongs in fundamentals – global technical preference) */}
+                                {id === 'deadlift' && (
+                                    <div className="flex flex-col gap-1 mt-1" data-testid="deadlift-rep-style-picker">
+                                        <div className="text-[10px] uppercase tracking-wide text-gray-500">Rep Style</div>
+                                        <div className="flex gap-2">
+                                            {(['dead_stop', 'touch_and_go'] as const).map(style => {
+                                                const active = (state as any).deadliftRepStyle === style || ((state as any).deadliftRepStyle == null && style === 'touch_and_go');
+                                                return (
+                                                    <button
+                                                        key={style}
+                                                        type="button"
+                                                        aria-pressed={active}
+                                                        onClick={() => setState(s => ({ ...(s as any), deadliftRepStyle: style }))}
+                                                        data-testid={`deadlift-style-${style}`}
+                                                        className={`px-2.5 py-1 rounded border text-[10px] font-medium ${active ? 'border-red-500 bg-red-700/30 text-red-200' : 'border-gray-600 text-gray-300 hover:bg-gray-700'}`}
+                                                    >{style === 'dead_stop' ? 'Dead Stop' : 'Touch & Go'}</button>
+                                                );
+                                            })}
+                                        </div>
+                                        <div className="text-[10px] text-gray-500">Sets expectation for main & supplemental pulling tempo.</div>
+                                    </div>
                                 )}
                             </div>
                         );
@@ -462,7 +590,15 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                                     }
                                     return (
                                         <tr key={row.lift} className="hover:bg-gray-800/30 transition">
-                                            <td className="py-2 pl-3 pr-4 capitalize text-gray-200">{row.lift === 'press' ? 'Overhead Press' : row.lift}</td>
+                                            <td className="py-2 pl-3 pr-4 capitalize text-gray-200">{
+                                                (() => {
+                                                    const code = state.variants?.[row.lift];
+                                                    if (!code) return (row.lift === 'press' ? 'Overhead Press' : row.lift);
+                                                    const list = VARIANT_OPTIONS[row.lift as LiftKey];
+                                                    const found = list.find(o => o.code === code);
+                                                    return found ? found.label : code.replace(/_/g, ' ');
+                                                })()
+                                            }</td>
                                             <td className="py-2 pr-4 text-gray-300">{baseVal}</td>
                                             <td className="py-2 pr-4 font-mono text-gray-100">{row.tmDisplay ?? '—'}</td>
                                             <td className={`py-2 pr-4 text-[10px] ${row.warnings.length ? 'text-amber-400' : 'text-emerald-400'}`}>{row.warnings.length ? row.warnings.join(', ') : 'OK'}</td>

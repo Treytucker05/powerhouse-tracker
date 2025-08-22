@@ -11,8 +11,17 @@ export function calcTrainingMax(oneRm: number, tmPct: number): number {
     return oneRm * tmPct;
 }
 
-export function roundWeight(val: number, increment: number): number {
-    return Math.round(val / increment) * increment;
+export function roundWeight(val: number, increment: number, strategy: 'nearest' | 'down' | 'up' = 'nearest'): number {
+    if (!increment) return val;
+    const ratio = val / increment;
+    switch (strategy) {
+        case 'down':
+            return Math.floor(ratio) * increment;
+        case 'up':
+            return Math.ceil(ratio) * increment;
+        default:
+            return Math.round(ratio) * increment;
+    }
 }
 
 function deriveOneRm(input: Step1State['lifts'][LiftId], tmPct: number): { tmRaw: number | null; source: 'tested' | 'reps' | 'manual' | 'none'; } {
@@ -42,7 +51,9 @@ function validate(tmRaw: number | null): string[] {
 function buildRow(lift: LiftId, state: Step1State): TMRow {
     const { tmRaw } = deriveOneRm(state.lifts[lift], state.tmPct);
     const inc = state.rounding.increment;
-    const tmDisplay = tmRaw != null ? roundWeight(tmRaw, inc) : null;
+    // Allow optional strategy on state.rounding.strategy (fallback nearest)
+    const strategy: any = (state.rounding as any).strategy || 'nearest';
+    const tmDisplay = tmRaw != null ? roundWeight(tmRaw, inc, strategy) : null;
     return {
         lift,
         tmRaw,

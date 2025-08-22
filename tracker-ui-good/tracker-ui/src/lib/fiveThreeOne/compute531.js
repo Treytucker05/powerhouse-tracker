@@ -98,34 +98,58 @@ function mainSetsFor(tm, loadingOption, targetWeek, state) {
     if (!entry) return [];
     const inc = state?.rounding?.increment ?? (state?.units === UNITS.KG ? 2.5 : 5);
     const mode = state?.rounding?.mode ?? 'nearest';
+
+    // Check for 5s PRO programming approach
+    const is5sPro = state?.programmingApproach === 'basic' && state?.supplemental?.type === '5spro';
+    const isLeaderPhase = state?.programmingApproach === 'leaderAnchor' && state?.cyclePhase === 'leader';
+
     return entry.sets.map((s) => ({
         pct: s.pct,
-        reps: s.reps,
-        amrap: !!s.amrap && targetWeek !== 4, // never AMRAP deload
+        reps: is5sPro ? 5 : s.reps, // 5s PRO: all sets are 5 reps
+        amrap: !is5sPro && !isLeaderPhase && !!s.amrap && targetWeek !== 4, // no AMRAP for 5s PRO, leader phases, or deload
         weight: roundToIncrement(pctOfTM(tm, s.pct), inc, mode),
     }));
 }
 
 // Simple set calculation using schemes; used by previews/utilities
-export function calcMainSets(tm, optionOrOpts = 1, week = 1, rounding = { increment: 5, mode: 'nearest' }) {
+export function calcMainSets(tm, optionOrOpts = 1, week = 1, rounding = { increment: 5, mode: 'nearest' }, programmingOptions = {}) {
     if (!Number.isFinite(tm)) return [];
-    // Support legacy signature: calcMainSets(tm, { week, option, increment, mode })
+
+    // Support legacy signature: calcMainSets(tm, { week, option, increment, mode, programmingApproach, supplementalType })
     if (optionOrOpts && typeof optionOrOpts === 'object') {
-        const { week: w = 1, option: opt = 1, increment = 5, mode = 'nearest' } = optionOrOpts;
+        const {
+            week: w = 1,
+            option: opt = 1,
+            increment = 5,
+            mode = 'nearest',
+            programmingApproach = 'basic',
+            supplementalType = null,
+            cyclePhase = null
+        } = optionOrOpts;
+
+        const is5sPro = programmingApproach === 'basic' && supplementalType === '5spro';
+        const isLeaderPhase = programmingApproach === 'leaderAnchor' && cyclePhase === 'leader';
+
         return getMainSetScheme(opt, w).map(s => ({
             pct: s.pct,
-            reps: typeof s.reps === 'string' ? Number(s.reps.replace('+', '')) || Number(s.reps) || 0 : s.reps,
-            amrap: typeof s.reps === 'string' ? s.reps.includes('+') && w !== 4 : false,
+            reps: is5sPro ? 5 : (typeof s.reps === 'string' ? Number(s.reps.replace('+', '')) || Number(s.reps) || 0 : s.reps),
+            amrap: !is5sPro && !isLeaderPhase && typeof s.reps === 'string' ? s.reps.includes('+') && w !== 4 : false,
             weight: roundToIncrement(tm * (s.pct / 100), increment, mode),
         }));
     }
+
     const opt = Number(optionOrOpts) || 1;
     const inc = rounding?.increment ?? 5;
     const mode = rounding?.mode ?? 'nearest';
+    const { programmingApproach = 'basic', supplementalType = null, cyclePhase = null } = programmingOptions;
+
+    const is5sPro = programmingApproach === 'basic' && supplementalType === '5spro';
+    const isLeaderPhase = programmingApproach === 'leaderAnchor' && cyclePhase === 'leader';
+
     return getMainSetScheme(opt, week).map(s => ({
         pct: s.pct,
-        reps: typeof s.reps === 'string' ? Number(s.reps.replace('+', '')) || Number(s.reps) || 0 : s.reps,
-        amrap: typeof s.reps === 'string' ? s.reps.includes('+') && week !== 4 : false,
+        reps: is5sPro ? 5 : (typeof s.reps === 'string' ? Number(s.reps.replace('+', '')) || Number(s.reps) || 0 : s.reps),
+        amrap: !is5sPro && !isLeaderPhase && typeof s.reps === 'string' ? s.reps.includes('+') && week !== 4 : false,
         weight: roundToIncrement(tm * (s.pct / 100), inc, mode),
     }));
 }

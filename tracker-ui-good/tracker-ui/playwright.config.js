@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './e2e',
+  testMatch: ['**/*.spec.*', '**/*.test.*', '**/*.e2e.*'],
   timeout: 30 * 1000,
   expect: {
     timeout: 5000
@@ -23,10 +24,11 @@ export default defineConfig({
     },
   ],
 
-  // Comment out webServer for manual testing
-  // webServer: {
-  //   command: 'pnpm run preview',
-  //   port: 5173,
-  //   reuseExistingServer: !process.env.CI,
-  // },
+  // Start the dev server automatically for E2E
+  webServer: {
+    command: 'npm run dev',
+    port: 5173,
+    reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000,
+  },
 });

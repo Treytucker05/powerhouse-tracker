@@ -252,7 +252,20 @@ export function AppProvider({ children }) {
                     dispatch({ type: APP_ACTIONS.SET_USER, payload: session.user });
                     await loadUserData(session.user.id);
                 } else {
-                    loadLocalData();
+                    // Dev-only E2E bypass: if the special localStorage flag is set, emulate an authenticated user
+                    try {
+                        const isDev = !!import.meta.env?.DEV;
+                        const flag = typeof window !== 'undefined' ? window.localStorage.getItem('ph.e2e.user') : null;
+                        if (isDev && flag === '1') {
+                            const fakeUser = { id: 'e2e-user', email: 'e2e@example.com' };
+                            dispatch({ type: APP_ACTIONS.SET_USER, payload: fakeUser });
+                            await loadUserData(fakeUser.id);
+                        } else {
+                            loadLocalData();
+                        }
+                    } catch {
+                        loadLocalData();
+                    }
                 }
             } catch (e) {
                 console.warn('Initial session fetch failed', e);

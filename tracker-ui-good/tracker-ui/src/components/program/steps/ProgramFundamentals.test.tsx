@@ -2,10 +2,21 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import ProgramFundamentals from './ProgramFundamentals';
 import { BuilderStateProvider } from '@/context/BuilderState';
+import { MemoryRouter } from 'react-router-dom';
+
+function renderWithProviders(ui: React.ReactElement, initialEntries: string[] = ['/build/step1']) {
+    return render(
+        <MemoryRouter initialEntries={initialEntries}>
+            <BuilderStateProvider>
+                {ui}
+            </BuilderStateProvider>
+        </MemoryRouter>
+    );
+}
 
 describe('ProgramFundamentals', () => {
     it('renders headings and empty TM table initially', () => {
-        render(<BuilderStateProvider><ProgramFundamentals /></BuilderStateProvider>);
+        renderWithProviders(<ProgramFundamentals />);
         expect(screen.getByText(/Program Fundamentals/i)).toBeInTheDocument();
         // Two occurrences: label strong + helper hint
         expect(screen.getAllByText(/Training Max/i).length).toBeGreaterThan(0);
@@ -14,7 +25,7 @@ describe('ProgramFundamentals', () => {
     });
 
     it('computes TM after entering tested 1RM', () => {
-        render(<BuilderStateProvider><ProgramFundamentals /></BuilderStateProvider>);
+        renderWithProviders(<ProgramFundamentals />);
         const inputs = screen.getAllByRole('spinbutton');
         // assume first input corresponds to press 1RM tested
         fireEvent.change(inputs[0], { target: { value: '150' } });
@@ -23,7 +34,7 @@ describe('ProgramFundamentals', () => {
     });
 
     it('switching units adjusts rounding microplate toggle meaning', () => {
-        render(<BuilderStateProvider><ProgramFundamentals /></BuilderStateProvider>);
+        renderWithProviders(<ProgramFundamentals />);
         // toggle units to kg
         const kgPills = screen.getAllByText('KG');
         fireEvent.click(kgPills[0]);

@@ -15,6 +15,7 @@ export interface Step1StateMeta {
     rounding: number; // active rounding increment derived from units + microplates
     inputs: Record<string, LiftInputs>; // press, deadlift, bench, squat
     tmTable: Record<string, number>; // computed/placeholder TMs (rounded)
+    variants?: Record<string, string>; // per-lift variant codes
 }
 
 interface Step2StateMeta {
@@ -38,7 +39,8 @@ const DEFAULT_STEP1: Step1StateMeta = {
     microplates: false,
     rounding: 5,
     inputs: { press: {}, deadlift: {}, bench: {}, squat: {} },
-    tmTable: { press: 0, deadlift: 0, bench: 0, squat: 0 }
+    tmTable: { press: 0, deadlift: 0, bench: 0, squat: 0 },
+    variants: { press: 'overhead_press', bench: 'bench_press', squat: 'back_squat', deadlift: 'conventional_deadlift' }
 };
 const DEFAULT_STEP2: Step2StateMeta = { templateId: undefined, schemeId: undefined };
 interface Step3StateMeta {
@@ -51,6 +53,10 @@ interface Step3StateMeta {
     assistanceMode?: string; // minimal, balanced, template, custom
     conditioningPlan?: string; // minimal, standard, extensive
     customNotes?: string;
+    liftOrder?: string[]; // ordering of primary lifts for the week (press, deadlift, bench, squat)
+    liftRotation?: string[][]; // multi-week rotation for 2 & 3 day templates (each inner array = one week of main lifts)
+    mainSetOption?: 1 | 2; // Option 1 (default) vs Option 2 loading pattern for main sets
+    novFullPrep?: boolean; // N.O.V. foam + stretch + rope sequence before barbell ramp
 }
 const DEFAULT_STEP3: Step3StateMeta = {
     scheduleFrequency: 4,
@@ -61,7 +67,11 @@ const DEFAULT_STEP3: Step3StateMeta = {
     supplemental: 'bbb',
     assistanceMode: 'balanced',
     conditioningPlan: 'standard',
-    customNotes: ''
+    customNotes: '',
+    liftOrder: ['press', 'deadlift', 'bench', 'squat'],
+    liftRotation: [['press', 'deadlift', 'bench', 'squat']],
+    mainSetOption: 1,
+    novFullPrep: false
 };
 
 const BuilderStateCtx = createContext<BuilderStateShape | undefined>(undefined);

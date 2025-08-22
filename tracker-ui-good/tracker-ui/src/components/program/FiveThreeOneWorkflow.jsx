@@ -14,7 +14,8 @@ import { useProgramV2 } from '../../methods/531/contexts/ProgramContextV2.jsx';
 import Step1MaxTesting from './steps/Step1MaxTesting';
 import ScheduleSelectionStep from './steps/ScheduleSelectionStep';
 import Step2CoreLifts from './steps/Step2CoreLifts';
-import Step3ScheduleWarmup from './steps/Step3ScheduleWarmup';
+import Step3ScheduleWarmup from './steps/Step3ScheduleWarmup'; // legacy consolidated (kept temporarily)
+import Step3CustomizeDesign from './steps/Step3CustomizeDesign'; // spec-compliant Step 3
 import Step4CycleStructure from './steps/Step4CycleStructure';
 import Step5Week1Execution from './steps/Step5Week1Execution';
 import Step6Week2Execution from './steps/Step6Week2Execution';
@@ -414,19 +415,10 @@ export default function FiveThreeOneWorkflow() {
                     />
                 );
             case 'warmup':
-                // Force all sections to show by providing complete stub data
+                // New Step 3 Customize Design per UI spec (legacy component retained for reference)
                 return (
-                    <Step3ScheduleWarmup
-                        data={{
-                            trainingMaxes: programData?.step1?.trainingMaxes || {},
-                            schedule: { frequency: '4day' },
-                            warmup: { policy: 'standard' },
-                            supplemental: { type: 'fsl' },
-                            programmingApproach: 'basic',
-                            leaderAnchorPattern: '2+1',
-                            assistanceConfig: { mode: 'minimal' },
-                            equipmentMap: { barbell: true, plates: true, bench: true, squat_rack: true }
-                        }}
+                    <Step3CustomizeDesign
+                        data={programData.step3 || {}}
                         updateData={(partial) =>
                             setProgramData(prev => ({
                                 ...prev,
