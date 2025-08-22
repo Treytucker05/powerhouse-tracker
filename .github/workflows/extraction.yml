@@ -1,4 +1,4 @@
-name: Extraction Validation
+name: Extraction Build
 
 on:
   push:
@@ -7,37 +7,24 @@ on:
     branches: [ main ]
 
 jobs:
-  extraction:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install dependencies (CI)
+      - name: Install deps
         run: npm ci
 
-      - name: Ensure required dev deps
-        run: |
-          npm ls xlsx || npm i -D xlsx
-          npm ls ts-node || npm i -D ts-node
-          npm ls typescript || npm i -D typescript
-          npm ls @types/node || npm i -D @types/node
+      - name: Build extraction
+        run: npm run extract:build:js
 
-      - name: Build extraction sheet
-        run: npm run extract:build
-
-      - name: Fail if generated artifacts changed
+      - name: Check for changes
         run: |
-          CHANGED=$(git status --porcelain | awk '{print $2}')
-          echo "Changed files:" $CHANGED
-          if git diff --name-only --exit-code -- public/methodology/extraction/ data/extraction/*.xlsx; then
-            echo "No generated artifact changes."
-          else
-            echo "Generated artifacts differ. Please run 'npm run extract:build' and commit results." >&2
-            exit 1
-          fi
+          git config --global user.email "ci@example.com"
+          git config --global user.name "CI"
+          git diff --exit-code || (echo "❌ Extracted files out of date. Run npm run extract:build locally and commit." && exit 1)

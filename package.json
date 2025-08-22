@@ -12,6 +12,15 @@
     "prepush": "npm run lint && npm run test:ci",
     "verify:531": "node scripts/verify-531.mjs",
     "start": "npm run dev",
-    "extract:build": "ts-node scripts/build-extraction-sheet.ts"
+    "extract:build": "ts-node --transpile-only scripts/build-extraction-sheet.ts",
+    "extract:build:js": "node scripts/build-extraction-sheet.js",
+    "extract:all": "npm run extract:build:js && node scripts/open-extraction.js",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2",
+    "xlsx": "^0.18.5"
   }
 }

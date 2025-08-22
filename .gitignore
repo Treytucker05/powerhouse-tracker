@@ -107,3 +107,35 @@ bower_components
 build/Release
 
 # Dependency dire
+
+## --- Extraction Repo Hygiene Additions --- ##
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build artifacts
+dist/
+out/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Extraction outputs (Excel/CSV can be checked in, so don’t ignore them)
+!data/extraction/531_extraction_template.xlsx
+!public/methodology/extraction/*.csv
+
+## Generated extraction outputs
+data/extraction/
+public/methodology/extraction/
+
+## Old cache
+node_modules_old/
