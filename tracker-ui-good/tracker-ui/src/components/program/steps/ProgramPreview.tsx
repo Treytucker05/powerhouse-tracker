@@ -4,10 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import BuilderProgress from './BuilderProgress';
 import { tryGenerate531, GeneratedProgram531 } from '@/lib/program/generation/fiveThreeOneGenerator';
 import { variantLabel } from '@/lib/variants/registry';
+import { templateLabel, schemeLabel, schemeAmrap } from '@/lib/builder/templates';
 import { supabase, getCurrentUserId } from '@/lib/supabaseClient';
 import { syncToSupabase, syncToLocalStorage, checkTableExists } from '@/context/appHelpers';
 import { toast } from 'react-toastify';
 import { makeV2FromBuilder, writeProgramV2ToLocalStorage } from '@/lib/adapters/builderToProgramV2';
+import { formatWeight, normalizeUnits } from '@/lib/units';
 
 // Step 4: Preview & Export (scaffold)
 // Focus: Provide a read-only style preview of generated program structure with week tabs and day cards.
@@ -62,6 +64,7 @@ const ProgramPreview: React.FC = () => {
     const [activeWeek, setActiveWeek] = React.useState(1);
     const [exporting, setExporting] = React.useState(false);
     const [lastSavedAt, setLastSavedAt] = React.useState<string | null>(null);
+    const [viewMode, setViewMode] = React.useState<'cards' | 'grid'>('cards');
     const scheduleFrequency = step3?.scheduleFrequency || 4;
 
     // Seed the canonical ProgramV2 store from Builder Steps 1–3 for engine-driven flows
@@ -149,27 +152,56 @@ const ProgramPreview: React.FC = () => {
 
     return (
         <div data-testid="step4-preview-root" className="min-h-screen bg-gray-900 text-gray-100 flex flex-col">
+            {/* Print helpers: hide most UI when printing and show a compact snapshot */}
+            <style>{`
+                @media print {
+                    .no-print { display: none !important; }
+                    .print-only { display: block !important; }
+                    body, html { background: #ffffff !important; }
+                }
+                .print-only { display: none; }
+            `}</style>
             <div className="px-8 pt-6"><BuilderProgress current={4} /></div>
             <header className="px-8 pt-4 pb-4 border-b border-gray-800 flex flex-col gap-2">
-                <h1 className="text-2xl font-semibold tracking-tight">Preview & Export</h1>
+                <h1 className="text-2xl font-semibold tracking-tight">Step 4 · Preview & Export</h1>
                 <p className="text-sm text-gray-400">{program ? 'Generated preview from your selections.' : 'Enter Training Maxes (Step 1) to generate preview.'}</p>
             </header>
-            <div className="flex-1 grid grid-cols-12 gap-6 px-8 py-6">
+            {/* Screen-only interactive preview */}
+            <div className="no-print flex-1 grid grid-cols-12 gap-6 px-8 py-6">
                 <section className="col-span-12 lg:col-span-8 space-y-6">
-                    <div className="flex flex-wrap items-center gap-2 text-[11px] -mt-2">
-                        <button onClick={() => navigate('/build/step1')} className="px-2 py-1 rounded border border-gray-700 hover:border-gray-500 hover:bg-gray-800/60">Fundamentals</button>
-                        <button onClick={() => navigate('/build/step2')} className="px-2 py-1 rounded border border-gray-700 hover:border-gray-500 hover:bg-gray-800/60">Template</button>
-                        <button onClick={() => navigate('/build/step3')} className="px-2 py-1 rounded border border-gray-700 hover:border-gray-500 hover:bg-gray-800/60">Customize</button>
-                        <span className="text-gray-600">|</span>
-                        <button onClick={() => navigate('/build/step5')} className="px-2 py-1 rounded border border-red-600/60 text-red-200 border hover:bg-red-600/10">Skip to Progression</button>
-                    </div>
+                    {/* Navigation is handled by BuilderProgress and footer buttons; extra inline nav removed for clarity */}
                     <div>
+                        {/* View Toggle */}
+                        <div className="flex items-center gap-2 mb-3" data-testid="preview-view-toggle">
+                            <span className="text-xs text-gray-400">View:</span>
+                            <button
+                                type="button"
+                                data-testid="preview-toggle-cards"
+                                onClick={() => setViewMode('cards')}
+                                aria-pressed={viewMode === 'cards'}
+                                className={`px-2.5 py-1 rounded border text-xs ${viewMode === 'cards' ? 'border-red-500 bg-red-600/10 text-red-200' : 'border-gray-700 bg-gray-800/50 hover:border-gray-500 text-gray-300'}`}
+                            >Cards</button>
+                            <button
+                                type="button"
+                                data-testid="preview-toggle-grid"
+                                onClick={() => setViewMode('grid')}
+                                aria-pressed={viewMode === 'grid'}
+                                className={`px-2.5 py-1 rounded border text-xs ${viewMode === 'grid' ? 'border-red-500 bg-red-600/10 text-red-200' : 'border-gray-700 bg-gray-800/50 hover:border-gray-500 text-gray-300'}`}
+                            >Grid</button>
+                            <div className="flex-1" />
+                            <button
+                                type="button"
+                                onClick={() => window.print()}
+                                className="px-2.5 py-1 rounded border text-xs border-gray-700 bg-gray-800/50 hover:border-gray-500 text-gray-300"
+                            >Print Week</button>
+                        </div>
                         <div data-testid="week-tabs" className="flex flex-wrap gap-2 mb-4">
                             {weeksAvailable.map(w => (
                                 <button
                                     key={w}
                                     data-testid={`week-tab-${w}`}
                                     onClick={() => setActiveWeek(w)}
+                                    aria-current={activeWeek === w ? 'page' : undefined}
                                     className={`px-3 py-1.5 rounded border text-xs font-medium transition ${activeWeek === w ? 'border-red-500 bg-red-600/10 text-red-200' : 'border-gray-700 bg-gray-800/50 hover:border-gray-500 text-gray-300'}`}
                                 >Week {w}</button>
                             ))}
@@ -179,45 +211,73 @@ const ProgramPreview: React.FC = () => {
                                 5s Pro selected: main sets are straight 5s with no AMRAP.
                             </div>
                         )}
-                        <div data-testid="week-content" className="grid gap-4">
-                            {days.map(d => {
-                                const dayData = activeWeekData?.days.find(dd => dd.main?.dayIndex === d);
-                                const main = dayData?.main;
-                                return (
-                                    <div key={d} data-testid={`day-card-${activeWeek}-${d}`} className="rounded-md border border-gray-800 bg-gray-800/50 p-4 space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <span className="font-semibold text-sm">Week {activeWeek} · Day {d}</span>
-                                            <span className="text-[10px] uppercase tracking-wide text-gray-500">{main ? (() => {
-                                                const code = step1?.variants?.[main.lift as keyof typeof step1.variants] || main.lift;
-                                                const label = variantLabel(code) || main.lift;
-                                                return label;
-                                            })() : 'Pending'}</span>
+                        {viewMode === 'cards' ? (
+                            <div data-testid="week-content" className="grid gap-4">
+                                {days.map(d => {
+                                    const dayData = activeWeekData?.days.find(dd => dd.main?.dayIndex === d);
+                                    const main = dayData?.main;
+                                    return (
+                                        <div key={d} data-testid={`day-card-${activeWeek}-${d}`} className="rounded-md border border-gray-800 bg-gray-800/50 p-4 space-y-2">
+                                            <div className="flex items-center justify-between">
+                                                <span className="font-semibold text-sm">Week {activeWeek} · Day {d}</span>
+                                                <span className="text-[10px] uppercase tracking-wide text-gray-500">{main ? (() => {
+                                                    const code = step1?.variants?.[main.lift as keyof typeof step1.variants] || main.lift;
+                                                    const label = variantLabel(code) || main.lift;
+                                                    return label;
+                                                })() : 'Pending'}</span>
+                                            </div>
+                                            <ul className="text-xs space-y-1 text-gray-300 ml-1">
+                                                {dayData?.warmup && (
+                                                    <li><span className="text-gray-400">Warm-up:</span> {dayData.warmup.replace(/^Warm-up:\s*/i, '')}</li>
+                                                )}
+                                                {main && main.sets.length > 0 ? (
+                                                    main.sets.map((s, idx) => (
+                                                        <li key={idx}><span className="text-gray-400">Set {idx + 1}:</span> {s.reps} @ {s.pct}% {s.weight ? `(${formatWeight(s.weight, step1.units)})` : ''}{s.type === 'amrap' ? ' AMRAP' : ''}</li>
+                                                    ))
+                                                ) : (
+                                                    <li><span className="text-gray-400">Primary:</span> {program ? 'TM missing for this lift' : 'Enter TMs in Step 1'}</li>
+                                                )}
+                                                <li><span className="text-gray-400">Supplemental:</span> {(() => {
+                                                    const sup = dayData?.supplemental;
+                                                    if (!sup) return '(n/a)';
+                                                    const units = normalizeUnits(step1?.units);
+                                                    return sup.replace(/\((\d+(?:\.[0-9]+)?)\)/g, (_, n) => `(${formatWeight(n, units)})`);
+                                                })()}</li>
+                                                <li><span className="text-gray-400">Assistance:</span> {dayData?.assistance || '(n/a)'}</li>
+                                            </ul>
                                         </div>
-                                        <ul className="text-xs space-y-1 text-gray-300 ml-1">
-                                            {dayData?.warmup && (
-                                                <li><span className="text-gray-400">Warm-up:</span> {dayData.warmup.replace(/^Warm-up:\s*/i, '')}</li>
-                                            )}
-                                            {main && main.sets.length > 0 ? (
-                                                main.sets.map((s, idx) => (
-                                                    <li key={idx}><span className="text-gray-400">Set {idx + 1}:</span> {s.reps} @ {s.pct}% {s.weight ? `(${s.weight}${step1.units})` : ''}{s.type === 'amrap' ? ' AMRAP' : ''}</li>
-                                                ))
-                                            ) : (
-                                                <li><span className="text-gray-400">Primary:</span> {program ? 'TM missing for this lift' : 'Enter TMs in Step 1'}</li>
-                                            )}
-                                            <li><span className="text-gray-400">Supplemental:</span> {(() => {
-                                                const sup = dayData?.supplemental;
-                                                if (!sup) return '(n/a)';
-                                                const units = step1?.units || '';
-                                                if (!units) return sup;
-                                                // Append units inside numeric parentheses e.g., (130) -> (130lb)
-                                                return sup.replace(/\((\d+(?:\.[0-9]+)?)\)/g, `($1${units})`);
-                                            })()}</li>
-                                            <li><span className="text-gray-400">Assistance:</span> {dayData?.assistance || '(n/a)'}</li>
-                                        </ul>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div data-testid="grid-preview" className="rounded-md border border-gray-800 bg-gray-800/40 p-2">
+                                <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${days.length}, minmax(0, 1fr))` }}>
+                                    {days.map(d => {
+                                        const dayData = activeWeekData?.days.find(dd => dd.main?.dayIndex === d);
+                                        const main = dayData?.main;
+                                        const liftLabel = main ? (() => {
+                                            const code = step1?.variants?.[main.lift as keyof typeof step1.variants] || main.lift;
+                                            return variantLabel(code) || main.lift;
+                                        })() : 'Pending';
+                                        return (
+                                            <div key={d} data-testid={`grid-cell-${activeWeek}-${d}`} className="border border-gray-800 rounded-sm bg-gray-900/40 p-2">
+                                                <div className="text-[11px] font-semibold mb-1">Day {d}</div>
+                                                <div className="text-[10px] uppercase tracking-wide text-gray-500 mb-1">{liftLabel}</div>
+                                                <ul className="text-[11px] text-gray-300 space-y-0.5">
+                                                    {main && main.sets.length > 0 ? (
+                                                        main.sets.map((s, idx) => (
+                                                            <li key={idx}>Set {idx + 1}: {s.reps} @ {s.pct}%{s.type === 'amrap' ? ' (AMRAP)' : ''}</li>
+                                                        ))
+                                                    ) : (
+                                                        <li>Primary: {program ? 'TM missing' : 'Add TMs in Step 1'}</li>
+                                                    )}
+                                                </ul>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        )}
                     </div>
                     <div className="flex items-center gap-3 pt-2">
                         <button onClick={() => navigate('/build/step3')} data-testid="back-step3" className="px-4 py-2 rounded border border-gray-600 text-sm hover:bg-gray-800">Back</button>
@@ -235,7 +295,7 @@ const ProgramPreview: React.FC = () => {
                         <h3 className="font-semibold mb-2">Summary</h3>
                         <ul className="text-xs space-y-1 text-gray-300">
                             <li data-testid="summary-fundamentals"><span className="text-gray-400">Units:</span> {step1?.units || 'n/a'} · TM% {step1?.tmPct || 90}</li>
-                            <li data-testid="summary-template"><span className="text-gray-400">Template:</span> {step2?.templateId || 'none'} · <span className="text-gray-400">Scheme:</span> {step2?.schemeId || 'none'}</li>
+                            <li data-testid="summary-template"><span className="text-gray-400">Template:</span> {templateLabel(step2?.templateId)} · <span className="text-gray-400">Scheme:</span> {schemeLabel(step2?.schemeId)}{(() => { const a = schemeAmrap(step2?.schemeId); return a ? ` · AMRAP: ${a}` : ''; })()}</li>
                             <li data-testid="summary-schedule"><span className="text-gray-400">Schedule Days:</span> {scheduleFrequency}</li>
                             <li data-testid="summary-deload"><span className="text-gray-400">Deload:</span> {step3?.deload ? 'Yes' : 'No'}</li>
                             <li data-testid="summary-mainset-option"><span className="text-gray-400">Main Set Option:</span> {step3?.mainSetOption || 1}</li>
@@ -252,6 +312,38 @@ const ProgramPreview: React.FC = () => {
                         </ul>
                     </div>
                 </aside>
+            </div>
+
+            {/* Print-only snapshot for current week */}
+            <div className="print-only p-8">
+                <div data-testid="print-snapshot" className="max-w-5xl mx-auto">
+                    <h1 style={{ fontSize: '22px', fontWeight: 600, marginBottom: '4px', color: '#000' }}>5/3/1 Program — Week {activeWeek}</h1>
+                    <div style={{ fontSize: '12px', color: '#000', marginBottom: '12px' }}>
+                        Units: {normalizeUnits(step1?.units)} • Main Set Option: {step3?.mainSetOption || 1} • Generated: {new Date().toLocaleDateString()}
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${days.length}, minmax(0, 1fr))`, gap: '8px' }}>
+                        {days.map(d => {
+                            const dayData = activeWeekData?.days.find(dd => dd.main?.dayIndex === d);
+                            const main = dayData?.main;
+                            return (
+                                <div key={`print-${d}`} style={{ border: '1px solid #000', padding: '8px' }}>
+                                    <div style={{ fontWeight: 600, fontSize: '12px', marginBottom: '4px' }}>Day {d}</div>
+                                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                                        {main && main.sets?.length ? (
+                                            main.sets.map((s, idx) => (
+                                                <li key={idx} style={{ fontSize: '12px', color: '#000' }}>
+                                                    Set {idx + 1}: {s.reps} @ {s.pct}%{s.type === 'amrap' ? ' (AMRAP)' : ''}{s.weight ? ` — ${formatWeight(s.weight, step1?.units)}` : ''}
+                                                </li>
+                                            ))
+                                        ) : (
+                                            <li style={{ fontSize: '12px', color: '#000' }}>Primary: {program ? 'TM missing' : 'Add TMs in Step 1'}</li>
+                                        )}
+                                    </ul>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
             </div>
         </div>
     );

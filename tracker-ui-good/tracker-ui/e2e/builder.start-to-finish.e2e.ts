@@ -34,15 +34,11 @@ test('5/3/1 builder: start to finish export', async ({ page }) => {
     await page.getByTestId('step1-next').click();
     await page.waitForURL('**/build/step2');
 
-    // Choose a template (pick BBB)
+    // Choose a template (pick BBB) and confirm selection via "Use This Template"
     await page.getByTestId('template-bbb').click();
-    // Open details panel if needed and click Use This Template, otherwise selection via compare is enough
-    const detailsPanel = page.getByTestId('template-details-panel');
-    if (await detailsPanel.isVisible()) {
-        const useBtn = detailsPanel.getByRole('button', { name: /Use This Template/i });
-        if (await useBtn.count()) {
-            await useBtn.click();
-        }
+    const useBtn = page.getByRole('button', { name: /Use This Template/i });
+    if (await useBtn.count()) {
+        await useBtn.first().click();
     }
 
     // Next to Step 3
@@ -59,12 +55,17 @@ test('5/3/1 builder: start to finish export', async ({ page }) => {
     await expect(page.getByTestId('week-tab-1')).toBeVisible();
     await expect(page.getByTestId('week-content')).toBeVisible();
 
+    // Toggle to Grid view and verify grid appears
+    await page.getByTestId('preview-toggle-grid').click();
+    await expect(page.getByTestId('grid-preview')).toBeVisible();
+    // Toggle back to Cards to keep rest consistent
+    await page.getByTestId('preview-toggle-cards').click();
+
     // Export Program and verify localStorage updated
     await page.getByTestId('export-json').click();
-    const exported = await page.evaluate(() => {
-        return window.localStorage.getItem('currentProgram');
-    });
-    expect(exported).toBeTruthy();
+    // Wait for async export to complete and localStorage to be written
+    await page.waitForFunction(() => !!window.localStorage.getItem('currentProgram'));
+    const exported = await page.evaluate(() => window.localStorage.getItem('currentProgram'));
 
     // Optionally assert shape
     const payload = JSON.parse(exported!);

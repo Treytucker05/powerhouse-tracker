@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { supabase, getCurrentUserId } from '@/lib/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 import { useBuilder } from '@/context/BuilderState';
-import { SCHEMES as schemes, getSchemeDescriptor } from '@/lib/builder/templates';
+import { SCHEMES as schemes, getSchemeDescriptor, schemeLabel, schemeAmrap } from '@/lib/builder/templates';
 import { PERCENT_SCHEMES } from '@/lib/fiveThreeOne/compute531.js';
 import { WENDLER_531_BOOK_SUGGESTIONS as BOOK } from '@/lib/531-book-suggestions';
 import BuilderProgress from './BuilderProgress';
@@ -183,7 +183,7 @@ export default function DesignCustomize() {
             <div className="px-8 pt-6"><BuilderProgress current={3} /></div>
             <header className="px-8 pt-8 pb-4 border-b border-gray-800 flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-semibold mb-1">Customize Design</h1>
+                    <h1 className="text-2xl font-semibold mb-1">Step 3 · Customize</h1>
                     <p className="text-sm text-gray-400">Adjust schedule, warm-ups, supplemental & conditioning.</p>
                 </div>
                 <div className="flex items-center gap-4">
@@ -205,7 +205,7 @@ export default function DesignCustomize() {
                         <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-4 text-xs text-gray-400">
                             <div className="flex flex-wrap items-center gap-2 mb-1">
                                 <span className="text-gray-300 font-semibold">Template:</span>
-                                <span className="px-2 py-0.5 rounded bg-gray-700/50 border border-gray-600 text-[10px] font-mono">{step2.templateId}</span>
+                                <span className="px-2 py-0.5 rounded bg-gray-700/50 border border-gray-600 text-[10px] font-mono">{(step2.templateId === 'bbb' ? 'BBB' : step2.templateId)}</span>
                                 {locked && <span className="px-2 py-0.5 rounded bg-red-600/70 text-white text-[10px]">Locked</span>}
                                 {appliedTemplateId === step2.templateId && !hasUserCustomizations && (
                                     <span className="px-2 py-0.5 rounded bg-green-600/70 text-white text-[10px]">Defaults Applied</span>
@@ -396,7 +396,8 @@ export default function DesignCustomize() {
                     </div>
                     {/* Approach */}
                     <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-4">
-                        <h2 className="font-semibold mb-3">Programming Approach</h2>
+                        <h2 className="font-semibold mb-1">Programming Approach</h2>
+                        <p className="text-[11px] text-gray-400 mb-2">Informational reference from the book. AMRAP behavior is controlled by the Scheme above.</p>
                         <div className="flex flex-wrap gap-2">
                             {approaches.map(a => (
                                 <button
@@ -429,7 +430,6 @@ export default function DesignCustomize() {
                                 suggestions.push('Plan a deload after two cycles.');
                             } else if (catalogId === 'fives_pro') {
                                 suggestions.push('Pair main work with FSL or SSL supplemental.');
-                                suggestions.push('AMRAPs off for main sets (sets of 5).');
                             } else if (catalogId === 'competition_prep') {
                                 suggestions.push('Include controlled singles in training.');
                                 suggestions.push('Adjust PR logic to peak for a meet.');
@@ -451,11 +451,14 @@ export default function DesignCustomize() {
                         })()}
                     </div>
                     {/* Deload */}
-                    <div data-testid="deload-toggle" className="bg-gray-800/60 border border-gray-700 rounded-lg p-4 flex items-center gap-3">
-                        <span className="font-semibold">Deload Week</span>
-                        <label className="flex items-center gap-2 text-sm">
-                            <input type="checkbox" disabled={locked} checked={!!step3.deload} onChange={e => setField('deload', e.target.checked)} /> Enabled
-                        </label>
+                    <div data-testid="deload-toggle" className="bg-gray-800/60 border border-gray-700 rounded-lg p-4">
+                        <div className="flex items-center gap-3">
+                            <span className="font-semibold">Deload Week</span>
+                            <label className="text-sm flex items-center gap-2">
+                                <input type="checkbox" disabled={locked} checked={!!step3.deload} onChange={e => setField('deload', e.target.checked)} /> Enabled
+                            </label>
+                        </div>
+                        <p className="text-[11px] text-gray-400 mt-1">Week 4 lightens load and volume (no AMRAP). Leave on unless you have a specific reason.</p>
                     </div>
                     {/* Supplemental */}
                     <div data-testid="supplemental-picker" className="bg-gray-800/60 border border-gray-700 rounded-lg p-4">
@@ -546,7 +549,7 @@ export default function DesignCustomize() {
                     {/* Conditioning */}
                     {/* Schemes (moved from Step 2) */}
                     <div data-testid="scheme-selector" className="bg-gray-800/60 border border-gray-700 rounded-lg p-4">
-                        <h2 className="font-semibold mb-3">Core Scheme & AMRAP</h2>
+                        <h2 className="font-semibold mb-3">Core Scheme</h2>
                         <div className="grid sm:grid-cols-3 gap-3" role="radiogroup" aria-label="Select 531 scheme">
                             {schemes.map(s => {
                                 const selected = step2.schemeId === s.id;
@@ -564,7 +567,7 @@ export default function DesignCustomize() {
                                             <span>{s.title}</span>
                                             {selected && <span className="text-[9px] px-1 py-0.5 rounded bg-red-600 text-white">Selected</span>}
                                         </div>
-                                        <div className="text-[10px] text-gray-400">AMRAP: {s.amrap}</div>
+                                        {selected && <div className="text-[10px] text-gray-400">AMRAP: {s.amrap}</div>}
                                         {selected && (
                                             <div className="mt-1 text-[10px] font-mono bg-red-900/30 border border-red-600/30 rounded px-2 py-1" data-testid={`scheme-descriptor-inline-${s.id}`}>{getSchemeDescriptor(s.id)}</div>
                                         )}
@@ -634,17 +637,32 @@ export default function DesignCustomize() {
                             );
                         })()}
                     </div>
-                    {/* Notes */}
-                    <div data-testid="custom-notes" className="bg-gray-800/60 border border-gray-700 rounded-lg p-4">
-                        <h2 className="font-semibold mb-3">Notes & Rationale</h2>
-                        <textarea
-                            value={step3.customNotes || ''}
-                            onChange={e => setField('customNotes', e.target.value.slice(0, 800))}
-                            placeholder="Add optional context: goals for this cycle, recovery considerations, constraints..."
-                            className="w-full h-32 text-sm rounded border border-gray-700 bg-gray-900/60 p-2 focus:outline-none focus:ring-2 focus:ring-red-500/50"
-                        />
-                        <div className="text-[10px] text-gray-500 mt-1 flex justify-between"><span>Private to you (saved with export)</span><span>{(step3.customNotes?.length || 0)}/800</span></div>
-                    </div>
+                    {/* Notes & Live Summary temporarily removed per UX simplification */}
+                    {false && (
+                        <div data-testid="custom-notes" className="bg-gray-800/60 border border-gray-700 rounded-lg p-4">
+                            <h2 className="font-semibold mb-3">Notes & Rationale</h2>
+                            <textarea
+                                className="w-full bg-gray-900/50 border border-gray-700 rounded p-2 text-sm text-gray-200"
+                                rows={3}
+                                placeholder="Optional notes about your selections..."
+                                value={step3.customNotes || ''}
+                                onChange={e => setField('customNotes', e.target.value.slice(0, 800))}
+                            />
+                            <div className="text-[10px] text-gray-500 mt-1 flex justify-between"><span>Private to you (saved with export)</span><span>{(step3.customNotes?.length || 0)}/800</span></div>
+                        </div>
+                    )}
+                    {false && (
+                        <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-4">
+                            <h3 className="font-semibold mb-2">Live Summary</h3>
+                            <ul className="text-xs text-gray-300 space-y-1">
+                                <li>Schedule: {step3.scheduleFrequency} days</li>
+                                <li>Warm‑ups: {step3.warmupsEnabled ? 'on' : 'off'} ({step3.warmupScheme})</li>
+                                <li>Supplemental: {String(step3.supplemental || 'none').toUpperCase()}</li>
+                                <li>Assistance: {step3.assistanceMode}</li>
+                                <li>Conditioning: {step3.conditioningPlan}</li>
+                            </ul>
+                        </div>
+                    )}
                 </section>
                 <aside className="col-span-12 lg:col-span-4 space-y-4">
                     <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-4 text-sm">
@@ -671,7 +689,7 @@ export default function DesignCustomize() {
                                 const meta = BOOK.conditioning.find(c => c.id === (step3.conditioningPlan as any));
                                 return meta?.label || step3.conditioningPlan;
                             })()}</li>
-                            <li>Scheme: {step2.schemeId || '(none)'}</li>
+                            <li>Scheme: {schemeLabel(step2.schemeId)}{(() => { const a = schemeAmrap(step2.schemeId); return a ? ` · AMRAP: ${a}` : ''; })()}</li>
                             <li>Main Set Opt: {step3.mainSetOption || 1}</li>
                             {(() => {
                                 const variants = (step1 as any)?.variants || {};
@@ -686,10 +704,7 @@ export default function DesignCustomize() {
                         </ul>
                     </div>
 
-                    {/* Enhanced Workout Preview for selected template */}
-                    {step2.templateId && (
-                        <WorkoutPreview templateId={step2.templateId} expanded={true} />
-                    )}
+                    {/* Template preview is shown in Step 2 details to avoid duplication */}
 
                     <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-4 text-sm" data-testid="readiness-box">
                         <h3 className="font-semibold mb-2">Generation Readiness</h3>

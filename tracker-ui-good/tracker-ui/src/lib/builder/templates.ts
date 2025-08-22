@@ -85,3 +85,33 @@ export function getSchemeDescriptor(id?: string) {
         default: return 'Select a scheme to view set waves';
     }
 }
+
+// Human label for template id (UI-facing). Ensures BBB casing.
+export function templateLabel(id?: string | null) {
+    switch (id) {
+        case 'bbb': return 'BBB';
+        case 'triumvirate': return 'Triumvirate';
+        case 'periodization_bible': return 'Periodization Bible';
+        case 'bodyweight': return 'Bodyweight';
+        case 'jackshit': return 'Jack Sh*t';
+        case undefined:
+        case null:
+            return 'none';
+        default:
+            return String(id);
+    }
+}
+
+// Human label for scheme id (UI-facing)
+export function schemeLabel(id?: string | null) {
+    if (!id) return '(none)';
+    const s = SCHEMES.find(x => x.id === id);
+    return s?.title || String(id);
+}
+
+// AMRAP behavior for a scheme id
+export function schemeAmrap(id?: string | null): 'on' | 'off' | null {
+    if (!id) return null;
+    const s = SCHEMES.find(x => x.id === id);
+    return s?.amrap ?? null;
+}

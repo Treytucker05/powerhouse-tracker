@@ -129,7 +129,7 @@ describe('TemplateAndScheme (Step 2)', () => {
 
             // Initially shows no template selected
             const summary = within(container).getByTestId('selection-summary');
-            expect(summary).toHaveTextContent('Template: —');
+            expect(summary).toHaveTextContent(/Template:\s+(—|none)/i);
 
             // Expand template first
             fireEvent.click(within(container).getByTestId('template-bbb'));
@@ -146,7 +146,7 @@ describe('TemplateAndScheme (Step 2)', () => {
                 expect(bbbTemplate).toHaveClass('border-red-500');
                 // Check for "Selected" within the template card specifically
                 expect(within(bbbTemplate).getByText('Selected')).toBeInTheDocument();
-                expect(summary).toHaveTextContent('Template: bbb');
+                expect(summary).toHaveTextContent('Template: BBB');
             });
         });
     });
@@ -192,7 +192,7 @@ describe('TemplateAndScheme (Step 2)', () => {
             // Verify the state change is reflected in the UI
             await waitFor(() => {
                 const summary = within(container).getByTestId('selection-summary');
-                expect(summary).toHaveTextContent('Template: bbb');
+                expect(summary).toHaveTextContent('Template: BBB');
                 const bbbTemplate = within(container).getByTestId('template-bbb');
                 expect(bbbTemplate).toHaveClass('border-red-500');
             });
@@ -463,7 +463,7 @@ describe('TemplateAndScheme (Step 2)', () => {
             // Check that template is selected (summary should update)
             await waitFor(() => {
                 const summary = within(container).getByTestId('selection-summary');
-                expect(summary).toHaveTextContent('Template: bbb');
+                expect(summary).toHaveTextContent('Template: BBB');
             });
         });
 

@@ -5,6 +5,7 @@ import { percentOfTM, toDisplayWeight } from '../lib/fiveThreeOne/math';
 import { getStandardWarmups } from '../lib/fiveThreeOne/validate';
 import { getTrainingMaxesFromAny, getLoadingOptionFromAny, getLiftOrderFromAny, getClientMetaFromAny } from '../lib/fiveThreeOne/stateBridge.js';
 import './print.css';
+import { normalizeUnits, formatWeight } from '@/lib/units';
 
 const LOADS = {
     1: [ // Option 1 (default)
@@ -82,6 +83,8 @@ export default function PrintWeek() {
         [programContext]
     );
 
+    const units = normalizeUnits(unit);
+
     const dayRows = liftOrder.map((liftKey) => {
         const tm = Number(trainingMaxes?.[liftKey]) || 0;
         const warmups = getStandardWarmups(tm).map(w => ({
@@ -101,7 +104,7 @@ export default function PrintWeek() {
                 <div className="left">
                     <h1>Print Week</h1>
                     <div className="sub">
-                        {clientMeta.clientName} • Unit: {unit} • Rounding: {roundingIncrement} {unit}
+                        {clientMeta.clientName} • Unit: {units} • Rounding: {roundingIncrement}{units}
                     </div>
                 </div>
                 <div className="right">
@@ -120,14 +123,14 @@ export default function PrintWeek() {
                 <div className="sheet-header">
                     <div>
                         <div className="title">{clientMeta.clientName} — 5/3/1 Program</div>
-                        <div className="meta">Week {week} • Loading Option {loadingOption} • Unit: {unit}</div>
+                        <div className="meta">Week {week} • Loading Option {loadingOption} • Unit: {units}</div>
                     </div>
                     <div className="notes">Notes:</div>
                 </div>
 
                 {dayRows.map((row, idx) => (
                     <div className="day" key={row.liftKey}>
-                        <div className="day-hd">{idx + 1}. {row.liftName} (TM: {toDisplayWeight(row.tm)} {unit})</div>
+                        <div className="day-hd">{idx + 1}. {row.liftName} (TM: {formatWeight(toDisplayWeight(row.tm), units)})</div>
                         <table className="tbl">
                             <thead>
                                 <tr>
@@ -140,7 +143,7 @@ export default function PrintWeek() {
                                         <td>Warm‑up</td>
                                         <td>{w.pct}%</td>
                                         <td>{w.reps}</td>
-                                        <td>{w.weight} {unit}</td>
+                                        <td>{formatWeight(w.weight, units)}</td>
                                         <td><input type="checkbox" /></td>
                                         <td></td>
                                     </tr>
@@ -150,7 +153,7 @@ export default function PrintWeek() {
                                         <td>{i < row.mainSets.length - 1 ? 'Set' : (s.amrap ? 'Top +' : 'Set')}</td>
                                         <td>{s.pct}%</td>
                                         <td>{s.reps}{s.amrap ? '+' : ''}</td>
-                                        <td>{s.weight} {unit}</td>
+                                        <td>{formatWeight(s.weight, units)}</td>
                                         <td><input type="checkbox" /></td>
                                         <td></td>
                                     </tr>

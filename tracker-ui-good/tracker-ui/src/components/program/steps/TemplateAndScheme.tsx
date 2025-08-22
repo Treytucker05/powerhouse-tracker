@@ -2,9 +2,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBuilder } from '@/context/BuilderState';
 import { supabase, getCurrentUserId } from '@/lib/supabaseClient';
-import { TEMPLATES as templates, TEMPLATE_DETAILS, TEMPLATE_META } from '@/lib/builder/templates';
+import { TEMPLATES as templates, TEMPLATE_DETAILS, TEMPLATE_META, templateLabel } from '@/lib/builder/templates';
 import BuilderProgress from './BuilderProgress';
-import { WorkoutPreview } from './WorkoutPreview';
+// Removed inline WorkoutPreview to avoid duplication with Step 4 comprehensive preview
 
 // --- Detailed Workout Definitions (UI only, not final programming engine) ---
 // Each template maps to 4 training days (classic) with main lift emphasis ordering.
@@ -56,9 +56,6 @@ function renderTemplateDetail(id: string) {
                     </div>
                 ))}
             </div>
-
-            {/* Add workout preview */}
-            <WorkoutPreview templateId={id} expanded={true} />
 
             <p className="text-[10px] text-gray-500">Click "Use This Template" to lock it in and proceed to scheme selection.</p>
         </div>
@@ -336,12 +333,8 @@ export default function TemplateAndScheme() {
             <div className="px-8 pt-6"><BuilderProgress current={2} /></div>
             <header className="px-8 pt-8 pb-4 border-b border-gray-800 flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-semibold mb-1">Select Template</h1>
+                    <h1 className="text-2xl font-semibold mb-1">Step 2 · Select Template</h1>
                     <p className="text-sm text-gray-400">Choose the structural template. You'll fine‑tune scheme & loading in Step 3.</p>
-                </div>
-                <div data-testid="selection-summary" className="text-xs text-gray-300">
-                    <div>Template: {step2.templateId || '—'}</div>
-                    <div>Scheme: (choose next step)</div>
                 </div>
             </header>
             <div className="flex-1 grid grid-cols-12 gap-6 px-8 py-6">
@@ -579,12 +572,12 @@ export default function TemplateAndScheme() {
                     {/* Cycle overview removed per latest request; detail now lives in the side panel */}
                 </section>
                 <aside className="col-span-12 lg:col-span-4 space-y-4">
-                    <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-4 text-sm">
+                    <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-4 text-sm" data-testid="selection-summary">
                         <h3 className="font-semibold mb-2">Selection Summary</h3>
                         <p className="text-xs text-gray-400 mb-2">These choices determine default assistance, deload policy and AMRAP flags.</p>
                         <ul className="text-xs space-y-1">
-                            <li>Template: <span className="font-mono">{step2.templateId || '—'}</span></li>
-                            <li>Scheme: <span className="font-mono">(select in Step 3)</span></li>
+                            <li>Template: <span className="font-mono">{templateLabel(step2.templateId)}</span></li>
+                            <li>Scheme: <span className="font-mono">(choose next step)</span></li>
                         </ul>
                         {step2.templateId && (
                             <div className="mt-3 text-[11px] text-gray-400 space-y-1">

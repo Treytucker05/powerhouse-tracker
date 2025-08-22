@@ -56,8 +56,8 @@ describe('Step 3 Template Integration UI', () => {
             expect(screen.getByTestId('step3-container')).toBeInTheDocument();
         });
 
-        // Should show main heading
-        expect(screen.getByText('Customize Design')).toBeInTheDocument();
+    // Should show main heading (allow prefix like "Step 3 ·")
+    expect(screen.getByText(/Customize$/i)).toBeInTheDocument();
 
         // Should show main controls
         expect(screen.getByText('Use Template Defaults (lock)')).toBeInTheDocument();
