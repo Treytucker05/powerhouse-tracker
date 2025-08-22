@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { pillClass } from './_shared/pillStyles.js';
 import { CheckCircle, Lock, Unlock } from 'lucide-react';
 
 /**
@@ -138,21 +139,44 @@ export default function Step3CustomizeDesign({ data, updateData }) {
     const resetCustomRows = () => setLocal(prev => ({ ...prev, warmups: { ...prev.warmups, custom: [] } }));
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 step3-viz">
+            {/* Scoped visual styles for Step 3 enhancements */}
+            <style>{`
+                .step3-viz * { transition: all 0.2s ease; }
+                .step3-viz .section:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.2); transform: translateY(-1px); }
+                .step3-viz .warm-ups-section { background: rgba(239,68,68,0.05); border-left: 4px solid #ef4444; padding: 1.5rem; margin-bottom: 2rem; border-radius: 8px; }
+                .step3-viz .supplemental-section { background: rgba(59,130,246,0.05); border-left: 4px solid #3b82f6; padding: 1.5rem; margin-bottom: 2rem; border-radius: 8px; }
+                .step3-viz .assistance-section { background: rgba(16,185,129,0.05); border-left: 4px solid #10b981; padding: 1.5rem; margin-bottom: 2rem; border-radius: 8px; }
+                .step3-viz .conditioning-section { background: rgba(251,191,36,0.05); border-left: 4px solid #fbbf24; padding: 1.5rem; margin-bottom: 2rem; border-radius: 8px; }
+                .step3-viz .core-scheme-section { background: rgba(168,85,247,0.05); border-left: 4px solid #a855f7; padding: 1.5rem; margin-bottom: 2rem; border-radius: 8px; }
+                .step3-viz .option-selected { background: #ef4444 !important; color: white !important; font-weight: bold; transform: scale(1.05); box-shadow: 0 0 20px rgba(239,68,68,0.3); }
+                .step3-viz .option-unselected { background: transparent; border: 1px solid #666; }
+                .step3-viz .option-pill:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; }
+                .step3-viz .percentage-table { background: #1a1a2e; border: 1px solid #3a3d4a; border-radius: 8px; overflow: hidden; }
+                .step3-viz .percentage-table tr:nth-child(odd) { background: rgba(255,255,255,0.02); }
+                .step3-viz .percentage-table tr:hover { background: rgba(239,68,68,0.1); border-left: 3px solid #ef4444; }
+                .step3-viz .percentage-table th { background: #2a2d3a; padding: 1rem; font-weight: 700; text-align: center; border-bottom: 2px solid #ef4444; }
+                .step3-viz .percentage-table td { font-family: 'Courier New', monospace; padding: 0.75rem; text-align: center; }
+            `}</style>
             {/* Header */}
             <div className="flex items-start justify-between">
                 <div>
                     <h3 className="text-xl font-semibold text-white">Step 3: Customize Design</h3>
                     <p className="text-gray-400 text-sm">Template defaults shown. Unlock to adjust training structure.</p>
                 </div>
-                <button
-                    onClick={() => setField({ locked: !locked })}
-                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded border text-sm ${locked ? 'border-gray-600 text-gray-200 hover:bg-gray-800' : 'border-red-500 text-red-200 bg-red-900/20 hover:bg-red-900/40'}`}
-                    data-testid="unlock-toggle"
-                >
-                    {locked ? <Unlock className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-                    {locked ? 'Unlock to Customize' : 'Lock (Use Defaults)'}
-                </button>
+            </div>
+
+            {/* Prominent Template Lock card */}
+            <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '2px solid #ef4444', padding: '1rem', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
+                <span style={{ fontSize: '1.5rem' }}>🔒</span>
+                <div>
+                    <label style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
+                        <input type="checkbox" checked={locked} onChange={e => setField({ locked: e.target.checked })} />{' '}Use Template Defaults
+                    </label>
+                    <p style={{ fontSize: '0.9rem', color: '#999', margin: 0 }}>
+                        Automatically applies BBB recommended settings. Uncheck to customize.
+                    </p>
+                </div>
             </div>
 
             {/* Sections */}
@@ -161,18 +185,24 @@ export default function Step3CustomizeDesign({ data, updateData }) {
                 <div className="space-y-3">
                     <div className="text-sm text-gray-300 font-medium">Weekly Frequency</div>
                     <div className="flex flex-wrap gap-2">
-                        {['2', '3', '4'].map(f => (
-                            <button key={f} disabled={locked} onClick={() => updateNested('schedule', { frequency: f })} className={`px-3 py-1 rounded border text-sm ${local.schedule.frequency === f ? 'border-red-500 ring-2 ring-red-600 text-white' : 'border-gray-600 text-gray-300 hover:bg-gray-700/40'} ${locked ? 'opacity-60 cursor-not-allowed' : ''}`}>{f}-Day</button>
-                        ))}
+                        {['2', '3', '4'].map(f => {
+                            const active = local.schedule.frequency === f;
+                            return (
+                                <button key={f} disabled={locked} onClick={() => updateNested('schedule', { frequency: f })} className={`${pillClass(active, locked)} text-sm`}>
+                                    {active ? <span className="mr-1">✓</span> : null}
+                                    {f}-Day
+                                </button>
+                            );
+                        })}
                     </div>
                     <div className="text-[11px] text-gray-500">Lift order: {local.schedule.order.join(' → ')}</div>
                     <div className="text-[10px] text-gray-500 italic">Drag & drop ordering placeholder (future).</div>
                 </div>
             </Section>
 
-            <Section title="2. Warm-ups" testId="warmup-chooser" open={open['warmup-chooser']} onToggle={() => toggle('warmup-chooser')}>
+            <Section title="2. 🔥 Warm-ups" testId="warmup-chooser" open={open['warmup-chooser']} onToggle={() => toggle('warmup-chooser')}>
                 {locked && <ReadOnlyOverlay />}
-                <div className="space-y-4">
+                <div className="space-y-4 warm-ups-section">
                     <div className="flex items-center gap-3">
                         <label className="flex items-center gap-2 text-sm text-gray-200">
                             <input type="checkbox" disabled={locked} checked={local.warmups.enabled} onChange={e => updateNested('warmups', { enabled: e.target.checked })} /> Enable Warm-ups
@@ -185,7 +215,10 @@ export default function Step3CustomizeDesign({ data, updateData }) {
                             const active = local.warmups.policy === p.id;
                             const disabled = locked || !local.warmups.enabled;
                             return (
-                                <button key={p.id} type="button" data-testid={`warmup-policy-${p.id}`} data-testid-old={`warmup-scheme-${p.id}`} /* legacy alias */ disabled={disabled} onClick={() => !disabled && updateNested('warmups', { policy: p.id })} aria-pressed={active ? 'true' : 'false'} className={`px-3 py-1.5 rounded font-semibold text-xs tracking-wide border transition ${active ? 'bg-red-600 text-white border-red-500 shadow-inner' : 'bg-red-800/20 text-red-300 border-red-700 hover:bg-red-700/40'} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>{p.label}</button>
+                                <button key={p.id} type="button" data-testid={`warmup-policy-${p.id}`} data-testid-old={`warmup-scheme-${p.id}`} /* legacy alias */ disabled={disabled} onClick={() => !disabled && updateNested('warmups', { policy: p.id })} aria-pressed={active ? 'true' : 'false'} className={`${pillClass(active, disabled)} font-semibold text-xs tracking-wide`}>
+                                    {active ? <span className="mr-1">✓</span> : null}
+                                    {p.label}
+                                </button>
                             );
                         })}
                     </div>
@@ -247,9 +280,9 @@ export default function Step3CustomizeDesign({ data, updateData }) {
                 </div>
             </Section>
 
-            <Section title="3. Programming Approach" testId="approach-section" open={open['approach-section']} onToggle={() => toggle('approach-section')}>
+            <Section title="3. 📊 Core Scheme" testId="approach-section" open={open['approach-section']} onToggle={() => toggle('approach-section')}>
                 {locked && <ReadOnlyOverlay />}
-                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3 core-scheme-section">
                     {APPROACH_CARDS.map(card => {
                         const active = local.approach === card.id;
                         return (
@@ -273,19 +306,25 @@ export default function Step3CustomizeDesign({ data, updateData }) {
                 <p className="text-[11px] text-gray-500 mt-1">Defaults from template; adjust if customizing.</p>
             </Section>
 
-            <Section title="5. Supplemental" testId="supplemental-picker" open={open['supplemental-picker']} onToggle={() => toggle('supplemental-picker')}>
+            <Section title="5. 💪 Supplemental" testId="supplemental-picker" open={open['supplemental-picker']} onToggle={() => toggle('supplemental-picker')}>
                 {locked && <ReadOnlyOverlay />}
-                <div className="flex flex-wrap gap-2">
-                    {SUPPLEMENTAL_METHODS.map(m => (
-                        <button key={m} disabled={locked} onClick={() => updateNested('supplemental', { method: m })} className={`px-3 py-1 rounded border text-xs font-medium ${local.supplemental.method === m ? 'border-red-500 ring-2 ring-red-600 text-white' : 'border-gray-600 text-gray-300 hover:bg-gray-700/40'} ${locked ? 'opacity-60 cursor-not-allowed' : ''}`}>{m.toUpperCase()}</button>
-                    ))}
+                <div className="flex flex-wrap gap-2 supplemental-section">
+                    {SUPPLEMENTAL_METHODS.map(m => {
+                        const active = local.supplemental.method === m;
+                        return (
+                            <button key={m} disabled={locked} onClick={() => updateNested('supplemental', { method: m })} className={`${pillClass(active, locked)} text-xs font-medium`}>
+                                {active ? <span className="mr-1">✓</span> : null}
+                                {m.toUpperCase()}
+                            </button>
+                        );
+                    })}
                 </div>
                 <p className="text-[10px] text-gray-500 mt-2 italic">One method per cycle (placeholder explanations).</p>
             </Section>
 
-            <Section title="6. Assistance" testId="assistance-picker" open={open['assistance-picker']} onToggle={() => toggle('assistance-picker')}>
+            <Section title="6. 🎯 Assistance" testId="assistance-picker" open={open['assistance-picker']} onToggle={() => toggle('assistance-picker')}>
                 {locked && <ReadOnlyOverlay />}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 assistance-section">
                     {ASSISTANCE_MODES.map(mode => {
                         const active = local.assistance.mode === mode.id;
                         return (
@@ -302,19 +341,28 @@ export default function Step3CustomizeDesign({ data, updateData }) {
                 {local.assistance.mode === 'custom' && <div className="mt-2 text-[11px] text-gray-500">Custom exercise catalog placeholder.</div>}
             </Section>
 
-            <Section title="7. Conditioning" testId="conditioning-planner" open={open['conditioning-planner']} onToggle={() => toggle('conditioning-planner')}>
+            <Section title="7. 🏃 Conditioning" testId="conditioning-planner" open={open['conditioning-planner']} onToggle={() => toggle('conditioning-planner')}>
                 {locked && <ReadOnlyOverlay />}
-                <div className="space-y-4">
+                <div className="space-y-4 conditioning-section">
                     <div className="flex flex-wrap gap-2">
-                        {CONDITIONING_INTENSITIES.map(ci => (
-                            <button key={ci.id} disabled={locked} onClick={() => updateNested('conditioning', { intensity: ci.id })} className={`px-3 py-1 rounded border text-sm ${local.conditioning.intensity === ci.id ? 'border-red-500 ring-2 ring-red-600 text-white' : 'border-gray-600 text-gray-300 hover:bg-gray-700/40'} ${locked ? 'opacity-60 cursor-not-allowed' : ''}`} title={ci.note}>{ci.label}</button>
-                        ))}
+                        {CONDITIONING_INTENSITIES.map(ci => {
+                            const active = local.conditioning.intensity === ci.id;
+                            return (
+                                <button key={ci.id} disabled={locked} onClick={() => updateNested('conditioning', { intensity: ci.id })} className={`${pillClass(active, locked)} text-sm`} title={ci.note}>
+                                    {active ? <span className="mr-1">✓</span> : null}
+                                    {ci.label}
+                                </button>
+                            );
+                        })}
                     </div>
                     <div className="flex flex-wrap gap-2">
                         {CONDITIONING_TARGET_CHIPS.map(ch => {
-                            const on = local.conditioning.targets.includes(ch);
+                            const active = local.conditioning.targets.includes(ch);
                             return (
-                                <button key={ch} disabled={locked} onClick={() => toggleTarget(ch, setLocal)} className={`px-3 py-1 rounded border text-xs ${on ? 'border-red-500 ring-2 ring-red-600 text-white' : 'border-gray-600 text-gray-300 hover:bg-gray-700/40'} ${locked ? 'opacity-60 cursor-not-allowed' : ''}`}>{ch}</button>
+                                <button key={ch} disabled={locked} onClick={() => toggleTarget(ch, setLocal)} className={`${pillClass(active, locked)} text-xs`}>
+                                    {active ? <span className="mr-1">✓</span> : null}
+                                    {ch}
+                                </button>
                             );
                         })}
                     </div>
@@ -322,9 +370,9 @@ export default function Step3CustomizeDesign({ data, updateData }) {
                 </div>
             </Section>
 
-            {/* Inline summary – future: move to side rail */}
-            <div className="bg-gray-900/60 border border-gray-700 rounded p-4 text-[11px] text-gray-300 space-y-1">
-                <div className="font-semibold text-white mb-1">Design Summary</div>
+            {/* Live Summary (sticky) */}
+            <div style={{ position: 'sticky', top: '2rem', background: 'linear-gradient(135deg, #1a1a2e, #2a2d3a)', border: '2px solid #ef4444', borderRadius: '8px', padding: '1.5rem', boxShadow: '0 8px 32px rgba(239, 68, 68, 0.2)' }} className="text-[11px] text-gray-300 space-y-1">
+                <h3 style={{ borderBottom: '2px solid #ef4444', paddingBottom: '0.5rem' }} className="text-white font-semibold">Live Summary</h3>
                 <SummaryLine label="Locked" value={locked ? 'Yes (Template Defaults)' : 'No (Customized)'} />
                 <SummaryLine label="Frequency" value={`${local.schedule.frequency}-Day`} />
                 <SummaryLine label="Warm-ups" value={local.warmups.enabled ? local.warmups.policy : 'Off'} />
@@ -340,7 +388,7 @@ export default function Step3CustomizeDesign({ data, updateData }) {
 
 function Section({ title, children, testId, open = true, onToggle }) {
     return (
-        <div className="bg-gray-900/60 border border-gray-700 rounded relative" data-testid={testId}>
+        <div className="bg-gray-900/60 border border-gray-700 rounded relative section" data-testid={testId}>
             <button type="button" onClick={onToggle} className="w-full flex items-center justify-between px-4 py-3 text-left" data-testid={`${testId}-toggle`} aria-expanded={open ? 'true' : 'false'}>
                 <span className="text-white font-medium text-sm">{title}</span>
                 <span className={`text-xs px-2 py-0.5 rounded border ${open ? 'border-red-500 text-red-300' : 'border-gray-600 text-gray-400'}`}>{open ? 'Open' : 'Closed'}</span>

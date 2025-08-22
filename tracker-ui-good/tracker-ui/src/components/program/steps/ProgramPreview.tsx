@@ -179,20 +179,24 @@ const ProgramPreview: React.FC = () => {
                                 data-testid="preview-toggle-cards"
                                 onClick={() => setViewMode('cards')}
                                 aria-pressed={viewMode === 'cards'}
-                                className={`px-2.5 py-1 rounded border text-xs ${viewMode === 'cards' ? 'border-red-500 bg-red-600/10 text-red-200' : 'border-gray-700 bg-gray-800/50 hover:border-gray-500 text-gray-300'}`}
-                            >Cards</button>
+                                className={`px-2.5 py-1 rounded-md select-none outline-none text-xs transition ${viewMode === 'cards'
+                                    ? 'bg-red-600 text-white border-2 border-red-300 shadow-md ring-2 ring-red-400/70 ring-offset-1 ring-offset-gray-900'
+                                    : 'bg-gray-900/40 text-red-200 border border-red-700/70 hover:border-red-500/70 hover:bg-red-900/20'}`}
+                            >{viewMode === 'cards' ? <span className="mr-1">✓</span> : null}Cards</button>
                             <button
                                 type="button"
                                 data-testid="preview-toggle-grid"
                                 onClick={() => setViewMode('grid')}
                                 aria-pressed={viewMode === 'grid'}
-                                className={`px-2.5 py-1 rounded border text-xs ${viewMode === 'grid' ? 'border-red-500 bg-red-600/10 text-red-200' : 'border-gray-700 bg-gray-800/50 hover:border-gray-500 text-gray-300'}`}
-                            >Grid</button>
+                                className={`px-2.5 py-1 rounded-md select-none outline-none text-xs transition ${viewMode === 'grid'
+                                    ? 'bg-red-600 text-white border-2 border-red-300 shadow-md ring-2 ring-red-400/70 ring-offset-1 ring-offset-gray-900'
+                                    : 'bg-gray-900/40 text-red-200 border border-red-700/70 hover:border-red-500/70 hover:bg-red-900/20'}`}
+                            >{viewMode === 'grid' ? <span className="mr-1">✓</span> : null}Grid</button>
                             <div className="flex-1" />
                             <button
                                 type="button"
                                 onClick={() => window.print()}
-                                className="px-2.5 py-1 rounded border text-xs border-gray-700 bg-gray-800/50 hover:border-gray-500 text-gray-300"
+                                className="px-3 py-1.5 rounded-md text-xs text-white bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 border border-emerald-400/60 shadow-sm"
                             >Print Week</button>
                         </div>
                         <div data-testid="week-tabs" className="flex flex-wrap gap-2 mb-4">
@@ -202,8 +206,10 @@ const ProgramPreview: React.FC = () => {
                                     data-testid={`week-tab-${w}`}
                                     onClick={() => setActiveWeek(w)}
                                     aria-current={activeWeek === w ? 'page' : undefined}
-                                    className={`px-3 py-1.5 rounded border text-xs font-medium transition ${activeWeek === w ? 'border-red-500 bg-red-600/10 text-red-200' : 'border-gray-700 bg-gray-800/50 hover:border-gray-500 text-gray-300'}`}
-                                >Week {w}</button>
+                                    className={`px-3 py-1.5 rounded-md text-xs font-medium select-none outline-none transition ${activeWeek === w
+                                        ? 'bg-red-600 text-white border-2 border-red-300 shadow-md ring-2 ring-red-400/70 ring-offset-1 ring-offset-gray-900'
+                                        : 'bg-gray-900/40 text-red-200 border border-red-700/70 hover:border-red-500/70 hover:bg-red-900/20'}`}
+                                >{activeWeek === w ? <span className="mr-1">✓</span> : null}Week {w}</button>
                             ))}
                         </div>
                         {step2?.schemeId === 'scheme_5spro' && (
@@ -217,7 +223,7 @@ const ProgramPreview: React.FC = () => {
                                     const dayData = activeWeekData?.days.find(dd => dd.main?.dayIndex === d);
                                     const main = dayData?.main;
                                     return (
-                                        <div key={d} data-testid={`day-card-${activeWeek}-${d}`} className="rounded-md border border-gray-800 bg-gray-800/50 p-4 space-y-2">
+                                        <div key={d} data-testid={`day-card-${activeWeek}-${d}`} className="rounded-md border border-gray-800 bg-gray-800/50 p-4 space-y-2 hover:border-gray-600 hover:shadow-md hover:shadow-black/20 transition">
                                             <div className="flex items-center justify-between">
                                                 <span className="font-semibold text-sm">Week {activeWeek} · Day {d}</span>
                                                 <span className="text-[10px] uppercase tracking-wide text-gray-500">{main ? (() => {
@@ -228,22 +234,25 @@ const ProgramPreview: React.FC = () => {
                                             </div>
                                             <ul className="text-xs space-y-1 text-gray-300 ml-1">
                                                 {dayData?.warmup && (
-                                                    <li><span className="text-gray-400">Warm-up:</span> {dayData.warmup.replace(/^Warm-up:\s*/i, '')}</li>
+                                                    <li className="hover:bg-gray-800/60 rounded px-1"><span className="text-gray-400">Warm-up:</span> {dayData.warmup.replace(/^Warm-up:\s*/i, '')}</li>
                                                 )}
                                                 {main && main.sets.length > 0 ? (
                                                     main.sets.map((s, idx) => (
-                                                        <li key={idx}><span className="text-gray-400">Set {idx + 1}:</span> {s.reps} @ {s.pct}% {s.weight ? `(${formatWeight(s.weight, step1.units)})` : ''}{s.type === 'amrap' ? ' AMRAP' : ''}</li>
+                                                        <li key={idx} className={`hover:bg-gray-800/60 rounded px-1 ${s.type === 'amrap' ? 'text-amber-300' : ''}`}>
+                                                            <span className="text-gray-400">Set {idx + 1}:</span> {s.reps} @ {s.pct}% {s.weight ? `(${formatWeight(s.weight, step1.units)})` : ''}
+                                                            {s.type === 'amrap' ? <span className="ml-1 inline-flex items-center px-1 py-0.5 rounded bg-amber-500/20 text-amber-200 text-[10px]">AMRAP</span> : null}
+                                                        </li>
                                                     ))
                                                 ) : (
-                                                    <li><span className="text-gray-400">Primary:</span> {program ? 'TM missing for this lift' : 'Enter TMs in Step 1'}</li>
+                                                    <li className="hover:bg-gray-800/60 rounded px-1"><span className="text-gray-400">Primary:</span> {program ? 'TM missing for this lift' : 'Enter TMs in Step 1'}</li>
                                                 )}
-                                                <li><span className="text-gray-400">Supplemental:</span> {(() => {
+                                                <li className="hover:bg-gray-800/60 rounded px-1"><span className="text-gray-400">Supplemental:</span> {(() => {
                                                     const sup = dayData?.supplemental;
                                                     if (!sup) return '(n/a)';
                                                     const units = normalizeUnits(step1?.units);
                                                     return sup.replace(/\((\d+(?:\.[0-9]+)?)\)/g, (_, n) => `(${formatWeight(n, units)})`);
                                                 })()}</li>
-                                                <li><span className="text-gray-400">Assistance:</span> {dayData?.assistance || '(n/a)'}</li>
+                                                <li className="hover:bg-gray-800/60 rounded px-1"><span className="text-gray-400">Assistance:</span> {dayData?.assistance || '(n/a)'}</li>
                                             </ul>
                                         </div>
                                     );
@@ -260,13 +269,15 @@ const ProgramPreview: React.FC = () => {
                                             return variantLabel(code) || main.lift;
                                         })() : 'Pending';
                                         return (
-                                            <div key={d} data-testid={`grid-cell-${activeWeek}-${d}`} className="border border-gray-800 rounded-sm bg-gray-900/40 p-2">
+                                            <div key={d} data-testid={`grid-cell-${activeWeek}-${d}`} className="border border-gray-800 rounded-sm bg-gray-900/40 p-2 hover:border-gray-600 hover:shadow-md hover:shadow-black/20 transition">
                                                 <div className="text-[11px] font-semibold mb-1">Day {d}</div>
                                                 <div className="text-[10px] uppercase tracking-wide text-gray-500 mb-1">{liftLabel}</div>
                                                 <ul className="text-[11px] text-gray-300 space-y-0.5">
                                                     {main && main.sets.length > 0 ? (
                                                         main.sets.map((s, idx) => (
-                                                            <li key={idx}>Set {idx + 1}: {s.reps} @ {s.pct}%{s.type === 'amrap' ? ' (AMRAP)' : ''}</li>
+                                                            <li key={idx} className={`rounded px-1 ${s.type === 'amrap' ? 'text-amber-300' : ''}`}>
+                                                                Set {idx + 1}: {s.reps} @ {s.pct}%{s.type === 'amrap' ? ' (AMRAP)' : ''}
+                                                            </li>
                                                         ))
                                                     ) : (
                                                         <li>Primary: {program ? 'TM missing' : 'Add TMs in Step 1'}</li>
@@ -286,12 +297,14 @@ const ProgramPreview: React.FC = () => {
                             onClick={handleExport}
                             data-testid="export-json"
                             disabled={!canExport || exporting}
-                            className={`px-4 py-2 rounded border text-sm transition ${!canExport || exporting ? 'border-gray-700 text-gray-500 cursor-not-allowed' : 'border-emerald-500 text-emerald-200 hover:bg-emerald-600/10'}`}
+                            className={`px-4 py-2 rounded-md text-sm transition shadow-sm ${!canExport || exporting
+                                ? 'border border-gray-700 text-gray-500 cursor-not-allowed bg-gray-800/40'
+                                : 'text-white bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 border border-emerald-400/60'}`}
                         >{exporting ? 'Exporting...' : 'Export Program'}</button>
                     </div>
                 </section>
                 <aside className="col-span-12 lg:col-span-4 space-y-4">
-                    <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-4 text-sm">
+                    <div className="bg-gradient-to-b from-gray-800/80 to-gray-900/40 border border-gray-700 rounded-lg p-4 text-sm">
                         <h3 className="font-semibold mb-2">Summary</h3>
                         <ul className="text-xs space-y-1 text-gray-300">
                             <li data-testid="summary-fundamentals"><span className="text-gray-400">Units:</span> {step1?.units || 'n/a'} · TM% {step1?.tmPct || 90}</li>

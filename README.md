@@ -37,6 +37,9 @@ A modern React-based training tracker with **complete program design system**, *
 
 ### **Documentation Archive**
 - **📁 Historical Docs:** [`docs/archive/`](docs/archive/) - Completed implementations and old planning files
+ - **📚 Docs Hub:** [`docs/INDEX.md`](docs/INDEX.md) - Canonical index of all docs (supersedes legacy indices)
+
+> Ongoing: README and instructional files are being consolidated per [`docs/docs-audit.md`](docs/docs-audit.md). Merged drafts live in `docs/merge-drafts/`.
 
 ## 🎯 Latest Features (v3.0.0)
 
