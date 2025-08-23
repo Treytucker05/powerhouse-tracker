@@ -7,8 +7,9 @@
   "homepage": "https://treytucker05.github.io/powerhouse-tracker/#/",
   "scripts": {
     "copy:csv": "mkdirp public/methodology/extraction && copyfiles -f data/extraction/*.csv public/methodology/extraction",
+    "copy:csv:dist": "mkdirp dist/methodology/extraction && copyfiles -f public/methodology/extraction/*.csv dist/methodology/extraction",
     "dev": "npm run copy:csv && vite",
-    "build": "npm run copy:csv && vite build",
+    "build": "npm run copy:csv && vite build && npm run copy:csv:dist",
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist --nojekyll --dotfiles",

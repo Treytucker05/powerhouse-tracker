@@ -13,6 +13,23 @@ import TemplateAndScheme from './components/program/steps/TemplateAndScheme.tsx'
 import DesignCustomize from './components/program/steps/DesignCustomize.tsx';
 import ProgramPreview from './components/program/steps/ProgramPreview.tsx';
 import ProgramProgression from './components/program/steps/ProgramProgression.tsx';
+// IA scaffold pages
+import Hub from './pages/Hub.tsx';
+import Step1Fundamentals from './pages/build/Step1Fundamentals.tsx';
+import Step2TemplateAndSchemePage from './pages/build/Step2TemplateAndSchemePage.tsx';
+import Step3Customize from './pages/build/Step3Customize.tsx';
+import Step4Preview from './pages/build/Step4Preview.tsx';
+import Step5Progression from './pages/build/Step5Progression.tsx';
+import TemplatesLibrary from './pages/library/TemplatesLibrary.tsx';
+import AssistanceLibrary from './pages/library/AssistanceLibrary.tsx';
+import WarmupsLibrary from './pages/library/WarmupsLibrary.tsx';
+import SupplementalLibrary from './pages/library/SupplementalLibrary.tsx';
+import ConditioningLibrary from './pages/library/ConditioningLibrary.tsx';
+import SpecialRulesLibrary from './pages/library/SpecialRulesLibrary.tsx';
+import TMCalculator from './pages/tools/TMCalculator.tsx';
+import PercentTable from './pages/tools/PercentTable.tsx';
+import SetRepCalculator from './pages/tools/SetRepCalculator.tsx';
+import DataStatus from './pages/data/DataStatus.tsx';
 import { BuilderStateProvider } from './context/BuilderState';
 import FiveThreeOneWorkflow from './components/program/FiveThreeOneWorkflow';
 // RESTORED - Using the original ProgramWizard531V2 for the 5-step workflow
@@ -70,7 +87,7 @@ function App() {
             <Route path="/" element={<AppShell />}>
               {/* Dashboard at root */}
               <Route index element={<Home />} />
-              <Route path="hub" element={<ProtectRoute><Home /></ProtectRoute>} />
+              <Route path="hub" element={<ProtectRoute><Hub /></ProtectRoute>} />
 
               {/* Program Design entry now routes to unified Program component (includes methodology selection + 5/3/1) */}
               <Route path="program-design" element={<ProtectRoute><Program /></ProtectRoute>} />
@@ -89,11 +106,11 @@ function App() {
                   <ProtectRoute>
                     <BuilderStateProvider>
                       <Routes>
-                        <Route path="step1" element={<ProgramFundamentals />} />
-                        <Route path="step2" element={<TemplateAndScheme />} />
-                        <Route path="step3" element={<DesignCustomize />} />
-                        <Route path="step4" element={<ProgramPreview />} />
-                        <Route path="step5" element={<ProgramProgression />} />
+                        <Route path="step1" element={<Step1Fundamentals />} />
+                        <Route path="step2" element={<Step2TemplateAndSchemePage />} />
+                        <Route path="step3" element={<Step3Customize />} />
+                        <Route path="step4" element={<Step4Preview />} />
+                        <Route path="step5" element={<Step5Progression />} />
                         <Route path="*" element={<Navigate to="/build/step1" replace />} />
                       </Routes>
                     </BuilderStateProvider>
@@ -106,6 +123,19 @@ function App() {
               <Route path="builder/531/v2/step/3" element={<Navigate to="/build/step3" replace />} />
               <Route path="builder/531/v2/step/4" element={<Navigate to="/build/step4" replace />} />
               <Route path="builder/531/v2/step/5" element={<Navigate to="/build/step5" replace />} />
+              {/* Libraries */}
+              <Route path="library/templates" element={<TemplatesLibrary />} />
+              <Route path="library/assistance" element={<AssistanceLibrary />} />
+              <Route path="library/warmups" element={<WarmupsLibrary />} />
+              <Route path="library/supplemental" element={<SupplementalLibrary />} />
+              <Route path="library/conditioning" element={<ConditioningLibrary />} />
+              <Route path="library/special-rules" element={<SpecialRulesLibrary />} />
+              {/* Tools */}
+              <Route path="tools/tm-calculator" element={<TMCalculator />} />
+              <Route path="tools/percent-table" element={<PercentTable />} />
+              <Route path="tools/set-rep-calculator" element={<SetRepCalculator />} />
+              {/* Data & Dev */}
+              <Route path="data/status" element={<DataStatus />} />
               <Route path="program/531/active" element={<ProtectRoute><Program531ActiveV2 /></ProtectRoute>} />
               <Route path="builder/review" element={<ProtectRoute><ProgramV2Provider><BuilderReviewPage /></ProgramV2Provider></ProtectRoute>} />
 

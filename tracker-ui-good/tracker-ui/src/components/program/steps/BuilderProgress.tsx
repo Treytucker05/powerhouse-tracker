@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
+import { LibraryButtons } from './LibraryButtons';
 
 const STEPS = [
     { n: 1, path: '/build/step1', label: 'Fundamentals' },
@@ -42,6 +43,10 @@ export default function BuilderProgress({ current }: Props) {
                     );
                 })}
             </ol>
+            {/* Always-visible Library buttons row beneath the step navigation */}
+            <div className="mt-3">
+                <LibraryButtons />
+            </div>
         </nav>
     );
 }

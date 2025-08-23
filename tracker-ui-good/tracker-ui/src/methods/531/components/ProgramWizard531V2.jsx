@@ -73,6 +73,7 @@ import Step2TemplateOrCustom from './steps/Step2TemplateOrCustom.jsx';
 import Step3DesignCustom from './steps/Step3DesignCustom.jsx';
 import Step4ReviewExport from './steps/Step4ReviewExport.jsx';
 import Step5ProgressionSmart from './steps/Step5ProgressionSmart.jsx';
+import { LibraryButtons } from '@/components/program/steps/LibraryButtons.tsx';
 
 const STEPS = [
     { id: 'fundamentals', title: 'Fundamentals', description: 'Units, rounding, TM%, 1RM/rep tests' },
@@ -938,6 +939,8 @@ function WizardShell() {
                                         Reset
                                     </button>
                                 </div>
+                                {/* Always-visible Library buttons row beneath the step header */}
+                                <LibraryButtons />
 
                                 {(() => {
                                     const validation = getStepWarnings(stepIndex);
