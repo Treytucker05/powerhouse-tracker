@@ -4,14 +4,17 @@ import { LibraryButtons } from "@/components/program/steps/LibraryButtons";
 import BuilderProgress from "@/components/program/steps/BuilderProgress";
 import { loadCsv } from "@/lib/loadCsv";
 import type { TemplateCsv } from "@/types/templates";
+import { useTagCatalog } from "@/ui/tags/useTagCatalog";
 
 type Row = Record<string, string>;
 
 export default function TemplatesLibrary() {
     const [rows, setRows] = useState<Row[]>([]);
     const [query, setQuery] = useState("");
+    const [tagFilters, setTagFilters] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [err, setErr] = useState<string | null>(null);
+    const { getTagMeta, getTagStyle, listAllTags } = useTagCatalog();
 
     useEffect(() => {
         setLoading(true);
@@ -41,6 +44,7 @@ export default function TemplatesLibrary() {
                     __id: (r.id || "").trim(),
                     __source_book: (r.source_book || "").trim(),
                     __source_pages: (r.source_pages || "").trim(),
+                    __tags: String((r as any).tags || "").trim(),
                 }));
 
                 // De-dupe by kebab id when available, otherwise by normalized name
@@ -82,8 +86,7 @@ export default function TemplatesLibrary() {
 
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
-        if (!q) return rows;
-        return rows.filter((r) => {
+    const applyText = (list: Row[]) => list.filter((r) => {
             const hay = [
                 r["Template Name"],
                 r["Book"],
@@ -93,13 +96,32 @@ export default function TemplatesLibrary() {
                 r["Conditioning"],
                 r["Leader/Anchor"],
                 r["Notes"],
+        (r as any).__tags,
+        // Include tag labels for free-text search
+        ...String((r as any).__tags || "")
+          .split("|")
+          .map((t) => t.trim())
+          .filter(Boolean)
+          .map((key) => getTagMeta(key)?.label || ""),
             ]
                 .filter(Boolean)
                 .join(" ")
                 .toLowerCase();
-            return hay.includes(q);
+            return q ? hay.includes(q) : true;
         });
-    }, [rows, query]);
+        const withText = applyText(rows);
+        if (!tagFilters.length) return withText;
+        return withText.filter((r) => {
+            const tags = String((r as any).__tags || "").split("|").map((t) => t.trim()).filter(Boolean);
+            // AND logic: every selected tag must be present
+            return tagFilters.every((t) => tags.includes(t));
+        });
+    }, [rows, query, tagFilters]);
+
+    const allTags = useMemo(() => listAllTags(), [listAllTags]);
+    function toggleTag(key: string) {
+        setTagFilters(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
+    }
 
     return (
         <div className="min-h-screen bg-[#1a1a2e] text-white px-6 py-8">
@@ -130,13 +152,36 @@ export default function TemplatesLibrary() {
                     <LibraryButtons />
                 </div>
 
-                <div className="mb-4">
+                <div className="mb-4 space-y-3">
                     <input
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                         placeholder="Search: template, book, main work, supplemental…"
                         className="w-full md:w-96 bg-[#0f1020] text-white placeholder-gray-400 border border-gray-700 rounded px-3 py-2 outline-none focus:ring-2 focus:ring-red-600"
                     />
+                    {/* Tags facet */}
+                    <div className="bg-[#0f1020] border border-gray-700 rounded p-3">
+                        <div className="text-xs text-gray-400 mb-2">Tags</div>
+                        <div className="flex flex-wrap gap-2">
+                            {allTags.map(tag => {
+                                const style = getTagStyle(tag.key);
+                                const active = tagFilters.includes(tag.key);
+                                return (
+                                    <button
+                                        key={tag.key}
+                                        onClick={() => toggleTag(tag.key)}
+                                        className={`px-2 py-1 rounded border text-xs ${style.pill} ${style.text} ${style.border} ${active ? 'ring-2 ring-offset-0 ring-indigo-500' : ''}`}
+                                        title={tag.description || tag.label}
+                                    >
+                                        {tag.label}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        {tagFilters.length > 0 && (
+                            <div className="mt-2 text-[11px] text-gray-400">Filtering by: {tagFilters.map(t => getTagMeta(t)?.label || t).join(', ')}</div>
+                        )}
+                    </div>
                 </div>
 
                 {loading && (
@@ -163,6 +208,7 @@ export default function TemplatesLibrary() {
                                     <th className="px-3 py-2 border-b border-gray-800">Conditioning</th>
                                     <th className="px-3 py-2 border-b border-gray-800">Leader/Anchor</th>
                                     <th className="px-3 py-2 border-b border-gray-800">Notes</th>
+                                    <th className="px-3 py-2 border-b border-gray-800">Tags</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -177,6 +223,23 @@ export default function TemplatesLibrary() {
                                         <td className="px-3 py-2 border-b border-gray-900">{r["Conditioning"]}</td>
                                         <td className="px-3 py-2 border-b border-gray-900">{r["Leader/Anchor"]}</td>
                                         <td className="px-3 py-2 border-b border-gray-900">{r["Notes"]}</td>
+                                        <td className="px-3 py-2 border-b border-gray-900">
+                                            <div className="flex flex-wrap gap-1">
+                                                {String((r as any).__tags || "")
+                                                    .split("|")
+                                                    .map((t) => t.trim())
+                                                    .filter(Boolean)
+                                                    .map((key) => {
+                                                        const meta = getTagMeta(key);
+                                                        const style = getTagStyle(key);
+                                                        return (
+                                                            <span key={key} className={`px-1.5 py-0.5 rounded border text-[10px] ${style.pill} ${style.text} ${style.border}`} title={meta?.description || key}>
+                                                                {meta?.label || key}
+                                                            </span>
+                                                        );
+                                                    })}
+                                            </div>
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>

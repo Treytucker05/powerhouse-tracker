@@ -1,0 +1,12 @@
+key,group,label,description
+template:football,Template,Football,Templates sourced from 5/3/1 for Football (2011)
+scheme:531,Scheme,5/3/1,Classic 5/3/1 loading
+supplemental:fsl,Supplemental,FSL,First Set Last variants
+supplemental:bbb,Supplemental,BBB,Boring But Big
+assistance:template,Assistance,Balanced Assistance,Balanced assistance categories
+season:off_season,Season,Off-Season,Off-season templates
+season:in_season,Season,In-Season,In-season templates
+population:team,Population,Team,Team-wide plans
+population:skill,Population,Skill,Skill position guidance
+population:linemen,Population,Linemen,Line position guidance
+conditioning:sport_specific,Conditioning,Sport-Specific,Football intervals/tempo
