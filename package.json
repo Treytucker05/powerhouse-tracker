@@ -17,9 +17,13 @@
     "extract:all": "npm run extract:build:js && node scripts/open-extraction.js",
     "format": "prettier --write .",
     "validate:templates:ui": "node scripts/validate-and-backfill.mjs",
-  "fix:templates:ui": "node scripts/validate-and-backfill.mjs --write",
-  "templates:tag:dry": "node scripts/templates-tag-pass.mjs",
-  "templates:tag": "node scripts/templates-tag-pass.mjs --write"
+    "fix:templates:ui": "node scripts/validate-and-backfill.mjs --write",
+  "validate:csv": "npm --prefix tracker-ui-good/tracker-ui run lint:csv",
+    "templates:tag:dry": "node scripts/templates-tag-pass.mjs",
+    "templates:tag": "node scripts/templates-tag-pass.mjs --write",
+    "audit:tags": "node scripts/tag-audit.mjs",
+    "tags:apply:dry": "node scripts/apply-tag-suggestions.mjs",
+    "tags:apply": "node scripts/apply-tag-suggestions.mjs --write"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",
