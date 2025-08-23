@@ -46,6 +46,7 @@ export interface ConditioningRow {
 export type Step3Selection = {
     supplemental?: SupplementalRow;
     assistance: {
+        mode: "Template" | "Preset" | "Custom";
         volumePreset: "Minimal" | "Standard" | "Loaded"; // 0–25, 25–50, 50–100
         picks: Record<"Push" | "Pull" | "Single-Leg/Core" | "Core", string[]>; // exercise names
         perCategoryTarget: Record<string, number>; // target reps per category
@@ -55,6 +56,7 @@ export type Step3Selection = {
         jumpsThrowsDose: number; // default 10 or 15
         jump?: string;
         throw?: string;
+        novFullPrep?: boolean;
     };
     conditioning: {
         hardDays: number;
@@ -62,4 +64,37 @@ export type Step3Selection = {
         modalities: string[]; // selected activities
         preferredDays?: string[]; // M/T/W/...
     };
+    cycle?: {
+        includeDeload: boolean;
+        notes?: string;
+    };
 };
+
+export interface SeventhWeekRow {
+    ProtocolId: string;
+    Name: string;
+    Kind: "Deload" | "TMTest" | "PRTest" | string;
+    MainSets: string;
+    Percentages: string;
+    Criteria: string;
+    Notes: string;
+}
+export interface TMRuleRow {
+    PolicyId: string;
+    Name: string;
+    StartTMPercent: number;
+    UpperBumpPerCycle: number;
+    LowerBumpPerCycle: number;
+    FiveForwardThreeBack: boolean;
+    ConservativeOption: boolean;
+    Notes: string;
+}
+export interface JokerRuleRow {
+    RuleId: string;
+    AllowedPattern: string;
+    AllowedWeeks: string;
+    MaxJokers: number;
+    IncrementHint: string;
+    StopCondition: string;
+    Notes: string;
+}

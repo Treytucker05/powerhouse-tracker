@@ -5,6 +5,8 @@ import type { Step1State, LiftId } from '@/lib/step1/types';
 import { useBuilder } from '@/context/BuilderState';
 import { supabase, getCurrentUserId } from '@/lib/supabaseClient';
 import BuilderProgress from './BuilderProgress';
+import SchedulePanel from '@/components/program/steps/Step1/SchedulePanel';
+import RotationMapper from '@/components/program/steps/Step1/RotationMapper';
 // Lightweight local UI primitives (placeholder until design system integration)
 type PillVariant = 'indigo' | 'emerald' | 'amber' | 'neutral' | 'red';
 type PillProps = React.PropsWithChildren<{ active?: boolean; onClick?: () => void; label?: string; variant?: PillVariant }>;
@@ -568,6 +570,12 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                             );
                         })}
                     </div>
+                </section>
+
+                {/* Schedule & Rotation */}
+                <section>
+                    <SchedulePanel />
+                    <RotationMapper />
                 </section>
 
                 {/* Continue button */}

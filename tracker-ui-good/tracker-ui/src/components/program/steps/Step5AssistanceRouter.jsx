@@ -7,12 +7,14 @@ import { TEMPLATE_IDS } from '../../../lib/fiveThreeOne/assistanceLibrary.js';
 import { buildAssistancePlan } from '../../../lib/fiveThreeOne/assistPlanner.js';
 import { percentOfTM, toDisplayWeight } from '../../../lib/fiveThreeOne/math.js';
 import { useExerciseDB } from '../../../contexts/ExerciseDBContext.jsx';
+import { useFinalPlan } from '../../../store/finalPlanStore';
 
 export default function Step5AssistanceRouter({ data, updateData }) {
     const st = data || {};
     const { loaded: exLoaded, categoriesMap } = useExerciseDB();
     const [newPick, setNewPick] = useState({}); // { press: name }
     const set = (patch) => updateData({ ...st, ...patch });
+    const { locked, plan } = useFinalPlan();
 
     const templateId = st?.template?.id || st?.template; // support either shape
     const lifts = st?.lifts || {};
@@ -64,6 +66,11 @@ export default function Step5AssistanceRouter({ data, updateData }) {
 
     return (
         <div className="space-y-6">
+            {locked && (
+                <div className="sticky top-0 z-10 bg-[#0b1220] border-b border-gray-700 p-3 text-sm text-emerald-300">
+                    Final plan saved on {plan?.createdAt ? new Date(plan.createdAt).toLocaleString() : 'this session'}. Steps 1–5 are locked. You can reset to edit again.
+                </div>
+            )}
             <div className="flex items-start justify-between">
                 <div>
                     <h3 className="text-xl font-semibold text-white mb-1">Step 5: Assistance Router</h3>

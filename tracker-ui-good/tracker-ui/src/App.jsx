@@ -29,6 +29,8 @@ import SpecialRulesLibrary from './pages/library/SpecialRulesLibrary.tsx';
 import TMCalculator from './pages/tools/TMCalculator.tsx';
 import PercentTable from './pages/tools/PercentTable.tsx';
 import SetRepCalculator from './pages/tools/SetRepCalculator.tsx';
+import EquipmentProfile from './pages/tools/EquipmentProfile.tsx';
+import DataCoveragePage from './pages/tools/DataCoverage.tsx';
 import DataStatus from './pages/data/DataStatus.tsx';
 import { BuilderStateProvider } from './context/BuilderState';
 import FiveThreeOneWorkflow from './components/program/FiveThreeOneWorkflow';
@@ -65,6 +67,10 @@ const ProgramWizard531 = lazy(() => import("./components/program/ProgramWizard53
 const ExercisesPage = lazy(() => import('./pages/Exercises.jsx'));
 const ProfilePage = lazy(() => import('./pages/Profile.jsx'));
 const ResourcesPage = lazy(() => import('./pages/Resources.jsx'));
+import CalendarPage from './pages/calendar/CalendarPage';
+import Step6Calendar from '@/components/program/steps/Step6Calendar';
+import PreviewPage from '@/pages/preview/PreviewPage';
+import { useFinalPlan } from './store/finalPlanStore';
 
 // Loading component
 const LoadingSpinner = () => (
@@ -72,6 +78,11 @@ const LoadingSpinner = () => (
     <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
   </div>
 );
+
+function LockGuard({ children }) {
+  const { locked } = useFinalPlan();
+  return locked ? <Navigate to="/build/step6" replace /> : children;
+}
 
 function App() {
   return (
@@ -98,7 +109,7 @@ function App() {
               {/* 5/3/1 canonical - ENHANCED with step-specific routing */}
               <Route path="builder/531" element={<Navigate to="/builder/531/v2/step/1" replace />} />
               <Route path="builder/531/v2" element={<Navigate to="/builder/531/v2/step/1" replace />} />
-              <Route path="builder/531/v2/step/:stepNumber" element={<ProtectRoute><ProgramV2Provider><ProgramWizard531V2 /></ProgramV2Provider></ProtectRoute>} />
+              <Route path="builder/531/v2/step/:stepNumber" element={<ProtectRoute><ProgramV2Provider><LockGuard><ProgramWizard531V2 /></LockGuard></ProgramV2Provider></ProtectRoute>} />
               {/* New spec-aligned build routes (UI-first scaffold) with a single persistent provider */}
               <Route
                 path="build/*"
@@ -106,11 +117,12 @@ function App() {
                   <ProtectRoute>
                     <BuilderStateProvider>
                       <Routes>
-                        <Route path="step1" element={<Step1Fundamentals />} />
-                        <Route path="step2" element={<Step2TemplateAndSchemePage />} />
-                        <Route path="step3" element={<Step3Customize />} />
-                        <Route path="step4" element={<Step4Preview />} />
-                        <Route path="step5" element={<Step5Progression />} />
+                        <Route path="step1" element={<LockGuard><Step1Fundamentals /></LockGuard>} />
+                        <Route path="step2" element={<LockGuard><Step2TemplateAndSchemePage /></LockGuard>} />
+                        <Route path="step3" element={<LockGuard><Step3Customize /></LockGuard>} />
+                        <Route path="step4" element={<LockGuard><Step4Preview /></LockGuard>} />
+                        <Route path="step5" element={<LockGuard><Step5Progression /></LockGuard>} />
+                        <Route path="step6" element={<Step6Calendar />} />
                         <Route path="*" element={<Navigate to="/build/step1" replace />} />
                       </Routes>
                     </BuilderStateProvider>
@@ -123,6 +135,7 @@ function App() {
               <Route path="builder/531/v2/step/3" element={<Navigate to="/build/step3" replace />} />
               <Route path="builder/531/v2/step/4" element={<Navigate to="/build/step4" replace />} />
               <Route path="builder/531/v2/step/5" element={<Navigate to="/build/step5" replace />} />
+              <Route path="builder/531/v2/step/6" element={<Navigate to="/build/step6" replace />} />
               {/* Libraries */}
               <Route path="library/templates" element={<TemplatesLibrary />} />
               <Route path="library/assistance" element={<AssistanceLibrary />} />
@@ -134,6 +147,8 @@ function App() {
               <Route path="tools/tm-calculator" element={<TMCalculator />} />
               <Route path="tools/percent-table" element={<PercentTable />} />
               <Route path="tools/set-rep-calculator" element={<SetRepCalculator />} />
+              <Route path="tools/equipment" element={<EquipmentProfile />} />
+              <Route path="tools/data-coverage" element={<DataCoveragePage />} />
               {/* Data & Dev */}
               <Route path="data/status" element={<DataStatus />} />
               <Route path="program/531/active" element={<ProtectRoute><Program531ActiveV2 /></ProtectRoute>} />
@@ -152,6 +167,8 @@ function App() {
               <Route path="profile" element={<ProtectRoute><ProfilePage /></ProtectRoute>} />
               <Route path="resources" element={<ResourcesPage />} />
               <Route path="train" element={<ProtectRoute><TrainToday /></ProtectRoute>} />
+              <Route path="calendar" element={<ProtectRoute><CalendarPage /></ProtectRoute>} />
+              <Route path="preview" element={<ProtectRoute><PreviewPage /></ProtectRoute>} />
 
               {/* Redirect legacy builder paths */}
               <Route path="mesocycle" element={<MacrocycleRedirect />} />

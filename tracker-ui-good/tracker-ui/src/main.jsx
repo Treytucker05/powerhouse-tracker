@@ -9,6 +9,13 @@ import { ExerciseDBProvider } from './contexts/ExerciseDBContext.jsx'
 import { AppProvider } from './context/AppContext.jsx'
 import { ToastProvider } from './components/ui/Toast.jsx'
 import { SettingsProvider } from './contexts/SettingsContext.jsx'
+import { SettingsProvider as BookSettingsProvider } from './store/settingsStore'
+import { EquipmentProvider } from './store/equipmentStore'
+import { ScheduleProvider } from './store/scheduleStore'
+import { CalendarProvider } from './store/calendarStore'
+import { ProgressionProvider } from './store/progressionStore'
+import { FinalPlanProvider } from './store/finalPlanStore'
+import { Step3Provider } from './store/step3Store'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 
 // Ensure dark mode is always enabled
@@ -57,17 +64,31 @@ createRoot(document.getElementById('root')).render(
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <SettingsProvider>
-          <ExerciseDBProvider>
-            <AppProvider>
-              <TrainingStateProvider>
-                <ToastProvider>
-                  <HashRouter basename="/">
-                    <App />
-                  </HashRouter>
-                </ToastProvider>
-              </TrainingStateProvider>
-            </AppProvider>
-          </ExerciseDBProvider>
+          <BookSettingsProvider>
+            <EquipmentProvider>
+              <ScheduleProvider>
+                <Step3Provider>
+                  <ProgressionProvider>
+                    <CalendarProvider>
+                      <FinalPlanProvider>
+                        <ExerciseDBProvider>
+                          <AppProvider>
+                            <TrainingStateProvider>
+                              <ToastProvider>
+                                <HashRouter basename="/">
+                                  <App />
+                                </HashRouter>
+                              </ToastProvider>
+                            </TrainingStateProvider>
+                          </AppProvider>
+                        </ExerciseDBProvider>
+                      </FinalPlanProvider>
+                    </CalendarProvider>
+                  </ProgressionProvider>
+                </Step3Provider>
+              </ScheduleProvider>
+            </EquipmentProvider>
+          </BookSettingsProvider>
         </SettingsProvider>
       </QueryClientProvider>
     </ErrorBoundary>

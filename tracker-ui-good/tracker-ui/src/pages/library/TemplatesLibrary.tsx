@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { LibraryButtons } from "@/components/program/steps/LibraryButtons";
 import BuilderProgress from "@/components/program/steps/BuilderProgress";
 import { loadCsv } from "@/lib/loadCsv";
+import type { TemplateCsv } from "@/types/templates";
 
 type Row = Record<string, string>;
 
@@ -14,17 +15,69 @@ export default function TemplatesLibrary() {
 
     useEffect(() => {
         setLoading(true);
-        loadCsv(`${import.meta.env.BASE_URL}methodology/extraction/templates_master.csv`)
-            .then((data) => {
-                // Defensive: strip empty PapaParse row(s)
-                const clean = (data as Row[]).filter(
+        const MASTER_URL = `${import.meta.env.BASE_URL}methodology/extraction/templates_master.csv`;
+        const ADDITIONS_URL = `${import.meta.env.BASE_URL}methodology/extraction/templates_additions.csv`;
+        (async () => {
+            try {
+                const master = await loadCsv<Row>(MASTER_URL).catch(() => [] as Row[]);
+                const additions = await loadCsv<TemplateCsv>(ADDITIONS_URL).catch(() => [] as TemplateCsv[]);
+
+                // Filter empty master rows
+                const cleanMaster = (master as Row[]).filter(
                     (r) => r && r["Template Name"] && r["Template Name"].trim().length > 0
                 );
-                setRows(clean);
+
+                // Merge additions: map to master-like display with extra columns
+                const mappedAdds: Row[] = (additions || []).map((r) => ({
+                    "Template Name": (r.display_name || "").trim(),
+                    "Book": (r.source_book || "").trim(),
+                    "Page": (r.source_pages || "").trim(),
+                    "Main Work": (r.core_scheme || "").trim(),
+                    "Supplemental": (r.supplemental || "").trim(),
+                    "Assistance": (r.assistance_guideline || "").trim(),
+                    "Conditioning": (r.conditioning_guideline || "").trim(),
+                    "Leader/Anchor": (r.leader_anchor || "").trim(),
+                    "Notes": (r.notes || "").trim(),
+                    __id: (r.id || "").trim(),
+                    __source_book: (r.source_book || "").trim(),
+                    __source_pages: (r.source_pages || "").trim(),
+                }));
+
+                // De-dupe by kebab id when available, otherwise by normalized name
+                const idFrom = (row: Row) => {
+                    if ((row as any).__id) return String((row as any).__id);
+                    const name = String(row["Template Name"] || "").toLowerCase().trim();
+                    return name
+                        .replace(/^(jack sh\*t|jack shit)$/, 'jackshit')
+                        .replace(/[^a-z0-9]+/g, '-');
+                };
+                const byId = new Map<string, Row>();
+                cleanMaster.forEach((r) => {
+                    const id = idFrom(r);
+                    if (id) byId.set(id, r);
+                });
+                mappedAdds.forEach((r) => {
+                    const id = idFrom(r);
+                    if (!id) return;
+                    byId.set(id, r); // prefer additions
+                });
+                const merged = Array.from(byId.values()).sort((a, b) => {
+                    const ca = String((a as any).category || '').toLowerCase();
+                    const cb = String((b as any).category || '').toLowerCase();
+                    if (ca !== cb) return ca < cb ? -1 : 1;
+                    const ta = String((a["Template Name"] || (a as any).display_name || "")).toLowerCase();
+                    const tb = String((b["Template Name"] || (b as any).display_name || "")).toLowerCase();
+                    return ta < tb ? -1 : ta > tb ? 1 : 0;
+                });
+
+                setRows(merged);
                 setErr(null);
-            })
-            .catch((e) => setErr(e?.message || "Failed to load CSV"))
-            .finally(() => setLoading(false));
+            } catch (e: any) {
+                setErr(e?.message || "Failed to load CSV");
+            } finally {
+                setLoading(false);
+            }
+        })();
     }, []);
 
     const filtered = useMemo(() => {
@@ -102,8 +155,8 @@ export default function TemplatesLibrary() {
                             <thead className="bg-[#121331]">
                                 <tr className="text-left">
                                     <th className="px-3 py-2 border-b border-gray-800">Template Name</th>
-                                    <th className="px-3 py-2 border-b border-gray-800">Book</th>
-                                    <th className="px-3 py-2 border-b border-gray-800">Page</th>
+                                    <th className="px-3 py-2 border-b border-gray-800 hidden md:table-cell">Source</th>
+                                    <th className="px-3 py-2 border-b border-gray-800 text-right hidden md:table-cell">Pages</th>
                                     <th className="px-3 py-2 border-b border-gray-800">Main Work</th>
                                     <th className="px-3 py-2 border-b border-gray-800">Supplemental</th>
                                     <th className="px-3 py-2 border-b border-gray-800">Assistance</th>
@@ -116,8 +169,8 @@ export default function TemplatesLibrary() {
                                 {filtered.map((r, i) => (
                                     <tr key={`${r["Template Name"]}-${i}`} className="odd:bg-[#10112a] even:bg-[#0e0f25]">
                                         <td className="px-3 py-2 border-b border-gray-900 font-medium">{r["Template Name"]}</td>
-                                        <td className="px-3 py-2 border-b border-gray-900">{r["Book"]}</td>
-                                        <td className="px-3 py-2 border-b border-gray-900">{r["Page"]}</td>
+                                        <td className="px-3 py-2 border-b border-gray-900 hidden md:table-cell">{(r as any).__source_book || r["Book"] || ""}</td>
+                                        <td className="px-3 py-2 border-b border-gray-900 text-right hidden md:table-cell">{(r as any).__source_pages || r["Page"] || ""}</td>
                                         <td className="px-3 py-2 border-b border-gray-900">{r["Main Work"]}</td>
                                         <td className="px-3 py-2 border-b border-gray-900">{r["Supplemental"]}</td>
                                         <td className="px-3 py-2 border-b border-gray-900">{r["Assistance"]}</td>

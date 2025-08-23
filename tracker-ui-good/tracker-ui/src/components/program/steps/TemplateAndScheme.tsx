@@ -1,10 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBuilder } from '@/context/BuilderState';
 import { supabase, getCurrentUserId } from '@/lib/supabaseClient';
 import { TEMPLATES as TEMPLATE_DEFS, TEMPLATE_DETAILS, TEMPLATE_META, templateLabel } from '@/lib/builder/templates';
 import BuilderProgress from './BuilderProgress';
 import { loadCsv } from '@/lib/loadCsv';
+import type { TemplateCsv } from '@/types/templates';
+import type { SupplementalRow } from '@/types/step3';
+
+function fitMeter(row: SupplementalRow) {
+    const sets = parseInt(String(row.SupplementalSetsReps || "").match(/\d+/)?.[0] ?? "0", 10) || 0;
+    const time = Math.min(5, Math.round(sets / 2) + (Number((row as any).AssistancePerCategoryMax || 0) > 75 ? 2 : 0));
+    const hypertrophy = Math.min(5, Math.round(sets / 2) + (row.SupplementalScheme === "BBB" ? 2 : 0));
+    const strength = row.Phase === "Anchor" && row.MainPattern !== "5s PRO" ? 4 : 2;
+    const cond = Math.min(5, (Number((row as any).HardConditioningMax || 0) >= 3 ? 4 : 2));
+    return { strength, hypertrophy, time, cond };
+}
 // Removed inline WorkoutPreview to avoid duplication with Step 4 comprehensive preview
 
 // --- Detailed Workout Definitions (UI only, not final programming engine) ---
@@ -71,7 +82,7 @@ function TemplateComparisonTable({ templateIds, templates, onRemove, onSelect }:
     onSelect: (id: string) => void
 }) {
     // Local helper: map template name to id
-    const nameToId = (name: string) => {
+    const nameToId = (name?: string) => {
         const s = String(name || '').trim().toLowerCase();
         switch (s) {
             case 'boring but big': return 'bbb';
@@ -87,9 +98,13 @@ function TemplateComparisonTable({ templateIds, templates, onRemove, onSelect }:
 
     // Build rows by matching selected ids to CSV rows
     const rows = (templateIds || []).map(id => {
-        const row = (templates || []).find((t: any) => nameToId(t['Template Name'] ?? t.Template) === id);
+        const row = (templates || []).find((t: any) => {
+            const key = String(t['Template Name'] ?? t.Template ?? t.display_name ?? '').trim();
+            if (!key) return false;
+            return nameToId(key) === id;
+        });
         const def = TEMPLATE_DEFS.find(d => d.id === id);
-        const title = (row?.['Template Name'] as string) || def?.title || id;
+        const title = (row?.['Template Name'] as string) || (row as any)?.display_name || def?.title || id;
         return { id, title, row };
     }).filter(Boolean);
 
@@ -187,14 +202,55 @@ export default function TemplateAndScheme() {
         }
     };
 
-    // Load templates from CSV
-    const [csvTemplates, setCsvTemplates] = useState<any[]>([]);
+    // Load templates from CSV (master + additions)
+    const [csvTemplates, setCsvTemplates] = useState<TemplateCsv[]>([]);
     useEffect(() => {
         let active = true;
-        loadCsv(`${import.meta.env.BASE_URL}methodology/extraction/templates_master.csv`).then(rows => {
-            if (!active) return;
-            setCsvTemplates(Array.isArray(rows) ? rows : []);
-        }).catch(() => setCsvTemplates([]));
+        const MASTER_URL = `${import.meta.env.BASE_URL}methodology/extraction/templates_master.csv`;
+        const ADDITIONS_URL = `${import.meta.env.BASE_URL}methodology/extraction/templates_additions.csv`;
+        (async () => {
+            try {
+                const master = await loadCsv<TemplateCsv>(MASTER_URL).catch(() => []);
+                const additions = await loadCsv<TemplateCsv>(ADDITIONS_URL).catch(() => []);
+
+                // Normalize additions ids and fields
+                const addById = new Map<string, TemplateCsv>();
+                (additions || []).forEach((r: TemplateCsv) => {
+                    const id = String(r.id || '').trim();
+                    if (!id) return;
+                    addById.set(id, r);
+                });
+
+                // Map master into a common shape with synthetic id
+                const norm = (master || []).map((row: any) => {
+                    const name: string = String(row['Template Name'] ?? row.Template ?? '').trim();
+                    const id = name
+                        ? name.toLowerCase()
+                            .replace(/^(jack sh\*t|jack shit)$/, 'jackshit')
+                            .replace(/[^a-z0-9]+/g, '-')
+                        : '';
+                    return { ...(row as TemplateCsv), id } as TemplateCsv;
+                });
+
+                // Merge: prefer additions (have source_book) on duplicate ids
+                const mergedById = new Map<string, TemplateCsv>();
+                norm.forEach(r => { if (r.id) mergedById.set(r.id, r); });
+                addById.forEach((v, k) => { mergedById.set(k, v); });
+
+                // Stable sort: category → display_name (fallback to title)
+                const merged = Array.from(mergedById.values()).sort((a, b) => {
+                    const ca = String((a as any).category || '').toLowerCase();
+                    const cb = String((b as any).category || '').toLowerCase();
+                    if (ca !== cb) return ca < cb ? -1 : 1;
+                    const ta = String((a as any).display_name || (a as any)['Template Name'] || '').toLowerCase();
+                    const tb = String((b as any).display_name || (b as any)['Template Name'] || '').toLowerCase();
+                    return ta < tb ? -1 : ta > tb ? 1 : 0;
+                });
+                if (active) setCsvTemplates(merged);
+            } catch {
+                if (active) setCsvTemplates([]);
+            }
+        })();
         return () => { active = false; };
     }, []);
 
@@ -202,41 +258,66 @@ export default function TemplateAndScheme() {
 
     // Build UI list from CSV rows
     const availableTemplates = React.useMemo(() => {
+        function toTitle(row: TemplateCsv): string {
+            const name = String((row as any)['Template Name'] ?? (row as any).Template ?? '').trim();
+            return name || String(row.display_name || '').trim() || '';
+        }
+        function toId(row: TemplateCsv): string {
+            const name = toTitle(row);
+            return name
+                ? name.toLowerCase().replace(/^(jack sh\*t|jack shit)$/, 'jackshit').replace(/[^a-z0-9]+/g, '_')
+                : String(row.id || '').trim();
+        }
+
         return (csvTemplates || [])
-            .map((row: any) => {
-                const name: string = String(row['Template Name'] ?? row.Template ?? '').trim();
-                const id = nameToId(name);
+            .map((row: TemplateCsv) => {
+                const name = toTitle(row);
+                const id = toId(row);
                 const def = TEMPLATE_DEFS.find(d => d.id === id);
-                const desc = def?.desc || String(row.Notes ?? row.Description ?? '').trim();
+                const desc = def?.desc || String((row as any).Notes ?? (row as any).Description ?? row.notes ?? '').trim();
+                // Prefer additions fields when present
+                const mainWork = (row as any)['Main Work'] ?? '';
+                const supplemental = (row as any)['Supplemental'] ?? row.supplemental ?? '';
+                const assistance = (row as any)['Assistance'] ?? row.assistance_guideline ?? '';
+                const conditioning = (row as any)['Conditioning'] ?? row.conditioning_guideline ?? '';
+                const notes = (row as any)['Notes'] ?? row.notes ?? '';
+                const leaderAnchor = (row as any)['Leader/Anchor'] ?? row.leader_anchor ?? '';
                 return {
                     id,
                     title: name || templateLabel(id),
                     desc,
-                    mainWork: row['Main Work'] ?? '',
-                    supplemental: row['Supplemental'] ?? '',
-                    assistance: row['Assistance'] ?? '',
-                    conditioning: row['Conditioning'] ?? '',
-                    notes: row['Notes'] ?? '',
-                    // default buckets so filter UI can treat them uniformly even if TEMPLATE_META is missing
+                    mainWork,
+                    supplemental,
+                    assistance,
+                    conditioning,
+                    notes,
+                    leaderAnchor,
                     difficulty: 'All',
                     focus: 'General',
                 };
             })
-            // de-dupe by id in case CSV has duplicates
             .filter((t: any, i: number, a: any[]) => a.findIndex(x => x.id === t.id) === i);
     }, [csvTemplates]);
 
     // Currently selected template's CSV row (for details panel)
     const selectedCsv = React.useMemo(() => {
         if (!expanded) return null;
-        const match = (csvTemplates || []).find((t: any) => nameToId(t['Template Name'] ?? t.Template) === expanded);
+        const match = (csvTemplates || []).find((t: any) => {
+            const key = String(t['Template Name'] ?? t.Template ?? t.display_name ?? '').trim();
+            if (!key) return false;
+            return nameToId(key) === expanded;
+        });
         return match || null;
     }, [csvTemplates, expanded]);
 
     // Selected template CSV row for Selection Summary
     const selectedCsvForSummary = React.useMemo(() => {
         if (!step2.templateId) return null;
-        const match = (csvTemplates || []).find((t: any) => nameToId(t['Template Name'] ?? t.Template) === step2.templateId);
+        const match = (csvTemplates || []).find((t: any) => {
+            const key = String(t['Template Name'] ?? t.Template ?? t.display_name ?? '').trim();
+            if (!key) return false;
+            return nameToId(key) === step2.templateId;
+        });
         return match || null;
     }, [csvTemplates, step2.templateId]);
 
@@ -399,6 +480,15 @@ export default function TemplateAndScheme() {
                             </div>
                         )}
 
+                        {/* Scheme chips (lightweight inline UI) */}
+                        <div className="mt-2 text-sm">
+                            <span className="mr-2">Scheme:</span>
+                            {(["5/3/1", "3/5/1", "5s PRO"] as const).map(m => (
+                                <button key={m} onClick={() => {/* integrate with step2 state when ready */ }}
+                                    className="px-2 py-1 mr-1 rounded border border-gray-700 bg-[#0b1220] hover:bg-[#ef4444]">{m}</button>
+                            ))}
+                        </div>
+
                         {/* Search and Filter Controls */}
                         <div className="mb-6 space-y-4">
                             {/* Search Input */}
@@ -518,6 +608,19 @@ export default function TemplateAndScheme() {
                                                         {!isSelected && isExpanded && <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-600/60 text-white">Viewing</span>}
                                                     </>
                                                 )}
+                                                {/* Leader/Anchor badge */}
+                                                {(() => {
+                                                    const raw = String((t as any).leaderAnchor || '').toLowerCase();
+                                                    if (!raw) return null;
+                                                    const isLeader = /leader/.test(raw) && !/anchor/.test(raw);
+                                                    const isAnchor = /anchor/.test(raw) && !/leader/.test(raw);
+                                                    const isBoth = /leader/.test(raw) && /anchor/.test(raw);
+                                                    const label = isBoth ? 'Leader/Anchor' : isLeader ? 'Leader' : isAnchor ? 'Anchor' : (t as any).leaderAnchor;
+                                                    const cls = isAnchor
+                                                        ? 'border border-red-500 text-red-400'
+                                                        : 'border border-gray-500 text-gray-300';
+                                                    return <span className={`text-[10px] px-2 py-0.5 rounded-full ${cls}`}>{label}</span>;
+                                                })()}
                                             </div>
                                             <p className="text-xs text-gray-300 leading-snug mb-2">{t.desc}</p>
                                             {meta && (
@@ -585,11 +688,11 @@ export default function TemplateAndScheme() {
                                                 {/* CSV-backed details */}
                                                 {selectedCsv ? (
                                                     <div className="space-y-1 text-xs text-gray-300">
-                                                        <p><strong className="text-gray-400">Main Work:</strong> {selectedCsv['Main Work'] || '—'}</p>
-                                                        <p><strong className="text-gray-400">Supplemental:</strong> {selectedCsv['Supplemental'] || '—'}</p>
-                                                        <p><strong className="text-gray-400">Assistance:</strong> {selectedCsv['Assistance'] || '—'}</p>
-                                                        <p><strong className="text-gray-400">Conditioning:</strong> {selectedCsv['Conditioning'] || '—'}</p>
-                                                        <p><strong className="text-gray-400">Notes:</strong> {selectedCsv['Notes'] || '—'}</p>
+                                                        <p><strong className="text-gray-400">Main Work:</strong> {(selectedCsv as any).ui_main || selectedCsv['Main Work'] || '—'}</p>
+                                                        <p><strong className="text-gray-400">Supplemental:</strong> {(selectedCsv as any).ui_supplemental || selectedCsv['Supplemental'] || '—'}</p>
+                                                        <p><strong className="text-gray-400">Assistance:</strong> {(selectedCsv as any).ui_assistance || selectedCsv['Assistance'] || '—'}</p>
+                                                        <p><strong className="text-gray-400">Conditioning:</strong> {(selectedCsv as any).ui_conditioning || selectedCsv['Conditioning'] || '—'}</p>
+                                                        <p><strong className="text-gray-400">Notes:</strong> {(selectedCsv as any).ui_notes || selectedCsv['Notes'] || (selectedCsv as any).notes || '—'}</p>
                                                     </div>
                                                 ) : (
                                                     <div className="text-xs text-gray-500">No details available.</div>
@@ -631,6 +734,30 @@ export default function TemplateAndScheme() {
                                 <p><strong className="text-gray-400">Assistance:</strong> {selectedCsvForSummary['Assistance'] || '—'}</p>
                                 <p><strong className="text-gray-400">Conditioning:</strong> {selectedCsvForSummary['Conditioning'] || '—'}</p>
                                 <p><strong className="text-gray-400">Notes:</strong> {selectedCsvForSummary['Notes'] || '—'}</p>
+                                {/* Fit Meter */}
+                                {(() => {
+                                    try {
+                                        const fit = fitMeter(selectedCsvForSummary as unknown as SupplementalRow);
+                                        return (
+                                            <div className="mt-2 text-xs text-gray-300 flex flex-wrap gap-2">
+                                                <span>Strength ★{"★".repeat(fit.strength)}{"☆".repeat(5 - fit.strength)}</span>
+                                                <span>Hypertrophy ★{"★".repeat(fit.hypertrophy)}{"☆".repeat(5 - fit.hypertrophy)}</span>
+                                                <span>Time ★{"★".repeat(fit.time)}{"☆".repeat(5 - fit.time)}</span>
+                                                <span>Cond Headroom ★{"★".repeat(fit.cond)}{"☆".repeat(5 - fit.cond)}</span>
+                                            </div>
+                                        );
+                                    } catch { return null; }
+                                })()}
+                                <div className="pt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            try { sessionStorage.setItem('applyTemplateDefaults', '1'); } catch { }
+                                            navigate('/build/step3?tab=assistance');
+                                        }}
+                                        className="mt-2 text-xs px-3 py-1.5 rounded border border-gray-600 hover:border-red-500 text-gray-200"
+                                    >Start with Template Defaults → Step 3</button>
+                                </div>
                             </div>
                         )}
                     </div>
