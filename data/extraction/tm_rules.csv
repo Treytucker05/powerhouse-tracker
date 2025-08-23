@@ -1,0 +1,3 @@
+PolicyId,Name,StartTMPercent,UpperBumpPerCycle,LowerBumpPerCycle,FiveForwardThreeBack,ConservativeOption,Notes
+tm_standard,Standard TM,85,5,10,true,true,"Default: 5f/3b allowed; +5 upper / +10 lower (lbs). TODO verify exact units."
+tm_conservative,Conservative TM,80,2.5,5,true,true,"For older lifters or high stress blocks. TODO"
