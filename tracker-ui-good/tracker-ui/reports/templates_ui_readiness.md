@@ -1,6 +1,6 @@
 # Templates UI Readiness Report
 
-Generated: 2025-08-23T07:47:34.435Z
+Generated: 2025-08-23T07:51:59.076Z
 
 | id | display_name | missing_fields | tag_count | session_badge |
 |---|---|---|---:|---|
@@ -49,6 +49,8 @@ Generated: 2025-08-23T07:47:34.435Z
 | football_summer9_skill_field | Going Into the Summer — 9 Weeks (Skill) [Field] | — | 4 | 45–60m |
 | hardgainers-anchor | Hardgainers (Anchor) | goal, experience, time_per_session_min, tags | 0 | - |
 | hardgainers-leaders | Hardgainers (Leaders) | goal, experience, time_per_session_min, tags | 0 | - |
+| football_inseason_conditioning | In‑Season Conditioning — Weekly Schedule | — | 4 | ≤45m |
+| football_inseason_2day_weightroom | In‑Season Training — 2‑Day (Weight Room) | — | 7 | 45–60m |
 | jack-sh-t | Jack Sh*t | goal, experience, time_per_session_min, tags | 0 | - |
 | jokers-fsl | Jokers + First Set Last (kit) | goal, experience, time_per_session_min, tags | 0 | - |
 | football_winter_8wk_linemen_field | Jumps/Throws/Speed — First 8 Weeks (Linemen) | — | 4 | 45–60m |
