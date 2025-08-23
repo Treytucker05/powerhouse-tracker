@@ -25,7 +25,10 @@ export default function Step2TemplateGallery({ data, updateData }) {
 
     // Load templates CSV once
     useEffect(() => {
-        loadCsv('/methodology/extraction/templates_master.csv').then(setTemplates).catch(() => setTemplates([]));
+        loadCsv(`${import.meta.env.BASE_URL}methodology/extraction/templates_master.csv`).then((rows) => {
+            console.log("CSV Loaded:", rows);
+            setTemplates(rows);
+        });
     }, []);
 
     // Helper to find row by name
@@ -106,11 +109,10 @@ export default function Step2TemplateGallery({ data, updateData }) {
 
     return (
         <div className="space-y-6">
-            {/* Debug: Loaded Templates (from CSV) */}
             {templates.length > 0 && (
-                <div className="mb-4 p-2 bg-neutral-800 text-white rounded">
-                    <h3 className="font-bold">Loaded Templates (from CSV)</h3>
-                    <ul className="list-disc ml-4">
+                <div className="mb-6 p-4 bg-neutral-900 rounded-lg">
+                    <h3 className="text-lg font-bold text-white mb-2">Loaded Templates (CSV)</h3>
+                    <ul className="list-disc list-inside text-gray-300">
                         {templates.map((t, i) => (
                             <li key={i}>
                                 {t["Template Name"]} — {t["Supplemental"]}
@@ -123,6 +125,7 @@ export default function Step2TemplateGallery({ data, updateData }) {
             <div className="flex items-start justify-between">
                 <div>
                     <h3 className="text-xl font-semibold text-white mb-1">Step 2: Choose Assistance Template</h3>
+
                     <p className="text-gray-400 text-sm">This choice drives your supplemental and accessory work. You can customize in the next step.</p>
                 </div>
                 <StepStatusPill stepId={STEP_IDS.TEMPLATE_GALLERY} data={st} />

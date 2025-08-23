@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { loadCsv } from '@/lib/loadCsv';
 import { pillClass } from './_shared/pillStyles.js';
 import { CheckCircle, Lock, Unlock } from 'lucide-react';
 
@@ -105,6 +106,11 @@ export default function Step3CustomizeDesign({ data, updateData }) {
         design.warmups.policy = scheme === 'minimalist' ? 'minimal' : (scheme === 'jumps_integrated' ? 'jumps' : 'standard');
     }
     const [local, setLocal] = useState(design);
+    // Assistance catalog from CSV (debug wire-up)
+    const [assistance, setAssistance] = useState([]);
+    useEffect(() => {
+        loadCsv(`${import.meta.env.BASE_URL}methodology/extraction/assistance_exercises.csv`).then(setAssistance);
+    }, []);
 
     // Persist outward on change (immediate for now)
     useEffect(() => { updateData({ design: local }); }, [local]);
@@ -140,6 +146,18 @@ export default function Step3CustomizeDesign({ data, updateData }) {
 
     return (
         <div className="space-y-6 step3-viz">
+            {assistance.length > 0 && (
+                <div className="mb-4 p-3 bg-neutral-900 rounded">
+                    <h3 className="font-bold text-white mb-2">Loaded Assistance (CSV)</h3>
+                    <ul className="list-disc list-inside text-gray-300">
+                        {assistance.map((a, i) => (
+                            <li key={i}>
+                                {a["Exercise"]} — {a["Category"]}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
             {/* Scoped visual styles for Step 3 enhancements */}
             <style>{`
                 .step3-viz * { transition: all 0.2s ease; }
