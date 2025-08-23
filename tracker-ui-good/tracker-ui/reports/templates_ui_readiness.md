@@ -1,6 +1,6 @@
 # Templates UI Readiness Report
 
-Generated: 2025-08-23T07:37:02.888Z
+Generated: 2025-08-23T07:47:34.435Z
 
 | id | display_name | missing_fields | tag_count | session_badge |
 |---|---|---|---:|---|
@@ -44,15 +44,15 @@ Generated: 2025-08-23T07:37:02.888Z
 | full-body-full-boring | Full Body, Full Boring | goal, experience, time_per_session_min, tags | 0 | - |
 | god-is-a-beast | God is a Beast | goal, experience, time_per_session_min, tags | 0 | - |
 | god-is-a-beast-leader | God Is A Beast (Leader) | goal, experience, time_per_session_min, tags | 0 | - |
-| football_summer9_weightroom | Going Into the Summer — 9 Week Training Cycle (Weight Room) | experience, time_per_session_min | 5 | - |
-| football_summer9_linemen_field | Going Into the Summer — 9 Weeks (Linemen) [Field] | experience, time_per_session_min | 4 | - |
-| football_summer9_skill_field | Going Into the Summer — 9 Weeks (Skill) [Field] | experience, time_per_session_min | 4 | - |
+| football_summer9_weightroom | Going Into the Summer — 9 Week Training Cycle (Weight Room) | — | 5 | 45–60m |
+| football_summer9_linemen_field | Going Into the Summer — 9 Weeks (Linemen) [Field] | — | 4 | 45–60m |
+| football_summer9_skill_field | Going Into the Summer — 9 Weeks (Skill) [Field] | — | 4 | 45–60m |
 | hardgainers-anchor | Hardgainers (Anchor) | goal, experience, time_per_session_min, tags | 0 | - |
 | hardgainers-leaders | Hardgainers (Leaders) | goal, experience, time_per_session_min, tags | 0 | - |
 | jack-sh-t | Jack Sh*t | goal, experience, time_per_session_min, tags | 0 | - |
 | jokers-fsl | Jokers + First Set Last (kit) | goal, experience, time_per_session_min, tags | 0 | - |
-| football_winter_8wk_linemen_field | Jumps/Throws/Speed — First 8 Weeks (Linemen) | experience, time_per_session_min | 4 | - |
-| football_winter_8wk_skill_field | Jumps/Throws/Speed — First 8 Weeks (Skill) | experience, time_per_session_min | 4 | - |
+| football_winter_8wk_linemen_field | Jumps/Throws/Speed — First 8 Weeks (Linemen) | — | 4 | 45–60m |
+| football_winter_8wk_skill_field | Jumps/Throws/Speed — First 8 Weeks (Skill) | — | 4 | 45–60m |
 | krypteia | Krypteia | goal, experience, time_per_session_min, tags | 0 | - |
 | leaders-3-month | Leaders (3-month) | goal, experience, time_per_session_min, tags | 0 | - |
 | leviathan | Leviathan | goal, experience, time_per_session_min, tags | 0 | - |
@@ -66,10 +66,10 @@ Generated: 2025-08-23T07:37:02.888Z
 | spinal-tap-1 | Spinal Tap (All weeks in one day) | goal, experience, time_per_session_min, tags | 0 | - |
 | spinal-tap-2 | Spinal Tap (Triples Only) | goal, experience, time_per_session_min, tags | 0 | - |
 | strength-challenge | Strength Challenge (Beyond) | goal, experience, time_per_session_min, tags | 0 | - |
-| football_precamp6_weightroom | Summer Pre-Camp — 6 Week Training Cycle (Weight Room) | experience, time_per_session_min | 5 | - |
-| football_precamp6_linemen_field | Summer Pre-Camp — 6 Weeks (Linemen) [Field] | experience, time_per_session_min | 4 | - |
-| football_precamp6_skill_field | Summer Pre-Camp — 6 Weeks (Skill) [Field] | experience, time_per_session_min | 4 | - |
+| football_precamp6_weightroom | Summer Pre-Camp — 6 Week Training Cycle (Weight Room) | — | 5 | 45–60m |
+| football_precamp6_linemen_field | Summer Pre-Camp — 6 Weeks (Linemen) [Field] | — | 4 | 45–60m |
+| football_precamp6_skill_field | Summer Pre-Camp — 6 Weeks (Skill) [Field] | — | 4 | 45–60m |
 | svr | SVR (3/5/1 + singles) | goal, experience, time_per_session_min, tags | 0 | - |
 | svr-ii | SVR II | goal, experience, time_per_session_min, tags | 0 | - |
 | triumvirate | Triumvirate | goal, experience, time_per_session_min, tags | 0 | - |
-| football_winter_8wk_weightroom | Winter Strength & Conditioning — 8 Week Cycle (Weight Room) | experience, time_per_session_min | 5 | - |
+| football_winter_8wk_weightroom | Winter Strength & Conditioning — 8 Week Cycle (Weight Room) | — | 5 | 45–60m |
