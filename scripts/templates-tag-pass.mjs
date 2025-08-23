@@ -196,8 +196,8 @@ function ensureCatalogEntries(catalog, usedTagKeys) {
   for (const key of usedTagKeys) {
     if (!key || keyIdx.has(key)) continue;
     const [group, labelRaw] = key.includes(':') ? key.split(':') : ['misc', key];
-    const label = (labelRaw || key).replace(/[-_]/g, ' ').replace(/\b\w/g, m => m.toUpperCase());
-    const row = { key, group, label, description: '', color: '' };
+  const label = (labelRaw || key).replace(/[-_]/g, ' ').replace(/\b\w/g, m => m.toUpperCase());
+  const row = { key, group, label, description: '', color: '' };
     // ensure header coverage
     for (const h of ['key','group','label','description','color']) if (!catalog.header.includes(h)) catalog.header.push(h);
     catalog.rows.push(row);
@@ -212,9 +212,74 @@ function writeCatalog(catalog) {
   writeCsvObj(catalog.path, catalog.header, catalog.rows);
 }
 
+function titleCaseGroup(group) {
+  const g = String(group || '').toLowerCase();
+  const map = {
+    template: 'Template',
+    scheme: 'Scheme',
+    supplemental: 'Supplemental',
+    assistance: 'Assistance',
+    season: 'Season',
+    population: 'Population',
+    conditioning: 'Conditioning',
+    goal: 'Goal',
+    phase: 'Phase',
+    rule: 'Rule',
+    meta: 'Meta',
+    misc: 'Meta',
+  };
+  return map[g] || (group || 'Meta');
+}
+
+function colorForGroup(group, key) {
+  const g = titleCaseGroup(group);
+  switch (g) {
+    case 'Scheme': return '#60a5fa'; // blue-400
+    case 'Supplemental':
+      if (key?.includes('bbb')) return '#f59e0b'; // amber-500
+      if (key?.includes('fsl')) return '#10b981'; // emerald-500
+      if (key?.includes('ssl')) return '#84cc16'; // lime-500
+      return '#f97316'; // orange-500
+    case 'Assistance': return '#14b8a6'; // teal-500
+    case 'Season': return key?.includes('in') ? '#eab308' : '#22c55e'; // yellow/green
+    case 'Population': return '#8b5cf6'; // violet-500
+    case 'Conditioning': return '#06b6d4'; // cyan-500
+    case 'Goal':
+      if (key?.includes('strength')) return '#ef4444'; // red-500
+      if (key?.includes('hypertrophy')) return '#f472b6'; // pink-400
+      if (key?.includes('conditioning')) return '#06b6d4'; // cyan
+      return '#a3e635'; // lime-400 balanced
+    case 'Phase': return key?.includes('anchor') ? '#fb923c' : '#f87171'; // orange/red
+    case 'Template':
+      if (key?.includes('football')) return '#16a34a'; // green-600
+      if (key?.includes('forever')) return '#f43f5e'; // rose-500
+      if (key?.includes('beyond')) return '#a855f7'; // purple-500
+      return '#3b82f6'; // blue-500
+    default: return '';
+  }
+}
+
+function normalizeAndColorizeCatalog(catalog) {
+  if (!catalog) return { normalized: 0, colored: 0 };
+  let normalized = 0, colored = 0;
+  for (const r of catalog.rows) {
+    const g = titleCaseGroup(r.group);
+    if (r.group !== g) { r.group = g; normalized++; }
+    if (!r.color || !String(r.color).trim()) {
+      const c = colorForGroup(r.group, r.key);
+      if (c) { r.color = c; colored++; }
+    }
+  }
+  return { normalized, colored };
+}
+
 function run() {
   let changed = 0, scanned = 0, missingPages = 0, missingBook = 0;
   const usedTagKeys = new Set();
+  const mergedRows = [];
+  const mergedHeader = [
+    'id','display_name','source_book','source_pages','core_scheme','supplemental','assistance_guideline','conditioning_guideline','leader_anchor','category','tags','ui_main','ui_supplemental','ui_assistance','ui_conditioning','ui_notes','time_per_session_min','experience'
+  ];
   for (const file of TPL_FILES) {
     const p = path.join(DATA_DIR, file);
     if (!fs.existsSync(p)) continue;
@@ -239,6 +304,30 @@ function run() {
       const book  = r.book || r.Book;
       if (!(pages||'').trim()) missingPages++;
       if (!(book||'').trim())  missingBook++;
+
+      // Build merged row with unified schema
+      const id = (r.id || '').trim() || (String(r['Template Name'] || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-'));
+      const merged = {
+        id,
+        display_name: (r.display_name || r['Template Name'] || '').trim(),
+        source_book: (r.source_book || r.book || r['Book'] || '').trim(),
+        source_pages: (r.source_pages || r.pages || r['Page'] || '').trim(),
+        core_scheme: (r.core_scheme || r['Main Work'] || '').trim(),
+        supplemental: (r.supplemental || r['Supplemental'] || '').trim(),
+        assistance_guideline: (r.assistance_guideline || r.assistance_mode || r.assistance_targets || r['Assistance'] || '').trim(),
+        conditioning_guideline: (r.conditioning_guideline || r.conditioning_mode || r['Conditioning'] || '').trim(),
+        leader_anchor: (r.leader_anchor || r.leader_anchor_fit || r['Leader/Anchor'] || '').trim(),
+        category: (r.category || '').trim(),
+        tags: (r.tags || '').trim(),
+        ui_main: r.ui_main || '',
+        ui_supplemental: r.ui_supplemental || '',
+        ui_assistance: r.ui_assistance || '',
+        ui_conditioning: r.ui_conditioning || '',
+        ui_notes: r.ui_notes || r.notes || r['Notes'] || '',
+        time_per_session_min: (r.time_per_session_min || '').trim(),
+        experience: (r.experience || '').trim(),
+      };
+      mergedRows.push(merged);
     });
 
     if (!DRY) writeCsvObj(p, header, rows);
@@ -247,14 +336,26 @@ function run() {
   // Update tag catalog with any missing keys
   const catalog = loadCatalog();
   const { added } = ensureCatalogEntries(catalog, usedTagKeys);
-  if (!DRY && catalog && added > 0) writeCatalog(catalog);
+  const { normalized, colored } = normalizeAndColorizeCatalog(catalog);
+  if (!DRY && catalog && (added > 0 || normalized > 0 || colored > 0)) writeCatalog(catalog);
 
   console.log(DRY ? 'Dry run — no files written.' : 'Write mode — files updated.');
   console.log(`Templates scanned: ${scanned}`);
   console.log(`Rows changed/backfilled: ${changed}`);
   console.log(`Missing pages: ${missingPages}  |  Missing book: ${missingBook}`);
-  console.log(`Catalog additions: ${added || 0}`);
+  console.log(`Catalog additions: ${added || 0} | normalized groups: ${normalized || 0} | colored: ${colored || 0}`);
   console.log('Tip: keep blanks for pages you haven\'t verified yet — we favor accuracy over guesses.');
+
+  // Emit unified merged CSV for research
+  if (!DRY) {
+    // De-dupe by id (prefer later entries to override earlier ones)
+    const byId = new Map();
+    for (const r of mergedRows) byId.set(r.id || r.display_name, r);
+    const mergedOut = Array.from(byId.values());
+    const outPath = path.join(DATA_DIR, 'templates_merged.csv');
+    writeCsvObj(outPath, mergedHeader, mergedOut);
+    console.log(`Wrote merged CSV: ${path.relative(ROOT, outPath)} (${mergedOut.length} rows)`);
+  }
 }
 
 run();
