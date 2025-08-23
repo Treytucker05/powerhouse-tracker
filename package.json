@@ -18,7 +18,7 @@
     "format": "prettier --write .",
     "validate:templates:ui": "node scripts/validate-and-backfill.mjs",
     "fix:templates:ui": "node scripts/validate-and-backfill.mjs --write",
-  "validate:csv": "npm --prefix tracker-ui-good/tracker-ui run lint:csv",
+    "validate:csv": "npm --prefix tracker-ui-good/tracker-ui run lint:csv",
     "templates:tag:dry": "node scripts/templates-tag-pass.mjs",
     "templates:tag": "node scripts/templates-tag-pass.mjs --write",
     "audit:tags": "node scripts/tag-audit.mjs",
