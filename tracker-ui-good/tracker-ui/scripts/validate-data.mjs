@@ -294,7 +294,17 @@ function lintGeneric(file, cols, label, errors, warnings) {
     lintJokers(dir, errors, warnings);
     lintGeneric(path.join(dir, "assistance_exercises.csv"), ["Category", "Exercise", "Equipment", "Difficulty", "BackStressFlag", "Notes"], "assistance", errors, warnings);
     lintGeneric(path.join(dir, "warmups.csv"), ["Type", "Name", "DefaultDose", "ExampleProtocol", "Notes"], "warmups", errors, warnings);
-    lintGeneric(path.join(dir, "conditioning.csv"), ["Activity", "Intensity", "ModalityGroup", "SuggestedDuration", "DefaultFreqPerWeek", "Notes"], "conditioning", errors, warnings);
+    // New containers header checks
+    const condReq = ["id","display_name","category","goal","conditioning_mode","time_per_session_min","time_per_week_min","population","seasonality","equipment","book","pages","notes","tags","rules_markdown"];
+    lintGeneric(path.join(dir, "conditioning.csv"), condReq, "conditioning", errors, warnings);
+    const jtReq = ["id","display_name","category","goal","conditioning_mode","population","equipment","book","pages","notes","tags","rules_markdown"];
+    lintGeneric(path.join(dir, "jumps_throws.csv"), jtReq, "jumps_throws", errors, warnings);
+
+    // Row count summary (non-fatal)
+    const cond = readCsv(path.join(dir, "conditioning.csv"));
+    const jt = readCsv(path.join(dir, "jumps_throws.csv"));
+    console.log(`[info] conditioning.csv rows: ${cond.rows.length}`);
+    console.log(`[info] jumps_throws.csv rows: ${jt.rows.length}`);
     lintGeneric(path.join(dir, "special_rules.csv"), ["Rule", "AppliesTo", "Notes"], "special_rules", errors, warnings);
 
     const banner = (txt, char, color) => {

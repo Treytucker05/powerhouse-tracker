@@ -26,6 +26,7 @@ import WarmupsLibrary from './pages/library/WarmupsLibrary.tsx';
 import SupplementalLibrary from './pages/library/SupplementalLibrary.tsx';
 import ConditioningLibrary from './pages/library/ConditioningLibrary.tsx';
 import SpecialRulesLibrary from './pages/library/SpecialRulesLibrary.tsx';
+import JumpsThrowsLibrary from './pages/library/JumpsThrowsLibrary.tsx';
 import TMCalculator from './pages/tools/TMCalculator.tsx';
 import PercentTable from './pages/tools/PercentTable.tsx';
 import SetRepCalculator from './pages/tools/SetRepCalculator.tsx';
@@ -142,6 +143,7 @@ function App() {
               <Route path="library/warmups" element={<WarmupsLibrary />} />
               <Route path="library/supplemental" element={<SupplementalLibrary />} />
               <Route path="library/conditioning" element={<ConditioningLibrary />} />
+              <Route path="library/jumps-throws" element={<JumpsThrowsLibrary />} />
               <Route path="library/special-rules" element={<SpecialRulesLibrary />} />
               {/* Tools */}
               <Route path="tools/tm-calculator" element={<TMCalculator />} />

@@ -98,3 +98,36 @@ export interface JokerRuleRow {
     StopCondition: string;
     Notes: string;
 }
+
+export interface ConditioningRow {
+    id: string;
+    display_name: string;
+    category: string;           // e.g., Football, General
+    goal: string;               // conditioning | strength+athleticism | etc.
+    conditioning_mode: string;  // prowler | sled | hill_sprints | tempo_runs | jumps_throws | sport_specific | easy_cardio
+    time_per_session_min?: number | '';
+    time_per_week_min?: number | '';
+    population?: string;        // team | skill | linemen | general
+    seasonality?: string;       // off_season | in_season | pre_season
+    equipment?: string;         // pipe list
+    book: string;
+    pages: string;
+    notes?: string;
+    tags?: string;              // pipe-delimited
+    rules_markdown?: string;
+}
+
+export interface JumpsThrowsRow {
+    id: string;
+    display_name: string;
+    category: string;
+    goal: string;               // athleticism | power | etc.
+    conditioning_mode: string;  // jumps | throws | jumps_throws
+    population?: string;
+    equipment?: string;         // boxes|hurdles|med_balls
+    book: string;
+    pages: string;
+    notes?: string;
+    tags?: string;
+    rules_markdown?: string;
+}

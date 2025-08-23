@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { LibraryButtons } from "@/components/program/steps/LibraryButtons";
 import BuilderProgress from "@/components/program/steps/BuilderProgress";
-import { loadCsv } from "@/lib/loadCsv";
+import { loadConditioningRows } from "@/lib/data/loadConditioningAndJumps";
+import type { ConditioningRow } from "@/types/step3";
 
-type Row = Record<string, string>;
+type Row = ConditioningRow;
 
 export default function ConditioningLibrary() {
     const [rows, setRows] = useState<Row[]>([]);
@@ -13,23 +14,23 @@ export default function ConditioningLibrary() {
 
     useEffect(() => {
         setLoading(true);
-        loadCsv(`${import.meta.env.BASE_URL}methodology/extraction/conditioning.csv`)
-            .then((data) => {
-                const clean = (data as Row[]).filter((r) => (r["Activity"] || r["activity"] || "").trim().length > 0);
-                setRows(clean);
-                setErr(null);
-            })
+        loadConditioningRows()
+            .then((data) => { setRows((data as Row[]).filter(r => (r.display_name||"").trim())); setErr(null); })
             .catch((e) => setErr(e?.message || "Failed to load CSV"))
             .finally(() => setLoading(false));
     }, []);
 
-    type Norm = { Activity: string; Intensity: string; Notes: string };
-
-    const normalized = useMemo<Norm[]>(() => {
+    const normalized = useMemo(() => {
         return rows.map((r) => ({
-            Activity: r["Activity"] || r["activity"] || r["Type"] || "",
-            Intensity: r["Intensity"] || r["intensity"] || r["Load"] || r["Zone"] || r["Pace"] || "",
-            Notes: r["Notes"] || r["notes"] || "",
+            name: r.display_name || "",
+            mode: r.conditioning_mode || "",
+            population: r.population || "",
+            seasonality: r.seasonality || "",
+            tags: r.tags || "",
+            book: r.book || "",
+            pages: r.pages || "",
+            notes: r.notes || "",
+            rules: r.rules_markdown || "",
         }));
     }, [rows]);
 
@@ -38,8 +39,8 @@ export default function ConditioningLibrary() {
         const base = normalized;
         const searched = !q
             ? base
-            : base.filter((r) => [r.Activity, r.Intensity, r.Notes].join(" ").toLowerCase().includes(q));
-        return [...searched].sort((a, b) => a.Activity.localeCompare(b.Activity));
+            : base.filter((r) => Object.values(r).join(" ").toLowerCase().includes(q));
+        return [...searched].sort((a, b) => a.name.localeCompare(b.name));
     }, [normalized, query]);
 
     return (
@@ -83,17 +84,35 @@ export default function ConditioningLibrary() {
                         <table className="min-w-full text-sm">
                             <thead className="bg-[#121331]">
                                 <tr className="text-left">
-                                    <th className="px-3 py-2 border-b border-gray-800">Activity</th>
-                                    <th className="px-3 py-2 border-b border-gray-800">Intensity</th>
-                                    <th className="px-3 py-2 border-b border-gray-800">Notes</th>
+                                    <th className="px-3 py-2 border-b border-gray-800">Name</th>
+                                    <th className="px-3 py-2 border-b border-gray-800">Mode</th>
+                                    <th className="px-3 py-2 border-b border-gray-800">Population</th>
+                                    <th className="px-3 py-2 border-b border-gray-800">Season</th>
+                                    <th className="px-3 py-2 border-b border-gray-800">Tags</th>
+                                    <th className="px-3 py-2 border-b border-gray-800">Pages</th>
+                                    <th className="px-3 py-2 border-b border-gray-800">View</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {filtered.map((r, i) => (
-                                    <tr key={`${r.Activity}-${i}`} className="odd:bg-[#10112a] even:bg-[#0e0f25]">
-                                        <td className="px-3 py-2 border-b border-gray-900 font-medium">{r.Activity}</td>
-                                        <td className="px-3 py-2 border-b border-gray-900">{r.Intensity}</td>
-                                        <td className="px-3 py-2 border-b border-gray-900">{r.Notes}</td>
+                                    <tr key={`${r.name}-${i}`} className="odd:bg-[#10112a] even:bg-[#0e0f25]">
+                                        <td className="px-3 py-2 border-b border-gray-900 font-medium">{r.name}</td>
+                                        <td className="px-3 py-2 border-b border-gray-900">{r.mode}</td>
+                                        <td className="px-3 py-2 border-b border-gray-900">{r.population}</td>
+                                        <td className="px-3 py-2 border-b border-gray-900">{r.seasonality}</td>
+                                        <td className="px-3 py-2 border-b border-gray-900">{r.tags}</td>
+                                        <td className="px-3 py-2 border-b border-gray-900">{r.book ? `${r.book} — ` : ''}{r.pages}</td>
+                                        <td className="px-3 py-2 border-b border-gray-900">
+                                            {(r.notes || r.rules) ? (
+                                                <details>
+                                                    <summary className="cursor-pointer select-none text-blue-300">View</summary>
+                                                    <div className="mt-2 text-gray-300">
+                                                        {r.rules && <div className="prose prose-invert text-xs mb-2 whitespace-pre-wrap">{r.rules}</div>}
+                                                        {r.notes && <div className="text-xs whitespace-pre-wrap">{r.notes}</div>}
+                                                    </div>
+                                                </details>
+                                            ) : <span className="text-gray-500">—</span>}
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>

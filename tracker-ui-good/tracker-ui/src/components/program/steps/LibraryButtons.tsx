@@ -6,6 +6,7 @@ const libraryLinks = [
     { name: "Warm-ups", path: "/library/warmups" },
     { name: "Supplemental", path: "/library/supplemental" },
     { name: "Conditioning", path: "/library/conditioning" },
+    { name: "Jumps/Throws", path: "/library/jumps-throws" },
     { name: "Special Rules", path: "/library/special-rules" },
 ];
 
