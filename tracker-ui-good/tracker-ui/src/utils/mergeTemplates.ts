@@ -1,4 +1,5 @@
 import type { TemplateCsv } from '@/types/methodology';
+import { ensureFootballTag } from '@/lib/templates/display';
 
 // Merge master + additions where additions override by id; provide light normalization
 export function mergeTemplateCsv(master: TemplateCsv[], adds: TemplateCsv[]): TemplateCsv[] {
@@ -19,7 +20,7 @@ export function mergeTemplateCsv(master: TemplateCsv[], adds: TemplateCsv[]): Te
         if (!id) return;
         const prev = map.get(id) || {} as TemplateCsv;
         // Map synonyms into canonical fields while preserving originals
-        const merged: TemplateCsv = {
+        let merged: TemplateCsv = {
             ...prev,
             ...r,
             id,
@@ -27,6 +28,9 @@ export function mergeTemplateCsv(master: TemplateCsv[], adds: TemplateCsv[]): Te
             source: r.source || (r as any).source_book || (prev as any).source_book || prev.source,
             pages: r.pages || (r as any).source_pages || (prev as any).source_pages || prev.pages,
         };
+        // Auto-ensure Football tag
+        const tagsNow = ensureFootballTag((merged as any).tags, (merged as any).category);
+        merged = { ...(merged as any), tags: tagsNow } as any;
         map.set(id, merged);
     });
     return [...map.values()].sort((a, b) => {

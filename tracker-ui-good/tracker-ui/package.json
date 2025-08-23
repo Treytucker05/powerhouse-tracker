@@ -2,7 +2,7 @@
   "name": "powerhouse-tracker",
   "description": "Modern React training tracker with complete program design system",
   "private": true,
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "module",
   "homepage": "https://treytucker05.github.io/powerhouse-tracker/#/",
   "scripts": {
