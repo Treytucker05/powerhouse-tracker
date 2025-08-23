@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { loadCsv } from "@/lib/loadCsv";
 
-export type TagMeta = { key: string; group: string; label: string; description?: string };
+export type TagMeta = { key: string; group: string; label: string; description?: string; color?: string };
 
 export function useTagCatalog() {
     const [rows, setRows] = useState<TagMeta[]>([]);

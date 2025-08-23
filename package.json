@@ -15,7 +15,11 @@
     "extract:build": "ts-node --transpile-only scripts/build-extraction-sheet.ts",
     "extract:build:js": "node scripts/build-extraction-sheet.js",
     "extract:all": "npm run extract:build:js && node scripts/open-extraction.js",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "validate:templates:ui": "node scripts/validate-and-backfill.mjs",
+  "fix:templates:ui": "node scripts/validate-and-backfill.mjs --write",
+  "templates:tag:dry": "node scripts/templates-tag-pass.mjs",
+  "templates:tag": "node scripts/templates-tag-pass.mjs --write"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",

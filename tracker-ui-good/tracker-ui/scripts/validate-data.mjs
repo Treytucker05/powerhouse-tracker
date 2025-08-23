@@ -204,7 +204,7 @@ function lintGeneric(file, cols, label, errors, warnings) {
         const warnings = [];
         const missingAny = [];
         const rowsForReport = [];
-    for (const r of merged.values()) {
+        for (const r of merged.values()) {
             // Access across both schemas
             const id = r.id || slugifyId(r.display_name || r["display_name"]);
             const display = r.display_name || r["display_name"] || r["Template Name"] || id;

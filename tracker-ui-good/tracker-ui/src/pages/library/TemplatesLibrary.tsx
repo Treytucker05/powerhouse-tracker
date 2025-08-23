@@ -5,8 +5,9 @@ import BuilderProgress from "@/components/program/steps/BuilderProgress";
 import { loadCsv } from "@/lib/loadCsv";
 import type { TemplateCsv } from "@/types/templates";
 import { useTagCatalog } from "@/ui/tags/useTagCatalog";
-import { getTagStyle } from "@/ui/tags/colors";
 import { withDerived } from "@/lib/templates/display";
+import { deriveSessionTimeChip, deriveDifficultyChip } from "@/lib/tags/resolve";
+import { TagChips } from "@/components/TagChips";
 
 type Row = Record<string, string>;
 
@@ -79,7 +80,27 @@ export default function TemplatesLibrary() {
 
                 // attach derived display fields
                 const withDisplay = merged.map((r) => withDerived(r as any));
-                setRows(withDisplay as any);
+                // Attach unified chips derived from tags + simple metadata so table matches cards
+                const hydrated = withDisplay.map((r) => {
+                    const disp = (r as any).__display || {};
+                    const keys = String(disp.tags || (r as any).__tags || "")
+                        .split("|")
+                        .map((t) => t.trim())
+                        .filter(Boolean);
+                    const tagChips = keys.map((key) => {
+                        const meta = getTagMeta(key);
+                        return { text: meta.label || key, color: (meta as any).color, key } as any;
+                    });
+                    const infoChips: any[] = [];
+                    const timeChip = deriveSessionTimeChip((r as any).time_per_session_min);
+                    if (timeChip) infoChips.push({ text: timeChip });
+                    const diffChip = deriveDifficultyChip((r as any).experience);
+                    if (diffChip) infoChips.push({ text: diffChip });
+                    const la = (r as any).leader_anchor_fit;
+                    if (la) infoChips.push({ text: la });
+                    return { ...(r as any), __display: { ...disp, tagChips, infoChips } } as any;
+                });
+                setRows(hydrated as any);
                 setErr(null);
             } catch (e: any) {
                 setErr(e?.message || "Failed to load CSV");
@@ -189,13 +210,12 @@ export default function TemplatesLibrary() {
                                     <div className="text-[11px] text-gray-400 mb-1">{group.label}</div>
                                     <div className="flex flex-wrap gap-2">
                                         {group.items.map(tag => {
-                                            const style = getTagStyle(tag.group);
                                             const active = tagFilters.includes(String(tag.key).toLowerCase());
                                             return (
                                                 <button
                                                     key={tag.key}
                                                     onClick={() => toggleTag(tag.key)}
-                                                    className={`px-2 py-1 rounded border text-xs ${style.pill} ${style.text} ${style.border} ${active ? 'ring-2 ring-offset-0 ring-indigo-500' : ''}`}
+                                                    className={`px-2 py-1 rounded border text-xs bg-white/5 border-white/10 ${active ? 'ring-2 ring-offset-0 ring-indigo-500' : ''}`}
                                                     title={tag.description || tag.label}
                                                 >
                                                     {tag.label}
@@ -236,6 +256,7 @@ export default function TemplatesLibrary() {
                                     <th className="px-3 py-2 border-b border-gray-800">Conditioning</th>
                                     <th className="px-3 py-2 border-b border-gray-800">Leader/Anchor</th>
                                     <th className="px-3 py-2 border-b border-gray-800">Notes</th>
+                                    <th className="px-3 py-2 border-b border-gray-800">Info</th>
                                     <th className="px-3 py-2 border-b border-gray-800">Tags</th>
                                 </tr>
                             </thead>
@@ -250,23 +271,12 @@ export default function TemplatesLibrary() {
                                         <td className="px-3 py-2 border-b border-gray-900">{(r as any).__display?.assistance || r["Assistance"]}</td>
                                         <td className="px-3 py-2 border-b border-gray-900">{(r as any).__display?.conditioning || r["Conditioning"]}</td>
                                         <td className="px-3 py-2 border-b border-gray-900">{(r as any).__display?.leaderAnchor || r["Leader/Anchor"]}</td>
-                                        <td className="px-3 py-2 border-b border-gray-900">{(r as any).__display?.notes || r["Notes"]}</td>
+                                        <td className="px-3 py-2 border-b border-gray-900">{(r as any).__display?.notes || (r as any).ui_notes || r["Notes"]}</td>
                                         <td className="px-3 py-2 border-b border-gray-900">
-                                            <div className="flex flex-wrap gap-1">
-                                                {String((r as any).__display?.tags || (r as any).__tags || "")
-                                                    .split("|")
-                                                    .map((t) => t.trim())
-                                                    .filter(Boolean)
-                                                    .map((key) => {
-                                                        const meta = getTagMeta(key);
-                                                        const style = getTagStyle(meta.group);
-                                                        return (
-                                                            <span key={key} className={`px-1.5 py-0.5 rounded border text-[10px] ${style.pill} ${style.text} ${style.border}`} title={meta?.description || key}>
-                                                                {meta?.label || key}
-                                                            </span>
-                                                        );
-                                                    })}
-                                            </div>
+                                            <TagChips chips={((r as any).__display?.infoChips || []) as any} />
+                                        </td>
+                                        <td className="px-3 py-2 border-b border-gray-900">
+                                            <TagChips chips={((r as any).__display?.tagChips || []) as any} />
                                         </td>
                                     </tr>
                                 ))}

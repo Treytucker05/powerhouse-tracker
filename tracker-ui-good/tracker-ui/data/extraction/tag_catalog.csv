@@ -1,12 +1,22 @@
-key,group,label,description
-template:football,Template,Football,Templates sourced from 5/3/1 for Football (2011)
-scheme:531,Scheme,5/3/1,Classic 5/3/1 loading
-supplemental:fsl,Supplemental,FSL,First Set Last variants
-supplemental:bbb,Supplemental,BBB,Boring But Big
-assistance:template,Assistance,Balanced Assistance,Balanced assistance categories
-season:off_season,Season,Off-Season,Off-season templates
-season:in_season,Season,In-Season,In-season templates
-population:team,Population,Team,Team-wide plans
-population:skill,Population,Skill,Skill position guidance
-population:linemen,Population,Linemen,Line position guidance
-conditioning:sport_specific,Conditioning,Sport-Specific,Football intervals/tempo
+key,group,label,description,color
+template:football,Template,Football,Templates sourced from 5/3/1 for Football (2011),
+scheme:531,Scheme,5/3/1,Classic 5/3/1 loading,
+supplemental:fsl,Supplemental,FSL,First Set Last variants,
+supplemental:bbb,Supplemental,BBB,Boring But Big,
+assistance:template,Assistance,Balanced Assistance,Balanced assistance categories,
+season:off_season,Season,Off-Season,Off-season templates,
+season:in_season,Season,In-Season,In-season templates,
+population:team,Population,Team,Team-wide plans,
+population:skill,Population,Skill,Skill position guidance,
+population:linemen,Population,Linemen,Line position guidance,
+conditioning:sport_specific,Conditioning,Sport-Specific,Football intervals/tempo,
+goal:balanced,goal,Balanced Development,General balanced programming,
+assistance:movement-families,assistance,Movement Families,"Three movement categories per day (e.g., pull, push, core)",
+phase:anchor,phase,Anchor,,
+phase:leader,phase,Leader,,
+template:forever,template,Forever,,
+scheme:5x5-531,scheme,5x5 531,,
+scheme:spinal-tap,scheme,Spinal Tap,,
+scheme:351,scheme,351,,
+supplemental:ssl,supplemental,Ssl,,
+assistance:circuits,assistance,Circuits,,
