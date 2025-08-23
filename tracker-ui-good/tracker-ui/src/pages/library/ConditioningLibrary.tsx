@@ -15,7 +15,7 @@ export default function ConditioningLibrary() {
     useEffect(() => {
         setLoading(true);
         loadConditioningRows()
-            .then((data) => { setRows((data as Row[]).filter(r => (r.display_name||"").trim())); setErr(null); })
+            .then((data) => { setRows((data as Row[]).filter(r => (r.display_name || "").trim())); setErr(null); })
             .catch((e) => setErr(e?.message || "Failed to load CSV"))
             .finally(() => setLoading(false));
     }, []);

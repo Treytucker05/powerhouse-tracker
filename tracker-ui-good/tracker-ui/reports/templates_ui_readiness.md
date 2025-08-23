@@ -1,6 +1,6 @@
 # Templates UI Readiness Report
 
-Generated: 2025-08-23T07:51:59.076Z
+Generated: 2025-08-23T08:42:15.115Z
 
 | id | display_name | missing_fields | tag_count | session_badge |
 |---|---|---|---:|---|
