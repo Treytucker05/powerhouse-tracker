@@ -1,0 +1,3 @@
+id,name,book,pages,summary,rules_markdown,notes
+TM_STD_90,TM = 90% of Max,5/3/1 (2009/2011),TBD,"Set TM to 90% of true max. Standard +2.5/+5 lb per cycle.","TM = round_to_load(true_max*0.90). Progression: upper +2.5 lb; lower +5 lb per cycle.","TODO: add precise page cites."
+TM_LEADER_ANCHOR,Leader/Anchor TM Progression,5/3/1 Forever (2017),TBD,"Adjust TM differently during Leaders vs Anchors.","Leader: bump TM each cycle; Anchor: may hold TM if pushing PRs/Jokers.","TODO: confirm increments + pages."
