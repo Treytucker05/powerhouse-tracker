@@ -101,7 +101,7 @@ for (let i = 1; i < lines.length; i++) {
   migrated++;
 }
 
-const backup = file.replace(/\.csv$/, `.legacy.${Date.now()}.csv`);
+const backup = file.replace(/\.csv$/, `.legacy.${Date.now()}.bak`);
 fs.writeFileSync(backup, text, "utf8");
 fs.writeFileSync(file, out.join("\n") + "\n", "utf8");
 console.log(`Migration complete. Migrated ${migrated} rows; unchanged ${unchanged}. Backup saved to ${backup}`);
