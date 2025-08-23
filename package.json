@@ -11,6 +11,8 @@
     "test:ci": "npm --prefix tracker-ui-good/tracker-ui run test:ci",
     "prepush": "npm run lint && npm run test:ci",
     "verify:531": "node scripts/verify-531.mjs",
+    "validate:csv": "node scripts/validate-csv.mjs",
+    "validate:templates:ui": "node scripts/validate-templates-ui.mjs",
     "start": "npm run dev"
   }
 }
