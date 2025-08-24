@@ -124,11 +124,14 @@ export default function Step2TemplateGallery({ data, updateData }) {
             const title = (TILES.find(t => t.id === id)?.title || '').toLowerCase();
             row = tplAdditions.find(r => String(r.display_name || '').toLowerCase().includes(title));
         }
+        const split = (v) => String(v || '').split(/[|,;/]/g).map(s => s.trim().toLowerCase()).filter(Boolean);
         if (row) {
-            const split = (v) => String(v || '').split(/[|,;/]/g).map(s => s.trim().toLowerCase()).filter(Boolean);
             const targets = split(row.assistance_targets);
             const equipment = split(row.equipment);
-            updateData && updateData({ assistanceTargets: targets, equipment });
+            updateData && updateData({ assistanceTargets: targets.length ? targets : ["push","pull","single_leg","core"], equipment });
+        } else {
+            // Persist sensible defaults if no additions row available
+            updateData && updateData({ assistanceTargets: ["push","pull","single_leg","core"], equipment: [] });
         }
     };
 

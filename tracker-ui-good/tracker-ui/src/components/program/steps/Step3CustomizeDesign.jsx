@@ -126,8 +126,8 @@ export default function Step3CustomizeDesign({ data, updateData }) {
 
     const targets = (data?.assistanceTargets && Array.isArray(data.assistanceTargets) && data.assistanceTargets.length)
         ? data.assistanceTargets
-        : ["push", "pull", "single", "core"];
-    const equipList = Array.isArray(data?.equipment) ? data.equipment : [];
+        : ["push", "pull", "single_leg", "core"];
+    const equipList = Array.isArray(data?.equipment) ? data.equipment.map(e => (e || '').toLowerCase()) : [];
     const picks = assistRows.length ? matchAssistance({ targets, equipment: equipList }, assistRows) : { byTarget: {} };
 
     const [selectedByTarget, setSelectedByTarget] = useState({});
@@ -212,7 +212,7 @@ export default function Step3CustomizeDesign({ data, updateData }) {
                                         </label>
                                     );
                                 }) : (
-                                    <div className="text-[11px] text-gray-500">No matches for {target}; using fallback list.</div>
+                                    <div className="text-[11px] text-gray-500">No matches for {target}; using fallback.</div>
                                 )}
                             </div>
                         ))}

@@ -9,7 +9,8 @@ export type AssistanceRow = {
     notes?: string;
 };
 
-const truthy = new Set(["1", "true", "yes", "y", "low", "high"]);
+// Treat common truthy inputs (including qualitative difficulty values) as true
+const truthy = new Set(["1", "true", "yes", "y", "low", "medium", "high"]);
 
 function splitEquip(v?: string): string[] {
     if (!v) return [];
@@ -33,17 +34,19 @@ export async function loadAssistanceCsv(): Promise<AssistanceRow[]> {
     for (const r of rows || []) {
         // Filter to plausible data rows: require at least these headers present
         const keys = Object.keys(r || {});
-        if (keys.length < 4) continue;
-        const hasCategory = keys.some(k => /^category$/i.test(k));
-        const hasExercise = keys.some(k => /^exercise$/i.test(k));
-        const hasEquipment = keys.some(k => /^equipment$/i.test(k));
-        if (!hasCategory || !hasExercise || !hasEquipment) continue;
+    if (keys.length < 5) continue;
+    const hasCategory = keys.some(k => /^category$/i.test(k));
+    const hasExercise = keys.some(k => /^exercise$/i.test(k));
+    const hasEquipment = keys.some(k => /^equipment$/i.test(k));
+    const hasDifficulty = keys.some(k => /^difficulty$/i.test(k));
+    const hasBackFlag = keys.some(k => /^(back[_\s-]?stress(flag)?)$/i.test(k));
+    if (!hasCategory || !hasExercise || !hasEquipment || !hasDifficulty || !hasBackFlag) continue;
 
         const categoryRaw = r["category"] ?? r["Category"];
         const exerciseRaw = r["exercise"] ?? r["Exercise"];
         const equipmentRaw = r["equipment"] ?? r["Equipment"];
         const difficultyRaw = r["difficulty"] ?? r["Difficulty"];
-        const backRaw = r["backstressflag"] ?? r["back_stress_flag"] ?? r["BackStressFlag"] ?? r["backstress"];
+    const backRaw = r["backstressflag"] ?? r["back_stress_flag"] ?? r["BackStressFlag"] ?? r["backstress"];
         const notesRaw = r["notes"] ?? r["Notes"];
 
         const category = lower(categoryRaw);
