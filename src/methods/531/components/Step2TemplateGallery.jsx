@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { loadTemplates } from '../../../lib/templates/loadTemplates';
-import { validateTemplate } from '../../../lib/templates/validateTemplate';
+import { validateTemplate } from "../../../lib/templates/validateTemplate";
 
 export default function Step2TemplateGallery({ onSelect, autoNext }) {
     const [loading, setLoading] = useState(true);
@@ -43,6 +43,7 @@ export default function Step2TemplateGallery({ onSelect, autoNext }) {
     const [tmPct, setTmPct] = useState(0.9);
     const [increments, setIncrements] = useState({ upper: 5, lower: 10 });
     const [scheduleDays, setScheduleDays] = useState(4);
+    const wizard = useMemo(() => ({ templateChoice: list.find(t => t.id === selectedId) }), [list, selectedId]);
 
     return (
         <div className="p-4 space-y-3">
@@ -58,13 +59,14 @@ export default function Step2TemplateGallery({ onSelect, autoNext }) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {list.map(t => {
-                    const { ok, warnings } = validateTemplate(t);
+                    const issues = validateTemplate(t);
+                    const ok = issues.length === 0;
                     return (
                         <button
                             key={t.id}
                             onClick={() => { setSelectedId(t.id); onSelect?.(t.id); autoNext?.(); }}
                             className={`text-left p-3 rounded border hover:border-blue-500 hover:bg-blue-500/5 transition ${ok ? 'border-gray-700' : 'border-amber-600'}`}
-                            title={!ok ? 'Validation issues' : warnings.join('\n')}
+                            title={!ok ? issues.map(i => `${i.field}: ${i.message}`).join('\n') : ''}
                         >
                             <div className="flex items-center justify-between">
                                 <div className="font-semibold">{t.display_name}</div>
@@ -88,7 +90,7 @@ export default function Step2TemplateGallery({ onSelect, autoNext }) {
                 })}
             </div>
 
-            {import.meta?.env?.DEV ? (
+                                                {import.meta?.env?.DEV ? (
                 <div className="mt-4 p-3 rounded border border-gray-700 bg-gray-900 text-xs text-gray-300">
                     <div className="font-semibold mb-1">DEV · Step2 Selection</div>
                     <div>selected: {selectedId || '—'}</div>
@@ -97,6 +99,15 @@ export default function Step2TemplateGallery({ onSelect, autoNext }) {
                     <div>scheduleDays: {scheduleDays}</div>
                 </div>
             ) : null}
+
+                        {import.meta?.env?.DEV && wizard?.templateChoice ? (
+    <div style={{marginTop:8,padding:8,border:"1px solid #ccc",borderRadius:8}}>
+        <div style={{fontWeight:600,fontSize:12}}>Template issues</div>
+        <pre style={{fontSize:11,whiteSpace:"pre-wrap"}}>
+{JSON.stringify(validateTemplate(wizard.templateChoice), null, 2)}
+        </pre>
+    </div>
+) : null}
         </div>
     );
 }
