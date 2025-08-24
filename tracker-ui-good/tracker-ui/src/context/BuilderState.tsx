@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 type BuilderState = Record<string, any>;
-const Ctx = createContext<{state:BuilderState; setState:(u:Partial<BuilderState>)=>void} | null>(null);
+const Ctx = createContext<{ state: BuilderState; setState: (u: Partial<BuilderState>) => void } | null>(null);
 export function BuilderStateProvider({ children }: { children: React.ReactNode }) {
     const [state, set] = useState<BuilderState>({});
     const setState = (u: Partial<BuilderState>) => set(prev => ({ ...prev, ...u }));

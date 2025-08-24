@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "npm --prefix tracker-ui-good/tracker-ui run dev",
+    "dev": "cd tracker-ui-good/tracker-ui && npm run dev",
     "build": "npm --prefix tracker-ui-good/tracker-ui run build",
     "lint": "npm --prefix tracker-ui-good/tracker-ui run lint",
     "test": "npm --prefix tracker-ui-good/tracker-ui run test",
@@ -15,7 +15,8 @@
     "extract:build": "ts-node --transpile-only scripts/build-extraction-sheet.ts",
     "extract:build:js": "node scripts/build-extraction-sheet.js",
     "extract:all": "npm run extract:build:js && node scripts/open-extraction.js",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "install-app": "cd tracker-ui-good/tracker-ui && npm ci"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",
