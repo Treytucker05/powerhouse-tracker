@@ -1,0 +1,38 @@
+{
+  "methodology/extraction/templates_master.csv": [
+    "template_name","book","page","main_work","supplemental","assistance","conditioning","leader_anchor","notes","ui_main","ui_supplemental","ui_assistance","ui_conditioning","ui_notes"
+  ],
+  "methodology/extraction/templates_additions.csv": [
+    "id","display_name","category","goal","days_per_week","scheme","supplemental","assistance_mode","assistance_targets","conditioning_mode","time_per_session_min","time_per_week_min","leader_anchor_fit","pr_sets_allowed","jokers_allowed","amrap_style","deload_policy","seventh_week_default","tm_default_pct","tm_prog_upper_lb","tm_prog_lower_lb","equipment","population","seasonality","constraints","experience","book","pages","notes","tags","ui_main","ui_supplemental","ui_assistance","ui_conditioning","ui_notes"
+  ],
+  "methodology/extraction/tm_rules.csv": [
+    "policyid","name","starttmpercent","upperbumppercycle","lowerbumppercycle","fiveforwardthreeback","conservativeoption","notes"
+  ],
+  "methodology/extraction/supplemental.csv": [
+    "template","phase","mainpattern","supplementalscheme","supplementalsetsreps","supplementalpercentschedule","assistancepercategorymin","assistancepercategorymax","hardconditioningmax","easyconditioningmin","jumpsthrowsdefault","tmrecommendation","notes","cyclemin","cyclemax","compatibleanchors"
+  ],
+  "methodology/extraction/warmups.csv": [
+    "type","name","defaultdose","exampleprotocol","notes"
+  ],
+  "methodology/extraction/special_rules.csv": [
+    "rule","appliesto","notes"
+  ],
+  "methodology/extraction/seventh_week.csv": [
+    "protocolid","name","kind","mainsets","percentages","criteria","notes"
+  ],
+  "methodology/extraction/jumps_throws.csv": [
+    "id","display_name","category","goal","conditioning_mode","population","equipment","book","pages","notes","tags","rules_markdown"
+  ],
+  "methodology/extraction/joker_rules.csv": [
+    "ruleid","allowedpattern","allowedweeks","maxjokers","incrementhint","stopcondition","notes"
+  ],
+  "methodology/extraction/conditioning.csv": [
+    "id","display_name","category","goal","conditioning_mode","time_per_session_min","time_per_week_min","population","seasonality","equipment","book","pages","notes","tags","rules_markdown"
+  ],
+  "methodology/extraction/assistance_exercises.csv": [
+    "category","exercise","equipment","difficulty","backstressflag","notes"
+  ],
+  "data/exercise_database.csv": [
+    "exercise","category","equipment","default_sets","default_reps","progression_rule","notes","source"
+  ]
+}
