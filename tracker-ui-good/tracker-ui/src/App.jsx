@@ -72,6 +72,7 @@ import CalendarPage from './pages/calendar/CalendarPage';
 import Step6Calendar from '@/components/program/steps/Step6Calendar';
 import PreviewPage from '@/pages/preview/PreviewPage';
 import { useFinalPlan } from './store/finalPlanStore';
+import TemplateDetail from './pages/TemplateDetail.jsx';
 
 // Loading component
 const LoadingSpinner = () => (
@@ -124,6 +125,7 @@ function App() {
                         <Route path="step4" element={<LockGuard><Step4Preview /></LockGuard>} />
                         <Route path="step5" element={<LockGuard><Step5Progression /></LockGuard>} />
                         <Route path="step6" element={<Step6Calendar />} />
+                        <Route path="templates/:id" element={<TemplateDetail />} />
                         <Route path="*" element={<Navigate to="/build/step1" replace />} />
                       </Routes>
                     </BuilderStateProvider>

@@ -172,6 +172,13 @@ export default function Step3CustomizeDesign({ data, updateData }) {
 
     return (
         <div className="space-y-6 step3-viz">
+            {/* Soft guards based on Step 2 constraints */}
+            {data?.jokersEnabled === false && (
+                <div className="p-2 text-xs border border-yellow-700 bg-yellow-900/20 text-yellow-200 rounded">Template disallows Jokers</div>
+            )}
+            {data?.prEnabled === false && (
+                <div className="p-2 text-xs border border-yellow-700 bg-yellow-900/20 text-yellow-200 rounded">No PR sets on selected template</div>
+            )}
             {!!assistErr && (
                 <div className="mb-3 p-2 text-xs border border-yellow-600 bg-yellow-900/20 text-yellow-200 rounded">{assistErr}</div>
             )}
