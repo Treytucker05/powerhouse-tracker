@@ -31,6 +31,12 @@ export default function Step2TemplateGallery({ data, updateData }) {
         });
     }, []);
 
+    // Load additions (ids, assistance_targets, equipment) for persistence on selection
+    const [tplAdditions, setTplAdditions] = useState([]);
+    useEffect(() => {
+        loadCsv(`${import.meta.env.BASE_URL}methodology/extraction/templates_additions.csv`).then(setTplAdditions).catch(() => setTplAdditions([]));
+    }, []);
+
     // Helper to find row by name
     const byName = useMemo(() => {
         const map = {};
@@ -105,7 +111,26 @@ export default function Step2TemplateGallery({ data, updateData }) {
         return { counts, warnings };
     }, [assistance.perDay, byName, exLoaded, st.template]);
 
-    const choose = (id) => set({ template: id });
+    const choose = (id) => {
+        // Persist template id
+        set({ template: id });
+        // Try to persist assistance targets + equipment if available
+        const normId = String(id || '').toLowerCase();
+        const idMap = { bbb: 'bbb', triumvirate: 'triumvirate', periodization_bible: 'periodization_bible', bodyweight: 'bodyweight', jack_shit: 'jack_shit' };
+        const mapped = idMap[normId] || normId;
+        let row = tplAdditions.find(r => String(r.id || '').toLowerCase() === mapped);
+        if (!row) {
+            // Fallback by display name contains
+            const title = (TILES.find(t => t.id === id)?.title || '').toLowerCase();
+            row = tplAdditions.find(r => String(r.display_name || '').toLowerCase().includes(title));
+        }
+        if (row) {
+            const split = (v) => String(v || '').split(/[|,;/]/g).map(s => s.trim().toLowerCase()).filter(Boolean);
+            const targets = split(row.assistance_targets);
+            const equipment = split(row.equipment);
+            updateData && updateData({ assistanceTargets: targets, equipment });
+        }
+    };
 
     return (
         <div className="space-y-6">

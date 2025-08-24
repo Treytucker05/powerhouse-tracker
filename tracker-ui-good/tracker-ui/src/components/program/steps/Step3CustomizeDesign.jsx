@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { loadCsv } from '@/lib/loadCsv';
+import { loadAssistanceCsv } from '@/lib/assistance/loadAssistance';
+import { matchAssistance } from '@/lib/assistance/match';
+import { setAssistancePerDay } from '@/state/assistance';
 import { pillClass } from './_shared/pillStyles.js';
 import { CheckCircle, Lock, Unlock } from 'lucide-react';
 
@@ -107,10 +110,33 @@ export default function Step3CustomizeDesign({ data, updateData }) {
     }
     const [local, setLocal] = useState(design);
     // Assistance catalog from CSV (debug wire-up)
-    const [assistance, setAssistance] = useState([]);
+    const [assistRows, setAssistRows] = useState([]);
+    const [assistErr, setAssistErr] = useState('');
     useEffect(() => {
-        loadCsv(`${import.meta.env.BASE_URL}methodology/extraction/assistance_exercises.csv`).then(setAssistance);
+        (async () => {
+            try {
+                const rows = await loadAssistanceCsv();
+                setAssistRows(rows);
+            } catch (e) {
+                setAssistErr('Assistance catalog not found; open builder to add manually.');
+                setAssistRows([]);
+            }
+        })();
     }, []);
+
+    const targets = (data?.assistanceTargets && Array.isArray(data.assistanceTargets) && data.assistanceTargets.length)
+        ? data.assistanceTargets
+        : ["push", "pull", "single", "core"];
+    const equipList = Array.isArray(data?.equipment) ? data.equipment : [];
+    const picks = assistRows.length ? matchAssistance({ targets, equipment: equipList }, assistRows) : { byTarget: {} };
+
+    const [selectedByTarget, setSelectedByTarget] = useState({});
+    useEffect(() => {
+        // Initialize selections to all picks
+        const init = {};
+        Object.entries(picks.byTarget || {}).forEach(([k, arr]) => { init[k] = new Set(arr); });
+        setSelectedByTarget(init);
+    }, [assistRows.length]);
 
     // Persist outward on change (immediate for now)
     useEffect(() => { updateData({ design: local }); }, [local]);
@@ -146,18 +172,87 @@ export default function Step3CustomizeDesign({ data, updateData }) {
 
     return (
         <div className="space-y-6 step3-viz">
-            {assistance.length > 0 && (
+            {!!assistErr && (
+                <div className="mb-3 p-2 text-xs border border-yellow-600 bg-yellow-900/20 text-yellow-200 rounded">{assistErr}</div>
+            )}
+            {assistRows.length > 0 && (
                 <div className="mb-4 p-3 bg-neutral-900 rounded">
                     <h3 className="font-bold text-white mb-2">Loaded Assistance (CSV)</h3>
                     <ul className="list-disc list-inside text-gray-300">
-                        {assistance.map((a, i) => (
+                        {assistRows.map((a, i) => (
                             <li key={i}>
-                                {a["Exercise"]} — {a["Category"]}
+                                {a.exercise} — {a.category}
                             </li>
                         ))}
                     </ul>
                 </div>
             )}
+
+            {/* Assistance suggestions per target */}
+            {Object.keys(picks.byTarget || {}).length ? (
+                <div className="bg-emerald-900/10 border border-emerald-700 rounded p-3">
+                    <div className="text-white font-medium mb-2">Assistance Suggestions</div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                        {Object.entries(picks.byTarget).map(([target, list]) => (
+                            <div key={target} className="border border-gray-700 rounded p-2">
+                                <div className="text-xs text-gray-300 font-semibold mb-1">{target}</div>
+                                {list.length ? list.map(name => {
+                                    const active = selectedByTarget[target]?.has(name);
+                                    return (
+                                        <label key={name} className="flex items-center gap-2 text-xs text-gray-300">
+                                            <input type="checkbox" checked={!!active} onChange={(e) => {
+                                                setSelectedByTarget(prev => {
+                                                    const next = { ...prev };
+                                                    const set = new Set(next[target] || []);
+                                                    if (e.target.checked) set.add(name); else set.delete(name);
+                                                    next[target] = set; return next;
+                                                });
+                                            }} />
+                                            {name}
+                                        </label>
+                                    );
+                                }) : (
+                                    <div className="text-[11px] text-gray-500">No matches for {target}; using fallback list.</div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                    <div className="mt-3">
+                        <button
+                            className="px-3 py-1.5 rounded border border-emerald-600 text-emerald-200 hover:bg-emerald-900/20 text-xs"
+                            onClick={() => {
+                                // Build perDay by distributing selected items evenly across schedule days
+                                const freq = Number((data?.schedule?.frequency) || (data?.days_per_week) || 4) || 4;
+                                const days = Array.from({ length: freq }, (_, i) => ({ day: i + 1, items: [] }));
+                                const targetsArr = Object.keys(picks.byTarget);
+                                let di = 0;
+                                targetsArr.forEach(tg => {
+                                    const items = Array.from(selectedByTarget[tg] || []);
+                                    items.forEach(name => {
+                                        days[di % days.length].items.push({ name, category: tg });
+                                        di++;
+                                    });
+                                });
+                                const perDay = days;
+                                if (typeof data?.assistance === 'object') {
+                                    // merge into existing assistance shape if present
+                                    updateData({ assistance: { ...(data.assistance || {}), perDay } });
+                                } else {
+                                    // store under assistance slice
+                                    updateData(setAssistancePerDay(data, perDay));
+                                }
+                            }}
+                        >Apply to week</button>
+                    </div>
+                    {import.meta?.env?.DEV && (
+                        <div className="mt-2 text-[11px] text-gray-400">
+                            <div>DEV: targets={JSON.stringify(targets)} equipment={JSON.stringify(equipList)}</div>
+                            <div>counts: {JSON.stringify(Object.fromEntries(Object.entries(picks.byTarget).map(([k, v]) => [k, (v || []).length])))}</div>
+                            <div>perDay length (after apply): {(data?.assistance?.perDay || []).length}</div>
+                        </div>
+                    )}
+                </div>
+            ) : null}
             {/* Scoped visual styles for Step 3 enhancements */}
             <style>{`
                 .step3-viz * { transition: all 0.2s ease; }
