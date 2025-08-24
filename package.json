@@ -16,7 +16,8 @@
     "extract:build:js": "node scripts/build-extraction-sheet.js",
     "extract:all": "npm run extract:build:js && node scripts/open-extraction.js",
     "format": "prettier --write .",
-    "install-app": "cd tracker-ui-good/tracker-ui && npm ci"
+    "install-app": "cd tracker-ui-good/tracker-ui && npm ci",
+    "validate:csv": "node scripts/validate_csv_schema.js --schemas=schemas.json"
   },
   "devDependencies": {
     "@types/node": "^24.3.0",
