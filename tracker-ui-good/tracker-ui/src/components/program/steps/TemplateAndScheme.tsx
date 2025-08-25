@@ -190,6 +190,44 @@ export default function TemplateAndScheme() {
     const detailsRef = React.useRef<HTMLDivElement | null>(null);
     const prevExpanded = React.useRef<string | null>(null);
 
+    // Enrichment state (badges + tags)
+    type Enriched = { id: string; display_name?: string; tags?: string[]; badges?: { time_band?: string; difficulty?: string; focus?: string } | null; blurb?: string };
+    const [enriched, setEnriched] = useState<Enriched[] | null>(null);
+    const [enrichedMap, setEnrichedMap] = useState<Record<string, Enriched>>({});
+    const [infoFilter, setInfoFilter] = useState<'all' | 'detailed' | 'needs_research'>('all');
+    const [sortKey, setSortKey] = useState<'none' | 'difficulty' | 'time_band'>('none');
+
+    // Utility: slugify to underscore id
+    const slugUnderscore = (s: string) => s.toLowerCase().trim().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+
+    // Load enrichment (non-blocking)
+    useEffect(() => {
+        let alive = true;
+        (async () => {
+            try {
+                const res = await fetch(`${import.meta.env.BASE_URL}templates/enriched.json`, { cache: 'no-store' });
+                if (!res.ok) throw new Error(String(res.status));
+                const data = (await res.json()) as Enriched[];
+                if (!alive) return;
+                setEnriched(data);
+                const map: Record<string, Enriched> = {};
+                (data || []).forEach((d) => {
+                    if (!d) return;
+                    const idKey = String((d as any).id || '').trim();
+                    if (idKey) map[idKey] = d;
+                    const disp = String((d as any).display_name || '').trim();
+                    if (disp) map[slugUnderscore(disp)] = d;
+                });
+                setEnrichedMap(map);
+            } catch (e) {
+                // Non-blocking on failure
+                if (import.meta.env.DEV) console.warn('enriched.json load failed', e);
+                if (alive) { setEnriched([]); setEnrichedMap({}); }
+            }
+        })();
+        return () => { alive = false; };
+    }, []);
+
     // Map CSV template names to internal IDs
     const nameToId = (name: string) => {
         const s = name.trim().toLowerCase();
@@ -413,7 +451,8 @@ export default function TemplateAndScheme() {
 
     // Filter templates based on search and filter criteria
     const filteredTemplates = React.useMemo(() => {
-        return availableTemplates.filter(template => {
+        // First stage: apply existing text/meta filters
+        let list = availableTemplates.filter(template => {
             const meta = (TEMPLATE_META as any)[template.id];
 
             // Search query filter (matches title or description)
@@ -436,8 +475,33 @@ export default function TemplateAndScheme() {
 
             return true;
         });
-    }, [searchQuery, difficultyFilter, focusFilter, availableTemplates]);
 
+        // Second stage: info filter using enrichment
+        if (infoFilter !== 'all') {
+            list = list.filter(t => {
+                const detail = enrichedMap[t.id] || null;
+                const mergedTags = ([] as string[])
+                    .concat((t as any).tags || [])
+                    .concat(detail?.tags || [])
+                    .filter(Boolean);
+                const hasDetail = !!detail;
+                const needsResearch = mergedTags.length === 0 || detail?.blurb === 'NEEDS_RESEARCH';
+                if (infoFilter === 'detailed') return hasDetail && !needsResearch;
+                return needsResearch; // needs_research
+            });
+        }
+
+        // Sorting by enrichment badges
+        if (sortKey !== 'none') {
+            const key = sortKey;
+            list = [...list].sort((a, b) => {
+                const ad = enrichedMap[a.id]?.badges?.[key] || '';
+                const bd = enrichedMap[b.id]?.badges?.[key] || '';
+                return String(ad).localeCompare(String(bd));
+            });
+        }
+        return list;
+    }, [searchQuery, difficultyFilter, focusFilter, availableTemplates, infoFilter, sortKey, enrichedMap]);
     // Get unique filter options
     const difficulties = React.useMemo(() => {
         const allDifficulties = availableTemplates
@@ -558,6 +622,33 @@ export default function TemplateAndScheme() {
                                         </button>
                                     </div>
                                 )}
+                                {/* Info Filter */}
+                                <div className="flex items-end gap-2">
+                                    <div className="min-w-[200px]">
+                                        <label className="block text-xs text-gray-400 mb-1">Info</label>
+                                        <div className="flex gap-2">
+                                            {(['all','detailed','needs_research'] as const).map(mode => (
+                                                <button
+                                                    key={mode}
+                                                    onClick={() => setInfoFilter(mode)}
+                                                    className={`px-2 py-1 text-xs rounded border ${infoFilter===mode? 'border-red-500 text-red-300' : 'border-gray-600 text-gray-300 hover:border-gray-500'}`}
+                                                >{mode==='all'?'All':'Detailed'}{mode==='needs_research'?' (Needs Research)':''}</button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="min-w-[180px]">
+                                        <label className="block text-xs text-gray-400 mb-1">Sort</label>
+                                        <select
+                                            value={sortKey}
+                                            onChange={(e)=> setSortKey(e.target.value as any)}
+                                            className="w-full px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                        >
+                                            <option value="none">Default</option>
+                                            <option value="difficulty">Difficulty</option>
+                                            <option value="time_band">Time Band</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Results Summary */}
@@ -579,6 +670,12 @@ export default function TemplateAndScheme() {
                                 const isExpanded = expanded === t.id;
                                 const isInComparison = compareTemplates.includes(t.id);
                                 const meta = (TEMPLATE_META as any)[t.id];
+                                const detail = enrichedMap[t.id];
+                                const tags = ([] as string[])
+                                    .concat((t as any).tags || [])
+                                    .concat(detail?.tags || [])
+                                    .filter(Boolean)
+                                    .slice(0, 8);
 
                                 let borderClass = 'border-gray-700 hover:border-gray-500 bg-gray-800/50';
                                 if (compareMode) {
@@ -630,6 +727,7 @@ export default function TemplateAndScheme() {
                                                 })()}
                                             </div>
                                             <p className="text-xs text-gray-300 leading-snug mb-2">{t.desc}</p>
+                                            {/* Built-in meta badges */}
                                             {meta && (
                                                 <div className="space-y-1">
                                                     <div className="flex flex-wrap gap-1">
@@ -642,6 +740,31 @@ export default function TemplateAndScheme() {
                                                     <div className="text-[10px] text-gray-500 leading-snug line-clamp-2">Best: {meta.suitability}</div>
                                                 </div>
                                             )}
+                                            {/* Enriched badges */}
+                                            {detail && (
+                                                <div className="mt-2 flex flex-wrap gap-1">
+                                                    {detail.badges?.time_band && (
+                                                        <span className="px-2 py-0.5 rounded-full bg-gray-800 border border-gray-700 text-[10px]">⏱ {detail.badges.time_band}</span>
+                                                    )}
+                                                    {detail.badges?.difficulty && (
+                                                        <span className="px-2 py-0.5 rounded-full bg-gray-800 border border-gray-700 text-[10px]">⚙️ {detail.badges.difficulty}</span>
+                                                    )}
+                                                    {detail.badges?.focus && (
+                                                        <span className="px-2 py-0.5 rounded-full bg-gray-800 border border-gray-700 text-[10px]">🎯 {detail.badges.focus}</span>
+                                                    )}
+                                                </div>
+                                            )}
+                                            {/* Tags / Needs Research */}
+        
+                                            <div className="mt-2 flex flex-wrap gap-1">
+                                                {tags.length > 0 ? (
+                                                    tags.map((tg) => (
+                                                        <span key={tg} className="px-2 py-0.5 rounded bg-gray-900 border border-gray-700 text-[10px] text-gray-300">{tg}</span>
+                                                    ))
+                                                ) : (
+                                                    <span className="px-2 py-0.5 rounded bg-gray-800 border border-gray-700 text-[10px] text-gray-400">Needs Research</span>
+                                                )}
+                                            </div>
                                         </div>
                                     </button>
                                 );
