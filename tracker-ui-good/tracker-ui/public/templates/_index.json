@@ -1,0 +1,981 @@
+[
+  {
+    "id": "5_s_pro_5x5_fsl",
+    "display_name": "5's PRO + 5x5 FSL",
+    "tags": [
+      "fsl",
+      "volume_mod",
+      "leader",
+      "anchor"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "five_and_dime_leader",
+    "display_name": "Five and Dime (Leader)",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "leviathan",
+    "display_name": "Leviathan",
+    "tags": [
+      "fsl",
+      "volume_mod",
+      "leader",
+      "anchor",
+      "leviathan"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "boring_but_big",
+    "display_name": "Boring But Big",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "triumvirate",
+    "display_name": "Triumvirate",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader",
+      "triumvirate"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "periodization_bible",
+    "display_name": "Periodization Bible",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader",
+      "periodization_bible"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "bodyweight",
+    "display_name": "Bodyweight",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "jackshit",
+    "display_name": "Jack Sh*t",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader",
+      "jackshit"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "hardgainers_leaders",
+    "display_name": "Hardgainers (Leaders)",
+    "tags": [
+      "5s_pro",
+      "no_pr",
+      "fsl",
+      "volume_mod",
+      "leader",
+      "hardgainers"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "Strength"
+    }
+  },
+  {
+    "id": "hardgainers_anchor",
+    "display_name": "Hardgainers (Anchor)",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "anchor",
+      "hardgainers"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "7th_week_protocol",
+    "display_name": "7th Week Protocol",
+    "tags": [],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "full_body_full_boring",
+    "display_name": "Full Body, Full Boring",
+    "tags": [
+      "fsl",
+      "volume_mod",
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "boring_but_strong",
+    "display_name": "Boring But Strong",
+    "tags": [
+      "leader",
+      "boring_but_strong"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "beach_body_challenge",
+    "display_name": "Beach Body Challenge",
+    "tags": [
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "krypteia",
+    "display_name": "Krypteia",
+    "tags": [
+      "leader",
+      "krypteia"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "leaders_3_month",
+    "display_name": "Leaders (3-month)",
+    "tags": [
+      "5s_pro",
+      "no_pr",
+      "ssl",
+      "strength",
+      "fsl",
+      "volume_mod",
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "Strength"
+    }
+  },
+  {
+    "id": "anchor_1_month",
+    "display_name": "Anchor (1-month)",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "fsl",
+      "volume_mod",
+      "anchor"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "5_s_pro_ssl",
+    "display_name": "5's PRO + SSL",
+    "tags": [
+      "ssl",
+      "strength",
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "Strength"
+    }
+  },
+  {
+    "id": "svr_ii",
+    "display_name": "SVR II",
+    "tags": [
+      "leader",
+      "svr"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "first_set_last_fsl",
+    "display_name": "First Set Last (FSL)",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "fsl",
+      "volume_mod",
+      "leader",
+      "anchor"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "second_set_last_ssl",
+    "display_name": "Second Set Last (SSL)",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "ssl",
+      "strength",
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "Strength"
+    }
+  },
+  {
+    "id": "full_body_template",
+    "display_name": "Full Body Template",
+    "tags": [
+      "fsl",
+      "volume_mod",
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "bbs_13_week_challenge",
+    "display_name": "BBS 13-week Challenge",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "fsl",
+      "volume_mod",
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "god_is_a_beast",
+    "display_name": "God is a Beast",
+    "tags": [
+      "leader",
+      "anchor"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "leviathan_anchor",
+    "display_name": "Leviathan (Anchor)",
+    "tags": [
+      "fsl",
+      "volume_mod",
+      "anchor",
+      "leviathan"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "spinal-tap-1",
+    "display_name": "Spinal Tap (All weeks in one day)",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "jokers",
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "Advanced",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "spinal-tap-2",
+    "display_name": "Spinal Tap (Triples Only)",
+    "tags": [
+      "jokers",
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "spinal-tap-anchor-black-army",
+    "display_name": "Spinal Tap — Anchor (Black Army Jacket)",
+    "tags": [
+      "anchor"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "anchor-5x5-3-1-guidelines",
+    "display_name": "Anchor — 5×5/3/1 Guidelines",
+    "tags": [
+      "anchor"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "strength-circuits",
+    "display_name": "5/3/1 Strength Circuits",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader",
+      "anchor"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "full-body-leader-anchor",
+    "display_name": "Full Body (Leader/Anchor",
+    "tags": [
+      "jokers",
+      "leader",
+      "anchor"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "full-body-v2",
+    "display_name": "Full Body (v2)",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader",
+      "anchor"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "full-boring",
+    "display_name": "Full Body — Full Boring (high DL freq)",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "full-body-pc",
+    "display_name": "Full Body + Power Clean",
+    "tags": [
+      "leader",
+      "anchor"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "full-body",
+    "display_name": "Full Body (3‑day)",
+    "tags": [
+      "leader",
+      "anchor"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "bbb-standard-6wk",
+    "display_name": "Boring But Big — 6‑Week",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "bbb-variation-1",
+    "display_name": "Boring But Big — Variation I",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "bbb-variation-2",
+    "display_name": "Boring But Big — Variation II (10/8/5)",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "bbb-6wk",
+    "display_name": "Boring But Big (6‑Week Challenge)",
+    "tags": [
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "bbb-base",
+    "display_name": "Boring But Big (Base)",
+    "tags": [
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "bbb-var1",
+    "display_name": "Boring But Big (Variation I)",
+    "tags": [
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "bbb-var2",
+    "display_name": "Boring But Big (Variation II)",
+    "tags": [
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "bbb-13wk",
+    "display_name": "Boring But Big — 13‑Week Challenge",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "bbb-5x5",
+    "display_name": "Boring But Big — 5x5 @ 80%",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "bbb-5x3",
+    "display_name": "Boring But Big — 5x3 @ 90%",
+    "tags": [
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "six-week-cycle-scaffold",
+    "display_name": "6‑Week Cycle Scaffold",
+    "tags": [],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "bbb-5x1",
+    "display_name": "Boring But Big (5x1 @ TM)",
+    "tags": [
+      "anchor"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "six-week-cycle",
+    "display_name": "6‑Week Cycle (2 cycles no deload)",
+    "tags": [],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "deload-menu",
+    "display_name": "Deload Menu (5 styles)",
+    "tags": [],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "assistance-vol",
+    "display_name": "Assistance Volume Guidelines",
+    "tags": [],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "god-is-a-beast-leader",
+    "display_name": "God Is A Beast (Leader)",
+    "tags": [
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "beyond-base",
+    "display_name": "Beyond 5/3/1 (Training Maximally)",
+    "tags": [
+      "leader",
+      "anchor"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "jokers-fsl",
+    "display_name": "Jokers + First Set Last (kit)",
+    "tags": [
+      "anchor"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "svr",
+    "display_name": "SVR (3/5/1 + singles)",
+    "tags": [
+      "anchor",
+      "svr"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "strength-challenge",
+    "display_name": "Strength Challenge (Beyond)",
+    "tags": [
+      "531_pr",
+      "pr_sets"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "rule-of-10",
+    "display_name": "Rule of 10 (per week)",
+    "tags": [
+      "leader",
+      "anchor"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "bbs",
+    "display_name": "Boring But Strong (BBS 10×5)",
+    "tags": [
+      "boring_but_strong"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "fives-pro-forever",
+    "display_name": "5’s PRO Forever",
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "leviathan-system",
+    "display_name": "Leviathan",
+    "tags": [
+      "leviathan"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "spinal-tap-5spro-leader",
+    "display_name": "Spinal Tap — 5’s PRO (Leader)",
+    "tags": [
+      "leader"
+    ],
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "football_winter_8wk_weightroom",
+    "display_name": "Winter Strength & Conditioning — 8 Week Cycle (Weight Room)",
+    "tags": [
+      "frequency:3d",
+      "scheme:531",
+      "assistance:template",
+      "season:off_season",
+      "population:team"
+    ],
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "football_winter_8wk_skill_field",
+    "display_name": "Jumps/Throws/Speed — First 8 Weeks (Skill)",
+    "tags": [
+      "frequency:3d",
+      "conditioning:jumps_throws",
+      "season:off_season",
+      "population:skill"
+    ],
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "football_winter_8wk_linemen_field",
+    "display_name": "Jumps/Throws/Speed — First 8 Weeks (Linemen)",
+    "tags": [
+      "frequency:3d",
+      "conditioning:jumps_throws",
+      "season:off_season",
+      "population:linemen"
+    ],
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "football_summer9_skill_field",
+    "display_name": "Going Into the Summer — 9 Weeks (Skill) [Field]",
+    "tags": [
+      "frequency:3d",
+      "conditioning:jumps_throws",
+      "season:off_season",
+      "population:skill"
+    ],
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "football_summer9_linemen_field",
+    "display_name": "Going Into the Summer — 9 Weeks (Linemen) [Field]",
+    "tags": [
+      "frequency:3d",
+      "conditioning:jumps_throws",
+      "season:off_season",
+      "population:linemen"
+    ],
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "football_summer9_weightroom",
+    "display_name": "Going Into the Summer — 9 Week Training Cycle (Weight Room)",
+    "tags": [
+      "frequency:3d",
+      "scheme:531",
+      "assistance:template",
+      "season:off_season",
+      "population:team"
+    ],
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "football_precamp6_skill_field",
+    "display_name": "Summer Pre-Camp — 6 Weeks (Skill) [Field]",
+    "tags": [
+      "frequency:3d",
+      "conditioning:jumps_throws",
+      "season:off_season",
+      "population:skill"
+    ],
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "football_precamp6_linemen_field",
+    "display_name": "Summer Pre-Camp — 6 Weeks (Linemen) [Field]",
+    "tags": [
+      "frequency:3d",
+      "conditioning:jumps_throws",
+      "season:off_season",
+      "population:linemen"
+    ],
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "football_precamp6_weightroom",
+    "display_name": "Summer Pre-Camp — 6 Week Training Cycle (Weight Room)",
+    "tags": [
+      "frequency:3d",
+      "scheme:531",
+      "assistance:template",
+      "season:off_season",
+      "population:team"
+    ],
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "football_inseason_2day_weightroom",
+    "display_name": "In‑Season Training — 2‑Day (Weight Room)",
+    "tags": [
+      "frequency:2d",
+      "scheme:531",
+      "assistance:template",
+      "conditioning:sport_specific",
+      "season:in_season",
+      "constraints:time_crunched",
+      "population:team"
+    ],
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    }
+  },
+  {
+    "id": "football_inseason_conditioning",
+    "display_name": "In‑Season Conditioning — Weekly Schedule",
+    "tags": [
+      "frequency:5d",
+      "conditioning:sport_specific",
+      "season:in_season",
+      "population:team"
+    ],
+    "badges": {
+      "time_band": "25–35m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    }
+  }
+]

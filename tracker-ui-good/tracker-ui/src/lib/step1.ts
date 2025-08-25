@@ -1,8 +1,5 @@
-export type LiftId = 'squat' | 'bench' | 'deadlift' | 'press';
-export type Step1State = { tmPct?: number; units?: 'lb' | 'kg'; rounding?: number; lifts?: Record<LiftId, number>; };
-export const step1_fundamentals = (s: Step1State = {}) => {
-    const tmPct = s.tmPct ?? 0.9;
-    const rounding = s.rounding ?? 5;
-    const lifts = s.lifts ?? { squat: 0, bench: 0, deadlift: 0, press: 0 };
-    return { tmPct, rounding, lifts };
-};
+// Bridge module: re-export the full Step 1 implementation.
+// This ensures imports from '@/lib/step1' get the real tmTable calculators.
+
+export * from './step1/index';
+export * from './step1/types';

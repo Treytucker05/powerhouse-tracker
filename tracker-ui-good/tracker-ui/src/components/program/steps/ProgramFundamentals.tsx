@@ -127,9 +127,12 @@ const defaultStep1State: LocalStep1 = {
 interface Props {
     goToStep?: (n: number) => void;
     saveProgramDraft?: (data: any) => void; // TODO strong type when draft shape available
+    // When embedded inside ProgramWizard531, these are provided. Keep optional for standalone usage/tests.
+    data?: any;
+    updateData?: (updates: any) => void;
 }
 
-export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Props) {
+export default function ProgramFundamentals({ goToStep, saveProgramDraft, data, updateData }: Props) {
     // Some legacy tests mount without a Router; detect and fallback
     let navigate: ReturnType<typeof useNavigate> | null = null;
     try {
@@ -139,12 +142,14 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
     } catch (e) {
         navigate = null;
     }
-    const { step1, setStep1 } = useBuilder();
+    const { state: builderState, setState: setBuilderState } = useBuilder();
+    const step1 = (builderState as any)?.step1 || {};
+    const setStep1 = (u: any) => setBuilderState({ step1: { ...((builderState as any)?.step1 || {}), ...u } });
     // Adapt builder's Step1 meta shape to this component's richer state shape; keep internal but sync outward.
     const [state, setState] = React.useState<LocalStep1>(() => {
         // Derive initial lift method/values from builder meta (if any) so data persists without waiting on Supabase hydration.
         const deriveLift = (key: string) => {
-            const input = (step1?.inputs || {})[key] || {} as any;
+            const input = ((step1 && (step1 as any).inputs) ? (step1 as any).inputs : {})[key] || {} as any;
             if (input.manualTm && input.manualTm > 0) {
                 return { method: 'manual', manualTM: input.manualTm } as any;
             }
@@ -162,9 +167,9 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
         const normalizeStrategy = (s: any): 'nearest' | 'down' | 'up' => (s === 'down' || s === 'up') ? s : 'nearest';
         return {
             ...defaultStep1State,
-            units: normalizeUnits(step1?.units),
-            tmPct: normalizePct(step1?.tmPct),
-            rounding: { strategy: normalizeStrategy((step1 as any)?.rounding?.strategy), increment: (typeof (step1?.rounding) === 'number' ? (step1?.rounding as any) : (step1 as any)?.rounding?.increment) || 5 },
+            units: normalizeUnits(step1 ? (step1 as any).units : undefined),
+            tmPct: normalizePct(step1 ? (step1 as any).tmPct : undefined),
+            rounding: { strategy: normalizeStrategy(step1 ? (step1 as any)?.rounding?.strategy : undefined), increment: (typeof (step1 ? (step1 as any).rounding : undefined) === 'number' ? ((step1 as any)?.rounding as any) : (step1 as any)?.rounding?.increment) || 5 },
             lifts: {
                 squat: deriveLift('squat'),
                 bench: deriveLift('bench'),
@@ -172,10 +177,10 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                 press: deriveLift('press'),
             },
             variants: {
-                squat: step1?.variants?.squat || 'back_squat',
-                bench: step1?.variants?.bench || 'bench_press',
-                deadlift: step1?.variants?.deadlift || 'conventional_deadlift',
-                press: step1?.variants?.press || 'overhead_press'
+                squat: (step1 as any)?.variants?.squat || 'back_squat',
+                bench: (step1 as any)?.variants?.bench || 'bench_press',
+                deadlift: (step1 as any)?.variants?.deadlift || 'conventional_deadlift',
+                press: (step1 as any)?.variants?.press || 'overhead_press'
             },
             deadliftRepStyle: (step1 as any)?.deadliftRepStyle || 'touch_and_go'
         } as LocalStep1;
@@ -185,41 +190,40 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
 
     // If builder meta later gains values (e.g., restored from localStorage) while internal lifts are still empty, sync once.
     React.useEffect(() => {
-        setState(prev => {
-            const allEmpty = Object.values(prev.lifts).every((l: any) => (l.oneRM ?? l.weight ?? l.manualTM ?? 0) === 0);
-            if (!allEmpty) return prev;
-            const hasAny = Object.values(step1.inputs || {}).some((i: any) => (i?.oneRm || i?.manualTm || (i?.repCalcWeight && i?.repCalcReps)));
-            if (!hasAny) return prev;
-            const deriveLift = (key: string) => {
-                const input = (step1?.inputs || {})[key] || {} as any;
-                if (input.manualTm && input.manualTm > 0) return { method: 'manual', manualTM: input.manualTm } as any;
-                if (input.repCalcWeight && input.repCalcReps) return { method: 'reps', weight: input.repCalcWeight, reps: input.repCalcReps } as any;
-                if (input.oneRm && input.oneRm > 0) return { method: 'tested', oneRM: input.oneRm } as any;
-                return { method: 'tested', oneRM: 0 } as any;
-            };
-            return {
-                ...prev,
-                lifts: {
-                    squat: deriveLift('squat'),
-                    bench: deriveLift('bench'),
-                    deadlift: deriveLift('deadlift'),
-                    press: deriveLift('press'),
-                },
-                variants: {
-                    squat: step1?.variants?.squat || prev.variants?.squat || 'back_squat',
-                    bench: step1?.variants?.bench || prev.variants?.bench || 'bench_press',
-                    deadlift: step1?.variants?.deadlift || prev.variants?.deadlift || 'conventional_deadlift',
-                    press: step1?.variants?.press || prev.variants?.press || 'overhead_press'
-                },
-                deadliftRepStyle: (step1 as any)?.deadliftRepStyle || prev.deadliftRepStyle || 'touch_and_go'
-            };
-        });
+        const allEmpty = Object.values(state.lifts).every((l: any) => (l.oneRM ?? l.weight ?? l.manualTM ?? 0) === 0);
+        const hasAny = Object.values(((step1 as any)?.inputs || {})).some((i: any) => (i?.oneRm || i?.manualTm || (i?.repCalcWeight && i?.repCalcReps)));
+        if (!allEmpty || !hasAny) return;
+        const deriveLift = (key: string) => {
+            const input = (((step1 as any)?.inputs || {}) as any)[key] || {} as any;
+            if (input.manualTm && input.manualTm > 0) return { method: 'manual', manualTM: input.manualTm } as any;
+            if (input.repCalcWeight && input.repCalcReps) return { method: 'reps', weight: input.repCalcWeight, reps: input.repCalcReps } as any;
+            if (input.oneRm && input.oneRm > 0) return { method: 'tested', oneRM: input.oneRm } as any;
+            return { method: 'tested', oneRM: 0 } as any;
+        };
+        setState(prev => ({
+            ...prev,
+            lifts: {
+                squat: deriveLift('squat'),
+                bench: deriveLift('bench'),
+                deadlift: deriveLift('deadlift'),
+                press: deriveLift('press'),
+            },
+            variants: {
+                squat: (step1 as any)?.variants?.squat || (prev as any).variants?.squat || 'back_squat',
+                bench: (step1 as any)?.variants?.bench || (prev as any).variants?.bench || 'bench_press',
+                deadlift: (step1 as any)?.variants?.deadlift || (prev as any).variants?.deadlift || 'conventional_deadlift',
+                press: (step1 as any)?.variants?.press || (prev as any).variants?.press || 'overhead_press'
+            },
+            deadliftRepStyle: (step1 as any)?.deadliftRepStyle || (prev as any).deadliftRepStyle || 'touch_and_go'
+        }));
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [step1.inputs]);
+    }, [(step1 as any)?.inputs, (step1 as any)?.variants, (step1 as any)?.deadliftRepStyle]);
 
     // Push condensed snapshot back to builder meta on every calc change & debounce persist
+    const lastPushedRef = React.useRef<string>('');
     React.useEffect(() => {
-        const { tmTable } = step1_fundamentals(state);
+        const res: any = step1_fundamentals(state as any);
+        const tmTable: any[] = Array.isArray(res?.tmTable) ? res.tmTable : [];
         const condensed: any = {
             units: state.units as any,
             tmPct: (state.tmPct === 0.85 ? 0.85 : 0.9) as 0.85 | 0.9,
@@ -231,17 +235,36 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                 repCalcReps: (v as any).reps,
                 manualTm: (v as any).manualTM
             }])) as any,
-            tmTable: Object.fromEntries(tmTable.map(r => [r.lift, r.tmDisplay || 0])) as any
+            tmTable: Object.fromEntries((tmTable as any[]).map((r: any) => [r.lift, r.tmDisplay || 0])) as any
         };
         // include variants for persistence
         (condensed as any).variants = state.variants;
         condensed.deadliftRepStyle = state.deadliftRepStyle;
-        setStep1(condensed);
+        // Guard against infinite loops: only push when condensed actually changes
+        const fingerprint = JSON.stringify(condensed);
+        if (fingerprint !== lastPushedRef.current) {
+            lastPushedRef.current = fingerprint;
+            setStep1(condensed);
+
+            // Also sync into the outer ProgramWizard state when available so step validation advances
+            try {
+                const liftsFromTm = Object.fromEntries((tmTable as any[]).map((r: any) => [r.lift, { tm: r.tmDisplay || 0 }])) as any;
+                const roundingObj = { increment: state.rounding.increment, mode: state.rounding.strategy } as any;
+                // Only call if parent provided updater
+                (typeof (updateData) === 'function') && updateData({
+                    step1: condensed,
+                    units: state.units,
+                    tmPct: condensed.tmPct,
+                    rounding: roundingObj,
+                    lifts: liftsFromTm
+                });
+            } catch { /* no-op */ }
+        }
 
         // Debounced persistence (skip during tests / SSR)
         const isTest = typeof window === 'undefined' || (window as any)?.process?.env?.NODE_ENV === 'test';
         let handle: any;
-        if (!isTest) {
+        if (!isTest && lastPushedRef.current) {
             handle = setTimeout(async () => {
                 try {
                     const userId = await getCurrentUserId();
@@ -250,7 +273,7 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                         user_id: userId,
                         step: 1,
                         state: state, // full UI state for potential future migrations
-                        condensed,
+                        condensed: JSON.parse(lastPushedRef.current),
                         updated_at: new Date().toISOString()
                     };
                     // Upsert into table program_builder_state (create instruction in README if table missing)
@@ -262,7 +285,8 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
             }, 600); // 600ms debounce
         }
         return () => handle && clearTimeout(handle);
-    }, [state, setStep1]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [state]);
 
     // Initial load: attempt to hydrate from Supabase if empty (client side only)
     React.useEffect(() => {
@@ -291,8 +315,9 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
     }, []);
 
     // compute once per render
-    const { tmTable } = step1_fundamentals(state);
-    const tmReadyCount = React.useMemo(() => tmTable.filter(r => (r.tmDisplay ?? 0) > 0).length, [tmTable]);
+    const resNow: any = step1_fundamentals(state as any);
+    const tmTable: any[] = Array.isArray(resNow?.tmTable) ? resNow.tmTable : [];
+    const tmReadyCount = React.useMemo(() => (tmTable as any[]).filter((r: any) => (r.tmDisplay ?? 0) > 0).length, [tmTable]);
 
     // Enforce valid selections at all times (one per toggle group)
     React.useEffect(() => {
@@ -355,7 +380,7 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
     // (removed) legacy stacked-button method selector; radios are used per-lift now.
 
     const onNext = () => {
-        if (tmTable.some(r => (r.tmDisplay ?? 0) <= 0)) return; // guard
+        if ((tmTable as any[]).some((r: any) => (r.tmDisplay ?? 0) <= 0)) return; // guard
         if (saveProgramDraft) {
             saveProgramDraft({
                 step1: state,
@@ -366,7 +391,7 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
         if (goToStep) goToStep(2); else if (navigate) navigate('/build/step2');
     };
 
-    const tmLookup = React.useMemo(() => Object.fromEntries(tmTable.map(r => [r.lift, r.tmDisplay ?? '—'])), [tmTable]);
+    const tmLookup = React.useMemo(() => Object.fromEntries((tmTable as any[]).map((r: any) => [r.lift, r.tmDisplay ?? '—'])), [tmTable]);
 
     // Variant options per lift (MVP list; codes stable for persistence)
     const VARIANT_OPTIONS: Record<LiftKey, { code: string; label: string }[]> = {

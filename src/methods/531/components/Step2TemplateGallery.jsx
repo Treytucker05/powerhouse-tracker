@@ -90,7 +90,7 @@ export default function Step2TemplateGallery({ onSelect, autoNext }) {
                 })}
             </div>
 
-                                                {import.meta?.env?.DEV ? (
+            {import.meta?.env?.DEV ? (
                 <div className="mt-4 p-3 rounded border border-gray-700 bg-gray-900 text-xs text-gray-300">
                     <div className="font-semibold mb-1">DEV · Step2 Selection</div>
                     <div>selected: {selectedId || '—'}</div>
@@ -100,14 +100,14 @@ export default function Step2TemplateGallery({ onSelect, autoNext }) {
                 </div>
             ) : null}
 
-                        {import.meta?.env?.DEV && wizard?.templateChoice ? (
-    <div style={{marginTop:8,padding:8,border:"1px solid #ccc",borderRadius:8}}>
-        <div style={{fontWeight:600,fontSize:12}}>Template issues</div>
-        <pre style={{fontSize:11,whiteSpace:"pre-wrap"}}>
-{JSON.stringify(validateTemplate(wizard.templateChoice), null, 2)}
-        </pre>
-    </div>
-) : null}
+            {import.meta?.env?.DEV && wizard?.templateChoice ? (
+                <div style={{ marginTop: 8, padding: 8, border: "1px solid #ccc", borderRadius: 8 }}>
+                    <div style={{ fontWeight: 600, fontSize: 12 }}>Template issues</div>
+                    <pre style={{ fontSize: 11, whiteSpace: "pre-wrap" }}>
+                        {JSON.stringify(validateTemplate(wizard.templateChoice), null, 2)}
+                    </pre>
+                </div>
+            ) : null}
         </div>
     );
 }

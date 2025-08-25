@@ -36,7 +36,7 @@ export const useSchedule = create<ScheduleState>((set, get) => ({
     days: defaultDays(4),
     rotation: '4D: SQ-BP-DL-PR',
 
-        setDaysPerWeek: (d) => set((state) => {
+    setDaysPerWeek: (d) => set((state) => {
         let days = [...state.days];
         if (days.length > d) {
             // trim while preserving earlier-in-week preference
@@ -54,23 +54,23 @@ export const useSchedule = create<ScheduleState>((set, get) => ({
         return { ...next, state: { daysPerWeek: next.daysPerWeek, days: next.days, rotation: state.rotation } } as unknown as ScheduleState;
     }),
 
-        toggleDay: (day) => set((state) => {
+    toggleDay: (day) => set((state) => {
         const exists = state.days.includes(day);
         if (exists) {
-                const days = state.days.filter((d) => d !== day) as Weekday[];
-                return { days, state: { daysPerWeek: state.daysPerWeek, days, rotation: state.rotation } } as unknown as ScheduleState;
+            const days = state.days.filter((d) => d !== day) as Weekday[];
+            return { days, state: { daysPerWeek: state.daysPerWeek, days, rotation: state.rotation } } as unknown as ScheduleState;
         } else {
             const next = [...state.days, day];
             // keep sorted by week order
             const sorted = next.sort((a, b) => ALL_DAYS.indexOf(a) - ALL_DAYS.indexOf(b));
             // cap to daysPerWeek
-                const days = sorted.slice(0, state.daysPerWeek) as Weekday[];
-                return { days, state: { daysPerWeek: state.daysPerWeek, days, rotation: state.rotation } } as unknown as ScheduleState;
+            const days = sorted.slice(0, state.daysPerWeek) as Weekday[];
+            return { days, state: { daysPerWeek: state.daysPerWeek, days, rotation: state.rotation } } as unknown as ScheduleState;
         }
     }),
 
-        setRotation: (r) => set((s) => ({ rotation: r, state: { daysPerWeek: s.daysPerWeek, days: s.days, rotation: r } })),
-        setDays: (days) => set((s) => ({ days, state: { daysPerWeek: s.daysPerWeek, days, rotation: s.rotation } })),
+    setRotation: (r) => set((s) => ({ rotation: r, state: { daysPerWeek: s.daysPerWeek, days: s.days, rotation: r } })),
+    setDays: (days) => set((s) => ({ days, state: { daysPerWeek: s.daysPerWeek, days, rotation: s.rotation } })),
 }));
 
 export function ScheduleProvider({ children }: { children: React.ReactNode }) {

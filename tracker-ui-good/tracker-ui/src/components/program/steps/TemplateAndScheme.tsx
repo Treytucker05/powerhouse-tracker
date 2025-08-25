@@ -176,7 +176,10 @@ function TemplateComparisonTable({ templateIds, templates, onRemove, onSelect }:
 // scheme descriptor moved to shared module if needed later
 
 export default function TemplateAndScheme() {
-    const { step2, setStep2 } = useBuilder();
+    // Align with BuilderState context API: returns { state, setState }
+    const { state: builderState, setState: setBuilderState } = useBuilder();
+    const step2 = (builderState as any)?.step2 || {};
+    const setStep2 = (u: any) => setBuilderState({ step2: { ...((builderState as any)?.step2 || {}), ...u } });
     const navigate = useNavigate();
     const [expanded, setExpanded] = React.useState<string | null>(null);
     const [searchQuery, setSearchQuery] = React.useState('');
@@ -311,15 +314,19 @@ export default function TemplateAndScheme() {
     }, [csvTemplates, expanded]);
 
     // Selected template CSV row for Selection Summary
+    // Helper to safely resolve a template id from multiple shapes
+    const getTemplateId = (t: any) => t?.templateId ?? t?.template?.id ?? t?.template ?? null;
+    const selectedTemplateId = getTemplateId(step2);
+
     const selectedCsvForSummary = React.useMemo(() => {
-        if (!step2.templateId) return null;
+        if (!selectedTemplateId) return null;
         const match = (csvTemplates || []).find((t: any) => {
             const key = String(t['Template Name'] ?? t.Template ?? t.display_name ?? '').trim();
             if (!key) return false;
-            return nameToId(key) === step2.templateId;
+            return nameToId(key) === selectedTemplateId;
         });
         return match || null;
-    }, [csvTemplates, step2.templateId]);
+    }, [csvTemplates, selectedTemplateId]);
 
     const onTemplate = (id: string) => {
         if (compareMode) {
@@ -363,7 +370,7 @@ export default function TemplateAndScheme() {
         prevExpanded.current = expanded;
     }, [expanded]);
     // Scheme selection moved to Step 3 (Customize)
-    const canNext = !!step2.templateId;
+    const canNext = !!selectedTemplateId;
 
     // Persist Step2 (template + scheme) debounced
     React.useEffect(() => {
@@ -568,7 +575,7 @@ export default function TemplateAndScheme() {
 
                         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {filteredTemplates.map(t => {
-                                const isSelected = step2.templateId === t.id;
+                                const isSelected = selectedTemplateId === t.id;
                                 const isExpanded = expanded === t.id;
                                 const isInComparison = compareTemplates.includes(t.id);
                                 const meta = (TEMPLATE_META as any)[t.id];
@@ -672,18 +679,23 @@ export default function TemplateAndScheme() {
                                             templateIds={compareTemplates}
                                             templates={csvTemplates}
                                             onRemove={removeFromComparison}
-                                            onSelect={(id) => setStep2({ templateId: id })}
+                                            onSelect={(id) => setStep2({ templateId: id, template: id })}
                                         />
                                     </>
                                 ) : (
                                     <>
                                         <h3 className="font-semibold mb-2 text-sm">Template Details</h3>
-                                        {!expanded && <p className="text-xs text-gray-500">Select a template card above to view its details.</p>}
+                                        {!expanded && !selectedTemplateId && (
+                                            <p className="text-xs text-gray-500">Select a template card above to view its details.</p>
+                                        )}
+                                        {expanded && !selectedTemplateId && (
+                                            <div className="text-xs text-amber-300">Template selection invalid. Please reselect.</div>
+                                        )}
                                         {expanded && (
                                             <div className="space-y-3">
                                                 <div className="flex items-center gap-2">
                                                     <h4 className="text-sm font-medium">{availableTemplates.find(t => t.id === expanded)?.title || TEMPLATE_DEFS.find(t => t.id === expanded)?.title || templateLabel(expanded)}</h4>
-                                                    {step2.templateId === expanded && <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-600/70 text-white">Selected</span>}
+                                                    {selectedTemplateId === expanded && <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-600/70 text-white">Selected</span>}
                                                 </div>
                                                 {/* CSV-backed details */}
                                                 {selectedCsv ? (
@@ -698,10 +710,10 @@ export default function TemplateAndScheme() {
                                                     <div className="text-xs text-gray-500">No details available.</div>
                                                 )}
                                                 <div className="flex gap-2 pt-1">
-                                                    {step2.templateId !== expanded && (
+                                                    {selectedTemplateId !== expanded && (
                                                         <button
                                                             type="button"
-                                                            onClick={() => setStep2({ templateId: expanded })}
+                                                            onClick={() => setStep2({ templateId: expanded, template: expanded })}
                                                             className="text-xs px-3 py-1.5 rounded bg-red-600 hover:bg-red-500 text-white font-medium"
                                                         >Use This Template</button>
                                                     )}
@@ -724,7 +736,9 @@ export default function TemplateAndScheme() {
                 <aside className="col-span-12 lg:col-span-4 space-y-4">
                     <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-4 text-sm" data-testid="selection-summary">
                         <h3 className="font-semibold mb-2">Selection Summary</h3>
-                        {!selectedCsvForSummary ? (
+                        {!selectedTemplateId ? (
+                            <div className="text-xs text-gray-500">Choose a template first.</div>
+                        ) : !selectedCsvForSummary ? (
                             <div className="text-xs text-gray-500">No template selected.</div>
                         ) : (
                             <div className="text-sm text-gray-300 space-y-1">
