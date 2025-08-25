@@ -1,5 +1,6 @@
 # Boring But Big (5x1 @ TM)
 
+
 ## Overview
 27‑week longform progression end‑cap.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

@@ -1,5 +1,6 @@
 # God Is A Beast (Leader)
 
+
 ## Overview
 Pieces of BBS + Spinal Tap; longer full cycle; patience required.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

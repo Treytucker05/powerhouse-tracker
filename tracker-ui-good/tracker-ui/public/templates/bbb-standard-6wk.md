@@ -1,5 +1,6 @@
 # Boring But Big — 6‑Week
 
+
 ## Overview
 Map weeks exactly: W1 50, W2 50, W3 60, W4 60, W5 70, W6 70.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

@@ -1,5 +1,6 @@
 # Strength Challenge (Beyond)
 
+
 ## Overview
 Clear deload and conditioning rules included.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

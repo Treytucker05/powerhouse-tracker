@@ -1,5 +1,6 @@
 # Winter Strength & Conditioning — 8 Week Cycle (Weight Room)
 
+
 ## Overview
 Extra 3x5 at 55/65/75% are submax; chins between sets; start too light. (p.132–135)
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

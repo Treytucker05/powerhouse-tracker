@@ -1,5 +1,6 @@
 # Full Body + Power Clean
 
+
 ## Overview
 PC primes the heavy work days; alternate PC/DL as needed.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

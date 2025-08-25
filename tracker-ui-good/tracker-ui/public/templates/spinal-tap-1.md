@@ -1,5 +1,6 @@
 # Spinal Tap (All weeks in one day)
 
+
 ## Overview
 Very high stress; TM increases each workout.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

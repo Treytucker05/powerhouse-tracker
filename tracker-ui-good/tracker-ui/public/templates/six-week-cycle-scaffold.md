@@ -1,5 +1,6 @@
 # 6‑Week Cycle Scaffold
 
+
 ## Overview
 Also includes 3/5/1 order option.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

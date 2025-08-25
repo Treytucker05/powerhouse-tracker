@@ -1,5 +1,6 @@
 # Full Body (v2)
 
+
 ## Overview
 Classic v2 update to the 2E full body; simple assistance.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

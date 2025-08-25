@@ -1,5 +1,6 @@
 # Boring But Big (Base)
 
+
 ## Overview
 Start at 30–40% TM if new to BBB; deload options vary.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

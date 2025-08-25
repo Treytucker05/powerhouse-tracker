@@ -1,5 +1,6 @@
 # Boring But Big (Variation I)
 
+
 ## Overview
 Template One only; very taxing.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

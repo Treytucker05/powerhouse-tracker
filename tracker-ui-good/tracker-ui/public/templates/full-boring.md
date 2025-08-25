@@ -1,5 +1,6 @@
 # Full Body — Full Boring (high DL freq)
 
+
 ## Overview
 Beginners OK; advanced lifters limit DL stress.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

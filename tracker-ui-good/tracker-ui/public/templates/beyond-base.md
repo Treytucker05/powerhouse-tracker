@@ -1,5 +1,6 @@
 # Beyond 5/3/1 (Training Maximally)
 
+
 ## Overview
 Auto‑regulated heavy singles with structured down sets.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

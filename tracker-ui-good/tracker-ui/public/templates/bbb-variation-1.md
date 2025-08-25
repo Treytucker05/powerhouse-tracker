@@ -1,5 +1,6 @@
 # Boring But Big — Variation I
 
+
 ## Overview
 6-week progression; do required reps on main, then 5x10 @ first-set percent.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

@@ -1,5 +1,6 @@
 # Full Body (Leader/Anchor
 
+
 ## Overview
 Follows Leader/Anchor model
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

@@ -1,5 +1,6 @@
 # Boring But Big — 5x5 @ 80%
 
+
 ## Overview
 Often follows BBB 5x10 block.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

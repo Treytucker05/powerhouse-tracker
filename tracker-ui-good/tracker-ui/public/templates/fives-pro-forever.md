@@ -1,5 +1,6 @@
 # 5’s PRO Forever
 
+
 ## Overview
 PR sets limited; per‑lift supplemental volume is the lever.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

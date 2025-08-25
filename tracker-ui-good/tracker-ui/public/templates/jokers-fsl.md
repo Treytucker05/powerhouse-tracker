@@ -1,5 +1,6 @@
 # Jokers + First Set Last (kit)
 
+
 ## Overview
 Use PR set then Jokers when strong; balance with FSL volume.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

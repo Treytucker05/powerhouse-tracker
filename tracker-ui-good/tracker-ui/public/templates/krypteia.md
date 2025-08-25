@@ -1,5 +1,6 @@
 # Krypteia
 
+
 ## Overview
 NEEDS_RESEARCH
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

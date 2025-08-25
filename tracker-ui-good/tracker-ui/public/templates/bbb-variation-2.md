@@ -1,5 +1,6 @@
 # Boring But Big — Variation II (10/8/5)
 
+
 ## Overview
 Week-to-week set/rep change for BBB work.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

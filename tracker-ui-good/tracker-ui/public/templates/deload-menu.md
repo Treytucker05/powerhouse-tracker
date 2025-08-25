@@ -1,5 +1,6 @@
 # Deload Menu (5 styles)
 
+
 ## Overview
 “Choose deload that matches fatigue & goals.”
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

@@ -1,5 +1,6 @@
 # Jumps/Throws/Speed — First 8 Weeks (Linemen)
 
+
 ## Overview
 Push-up start accelerations; introduce Kneeling Coil Throw; Week 4 deload.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

@@ -1,5 +1,6 @@
 # Boring But Big (Variation II)
 
+
 ## Overview
 Moderate variant—logical volume ramp.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

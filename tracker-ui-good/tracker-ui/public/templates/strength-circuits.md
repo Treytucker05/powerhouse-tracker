@@ -1,5 +1,6 @@
 # 5/3/1 Strength Circuits
 
+
 ## Overview
 Perfect form; never more than 80% TM; not for beginners.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

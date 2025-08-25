@@ -627,12 +627,12 @@ export default function TemplateAndScheme() {
                                     <div className="min-w-[200px]">
                                         <label className="block text-xs text-gray-400 mb-1">Info</label>
                                         <div className="flex gap-2">
-                                            {(['all','detailed','needs_research'] as const).map(mode => (
+                                            {(['all', 'detailed', 'needs_research'] as const).map(mode => (
                                                 <button
                                                     key={mode}
                                                     onClick={() => setInfoFilter(mode)}
-                                                    className={`px-2 py-1 text-xs rounded border ${infoFilter===mode? 'border-red-500 text-red-300' : 'border-gray-600 text-gray-300 hover:border-gray-500'}`}
-                                                >{mode==='all'?'All':'Detailed'}{mode==='needs_research'?' (Needs Research)':''}</button>
+                                                    className={`px-2 py-1 text-xs rounded border ${infoFilter === mode ? 'border-red-500 text-red-300' : 'border-gray-600 text-gray-300 hover:border-gray-500'}`}
+                                                >{mode === 'all' ? 'All' : 'Detailed'}{mode === 'needs_research' ? ' (Needs Research)' : ''}</button>
                                             ))}
                                         </div>
                                     </div>
@@ -640,7 +640,7 @@ export default function TemplateAndScheme() {
                                         <label className="block text-xs text-gray-400 mb-1">Sort</label>
                                         <select
                                             value={sortKey}
-                                            onChange={(e)=> setSortKey(e.target.value as any)}
+                                            onChange={(e) => setSortKey(e.target.value as any)}
                                             className="w-full px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                                         >
                                             <option value="none">Default</option>
@@ -755,7 +755,7 @@ export default function TemplateAndScheme() {
                                                 </div>
                                             )}
                                             {/* Tags / Needs Research */}
-        
+
                                             <div className="mt-2 flex flex-wrap gap-1">
                                                 {tags.length > 0 ? (
                                                     tags.map((tg) => (

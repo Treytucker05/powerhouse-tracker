@@ -1,5 +1,6 @@
 # Jumps/Throws/Speed — First 8 Weeks (Skill)
 
+
 ## Overview
 Falling-start sprints; Box Jumps at 80% of max; Week 4 deload; full recovery between reps.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

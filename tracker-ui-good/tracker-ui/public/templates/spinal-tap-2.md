@@ -1,5 +1,6 @@
 # Spinal Tap (Triples Only)
 
+
 ## Overview
 Best used on deadlift; purely triples across.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

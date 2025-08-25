@@ -1,5 +1,6 @@
 # Boring But Big — 13‑Week Challenge
 
+
 ## Overview
 Spans 27 weeks if you chain 5x5→5x3→5x1; see book mapping.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

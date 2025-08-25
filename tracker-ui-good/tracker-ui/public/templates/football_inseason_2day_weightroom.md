@@ -1,5 +1,6 @@
 # In‑Season Training — 2‑Day (Weight Room)
 
+
 ## Overview
 No PR sets; TM=90%; Mon/Wed lifts; ~30–45 min; minimal assistance; integrate in‑season conditioning schedule (football intervals + tempo runs).
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

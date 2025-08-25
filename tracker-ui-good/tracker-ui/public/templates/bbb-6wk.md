@@ -1,5 +1,6 @@
 # Boring But Big (6‑Week Challenge)
 
+
 ## Overview
 Push last 5/3/1 set weekly but keep BBB prescription.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

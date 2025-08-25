@@ -1,5 +1,6 @@
 # Leviathan
 
+
 ## Overview
 Singles, doubles or triples leading to TM; then supplemental selection.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

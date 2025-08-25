@@ -1,5 +1,6 @@
 # Going Into the Summer — 9 Week Training Cycle (Weight Room)
 
+
 ## Overview
 Lower weight-room volume; more speed; deload Week 6 (use deload %); typical assistance listed per day.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+

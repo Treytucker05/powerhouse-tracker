@@ -1,5 +1,6 @@
 # 6‑Week Cycle (2 cycles no deload)
 
+
 ## Overview
 “Increase TM after week 3” rule.
 
@@ -19,3 +20,12 @@ NEEDS_RESEARCH
 
 ## Pitfalls
 NEEDS_RESEARCH
+
+## Supplemental Notes
+
+
+## Scheme Notes
+
+
+## Sources
+
