@@ -6,6 +6,7 @@ import { STEP_IDS } from './_registry/stepRegistry.js';
 import { generateFiveThreeOneProgram } from '../../../lib/fiveThreeOne/generateProgram.js';
 import { copyJSON, downloadJSON } from '../../../lib/jsonExport.js';
 import { persistActiveCycle } from '../../../lib/fiveThreeOne/persistCycle.js';
+import { useProgramV2, selectLogging, setLogging } from '@/methods/531/contexts/ProgramContextV2.jsx';
 
 function Row({ label, value }) {
     return (
@@ -17,28 +18,30 @@ function Row({ label, value }) {
 }
 
 export default function Step8ReviewAndStart({ data }) {
+    const { state: programV2, dispatch } = useProgramV2();
+    const logging = selectLogging(programV2);
     const st = data || {};
     const [copied, setCopied] = useState(false);
     const [expanded, setExpanded] = useState(false);
     const [started, setStarted] = useState(false);
 
-    const program = useMemo(() => generateFiveThreeOneProgram(st), [st]);
+    const programJson = useMemo(() => generateFiveThreeOneProgram(st), [st]);
 
-    const cfg = program.config;
-    const tm = program.lifts;
+    const cfg = programJson.config;
+    const tm = programJson.lifts;
 
     const onCopy = async () => {
-        const ok = await copyJSON(program);
+    const ok = await copyJSON(programJson);
         setCopied(ok);
         setTimeout(() => setCopied(false), 1200);
     };
 
     const onDownload = () => {
-        downloadJSON(program, `531_program_${new Date().toISOString().slice(0, 10)}.json`);
+    downloadJSON(programJson, `531_program_${new Date().toISOString().slice(0, 10)}.json`);
     };
 
     const onStart = () => {
-        persistActiveCycle(program);
+    persistActiveCycle(programJson);
         setStarted(true);
     };
 
@@ -95,6 +98,27 @@ export default function Step8ReviewAndStart({ data }) {
                     <Row label="Pattern" value={cfg.schedule.pattern} />
                     <Row label="Lift Order" value={cfg.schedule.liftOrder.join(' → ')} />
                 </div>
+
+                <div className="bg-gray-900/60 border border-gray-700 rounded p-4 space-y-2">
+                    <div className="text-white font-medium mb-1">Logging Preferences</div>
+                    <label className="flex items-center justify-between text-sm">
+                        <span className="text-gray-300">Track AMRAP sets</span>
+                        <input type="checkbox" checked={!!logging.trackAmrap} onChange={(e) => setLogging(dispatch, { trackAmrap: e.target.checked })} />
+                    </label>
+                    <label className="flex items-center justify-between text-sm">
+                        <span className="text-gray-300">PR Flags</span>
+                        <input type="checkbox" checked={!!logging.prFlags} onChange={(e) => setLogging(dispatch, { prFlags: e.target.checked })} />
+                    </label>
+                    <div className="text-sm">
+                        <div className="text-gray-300 mb-1">Est. 1RM Formula</div>
+                        <div className="inline-flex border border-gray-700 rounded overflow-hidden">
+                            {[{k:'wendler',label:'Wendler'}, {k:'epley',label:'Epley'}].map(opt => (
+                                <button key={opt.k} onClick={() => setLogging(dispatch, { est1rmFormula: opt.k })}
+                                    className={`px-3 py-1 ${logging.est1rmFormula === opt.k ? 'bg-[#ef4444]' : 'bg-[#0b1220] text-gray-200'}`}>{opt.label}</button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {/* JSON Preview (collapsible) */}
@@ -108,7 +132,7 @@ export default function Step8ReviewAndStart({ data }) {
                 </button>
                 {expanded && (
                     <pre className="px-4 pb-4 text-xs text-gray-200 overflow-auto">
-                        {JSON.stringify(program, null, 2)}
+                        {JSON.stringify(programJson, null, 2)}
                     </pre>
                 )}
             </div>

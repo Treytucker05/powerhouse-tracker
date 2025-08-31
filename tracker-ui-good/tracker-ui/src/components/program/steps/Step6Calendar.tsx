@@ -7,6 +7,7 @@ import { useFinalPlan } from "@/store/finalPlanStore";
 import { useMemo } from "react";
 import { toast } from "react-toastify";
 import BuilderProgress from "@/components/program/steps/BuilderProgress";
+import { useProgramV2, selectPhasePlan, setPhasePlan, selectSeventhWeek, setSeventhWeek } from "@/methods/531/contexts/ProgramContextV2.jsx";
 
 export default function Step6Calendar() {
     const { state: cal } = useCalendar();
@@ -14,6 +15,10 @@ export default function Step6Calendar() {
     const { state: s3 } = useStep3();
     const { plan: progPlan, weeks } = useProgression();
     const { locked, save, reset, plan } = useFinalPlan();
+
+    const { state: program, dispatch } = useProgramV2();
+    const phasePlan = selectPhasePlan(program);
+    const seventh = selectSeventhWeek(program);
 
     const snapshot = useMemo(() => ({
         schedule: sched,
@@ -26,6 +31,40 @@ export default function Step6Calendar() {
         <>
             <div className="px-8 pt-6"><BuilderProgress current={6} /></div>
             <div className="bg-[#1a1a2e] min-h-screen text-white">
+                <div className="px-6 py-3 border-b border-gray-700 bg-[#0b1220]">
+                    <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                        <div className="p-3 rounded border border-gray-700 bg-[#0b1220]">
+                            <div className="text-gray-300 mb-1">Phase Pattern</div>
+                            <div className="inline-flex border border-gray-700 rounded overflow-hidden">
+                                {["2+1", "3+1"].map(p => (
+                                    <button key={p} onClick={() => setPhasePlan(dispatch, { pattern: p as any })}
+                                        className={`px-3 py-1 ${phasePlan?.pattern === p ? "bg-[#ef4444]" : "bg-[#0b1220] text-gray-200"}`}>{p}</button>
+                                ))}
+                            </div>
+                            <div className="text-[11px] text-gray-400 mt-1">Pattern controls the number of Leader cycles before Anchor.</div>
+                        </div>
+                        <div className="p-3 rounded border border-gray-700 bg-[#0b1220]">
+                            <div className="text-gray-300 mb-1">7th‑Week Mode</div>
+                            <div className="inline-flex border border-gray-700 rounded overflow-hidden">
+                                {[{k:'deload',label:'Deload'},{k:'tm_test',label:'TM‑Test'}].map(opt => (
+                                    <button key={opt.k} onClick={() => setSeventhWeek(dispatch, { mode: opt.k as any })}
+                                        className={`px-3 py-1 ${seventh?.mode === opt.k ? "bg-[#ef4444]" : "bg-[#0b1220] text-gray-200"}`}>{opt.label}</button>
+                                ))}
+                            </div>
+                            <div className="text-[11px] text-gray-400 mt-1">Choose a recovery/test protocol for the 7th week.</div>
+                        </div>
+                        <div className="p-3 rounded border border-gray-700 bg-[#0b1220]">
+                            <div className="text-gray-300 mb-1">7th‑Week Criteria</div>
+                            <div className="inline-flex border border-gray-700 rounded overflow-hidden">
+                                {[{k:'afterLeader',label:'After Leader'},{k:'every7th',label:'Every 7th'}].map(opt => (
+                                    <button key={opt.k} onClick={() => setSeventhWeek(dispatch, { criteria: opt.k as any })}
+                                        className={`px-3 py-1 ${seventh?.criteria === opt.k ? "bg-[#ef4444]" : "bg-[#0b1220] text-gray-200"}`}>{opt.label}</button>
+                                ))}
+                            </div>
+                            <div className="text-[11px] text-gray-400 mt-1">When to insert the 7th week deload/test.</div>
+                        </div>
+                    </div>
+                </div>
                 {locked && (
                     <div className="sticky top-0 z-10 bg-[#0b1220] border-b border-gray-700 p-3 text-sm text-emerald-300">
                         <div className="max-w-7xl mx-auto flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
