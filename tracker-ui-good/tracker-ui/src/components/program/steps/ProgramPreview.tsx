@@ -10,6 +10,7 @@ import { syncToSupabase, syncToLocalStorage, checkTableExists } from '@/context/
 import { toast } from 'react-toastify';
 import { makeV2FromBuilder, writeProgramV2ToLocalStorage } from '@/lib/adapters/builderToProgramV2';
 import { formatWeight, normalizeUnits } from '@/lib/units';
+import { useProgramV2, selectSupplementalSchemeId, setSupplementalSchemeId } from '@/methods/531/contexts/ProgramContextV2.jsx';
 
 // Step 4: Preview & Export (scaffold)
 // Focus: Provide a read-only style preview of generated program structure with week tabs and day cards.
@@ -60,7 +61,11 @@ function buildExportPayload(opts: { steps: any; program: GeneratedProgram531 }):
 
 const ProgramPreview: React.FC = () => {
     const navigate = useNavigate();
-    const { step1, step2, step3 } = useBuilder();
+    const { state: builder } = useBuilder();
+    const step1 = (builder as any)?.step1;
+    const step2 = (builder as any)?.step2;
+    const step3 = (builder as any)?.step3;
+    const { state: programV2, dispatch: programDispatch } = useProgramV2();
     const [activeWeek, setActiveWeek] = React.useState(1);
     const [exporting, setExporting] = React.useState(false);
     const [lastSavedAt, setLastSavedAt] = React.useState<string | null>(null);
@@ -314,15 +319,44 @@ const ProgramPreview: React.FC = () => {
                             <li data-testid="summary-mainset-option"><span className="text-gray-400">Main Set Option:</span> {step3?.mainSetOption || 1}</li>
                             {(() => {
                                 const baseMap: Record<string, string> = { press: 'overhead_press', bench: 'bench_press', squat: 'back_squat', deadlift: 'conventional_deadlift' };
-                                const variants = step1?.variants || {} as Record<string, string>;
-                                const custom = Object.entries(variants).filter(([k, v]) => baseMap[k] && baseMap[k] !== v);
+                                const variants = (step1?.variants || {}) as Record<string, string>;
+                                const custom = Object.keys(variants).filter((k) => baseMap[k] && baseMap[k] !== variants[k]);
                                 if (!custom.length) return null;
-                                const list = custom.map(([k, v]) => `${k}: ${variantLabel(v) || v.replace(/_/g, ' ')}`).join(', ');
+                                const list = custom.map((k) => {
+                                    const v = variants[k];
+                                    return `${k}: ${variantLabel(v) || String(v).replace(/_/g, ' ')}`;
+                                }).join(', ');
                                 return <li data-testid="summary-variants" title={list}><span className="text-gray-400">Variants:</span> <span className="text-amber-300">{custom.length} customized</span></li>;
                             })()}
                             {program && <li><span className="text-gray-400">Generated Weeks:</span> {program.weeks.length}</li>}
                             {lastSavedAt && <li><span className="text-gray-400">Last Export:</span> {new Date(lastSavedAt).toLocaleTimeString()}</li>}
                         </ul>
+                    </div>
+                    {/* Supplemental scheme selector (writes to ProgramContextV2) */}
+                    <div className="bg-gradient-to-b from-gray-800/80 to-gray-900/40 border border-gray-700 rounded-lg p-4 text-sm">
+                        <h3 className="font-semibold mb-2">Supplemental Scheme</h3>
+                        <label className="flex items-center justify-between gap-2">
+                            <span className="text-xs text-gray-300">Type</span>
+                            <select
+                                className="w-44 bg-gray-900 border border-gray-700 rounded px-2 py-1 text-sm"
+                                value={selectSupplementalSchemeId(programV2) || ''}
+                                onChange={(e) => setSupplementalSchemeId(programDispatch, e.target.value as any)}
+                            >
+                                <option value="">Choose…</option>
+                                <option value="fsl">FSL — First Set Last</option>
+                                <option value="ssl">SSL — Second Set Last</option>
+                                <option value="bbb">BBB — Boring But Big</option>
+                                <option value="bbs">BBS — Boring But Strong</option>
+                            </select>
+                        </label>
+                        {(() => {
+                            const id = selectSupplementalSchemeId(programV2);
+                            if (id === 'ssl') return <p className="mt-2 text-[11px] text-gray-300">SSL 5×5 at 75/80/85% of TM across weeks. Heavier than FSL — keep assistance modest.</p>;
+                            if (id === 'fsl') return <p className="mt-2 text-[11px] text-gray-300">FSL 5×5 at 65/70/75% of TM. Recovery‑friendly; assistance 50–100 reps per category works well.</p>;
+                            if (id === 'bbb') return <p className="mt-2 text-[11px] text-gray-300">BBB 5×10 at 50–70% of TM. High volume — limit extra assistance and mind recovery.</p>;
+                            if (id === 'bbs') return <p className="mt-2 text-[11px] text-gray-300">BBS 5×5 around 70% of TM. Strength‑biased volume; keep assistance balanced.</p>;
+                            return <p className="mt-2 text-[11px] text-gray-400">Pick a scheme for supplemental work. Loads are computed later.</p>;
+                        })()}
                     </div>
                 </aside>
             </div>

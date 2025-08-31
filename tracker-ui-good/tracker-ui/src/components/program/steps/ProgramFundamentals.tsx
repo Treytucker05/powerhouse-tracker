@@ -397,13 +397,13 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft, data, 
             const u = units === 'kg' ? CANON_UNITS.KG : CANON_UNITS.LBS;
             const inc = u === CANON_UNITS.KG ? 2.5 : 5;
             setRoundingIncrement(dispatch, inc);
-        } catch {}
+        } catch { }
     };
 
     const onTmPct = (pct: 0.85 | 0.90) => {
         setState(s => ({ ...s, tmPct: pct }));
         // Update V2 tmPctChoice which also adjusts minReps criteria
-        try { setTmPctChoice(dispatch, pct === 0.90 ? 90 : 85); } catch {}
+        try { setTmPctChoice(dispatch, pct === 0.90 ? 90 : 85); } catch { }
     };
 
     const onToggleMicro = (checked: boolean) => {

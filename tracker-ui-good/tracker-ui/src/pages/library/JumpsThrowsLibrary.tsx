@@ -1,20 +1,21 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { LibraryButtons } from "@/components/program/steps/LibraryButtons";
 import BuilderProgress from "@/components/program/steps/BuilderProgress";
-import { loadJumpsThrowsRows } from "@/lib/data/loadConditioningAndJumps";
+import { loadJumpsThrowsLibrary } from "@/lib/data/loadLibraries";
 import type { JumpsThrowsRow } from "@/types/step3";
 
 export default function JumpsThrowsLibrary() {
   const [rows, setRows] = useState<JumpsThrowsRow[]>([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [source, setSource] = useState<"json" | "csv">("csv");
   const [err, setErr] = useState<string | null>(null);
 
   useEffect(() => {
     setLoading(true);
-    loadJumpsThrowsRows()
-      .then((data) => { setRows(data.filter(r => (r.display_name||"").trim())); setErr(null); })
-      .catch((e) => setErr(e?.message || "Failed to load CSV"))
+    loadJumpsThrowsLibrary()
+      .then(({ rows, source }) => { setRows((rows as any[]).filter(r => (r.display_name || "").trim())); setSource(source); setErr(null); })
+      .catch((e) => setErr(e?.message || "Failed to load data"))
       .finally(() => setLoading(false));
   }, []);
 
@@ -31,7 +32,7 @@ export default function JumpsThrowsLibrary() {
       tags: r.tags || ""
     }));
     const searched = !q ? base : base.filter(r => Object.values(r).join(" ").toLowerCase().includes(q));
-    return [...searched].sort((a,b) => a.name.localeCompare(b.name));
+    return [...searched].sort((a, b) => a.name.localeCompare(b.name));
   }, [rows, query]);
 
   return (
@@ -41,13 +42,13 @@ export default function JumpsThrowsLibrary() {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-2xl font-semibold">Jumps & Throws Library</h1>
-            <p className="text-gray-400 text-sm">CSV-driven list from <code>jumps_throws.csv</code>. Use search to filter.</p>
+            <p className="text-gray-400 text-sm">Data source: <span className="font-mono uppercase">{source}</span></p>
           </div>
         </div>
         <div className="my-4"><LibraryButtons /></div>
         <div className="mb-4">
-          <input value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="Search…"
-            className="w-full md:w-96 bg-[#0f1020] text-white placeholder-gray-400 border border-gray-700 rounded px-3 py-2 outline-none focus:ring-2 focus:ring-red-600"/>
+          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search…"
+            className="w-full md:w-96 bg-[#0f1020] text-white placeholder-gray-400 border border-gray-700 rounded px-3 py-2 outline-none focus:ring-2 focus:ring-red-600" />
         </div>
         {loading && <div className="text-gray-300 text-sm">Loading jumps/throws…</div>}
         {err && <div className="text-red-400 text-sm mb-3">Error: {err}</div>}
@@ -71,7 +72,7 @@ export default function JumpsThrowsLibrary() {
                     <td className="px-3 py-2 border-b border-gray-900">{r.mode}</td>
                     <td className="px-3 py-2 border-b border-gray-900">{r.population}</td>
                     <td className="px-3 py-2 border-b border-gray-900">{r.equipment}</td>
-                    <td className="px-3 py-2 border-b border-gray-900">{r.book ? `${r.book} — `: ''}{r.pages}</td>
+                    <td className="px-3 py-2 border-b border-gray-900">{r.book ? `${r.book} — ` : ''}{r.pages}</td>
                     <td className="px-3 py-2 border-b border-gray-900">{r.tags}</td>
                   </tr>
                 ))}

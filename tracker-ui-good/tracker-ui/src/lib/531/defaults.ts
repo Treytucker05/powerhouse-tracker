@@ -9,7 +9,11 @@ export function deriveTemplateTargets(s: SupplementalRow): Record<string, number
     const min = Number((s as any).AssistancePerCategoryMin ?? 25);
     const max = Number((s as any).AssistancePerCategoryMax ?? 50);
     const isHeavyLeader = s.Phase === "Leader" && ["BBB", "BBS", "SSL"].includes(s.SupplementalScheme as any);
-    const target = isHeavyLeader ? min : Math.round((min + max) / 2);
+    const isFSLLdr = s.Phase === 'Leader' && (s.SupplementalScheme as any) === 'FSL';
+    // For SSL/BBB/BBS leaders → keep to lower end (min). For FSL leader → target high end (favor ~75 if 50–100).
+    const target = isHeavyLeader
+        ? min
+        : (isFSLLdr ? Math.max(60, Math.min(100, Math.round(((min || 25) + (max || 100) + 50) / 2))) : Math.round((min + max) / 2));
     return { "Push": target, "Pull": target, "Single-Leg/Core": target, "Core": target };
 }
 
@@ -25,20 +29,28 @@ export function buildStep3DefaultsFromSupplemental(s: SupplementalRow): Partial<
     const targets = deriveTemplateTargets(s);
     const hardCap = Number((s as any).HardConditioningMax ?? 2);
     const easyMin = Number((s as any).EasyConditioningMin ?? 3);
+    // Special defaults for SSL Leader (5s PRO + SSL): heavier supplemental → modest assistance, NOV prep, higher jumps dose
+    const isSSLLeader = s.Phase === 'Leader' && (s.SupplementalScheme as any) === 'SSL';
+    const isFSLLeader = s.Phase === 'Leader' && (s.SupplementalScheme as any) === 'FSL';
     return {
         supplemental: s,
         assistance: {
             mode: "Template",
-            volumePreset: "Standard",
+            volumePreset: (isFSLLeader ? "Loaded" : "Standard"),
             picks: { "Push": [], "Pull": [], "Single-Leg/Core": [], "Core": [] },
             perCategoryTarget: targets,
         } as any,
-        warmup: { mobility: '', jumpsThrowsDose: (s as any).JumpsThrowsDefault ?? 10 },
+        warmup: {
+            mobility: (isSSLLeader || isFSLLeader) ? 'Agile 8' : '',
+            jumpsThrowsDose: (isSSLLeader || isFSLLeader) ? 20 : ((s as any).JumpsThrowsDefault ?? 10),
+            novFullPrep: (isSSLLeader || isFSLLeader) ? true : undefined,
+        },
         conditioning: {
-            hardDays: Math.min(2, hardCap),
-            easyDays: Math.max(3, easyMin),
+            hardDays: Math.min(isSSLLeader ? 2 : (isFSLLeader ? 3 : 2), hardCap),
+            easyDays: Math.max(isSSLLeader ? 2 : 3, easyMin),
             modalities: []
-        }
+        },
+        cycle: { includeDeload: true }
     } as Partial<Step3Selection>;
 }
 

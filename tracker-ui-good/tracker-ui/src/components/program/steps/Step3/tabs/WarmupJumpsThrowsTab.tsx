@@ -52,7 +52,16 @@ export default function WarmupJumpsThrowsTab() {
     const onMobility = (name: string) => actions.setWarmup({ mobility: name });
     const onJump = (name: string) => actions.setWarmup({ jump: name });
     const onThrow = (name: string) => actions.setWarmup({ throw: name });
-    const onDose = (dose: number) => actions.setWarmup({ jumpsThrowsDose: Math.max(0, Math.min(100, Math.round(dose))) });
+    const clamp = (n: number, lo = 0, hi = 200) => Math.max(lo, Math.min(hi, Math.round(n)));
+    const onDose = (dose: number) => actions.setWarmup({ jumpsThrowsDose: clamp(dose, 0, 200) });
+    const onSplit = (patch: Partial<{ jumpsPerDay: number; throwsPerDay: number }>) => {
+        const j = typeof patch.jumpsPerDay === 'number' ? clamp(patch.jumpsPerDay) : state.warmup.jumpsPerDay || 0;
+        const t = typeof patch.throwsPerDay === 'number' ? clamp(patch.throwsPerDay) : state.warmup.throwsPerDay || 0;
+        // update split
+        actions.setWarmup({ ...patch });
+        // keep legacy combined field roughly synced for estimator fallbacks
+        actions.setWarmup({ jumpsThrowsDose: clamp(j + t) });
+    };
     const onNOV = (enabled: boolean) => actions.setWarmup({ novFullPrep: !!enabled });
 
     return (
@@ -104,16 +113,29 @@ export default function WarmupJumpsThrowsTab() {
                         </select>
                         <div className="text-xs text-gray-400">Thread sets between bar warmups; keep reps explosive.</div>
                     </div>
-                    <div>
-                        <label className="block text-gray-300 text-sm mb-1">Dose (reps)</label>
-                        <input
-                            type="number"
-                            min={0}
-                            max={100}
-                            value={state.warmup.jumpsThrowsDose ?? 10}
-                            onChange={(e) => onDose(Number(e.target.value))}
-                            className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-2 text-gray-100"
-                        />
+                    <div className="grid grid-cols-2 gap-2">
+                        <div>
+                            <label className="block text-gray-300 text-sm mb-1">Jumps (reps)</label>
+                            <input
+                                type="number"
+                                min={0}
+                                max={200}
+                                value={typeof state.warmup.jumpsPerDay === 'number' ? state.warmup.jumpsPerDay : 20}
+                                onChange={(e) => onSplit({ jumpsPerDay: Number(e.target.value) })}
+                                className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-2 text-gray-100"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-gray-300 text-sm mb-1">Throws (reps)</label>
+                            <input
+                                type="number"
+                                min={0}
+                                max={200}
+                                value={typeof state.warmup.throwsPerDay === 'number' ? state.warmup.throwsPerDay : 10}
+                                onChange={(e) => onSplit({ throwsPerDay: Number(e.target.value) })}
+                                className="w-full bg-gray-900 border border-gray-700 rounded px-2 py-2 text-gray-100"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>

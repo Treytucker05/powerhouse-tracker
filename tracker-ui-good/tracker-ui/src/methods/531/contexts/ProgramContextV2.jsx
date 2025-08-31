@@ -345,9 +345,9 @@ function reducerV2(state, action) {
         case 'SET_LOADING': return { ...state, loading: { ...state.loading, ...action.loading } };
         case 'SET_WARMUPS': return { ...state, warmups: { ...state.warmups, ...action.warmups } };
         case 'SET_SUPPLEMENTAL': return { ...state, supplemental: { ...state.supplemental, ...(action.supplemental || action.payload || {}) } };
-    case 'SET_ASSISTANCE': return { ...state, assistance: { ...state.assistance, ...(action.assistance || action.payload || {}) } };
-    case 'SET_ASSISTANCE_TARGETS': return { ...state, assistance: { ...state.assistance, targets: { ...state.assistance?.targets, ...(action.value || action.payload || {}) } } };
-    case 'SET_ASSISTANCE_SELECTIONS': return { ...state, assistance: { ...state.assistance, selections: Array.isArray(action.value) ? action.value : [] } };
+        case 'SET_ASSISTANCE': return { ...state, assistance: { ...state.assistance, ...(action.assistance || action.payload || {}) } };
+        case 'SET_ASSISTANCE_TARGETS': return { ...state, assistance: { ...state.assistance, targets: { ...state.assistance?.targets, ...(action.value || action.payload || {}) } } };
+        case 'SET_ASSISTANCE_SELECTIONS': return { ...state, assistance: { ...state.assistance, selections: Array.isArray(action.value) ? action.value : [] } };
         case 'SET_EQUIPMENT': return { ...state, equipment: Array.isArray(action.payload) ? action.payload : state.equipment };
         case 'SET_ASSIST_MODE': return { ...state, assistMode: action.payload };
         case 'SET_ASSIST_CUSTOM': {
@@ -372,11 +372,11 @@ function reducerV2(state, action) {
         case 'SET_AMRAP_WK3': return { ...state, amrapWk3: { ...(state.amrapWk3 || {}), ...(action.payload || {}) } };
         case 'SET_CYCLE': return { ...state, cycle: action.payload };
         case 'SET_WEEK': return { ...state, week: action.payload };
-    case 'SET_SEVENTH_WEEK': return { ...state, seventhWeek: { ...state.seventhWeek, ...(action.value || action.payload || {}) } };
-    case 'SET_PROGRESSION': return { ...state, progression: { ...state.progression, ...(action.value || action.payload || {}) } };
-    case 'SET_LOGGING': return { ...state, logging: { ...state.logging, ...(action.value || action.payload || {}) } };
-    case 'SET_AUTOMATION': return { ...state, automation: { ...state.automation, ...(action.value || action.payload || {}) } };
-    case 'SET_INCLUDE_WARMUPS_GLOBAL': return { ...state, includeWarmups: !!action.value };
+        case 'SET_SEVENTH_WEEK': return { ...state, seventhWeek: { ...state.seventhWeek, ...(action.value || action.payload || {}) } };
+        case 'SET_PROGRESSION': return { ...state, progression: { ...state.progression, ...(action.value || action.payload || {}) } };
+        case 'SET_LOGGING': return { ...state, logging: { ...state.logging, ...(action.value || action.payload || {}) } };
+        case 'SET_AUTOMATION': return { ...state, automation: { ...state.automation, ...(action.value || action.payload || {}) } };
+        case 'SET_INCLUDE_WARMUPS_GLOBAL': return { ...state, includeWarmups: !!action.value };
         case 'SET_HISTORY': return { ...state, history: action.history };
         case 'APPLY_TEMPLATE':
             return applyTemplate(state, action.key);

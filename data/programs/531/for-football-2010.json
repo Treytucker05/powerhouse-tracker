@@ -1,0 +1,601 @@
+{
+    "programId": "531",
+    "version": "for-football-2010",
+    "source": {
+        "sourceTitle": "5/3/1 for Football",
+        "edition": null,
+        "year": 2010,
+        "pageRanges": [
+            "132-166"
+        ]
+    },
+    "allowedUnits": [
+        "lb",
+        "kg"
+    ],
+    "lifts": {
+        "squat": {
+            "name": "Squat",
+            "aliases": [
+                "Back Squat"
+            ],
+            "tmCap": null
+        },
+        "bench": {
+            "name": "Bench Press",
+            "aliases": [
+                "Bench"
+            ],
+            "tmCap": null
+        },
+        "deadlift": {
+            "name": "Deadlift",
+            "aliases": [
+                "Trap Bar Deadlift"
+            ],
+            "tmCap": null
+        },
+        "press": {
+            "name": "Military Press",
+            "aliases": [
+                "Overhead Press",
+                "Press"
+            ],
+            "tmCap": null
+        }
+    },
+    "tmRule": {
+        "type": "percentage_of_1rm",
+        "factor": 0.9
+    },
+    "tmProgression": {
+        "perCycle": {
+            "upper": 0,
+            "lower": 0
+        },
+        "unit": "lb",
+        "perWeek": null
+    },
+    "rounding": {
+        "increment": 5,
+        "unit": "lb",
+        "minBar": 45,
+        "availablePlates": []
+    },
+    "options": {
+        "allowJokers": false,
+        "allowPRSets": true,
+        "supersetAssistance": true,
+        "restSeconds": {
+            "main": null,
+            "supplemental": null,
+            "assistance": null
+        },
+        "warmupNote": null,
+        "conditioningNote": null
+    },
+    "weeks": [
+        {
+            "id": "w1-5s",
+            "label": "5s Week",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.65,
+                    "reps": 5,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": null
+                },
+                {
+                    "percentOfTM": 0.75,
+                    "reps": 5,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": null
+                },
+                {
+                    "percentOfTM": 0.85,
+                    "reps": "5+",
+                    "prSet": true,
+                    "amrap": true,
+                    "joker": null,
+                    "note": null
+                }
+            ],
+            "deload": null,
+            "notes": [
+                "5/3/1 set/rep protocol used for main lift sets."
+            ]
+        },
+        {
+            "id": "w2-3s",
+            "label": "3s Week",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.7,
+                    "reps": 3,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": null
+                },
+                {
+                    "percentOfTM": 0.8,
+                    "reps": 3,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": null
+                },
+                {
+                    "percentOfTM": 0.9,
+                    "reps": "3+",
+                    "prSet": true,
+                    "amrap": true,
+                    "joker": null,
+                    "note": null
+                }
+            ],
+            "deload": null,
+            "notes": [
+                "5/3/1 set/rep protocol used for main lift sets."
+            ]
+        },
+        {
+            "id": "w3-531",
+            "label": "5/3/1 Week",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.75,
+                    "reps": 5,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": null
+                },
+                {
+                    "percentOfTM": 0.85,
+                    "reps": 3,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": null
+                },
+                {
+                    "percentOfTM": 0.95,
+                    "reps": "1+",
+                    "prSet": true,
+                    "amrap": true,
+                    "joker": null,
+                    "note": null
+                }
+            ],
+            "deload": null,
+            "notes": [
+                "5/3/1 set/rep protocol used for main lift sets."
+            ]
+        },
+        {
+            "id": "w4-deload",
+            "label": "Deload",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.4,
+                    "reps": 5,
+                    "prSet": false,
+                    "amrap": false,
+                    "joker": null,
+                    "note": null
+                },
+                {
+                    "percentOfTM": 0.5,
+                    "reps": 5,
+                    "prSet": false,
+                    "amrap": false,
+                    "joker": null,
+                    "note": null
+                },
+                {
+                    "percentOfTM": 0.6,
+                    "reps": 5,
+                    "prSet": false,
+                    "amrap": false,
+                    "joker": null,
+                    "note": null
+                }
+            ],
+            "deload": true,
+            "notes": [
+                "Use deload percentages when specified."
+            ]
+        },
+        {
+            "id": "ramp-55-65-75",
+            "label": "Secondary Ramp 3x5",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.55,
+                    "reps": 5,
+                    "prSet": false,
+                    "amrap": false,
+                    "joker": false,
+                    "note": "Not to failure."
+                },
+                {
+                    "percentOfTM": 0.65,
+                    "reps": 5,
+                    "prSet": false,
+                    "amrap": false,
+                    "joker": false,
+                    "note": "Not to failure."
+                },
+                {
+                    "percentOfTM": 0.75,
+                    "reps": 5,
+                    "prSet": false,
+                    "amrap": false,
+                    "joker": false,
+                    "note": "Not to failure."
+                }
+            ],
+            "deload": null,
+            "notes": [
+                "Extra work sets for the secondary lift.",
+                "55/65/75 x5 as extra sets. "
+            ]
+        }
+    ],
+    "schedules": [
+        {
+            "id": "3d-winter",
+            "label": "3 days/week (Winter)",
+            "days": [
+                {
+                    "name": "Mon",
+                    "mainLift": "press",
+                    "secondaryLift": "squat",
+                    "assistanceProfileId": null,
+                    "notes": [
+                        "Secondary squat: 55/65/75 x5."
+                    ]
+                },
+                {
+                    "name": "Wed",
+                    "mainLift": "deadlift",
+                    "secondaryLift": "press",
+                    "assistanceProfileId": null,
+                    "notes": [
+                        "Secondary press: 55/65/75 x5."
+                    ]
+                },
+                {
+                    "name": "Fri",
+                    "mainLift": "bench",
+                    "secondaryLift": "squat",
+                    "assistanceProfileId": null,
+                    "notes": [
+                        "Secondary squat: 55/65/75 x5."
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "2d-spring",
+            "label": "2 days/week (Spring practice)",
+            "days": [
+                {
+                    "name": "Day 1",
+                    "mainLift": "squat",
+                    "secondaryLift": "bench",
+                    "assistanceProfileId": null,
+                    "notes": []
+                },
+                {
+                    "name": "Day 2",
+                    "mainLift": "deadlift",
+                    "secondaryLift": "press",
+                    "assistanceProfileId": null,
+                    "notes": []
+                }
+            ]
+        },
+        {
+            "id": "3d-pre-camp",
+            "label": "3 days/week (Summer pre-camp)",
+            "days": [
+                {
+                    "name": "Mon",
+                    "mainLift": "deadlift",
+                    "secondaryLift": "press",
+                    "assistanceProfileId": null,
+                    "notes": []
+                },
+                {
+                    "name": "Wed",
+                    "mainLift": "bench",
+                    "secondaryLift": null,
+                    "assistanceProfileId": null,
+                    "notes": []
+                },
+                {
+                    "name": "Fri",
+                    "mainLift": "squat",
+                    "secondaryLift": null,
+                    "assistanceProfileId": null,
+                    "notes": []
+                }
+            ]
+        },
+        {
+            "id": "2d-in-season",
+            "label": "2 days/week (In-season)",
+            "days": [
+                {
+                    "name": "Day 1",
+                    "mainLift": "squat",
+                    "secondaryLift": "bench",
+                    "assistanceProfileId": null,
+                    "notes": []
+                },
+                {
+                    "name": "Day 2",
+                    "mainLift": "deadlift",
+                    "secondaryLift": "press",
+                    "assistanceProfileId": null,
+                    "notes": [
+                        "No rep max sets."
+                    ]
+                }
+            ]
+        }
+    ],
+    "supplemental": [
+        {
+            "id": "sec-ramp-3x5",
+            "name": "Secondary Ramp 3x5 55/65/75",
+            "type": "custom",
+            "sets": [
+                {
+                    "percentOfTM": 0.55,
+                    "reps": 5,
+                    "prSet": false,
+                    "amrap": false,
+                    "joker": false,
+                    "note": null
+                },
+                {
+                    "percentOfTM": 0.65,
+                    "reps": 5,
+                    "prSet": false,
+                    "amrap": false,
+                    "joker": false,
+                    "note": null
+                },
+                {
+                    "percentOfTM": 0.75,
+                    "reps": 5,
+                    "prSet": false,
+                    "amrap": false,
+                    "joker": false,
+                    "note": null
+                }
+            ],
+            "onMainLiftDay": true,
+            "appliesTo": "specific_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "Never to failure."
+            ]
+        }
+    ],
+    "assistance": {
+        "targets": {
+            "push": {
+                "min": 3,
+                "max": 5,
+                "unit": "sets"
+            },
+            "pull": {
+                "min": 3,
+                "max": 5,
+                "unit": "sets"
+            },
+            "single_leg": {
+                "min": 3,
+                "max": 3,
+                "unit": "sets"
+            },
+            "posterior_chain": {
+                "min": 3,
+                "max": 3,
+                "unit": "sets"
+            },
+            "core": {
+                "min": 3,
+                "max": 3,
+                "unit": "sets"
+            }
+        },
+        "pools": {
+            "push": [
+                "Dips",
+                "DB Bench Press",
+                "Pushups",
+                "Standing DB Press",
+                "Triceps Pushdown"
+            ],
+            "pull": [
+                "Chin-up",
+                "Pull-up",
+                "Fat Man Row",
+                "Sled Row",
+                "Face Pull"
+            ],
+            "single_leg": [
+                "DB Lunge",
+                "Bulgarian Split Squat",
+                "Step-up"
+            ],
+            "posterior_chain": [
+                "Glute-Ham Raise",
+                "45-Degree Back Raise",
+                "Band Good Morning",
+                "Shrug"
+            ],
+            "core": [
+                "Roman Chair Sit-up",
+                "Hanging Leg Raise",
+                "Lying Leg Raise",
+                "Med Ball Sit-up"
+            ]
+        },
+        "rules": {
+            "superset": true,
+            "totalTimeMinutes": null,
+            "perDayExerciseCount": 3
+        }
+    },
+    "assistanceProfiles": [
+        {
+            "id": "winter",
+            "label": "Winter base",
+            "overrides": {
+                "targets": {},
+                "rules": {
+                    "superset": true,
+                    "totalTimeMinutes": null,
+                    "perDayExerciseCount": 3
+                }
+            }
+        },
+        {
+            "id": "spring",
+            "label": "Spring practice",
+            "overrides": {
+                "targets": {},
+                "rules": {
+                    "superset": true,
+                    "totalTimeMinutes": null,
+                    "perDayExerciseCount": 2
+                }
+            }
+        },
+        {
+            "id": "going-into-summer",
+            "label": "Going into summer",
+            "overrides": {
+                "targets": {},
+                "rules": {
+                    "superset": true,
+                    "totalTimeMinutes": null,
+                    "perDayExerciseCount": 3
+                }
+            }
+        },
+        {
+            "id": "pre-camp",
+            "label": "Summer pre-camp",
+            "overrides": {
+                "targets": {},
+                "rules": {
+                    "superset": true,
+                    "totalTimeMinutes": null,
+                    "perDayExerciseCount": 3
+                }
+            }
+        },
+        {
+            "id": "in-season",
+            "label": "In-season",
+            "overrides": {
+                "targets": {},
+                "rules": {
+                    "superset": true,
+                    "totalTimeMinutes": null,
+                    "perDayExerciseCount": 2
+                }
+            }
+        }
+    ],
+    "templates": [
+        {
+            "id": "winter-8wk",
+            "name": "Winter 8-week 3-day",
+            "scheduleId": "3d-winter",
+            "weekOrder": [
+                "w1-5s",
+                "w2-3s",
+                "w3-531",
+                "w4-deload",
+                "w1-5s",
+                "w2-3s",
+                "w3-531",
+                "w4-deload"
+            ],
+            "supplementalByDay": {
+                "0": "sec-ramp-3x5",
+                "1": "sec-ramp-3x5",
+                "2": "sec-ramp-3x5"
+            },
+            "assistanceProfileId": "winter",
+            "notes": []
+        },
+        {
+            "id": "spring-2wk",
+            "name": "Spring practice 2-week",
+            "scheduleId": "2d-spring",
+            "weekOrder": [
+                "w1-5s",
+                "w2-3s"
+            ],
+            "supplementalByDay": {},
+            "assistanceProfileId": "spring",
+            "notes": [
+                "No rep-max sets during this block."
+            ]
+        },
+        {
+            "id": "pre-camp-6wk",
+            "name": "Summer pre-camp 6-week",
+            "scheduleId": "3d-pre-camp",
+            "weekOrder": [
+                "w1-5s",
+                "w2-3s",
+                "w3-531",
+                "w4-deload",
+                "w1-5s",
+                "w2-3s"
+            ],
+            "supplementalByDay": {
+                "0": "sec-ramp-3x5"
+            },
+            "assistanceProfileId": "pre-camp",
+            "notes": []
+        },
+        {
+            "id": "in-season",
+            "name": "In-season 2-day",
+            "scheduleId": "2d-in-season",
+            "weekOrder": [
+                "w1-5s",
+                "w2-3s",
+                "w3-531",
+                "w4-deload"
+            ],
+            "supplementalByDay": {},
+            "assistanceProfileId": "in-season",
+            "notes": [
+                "No PR sets on main work."
+            ]
+        }
+    ],
+    "notes": [
+        "TM = 90% of 1RM for this variant.",
+        "Use 55/65/75 x5 as extra work on the secondary lift; never to failure.",
+        "In spring and in-season blocks do not perform rep-max sets on main lifts.",
+        "Data extracted from the attached book. "
+    ]
+}

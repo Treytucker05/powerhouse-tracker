@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { LibraryButtons } from "@/components/program/steps/LibraryButtons";
 import BuilderProgress from "@/components/program/steps/BuilderProgress";
-import { loadConditioningRows } from "@/lib/data/loadConditioningAndJumps";
+import { loadConditioningLibrary } from "@/lib/data/loadLibraries";
 import type { ConditioningRow } from "@/types/step3";
 
 type Row = ConditioningRow;
@@ -10,13 +10,14 @@ export default function ConditioningLibrary() {
     const [rows, setRows] = useState<Row[]>([]);
     const [query, setQuery] = useState("");
     const [loading, setLoading] = useState(true);
+    const [source, setSource] = useState<"json" | "csv">("csv");
     const [err, setErr] = useState<string | null>(null);
 
     useEffect(() => {
         setLoading(true);
-        loadConditioningRows()
-            .then((data) => { setRows((data as Row[]).filter(r => (r.display_name||"").trim())); setErr(null); })
-            .catch((e) => setErr(e?.message || "Failed to load CSV"))
+        loadConditioningLibrary<Row>()
+            .then(({ rows, source }) => { setRows((rows as Row[]).filter(r => (r.display_name || "").trim())); setSource(source); setErr(null); })
+            .catch((e) => setErr(e?.message || "Failed to load data"))
             .finally(() => setLoading(false));
     }, []);
 
@@ -53,9 +54,7 @@ export default function ConditioningLibrary() {
                 <div className="flex items-center justify-between mb-4">
                     <div>
                         <h1 className="text-2xl font-semibold">Conditioning Library</h1>
-                        <p className="text-gray-400 text-sm">
-                            CSV-driven list from <code>conditioning.csv</code>. Use search to filter.
-                        </p>
+                        <p className="text-gray-400 text-sm">Data source: <span className="font-mono uppercase">{source}</span></p>
                     </div>
                 </div>
 

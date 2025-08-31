@@ -2,66 +2,23 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { LibraryButtons } from "@/components/program/steps/LibraryButtons";
 import BuilderProgress from "@/components/program/steps/BuilderProgress";
-import { loadCsv } from "@/lib/loadCsv";
-import type { TemplateCsv } from "@/types/templates";
+import { loadTemplatesLibrary } from "@/lib/data/loadLibraries";
 
 type Row = Record<string, string>;
 
 export default function TemplatesLibrary() {
     const [rows, setRows] = useState<Row[]>([]);
+    const [source, setSource] = useState<"json" | "csv">("csv");
     const [query, setQuery] = useState("");
     const [loading, setLoading] = useState(true);
     const [err, setErr] = useState<string | null>(null);
 
     useEffect(() => {
         setLoading(true);
-        const MASTER_URL = `${import.meta.env.BASE_URL}methodology/extraction/templates_master.csv`;
-        const ADDITIONS_URL = `${import.meta.env.BASE_URL}methodology/extraction/templates_additions.csv`;
         (async () => {
             try {
-                const master = await loadCsv<Row>(MASTER_URL).catch(() => [] as Row[]);
-                const additions = await loadCsv<TemplateCsv>(ADDITIONS_URL).catch(() => [] as TemplateCsv[]);
-
-                // Filter empty master rows
-                const cleanMaster = (master as Row[]).filter(
-                    (r) => r && r["Template Name"] && r["Template Name"].trim().length > 0
-                );
-
-                // Merge additions: map to master-like display with extra columns
-                const mappedAdds: Row[] = (additions || []).map((r) => ({
-                    "Template Name": (r.display_name || "").trim(),
-                    "Book": (r.source_book || "").trim(),
-                    "Page": (r.source_pages || "").trim(),
-                    "Main Work": (r.core_scheme || "").trim(),
-                    "Supplemental": (r.supplemental || "").trim(),
-                    "Assistance": (r.assistance_guideline || "").trim(),
-                    "Conditioning": (r.conditioning_guideline || "").trim(),
-                    "Leader/Anchor": (r.leader_anchor || "").trim(),
-                    "Notes": (r.notes || "").trim(),
-                    __id: (r.id || "").trim(),
-                    __source_book: (r.source_book || "").trim(),
-                    __source_pages: (r.source_pages || "").trim(),
-                }));
-
-                // De-dupe by kebab id when available, otherwise by normalized name
-                const idFrom = (row: Row) => {
-                    if ((row as any).__id) return String((row as any).__id);
-                    const name = String(row["Template Name"] || "").toLowerCase().trim();
-                    return name
-                        .replace(/^(jack sh\*t|jack shit)$/, 'jackshit')
-                        .replace(/[^a-z0-9]+/g, '-');
-                };
-                const byId = new Map<string, Row>();
-                cleanMaster.forEach((r) => {
-                    const id = idFrom(r);
-                    if (id) byId.set(id, r);
-                });
-                mappedAdds.forEach((r) => {
-                    const id = idFrom(r);
-                    if (!id) return;
-                    byId.set(id, r); // prefer additions
-                });
-                const merged = Array.from(byId.values()).sort((a, b) => {
+                const { rows, source } = await loadTemplatesLibrary<Row>();
+                const sorted = [...rows].sort((a, b) => {
                     const ca = String((a as any).category || '').toLowerCase();
                     const cb = String((b as any).category || '').toLowerCase();
                     if (ca !== cb) return ca < cb ? -1 : 1;
@@ -69,11 +26,11 @@ export default function TemplatesLibrary() {
                     const tb = String((b["Template Name"] || (b as any).display_name || "")).toLowerCase();
                     return ta < tb ? -1 : ta > tb ? 1 : 0;
                 });
-
-                setRows(merged);
+                setRows(sorted);
+                setSource(source);
                 setErr(null);
             } catch (e: any) {
-                setErr(e?.message || "Failed to load CSV");
+                setErr(e?.message || "Failed to load library data");
             } finally {
                 setLoading(false);
             }
@@ -112,7 +69,7 @@ export default function TemplatesLibrary() {
                     <div>
                         <h1 className="text-2xl font-semibold">Templates Library</h1>
                         <p className="text-gray-400 text-sm">
-                            CSV-driven list from <code>templates_master.csv</code>. Use search to filter.
+                            Data source: <span className="font-mono uppercase">{source}</span>
                         </p>
                     </div>
                     <div className="flex gap-2">

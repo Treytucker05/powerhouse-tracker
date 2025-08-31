@@ -46,7 +46,7 @@ export default function Step6Calendar() {
                         <div className="p-3 rounded border border-gray-700 bg-[#0b1220]">
                             <div className="text-gray-300 mb-1">7th‑Week Mode</div>
                             <div className="inline-flex border border-gray-700 rounded overflow-hidden">
-                                {[{k:'deload',label:'Deload'},{k:'tm_test',label:'TM‑Test'}].map(opt => (
+                                {[{ k: 'deload', label: 'Deload' }, { k: 'tm_test', label: 'TM‑Test' }].map(opt => (
                                     <button key={opt.k} onClick={() => setSeventhWeek(dispatch, { mode: opt.k as any })}
                                         className={`px-3 py-1 ${seventh?.mode === opt.k ? "bg-[#ef4444]" : "bg-[#0b1220] text-gray-200"}`}>{opt.label}</button>
                                 ))}
@@ -56,7 +56,7 @@ export default function Step6Calendar() {
                         <div className="p-3 rounded border border-gray-700 bg-[#0b1220]">
                             <div className="text-gray-300 mb-1">7th‑Week Criteria</div>
                             <div className="inline-flex border border-gray-700 rounded overflow-hidden">
-                                {[{k:'afterLeader',label:'After Leader'},{k:'every7th',label:'Every 7th'}].map(opt => (
+                                {[{ k: 'afterLeader', label: 'After Leader' }, { k: 'every7th', label: 'Every 7th' }].map(opt => (
                                     <button key={opt.k} onClick={() => setSeventhWeek(dispatch, { criteria: opt.k as any })}
                                         className={`px-3 py-1 ${seventh?.criteria === opt.k ? "bg-[#ef4444]" : "bg-[#0b1220] text-gray-200"}`}>{opt.label}</button>
                                 ))}

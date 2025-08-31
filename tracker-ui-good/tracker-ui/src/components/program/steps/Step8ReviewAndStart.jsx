@@ -31,17 +31,17 @@ export default function Step8ReviewAndStart({ data }) {
     const tm = programJson.lifts;
 
     const onCopy = async () => {
-    const ok = await copyJSON(programJson);
+        const ok = await copyJSON(programJson);
         setCopied(ok);
         setTimeout(() => setCopied(false), 1200);
     };
 
     const onDownload = () => {
-    downloadJSON(programJson, `531_program_${new Date().toISOString().slice(0, 10)}.json`);
+        downloadJSON(programJson, `531_program_${new Date().toISOString().slice(0, 10)}.json`);
     };
 
     const onStart = () => {
-    persistActiveCycle(programJson);
+        persistActiveCycle(programJson);
         setStarted(true);
     };
 
@@ -112,7 +112,7 @@ export default function Step8ReviewAndStart({ data }) {
                     <div className="text-sm">
                         <div className="text-gray-300 mb-1">Est. 1RM Formula</div>
                         <div className="inline-flex border border-gray-700 rounded overflow-hidden">
-                            {[{k:'wendler',label:'Wendler'}, {k:'epley',label:'Epley'}].map(opt => (
+                            {[{ k: 'wendler', label: 'Wendler' }, { k: 'epley', label: 'Epley' }].map(opt => (
                                 <button key={opt.k} onClick={() => setLogging(dispatch, { est1rmFormula: opt.k })}
                                     className={`px-3 py-1 ${logging.est1rmFormula === opt.k ? 'bg-[#ef4444]' : 'bg-[#0b1220] text-gray-200'}`}>{opt.label}</button>
                             ))}

@@ -38,10 +38,10 @@ export default function TopNav({ user }) {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-gray-900 dark:bg-gray-900 shadow-md">
+    <header className="sticky top-0 z-50 bg-gray-900 dark:bg-gray-900 shadow-md relative">
       <div className="flex justify-between items-center p-4 gap-4 text-white">
         {/* Logo */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <Link to="/" className="flex items-center gap-2 flex-shrink-0" aria-label="Go to Dashboard">
           <Dumbbell className="w-6 h-6 text-red-500" />
           <div className="text-xl font-bold">
             <span className="text-red-500">Power</span>
@@ -51,10 +51,10 @@ export default function TopNav({ user }) {
               style={{ color: '#000', WebkitTextStroke: '0', textShadow: 'none' }}
             >ATX</span>
           </div>
-        </div>
+        </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex gap-4 flex-1 justify-center">
+        <nav className="hidden lg:flex gap-4 flex-1 justify-center overflow-x-auto">
           {navItems.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
@@ -73,7 +73,7 @@ export default function TopNav({ user }) {
         </nav>
 
         {/* Desktop User Section */}
-        <div className="hidden md:flex items-center gap-2 relative">
+        <div className="hidden lg:flex items-center gap-2 relative">
           {/* Profile Avatar Button */}
           <button
             onClick={() => setIsProfileOpen(!isProfileOpen)}
@@ -106,10 +106,13 @@ export default function TopNav({ user }) {
         </div>
 
         {/* Mobile Hamburger Menu */}
-        <div className="md:hidden">
+        <div className="lg:hidden">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="text-gray-300 hover:text-white p-2 rounded-md transition-colors"
+            aria-label="Toggle navigation menu"
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-nav"
           >
             {isMobileMenuOpen ? (
               <X className="w-6 h-6" />
@@ -155,7 +158,10 @@ export default function TopNav({ user }) {
 
       {/* Mobile Navigation Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-gray-700 bg-gray-900">
+        <div
+          id="mobile-nav"
+          className="lg:hidden absolute left-0 right-0 top-full border-t border-gray-700 bg-gray-900 shadow-lg max-h-[75vh] overflow-y-auto"
+        >
           <div className="px-4 py-2 space-y-1">
             {navItems.map(({ to, label, icon: Icon }) => (
               <NavLink
@@ -179,14 +185,16 @@ export default function TopNav({ user }) {
               to="/profile"
               onClick={() => setIsMobileMenuOpen(false)}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive
+                `flex items-center gap-3 px-3 py-2 rounded-md text-base font-medium transition-colors min-w-0 ${isActive
                   ? 'bg-red-600 text-white'
                   : 'text-gray-300 hover:text-red-300 hover:bg-gray-800'
                 }`
               }
             >
               <Avatar />
-              Profile
+              <span className="truncate" title={user?.email || 'Profile'}>
+                {user?.email || 'Profile'}
+              </span>
             </NavLink>
 
             {/* Mobile Logout */}

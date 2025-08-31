@@ -1,0 +1,861 @@
+{
+    "programId": "531",
+    "version": "Forever",
+    "source": {
+        "sourceTitle": "5/3/1 Forever",
+        "edition": "First Edition",
+        "year": 2017,
+        "pageRanges": [
+            "p.3–7, 15, 20–36, 46–66, 68–81, 89–121, 134–176, 199–233, 243–245"
+        ]
+    },
+    "allowedUnits": [
+        "lb",
+        "kg"
+    ],
+    "lifts": {
+        "squat": {
+            "name": "Back Squat",
+            "aliases": [
+                "Squat"
+            ],
+            "tmCap": null
+        },
+        "bench": {
+            "name": "Bench Press",
+            "aliases": [
+                "Bench"
+            ],
+            "tmCap": null
+        },
+        "deadlift": {
+            "name": "Deadlift",
+            "aliases": [],
+            "tmCap": null
+        },
+        "press": {
+            "name": "Press",
+            "aliases": [
+                "Overhead Press",
+                "Military Press"
+            ],
+            "tmCap": null
+        }
+    },
+    "tmRule": {
+        "type": "other",
+        "note": "TM typically 80–90% of 1RM; 85% common; some templates use ≤80% (e.g., 5x5/3/1)."
+    },
+    "tmProgression": {
+        "perCycle": {
+            "upper": 5,
+            "lower": 10
+        },
+        "unit": "lb",
+        "perWeek": null
+    },
+    "rounding": {
+        "increment": 5,
+        "unit": "lb",
+        "minBar": 45
+    },
+    "options": {
+        "allowJokers": null,
+        "allowPRSets": null,
+        "supersetAssistance": null,
+        "restSeconds": {
+            "main": null,
+            "supplemental": null,
+            "assistance": null
+        },
+        "warmupNote": "Agile 8 or similar warm-up.",
+        "conditioningNote": "Hard conditioning 2–4 days and easy conditioning 3–5 days per template guidance."
+    },
+    "weeks": [
+        {
+            "id": "week-5s-pr",
+            "label": "Original 5/3/1 Week 1 (PR set)",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.65,
+                    "reps": 5,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": null
+                },
+                {
+                    "percentOfTM": 0.75,
+                    "reps": 5,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": null
+                },
+                {
+                    "percentOfTM": 0.85,
+                    "reps": "5+",
+                    "prSet": true,
+                    "amrap": true,
+                    "joker": null,
+                    "note": null
+                }
+            ],
+            "deload": null,
+            "notes": [
+                "Base week percentages for original 5/3/1."
+            ]
+        },
+        {
+            "id": "week-3s-pr",
+            "label": "Original 5/3/1 Week 2 (PR set)",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.70,
+                    "reps": 3,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": null
+                },
+                {
+                    "percentOfTM": 0.80,
+                    "reps": 3,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": null
+                },
+                {
+                    "percentOfTM": 0.90,
+                    "reps": "3+",
+                    "prSet": true,
+                    "amrap": true,
+                    "joker": null,
+                    "note": null
+                }
+            ],
+            "deload": null,
+            "notes": [
+                "Base week percentages for original 5/3/1."
+            ]
+        },
+        {
+            "id": "week-531-pr",
+            "label": "Original 5/3/1 Week 3 (PR set)",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.75,
+                    "reps": 5,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": null
+                },
+                {
+                    "percentOfTM": 0.85,
+                    "reps": 3,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": null
+                },
+                {
+                    "percentOfTM": 0.95,
+                    "reps": "1+",
+                    "prSet": true,
+                    "amrap": true,
+                    "joker": null,
+                    "note": null
+                }
+            ],
+            "deload": null,
+            "notes": [
+                "Base week percentages for original 5/3/1."
+            ]
+        },
+        {
+            "id": "5s-pro-w1",
+            "label": "5's PRO Week 1",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.65,
+                    "reps": 5,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": "No PR set."
+                },
+                {
+                    "percentOfTM": 0.75,
+                    "reps": 5,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": "No PR set."
+                },
+                {
+                    "percentOfTM": 0.85,
+                    "reps": 5,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": "No PR set."
+                }
+            ],
+            "deload": null,
+            "notes": [
+                "5's PRO uses standard 5/3/1 percentages without PR sets; used widely in Leader phases."
+            ]
+        },
+        {
+            "id": "5s-pro-w2",
+            "label": "5's PRO Week 2",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.70,
+                    "reps": 5,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": "No PR set."
+                },
+                {
+                    "percentOfTM": 0.80,
+                    "reps": 5,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": "No PR set."
+                },
+                {
+                    "percentOfTM": 0.90,
+                    "reps": 5,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": "No PR set."
+                }
+            ],
+            "deload": null,
+            "notes": [
+                "5's PRO week 2 mapping."
+            ]
+        },
+        {
+            "id": "5s-pro-w3",
+            "label": "5's PRO Week 3",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.75,
+                    "reps": 5,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": "No PR set."
+                },
+                {
+                    "percentOfTM": 0.85,
+                    "reps": 5,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": "No PR set."
+                },
+                {
+                    "percentOfTM": 0.95,
+                    "reps": 5,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": "No PR set."
+                }
+            ],
+            "deload": null,
+            "notes": [
+                "5's PRO week 3 mapping."
+            ]
+        },
+        {
+            "id": "7th-week-tm-test",
+            "label": "7th Week Protocol — TM Test",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.70,
+                    "reps": 5,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": null
+                },
+                {
+                    "percentOfTM": 0.80,
+                    "reps": 5,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": null
+                },
+                {
+                    "percentOfTM": 0.90,
+                    "reps": 5,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": null
+                },
+                {
+                    "percentOfTM": 1.0,
+                    "reps": 3,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": "Target 3–5 reps based on chosen TM."
+                }
+            ],
+            "deload": null,
+            "notes": [
+                "Use 70/80/90 then TM x3–5 to validate TM. No supplemental; limited assistance."
+            ]
+        },
+        {
+            "id": "leviathan-week",
+            "label": "Leviathan — Work to TM single",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.70,
+                    "reps": 1,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": "Warm-up single(s) 1–3 reps allowed."
+                },
+                {
+                    "percentOfTM": 0.80,
+                    "reps": 1,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": "Warm-up single(s) 1–3 reps allowed."
+                },
+                {
+                    "percentOfTM": 0.90,
+                    "reps": 1,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": "Warm-up single(s) 1–3 reps allowed."
+                },
+                {
+                    "percentOfTM": 1.0,
+                    "reps": 1,
+                    "prSet": null,
+                    "amrap": null,
+                    "joker": null,
+                    "note": "Hit TM single."
+                }
+            ],
+            "deload": null,
+            "notes": [
+                "Leviathan works to TM single each week; supplemental options vary."
+            ]
+        }
+    ],
+    "schedules": [
+        {
+            "id": "4-day-classic",
+            "label": "4 days/week",
+            "days": [
+                {
+                    "name": "Day 1",
+                    "mainLift": "press",
+                    "secondaryLift": "bench",
+                    "assistanceProfileId": "leader-25-50",
+                    "notes": []
+                },
+                {
+                    "name": "Day 2",
+                    "mainLift": "deadlift",
+                    "secondaryLift": "squat",
+                    "assistanceProfileId": "leader-25-50",
+                    "notes": []
+                },
+                {
+                    "name": "Day 3",
+                    "mainLift": "bench",
+                    "secondaryLift": "press",
+                    "assistanceProfileId": "leader-25-50",
+                    "notes": []
+                },
+                {
+                    "name": "Day 4",
+                    "mainLift": "squat",
+                    "secondaryLift": "deadlift",
+                    "assistanceProfileId": "leader-25-50",
+                    "notes": []
+                }
+            ]
+        },
+        {
+            "id": "3-day",
+            "label": "3 days/week",
+            "days": [
+                {
+                    "name": "Day 1",
+                    "mainLift": "squat",
+                    "secondaryLift": "bench",
+                    "assistanceProfileId": "leader-25-50",
+                    "notes": []
+                },
+                {
+                    "name": "Day 2",
+                    "mainLift": "deadlift",
+                    "secondaryLift": "press",
+                    "assistanceProfileId": "leader-25-50",
+                    "notes": []
+                },
+                {
+                    "name": "Day 3",
+                    "mainLift": "bench",
+                    "secondaryLift": "squat",
+                    "assistanceProfileId": "leader-25-50",
+                    "notes": []
+                }
+            ]
+        },
+        {
+            "id": "2-day-2x2x2",
+            "label": "2 days/week (2x2x2 lifting days)",
+            "days": [
+                {
+                    "name": "Day 1",
+                    "mainLift": "squat",
+                    "secondaryLift": "bench",
+                    "assistanceProfileId": "leader-25-50",
+                    "notes": [
+                        "Pair with conditioning and mobility days in the week."
+                    ]
+                },
+                {
+                    "name": "Day 2",
+                    "mainLift": "deadlift",
+                    "secondaryLift": "press",
+                    "assistanceProfileId": "leader-25-50",
+                    "notes": [
+                        "Mix 5's PRO or 5x5/3/1 per lift."
+                    ]
+                }
+            ]
+        }
+    ],
+    "supplemental": [
+        {
+            "id": "fsl-5x5",
+            "name": "First Set Last 5x5",
+            "type": "from_week_set",
+            "sourceSet": "first",
+            "sets": 5,
+            "reps": 5,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "5x5 FSL is a core Leader/Anchor option."
+            ]
+        },
+        {
+            "id": "ssl-5x5",
+            "name": "Second Set Last 5x5",
+            "type": "from_week_set",
+            "sourceSet": "second",
+            "sets": 5,
+            "reps": 5,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "Used in many Leader/Anchor templates."
+            ]
+        },
+        {
+            "id": "bbb-fsl-5x10",
+            "name": "BBB 5x10 @ FSL",
+            "type": "from_week_set",
+            "sourceSet": "first",
+            "sets": 5,
+            "reps": 10,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "BBB FSL variant uses first-set % for 5x10."
+            ]
+        },
+        {
+            "id": "bbb-50",
+            "name": "BBB 5x10 @ 50% TM",
+            "type": "fixed",
+            "sets": 5,
+            "reps": 10,
+            "percentOfTM": 0.5,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "Cycle 1 of BBB Challenge."
+            ]
+        },
+        {
+            "id": "bbb-60",
+            "name": "BBB 5x10 @ 60% TM",
+            "type": "fixed",
+            "sets": 5,
+            "reps": 10,
+            "percentOfTM": 0.6,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "Cycle 2 of BBB Challenge."
+            ]
+        },
+        {
+            "id": "bbb-70",
+            "name": "BBB 5x10 @ 70% TM",
+            "type": "fixed",
+            "sets": 5,
+            "reps": 10,
+            "percentOfTM": 0.7,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "Cycle 3 of BBB Challenge."
+            ]
+        },
+        {
+            "id": "bbs-10x5-fsl",
+            "name": "Boring But Strong 10x5 @ FSL",
+            "type": "from_week_set",
+            "sourceSet": "first",
+            "sets": 10,
+            "reps": 5,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "BBS with 10x5 at first-set % (65/70/75 by week)."
+            ]
+        },
+        {
+            "id": "wm-1x20-fsl",
+            "name": "Widowmaker 1x20 @ FSL",
+            "type": "from_week_set",
+            "sourceSet": "first",
+            "sets": 1,
+            "reps": 20,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "Used in multiple templates; caution on deadlift."
+            ]
+        },
+        {
+            "id": "531-top-5x5",
+            "name": "5x5/3/1 — 5x5 at top set %",
+            "type": "from_week_set",
+            "sourceSet": "third",
+            "sets": 5,
+            "reps": 5,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "Leader style 5x5/3/1: 85/90/95% x 5x5 by week."
+            ]
+        }
+    ],
+    "assistance": {
+        "targets": {
+            "push": {
+                "min": 25,
+                "max": 50,
+                "unit": "reps"
+            },
+            "pull": {
+                "min": 25,
+                "max": 50,
+                "unit": "reps"
+            },
+            "single_leg_core": {
+                "min": 25,
+                "max": 50,
+                "unit": "reps"
+            }
+        },
+        "pools": {
+            "push": [
+                "Dips",
+                "Push-up",
+                "DB Press"
+            ],
+            "pull": [
+                "Chin-up/Pull-up",
+                "Row"
+            ],
+            "single_leg_core": [
+                "Ab Wheel",
+                "Hanging Leg Raise",
+                "KB Swing",
+                "Single-Leg Squat",
+                "Straight-Leg Deadlift"
+            ]
+        },
+        "rules": {
+            "superset": true,
+            "totalTimeMinutes": null,
+            "perDayExerciseCount": null
+        }
+    },
+    "assistanceProfiles": [
+        {
+            "id": "leader-25-50",
+            "label": "Leader 25–50",
+            "overrides": {
+                "targets": {
+                    "push": {
+                        "min": 25,
+                        "max": 50,
+                        "unit": "reps"
+                    },
+                    "pull": {
+                        "min": 25,
+                        "max": 50,
+                        "unit": "reps"
+                    },
+                    "single_leg_core": {
+                        "min": 25,
+                        "max": 50,
+                        "unit": "reps"
+                    }
+                }
+            }
+        },
+        {
+            "id": "anchor-50-100",
+            "label": "Anchor 50–100",
+            "overrides": {
+                "targets": {
+                    "push": {
+                        "min": 50,
+                        "max": 100,
+                        "unit": "reps"
+                    },
+                    "pull": {
+                        "min": 50,
+                        "max": 100,
+                        "unit": "reps"
+                    },
+                    "single_leg_core": {
+                        "min": 50,
+                        "max": 100,
+                        "unit": "reps"
+                    }
+                }
+            }
+        },
+        {
+            "id": "seventh-week-25-50",
+            "label": "7th Week Deload Targets",
+            "overrides": {
+                "targets": {
+                    "push": {
+                        "min": 25,
+                        "max": 50,
+                        "unit": "reps"
+                    },
+                    "pull": {
+                        "min": 25,
+                        "max": 50,
+                        "unit": "reps"
+                    },
+                    "single_leg_core": {
+                        "min": 25,
+                        "max": 50,
+                        "unit": "reps"
+                    }
+                }
+            }
+        }
+    ],
+    "templates": [
+        {
+            "id": "leader-5spro-fsl",
+            "name": "Leader — 5's PRO + 5x5 FSL",
+            "scheduleId": "4-day-classic",
+            "weekOrder": [
+                "5s-pro-w1",
+                "5s-pro-w2",
+                "5s-pro-w3"
+            ],
+            "supplementalByDay": {
+                "0": "fsl-5x5",
+                "1": "fsl-5x5",
+                "2": "fsl-5x5",
+                "3": "fsl-5x5"
+            },
+            "assistanceProfileId": "leader-25-50",
+            "notes": [
+                "Common Leader pairing."
+            ]
+        },
+        {
+            "id": "leader-bbs-fsl",
+            "name": "Leader — Boring But Strong (10x5 FSL)",
+            "scheduleId": "4-day-classic",
+            "weekOrder": [
+                "5s-pro-w1",
+                "5s-pro-w2",
+                "5s-pro-w3"
+            ],
+            "supplementalByDay": {
+                "0": "bbs-10x5-fsl",
+                "1": "bbs-10x5-fsl",
+                "2": "bbs-10x5-fsl",
+                "3": "bbs-10x5-fsl"
+            },
+            "assistanceProfileId": "leader-25-50",
+            "notes": [
+                "Use 10x5 at 65/70/75% FSL across weeks."
+            ]
+        },
+        {
+            "id": "leader-bbb-challenge",
+            "name": "Leader — BBB Challenge (5x10 @ 50/60/70%)",
+            "scheduleId": "4-day-classic",
+            "weekOrder": [
+                "5s-pro-w1",
+                "5s-pro-w2",
+                "5s-pro-w3"
+            ],
+            "supplementalByDay": {
+                "0": "bbb-50",
+                "1": "bbb-60",
+                "2": "bbb-70",
+                "3": "bbb-70"
+            },
+            "assistanceProfileId": "leader-25-50",
+            "notes": [
+                "BBB challenge cycles progress 50→60→70% TM."
+            ]
+        },
+        {
+            "id": "leader-5x5-3-1",
+            "name": "Leader — 5x5/3/1",
+            "scheduleId": "4-day-classic",
+            "weekOrder": [
+                "5s-pro-w1",
+                "5s-pro-w2",
+                "5s-pro-w3"
+            ],
+            "supplementalByDay": {
+                "0": "531-top-5x5",
+                "1": "531-top-5x5",
+                "2": "531-top-5x5",
+                "3": "531-top-5x5"
+            },
+            "assistanceProfileId": "leader-25-50",
+            "notes": [
+                "Top set 5x5 at 85/90/95% by week; TM ≤80% for this method."
+            ]
+        },
+        {
+            "id": "anchor-original-531",
+            "name": "Anchor — Original 5/3/1 (PR sets)",
+            "scheduleId": "4-day-classic",
+            "weekOrder": [
+                "week-5s-pr",
+                "week-3s-pr",
+                "week-531-pr"
+            ],
+            "supplementalByDay": {},
+            "assistanceProfileId": "anchor-50-100",
+            "notes": [
+                "Standard Anchor with PR sets."
+            ]
+        },
+        {
+            "id": "leviathan-leader",
+            "name": "Leader — Leviathan (TM singles)",
+            "scheduleId": "4-day-classic",
+            "weekOrder": [
+                "leviathan-week",
+                "leviathan-week",
+                "leviathan-week"
+            ],
+            "supplementalByDay": {
+                "0": "bbs-10x5-fsl",
+                "1": "fsl-5x5",
+                "2": "bbb-fsl-5x10",
+                "3": "ssl-5x5"
+            },
+            "assistanceProfileId": "leader-25-50",
+            "notes": [
+                "Work to TM single; pick supplemental from listed options."
+            ]
+        },
+        {
+            "id": "leviathan-anchor-531",
+            "name": "Anchor — Leviathan + 5/3/1 PR sets",
+            "scheduleId": "4-day-classic",
+            "weekOrder": [
+                "week-5s-pr",
+                "week-3s-pr",
+                "week-531-pr"
+            ],
+            "supplementalByDay": {},
+            "assistanceProfileId": "anchor-50-100",
+            "notes": [
+                "Leviathan Anchor molds into Original 5/3/1 with PR sets."
+            ]
+        },
+        {
+            "id": "2x2x2-anchor",
+            "name": "2x2x2 — Anchor",
+            "scheduleId": "2-day-2x2x2",
+            "weekOrder": [
+                "week-5s-pr",
+                "week-3s-pr",
+                "week-531-pr"
+            ],
+            "supplementalByDay": {
+                "0": "fsl-5x5",
+                "1": "fsl-5x5"
+            },
+            "assistanceProfileId": "anchor-50-100",
+            "notes": [
+                "Main lifts PR or 5's PRO; supplemental 5x5 FSL or none."
+            ]
+        }
+    ],
+    "notes": [
+        "TM guidance: usually 85–90% for original; 80–85% common; some templates as low as 80%.",
+        "Standard 5/3/1 weeks: 65/75/85, 70/80/90, 75/85/95 with PR sets; after each cycle +10 lb (SQ/DL), +5 lb (BP/PR).",
+        "5x5/3/1 Leader uses top-set 5x5 at 85/90/95%; keep TM ≤80%.",
+        "BBB Challenge supplemental loads progress 50%→60%→70% across cycles.",
+        "BBS commonly 10x5 at FSL (65/70/75% by week).",
+        "7th Week Protocol: 70/80/90 x5 then TM x3–5; no supplemental; limited assistance.",
+        "Assistance per day per category: Leader 25–50 reps; Anchor 50–100 reps.",
+        "Rounding/bar defaults are not specified in the book; placeholders provided."
+    ]
+}

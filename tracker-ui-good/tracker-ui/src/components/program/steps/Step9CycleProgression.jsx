@@ -244,7 +244,7 @@ export default function Step9CycleProgression({ data = {}, updateData }) {
             <div className="bg-gray-700 p-6 rounded-lg">
                 <h4 className="text-lg font-medium text-white mb-4">Automation</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                    {[{k:'autoPercentCalc',label:'Auto percent calc'}, {k:'autoFsl',label:'Auto FSL'}, {k:'autoDeload',label:'Auto deload'}, {k:'autoTmUpdate',label:'Auto TM update'}].map(opt => (
+                    {[{ k: 'autoPercentCalc', label: 'Auto percent calc' }, { k: 'autoFsl', label: 'Auto FSL' }, { k: 'autoDeload', label: 'Auto deload' }, { k: 'autoTmUpdate', label: 'Auto TM update' }].map(opt => (
                         <label key={opt.k} className="flex items-center justify-between bg-gray-800 rounded border border-gray-700 px-3 py-2">
                             <span className="text-gray-300">{opt.label}</span>
                             <input type="checkbox" checked={!!automation[opt.k]}

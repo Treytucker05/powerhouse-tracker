@@ -1,0 +1,237 @@
+{
+  "kind": "index",
+  "program": "531",
+  "generatedAt": "2025-08-30T00:59:20.376Z",
+  "files": [
+    {
+      "file": "beyond-2013.json",
+      "version": "Beyond 5/3/1 (2013)",
+      "sourceTitle": "Beyond 5/3/1: Simple Training for Extraordinary Results",
+      "year": 2013,
+      "pages": [
+        "p.31–37",
+        "p.38–39",
+        "p.45",
+        "p.48–50",
+        "p.59–61",
+        "p.72–74",
+        "p.124–126"
+      ],
+      "counts": {
+        "weeks": 6,
+        "schedules": 2,
+        "supplemental": 11,
+        "templates": 6
+      },
+      "weekIds": [
+        "w1-5s",
+        "w2-3s",
+        "w3-531",
+        "svr-w1-3x3-90",
+        "svr-w2-5x5-ssl",
+        "svr-w3-531-singles"
+      ],
+      "scheduleIds": [
+        "bbb-template-1-4d",
+        "bbb-template-2-4d"
+      ],
+      "supplementalIds": [
+        "bbb-5x10-30",
+        "bbb-5x10-40",
+        "bbb-5x10-50",
+        "bbb-5x10-60",
+        "bbb-5x10-70",
+        "bbb-var1-from-first",
+        "bbb-var2-w1",
+        "bbb-var2-w2",
+        "bbb-var2-w3",
+        "bbb-5x5-80",
+        "bbb-5x3-90"
+      ],
+      "templateIds": [
+        "bbb-one-core",
+        "bbb-var1-core",
+        "svr-4d",
+        "bbb-challenge-50-2wk",
+        "bbb-challenge-60-2wk",
+        "bbb-challenge-70-2wk"
+      ]
+    },
+    {
+      "file": "for-football-2010.json",
+      "version": "for-football-2010",
+      "sourceTitle": "5/3/1 for Football",
+      "year": 2010,
+      "pages": [
+        "132-166"
+      ],
+      "counts": {
+        "weeks": 5,
+        "schedules": 4,
+        "supplemental": 1,
+        "templates": 4
+      },
+      "weekIds": [
+        "w1-5s",
+        "w2-3s",
+        "w3-531",
+        "w4-deload",
+        "ramp-55-65-75"
+      ],
+      "scheduleIds": [
+        "3d-winter",
+        "2d-spring",
+        "3d-pre-camp",
+        "2d-in-season"
+      ],
+      "supplementalIds": [
+        "sec-ramp-3x5"
+      ],
+      "templateIds": [
+        "winter-8wk",
+        "spring-2wk",
+        "pre-camp-6wk",
+        "in-season"
+      ]
+    },
+    {
+      "file": "forever-2017.json",
+      "version": "Forever",
+      "sourceTitle": "5/3/1 Forever",
+      "year": 2017,
+      "pages": [
+        "p.3–7, 15, 20–36, 46–66, 68–81, 89–121, 134–176, 199–233, 243–245"
+      ],
+      "counts": {
+        "weeks": 8,
+        "schedules": 3,
+        "supplemental": 9,
+        "templates": 8
+      },
+      "weekIds": [
+        "week-5s-pr",
+        "week-3s-pr",
+        "week-531-pr",
+        "5s-pro-w1",
+        "5s-pro-w2",
+        "5s-pro-w3",
+        "7th-week-tm-test",
+        "leviathan-week"
+      ],
+      "scheduleIds": [
+        "4-day-classic",
+        "3-day",
+        "2-day-2x2x2"
+      ],
+      "supplementalIds": [
+        "fsl-5x5",
+        "ssl-5x5",
+        "bbb-fsl-5x10",
+        "bbb-50",
+        "bbb-60",
+        "bbb-70",
+        "bbs-10x5-fsl",
+        "wm-1x20-fsl",
+        "531-top-5x5"
+      ],
+      "templateIds": [
+        "leader-5spro-fsl",
+        "leader-bbs-fsl",
+        "leader-bbb-challenge",
+        "leader-5x5-3-1",
+        "anchor-original-531",
+        "leviathan-leader",
+        "leviathan-anchor-531",
+        "2x2x2-anchor"
+      ]
+    },
+    {
+      "file": "powerlifting-2011.json",
+      "version": "powerlifting-2011",
+      "sourceTitle": "5/3/1 for Powerlifting: Simple and Effective Training for Maximal Strength",
+      "year": 2011,
+      "pages": [
+        "pp. 9-12",
+        "pp. 16-18",
+        "pp. 29-33",
+        "pp. 49-55",
+        "pp. 64-66",
+        "pp. 107-115"
+      ],
+      "counts": {
+        "weeks": 8,
+        "schedules": 1,
+        "supplemental": 3,
+        "templates": 2
+      },
+      "weekIds": [
+        "std-w1-3x5",
+        "std-w2-3x3",
+        "std-w3-531",
+        "std-w4-deload",
+        "pl-w1-3x3",
+        "pl-w2-3x5",
+        "pl-w3-531",
+        "pl-w4-deload"
+      ],
+      "scheduleIds": [
+        "four-day-nov"
+      ],
+      "supplementalIds": [
+        "bbb-50",
+        "bbb-60",
+        "first-set-last"
+      ],
+      "templateIds": [
+        "nov-powerlifting",
+        "nov-standard"
+      ]
+    },
+    {
+      "file": "second-edition-2011.json",
+      "version": "v2",
+      "sourceTitle": "5/3/1: The Simplest and Most Effective Training System to Increase Raw Strength",
+      "year": 2011,
+      "pages": [
+        "pp.10-13",
+        "pp.21-24",
+        "pp.31-33",
+        "pp.46-49",
+        "pp.76-77",
+        "pp.91-92",
+        "pp.123-130"
+      ],
+      "counts": {
+        "weeks": 6,
+        "schedules": 2,
+        "supplemental": 5,
+        "templates": 4
+      },
+      "weekIds": [
+        "w1-5s",
+        "w2-3s",
+        "w3-531",
+        "w4-deload",
+        "w1-5s-alt",
+        "w2-3s-alt"
+      ],
+      "scheduleIds": [
+        "4d-standard",
+        "3d-beginner-full-body"
+      ],
+      "supplementalIds": [
+        "sec-ramp-3x5",
+        "bbb-30-5x10",
+        "bbb-40-5x10",
+        "bbb-50-5x10",
+        "bbb-60-5x10"
+      ],
+      "templateIds": [
+        "original-4d",
+        "bbb-4d-50",
+        "option2-4d",
+        "beginner-3d"
+      ]
+    }
+  ]
+}

@@ -30,11 +30,17 @@ function defaultDays(n: DaysPerWeek): Weekday[] {
     return ['Mon', 'Tue', 'Thu', 'Fri'];
 }
 
+function rotationForDaysPerWeek(n: DaysPerWeek): RotationPreset {
+    if (n === 2) return '2D: SQ/BP • DL/PR';
+    if (n === 3) return '3D: SQ/BP • DL/PR • SQ/PR';
+    return '4D: SQ-BP-DL-PR';
+}
+
 export const useSchedule = create<ScheduleState>((set, get) => ({
-    state: { daysPerWeek: 4, days: defaultDays(4), rotation: '4D: SQ-BP-DL-PR' },
+    state: { daysPerWeek: 4, days: defaultDays(4), rotation: rotationForDaysPerWeek(4) },
     daysPerWeek: 4,
     days: defaultDays(4),
-    rotation: '4D: SQ-BP-DL-PR',
+    rotation: rotationForDaysPerWeek(4),
 
     setDaysPerWeek: (d) => set((state) => {
         let days = [...state.days];
@@ -51,7 +57,8 @@ export const useSchedule = create<ScheduleState>((set, get) => ({
             }
         }
         const next = { daysPerWeek: d as DaysPerWeek, days };
-        return { ...next, state: { daysPerWeek: next.daysPerWeek, days: next.days, rotation: state.rotation } } as unknown as ScheduleState;
+        const rotation = rotationForDaysPerWeek(next.daysPerWeek);
+        return { ...next, rotation, state: { daysPerWeek: next.daysPerWeek, days: next.days, rotation } } as unknown as ScheduleState;
     }),
 
     toggleDay: (day) => set((state) => {
@@ -70,7 +77,12 @@ export const useSchedule = create<ScheduleState>((set, get) => ({
     }),
 
     setRotation: (r) => set((s) => ({ rotation: r, state: { daysPerWeek: s.daysPerWeek, days: s.days, rotation: r } })),
-    setDays: (days) => set((s) => ({ days, state: { daysPerWeek: s.daysPerWeek, days, rotation: s.rotation } })),
+    setDays: (days) => set((s) => {
+        // Keep daysPerWeek aligned with number of selected days (clamped to 2–4)
+        const len = Math.max(2, Math.min(4, days.length)) as DaysPerWeek;
+        const rotation = rotationForDaysPerWeek(len);
+        return { days, daysPerWeek: len, rotation, state: { daysPerWeek: len, days, rotation } } as unknown as ScheduleState;
+    }),
 }));
 
 export function ScheduleProvider({ children }: { children: React.ReactNode }) {

@@ -8,11 +8,13 @@ import { getDataHealth, loadSeventhWeekCsv, loadTMPoliciesCsv } from "@/lib/data
 import DataStatusBanner from "@/components/ui/DataStatusBanner";
 import type { SeventhWeekRow, TMRuleRow } from "@/types/step3";
 import BuilderProgress from "@/components/program/steps/BuilderProgress";
+import { useProgramV2, selectAssistanceTargets, setAssistanceTargets } from "@/methods/531/contexts/ProgramContextV2.jsx";
 
 function Step5ProgressionInner() {
     const { plan, setPlan, weeks, totalWeeks } = useProgression();
     const { bookMode } = useSettings();
     const { state: s3 } = useStep3();
+    const { state: programV2, dispatch: programDispatch } = useProgramV2();
     const [health, setHealth] = useState<{ seventhWeek: boolean; tmRules: boolean; jokerRules: boolean } | null>(null);
     const [tmPolicies, setTmPolicies] = useState<TMRuleRow[]>([]);
     const [protocols, setProtocols] = useState<SeventhWeekRow[]>([]);
@@ -126,6 +128,42 @@ function Step5ProgressionInner() {
                                     ))}
                             </select>
                             <div className="text-[11px] text-gray-400 mt-1">Protocols from seventh_week.csv</div>
+                        </div>
+
+                        {/* Assistance targets (ProgramContextV2) */}
+                        <div className="mt-5 border-t border-gray-800 pt-4">
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="text-sm text-gray-300">Assistance Targets (per day)</div>
+                                <div className="flex items-center gap-1">
+                                    {[50, 75, 100].map(v => (
+                                        <button key={v} onClick={() => setAssistanceTargets(programDispatch, { push: v, pull: v, core: v })}
+                                            className="px-2 py-0.5 rounded border border-gray-700 text-[11px] hover:border-red-500">{v}</button>
+                                    ))}
+                                </div>
+                            </div>
+                            {(() => {
+                                const t = selectAssistanceTargets(programV2);
+                                const setField = (k: 'push'|'pull'|'core') => (e: React.ChangeEvent<HTMLInputElement>) => {
+                                    const val = Math.max(0, Math.min(300, Number(e.target.value || 0)));
+                                    setAssistanceTargets(programDispatch, { [k]: val } as any);
+                                };
+                                const Field = ({ label, k }: { label: string; k: 'push'|'pull'|'core' }) => (
+                                    <label className="flex items-center justify-between gap-2 mb-2">
+                                        <span className="text-xs text-gray-400 w-28">{label}</span>
+                                        <input type="number" min={0} max={300} step={5} value={t[k]}
+                                            onChange={setField(k)}
+                                            className="w-28 bg-[#0b1220] border border-gray-700 rounded px-2 py-1 text-sm" />
+                                    </label>
+                                );
+                                return (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                        <Field label="Push (reps)" k="push" />
+                                        <Field label="Pull (reps)" k="pull" />
+                                        <Field label="Core (reps)" k="core" />
+                                    </div>
+                                );
+                            })()}
+                            <div className="mt-1 text-[11px] text-gray-400">Set your daily rep targets. Quick‑set chips apply to all three.</div>
                         </div>
                     </div>
 

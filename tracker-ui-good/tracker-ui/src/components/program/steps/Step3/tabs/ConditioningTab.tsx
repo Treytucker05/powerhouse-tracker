@@ -121,20 +121,27 @@ export default function ConditioningTab() {
     const easy = state.conditioning.easyDays ?? 0;
     const total = hard + easy;
     const violates50 = total > 0 && hard > easy; // more hard than easy
+    const allowOver = !!state.conditioning.allowOverage;
 
     return (
         <div className="space-y-4">
             {/* 50% Rule Banner */}
-            <div className={`rounded border p-3 ${violates50 ? 'bg-red-900/20 border-red-700' : total === 0 ? 'bg-yellow-900/20 border-yellow-700' : 'bg-emerald-900/20 border-emerald-700'}`}>
+            <div className={`rounded border p-3 ${violates50 && !allowOver ? 'bg-red-900/20 border-red-700' : total === 0 ? 'bg-yellow-900/20 border-yellow-700' : 'bg-emerald-900/20 border-emerald-700'}`}>
                 <div className="text-sm">
                     <span className="font-medium text-gray-100">50% Rule:</span>{' '}
                     <span className="text-gray-200">At least half of your weekly conditioning should be Easy.</span>
                 </div>
                 <div className="text-xs mt-1 text-gray-300">
-                    {violates50 && 'Tip: Add Easy days or reduce Hard days to improve recovery.'}
+                    {violates50 && !allowOver && 'Tip: Add Easy days or reduce Hard days to improve recovery.'}
                     {!violates50 && total > 0 && 'Good balance — keep Easy work ≥ Hard for sustainable progress.'}
                     {total === 0 && 'No conditioning days selected yet.'}
                 </div>
+                {violates50 && (
+                    <label className="mt-2 inline-flex items-center gap-2 text-xs text-gray-300">
+                        <input type="checkbox" checked={allowOver} onChange={(e) => actions.setConditioning({ allowOverage: e.target.checked })} />
+                        Allow overage (I understand recovery will suffer)
+                    </label>
+                )}
             </div>
             {/* Frequency controls */}
             <div className="bg-[#0b1220] border border-gray-800 rounded p-4">

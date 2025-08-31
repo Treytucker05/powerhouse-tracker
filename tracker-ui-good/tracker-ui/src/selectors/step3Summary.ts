@@ -22,6 +22,8 @@ export function useCustomizeSummary(): CustomizeSummary {
         supplementalSets,
         assistanceTargets: state.assistance.perCategoryTarget || {},
         jumpsThrows: state.warmup.jumpsThrowsDose || 10,
+        jumpsPerDay: state.warmup.jumpsPerDay,
+        throwsPerDay: state.warmup.throwsPerDay,
     });
 
     return { summary: state, minutes };

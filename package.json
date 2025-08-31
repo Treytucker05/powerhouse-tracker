@@ -11,6 +11,11 @@
     "test:ci": "npm --prefix tracker-ui-good/tracker-ui run test:ci",
     "prepush": "npm run lint && npm run test:ci",
     "verify:531": "node scripts/verify-531.mjs",
+    "validate:531": "node scripts/validate-program-json.mjs schemas/531-program.schema.json data/programs/531/*.json",
+    "index:531": "node scripts/build-531-index.mjs data/programs/531",
+    "index:531:packs": "node scripts/build-531-pack-index.mjs data/packs/531",
+    "programs:531": "npm run validate:531 && npm run index:531",
+    "report:531": "node scripts/report-531-programs.mjs data/programs/531",
     "start": "npm run dev",
     "extract:build": "ts-node --transpile-only scripts/build-extraction-sheet.ts",
     "extract:build:js": "node scripts/build-extraction-sheet.js",
@@ -21,6 +26,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.3.0",
+    "ajv": "^8.17.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2",
     "xlsx": "^0.18.5"

@@ -4,7 +4,9 @@ import { estimateSessionMinutes, warningsForSelection } from '@/lib/531/rules';
 import { calcRecovery } from '@/lib/531/recovery';
 import { useSettings } from '@/store/settingsStore';
 import { useSchedule } from '@/store/scheduleStore';
+import { useBuilder } from '@/context/BuilderState';
 import { buildStep3DefaultsFromSupplemental } from '@/lib/531/defaults';
+import { resolveTemplateConfig } from '@/lib/531/templateSchema';
 
 function Meter({ label, current, target }: { label: string; current: number; target: number }) {
     const pct = Math.max(0, Math.min(100, Math.round((current / Math.max(1, target)) * 100)));
@@ -30,10 +32,16 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 export default function StickySummary() {
     const { state, actions } = useStep3();
     const { bookMode } = useSettings();
-    const { state: schedule } = useSchedule();
+    // Pull live schedule from store (top-level fields), and Step 2 split info
+    const scheduleLive = useSchedule(s => ({ days: s.days, daysPerWeek: s.daysPerWeek, rotation: s.rotation }));
+    const { state: builderState } = useBuilder();
+    const step2 = (builderState as any)?.step2 || {};
     const supp = state.supplemental;
+    const tplCfg = resolveTemplateConfig(((builderState as any)?.step2?.templateId) || null);
     const picks = state.assistance.picks;
     const targets = state.assistance.perCategoryTarget || {};
+    const step1 = (builderState as any)?.step1 || {};
+    const inheritedTM = typeof step1?.tmPct === 'number' ? Math.round(step1.tmPct * 100) + '%' : '—';
 
     // Heuristic: each pick ~10 reps proxy toward target display
     const currentReps = (arr?: string[]) => (Array.isArray(arr) ? arr.length * 10 : 0);
@@ -51,12 +59,14 @@ export default function StickySummary() {
     }, [supp?.SupplementalSetsReps]);
 
     const assistanceTargets = state.assistance.perCategoryTarget || {};
-    const jtDose = state.warmup.jumpsThrowsDose || 0;
+    const jtCombined = state.warmup.jumpsThrowsDose || 0;
     const estMinutes = estimateSessionMinutes({
         mainPattern: (supp?.MainPattern as any) || '531',
         supplementalSets,
         assistanceTargets,
-        jumpsThrows: jtDose,
+        jumpsThrows: jtCombined,
+        jumpsPerDay: state.warmup.jumpsPerDay,
+        throwsPerDay: state.warmup.throwsPerDay,
     });
 
     const warnings = warningsForSelection(supp, estMinutes, hard, state.cycle?.includeDeload !== false);
@@ -105,9 +115,26 @@ export default function StickySummary() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [supp]);
 
+    // Compute a rotation label that prefers Step 2's split (e.g., 2D • A/B) when available
+    const splitKey = (step2.splitKey || '') as '2D' | '3D' | '4D' | '';
+    const splitLabel = (step2.splitLabel || '') as string;
+    const computedRotation = splitKey ? `${splitKey}${splitLabel ? ': ' + splitLabel : ''}` : scheduleLive.rotation;
+    const daysLabel = (scheduleLive.days || []).join(' · ') || '—';
+
     return (
         <aside className="sticky top-4 bg-[#111827] border border-gray-700 rounded p-4">
             <div className="space-y-4">
+                {/* Schedule summary moved higher for clarity */}
+                <div className="border border-gray-700 rounded p-3">
+                    <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm text-gray-300">Training Days</span>
+                        <span className="text-sm font-semibold">{daysLabel}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-300">Rotation</span>
+                        <span className="text-sm font-semibold">{computedRotation}</span>
+                    </div>
+                </div>
                 <div>
                     <SectionHeading>Supplemental</SectionHeading>
                     {supp ? (
@@ -126,8 +153,25 @@ export default function StickySummary() {
                             </li>
                             <li>
                                 <span className="text-gray-400">TM: </span>
-                                {supp.TMRecommendation}
+                                {inheritedTM} <span className="text-[10px] text-gray-400">(from Step 1)</span>
                             </li>
+                            {supp.MainPattern === '5s PRO' && supp.SupplementalScheme === 'SSL' && (
+                                <li>
+                                    <span className="text-gray-400">SSL % by week: </span>
+                                    75/80/85% TM
+                                </li>
+                            )}
+                            {supp.MainPattern === '5s PRO' && supp.SupplementalScheme === 'FSL' && (
+                                <li>
+                                    <span className="text-gray-400">FSL % by week: </span>
+                                    65/70/75% TM
+                                </li>
+                            )}
+                            {(supp.MainPattern === '5s PRO') && (
+                                <li className="text-[11px] text-gray-400">
+                                    {tplCfg?.policiesRow ? tplCfg.policiesRow : 'Policies: AMRAP Off · Jokers No · 7th Week between phases'}
+                                </li>
+                            )}
                         </ul>
                     ) : (
                         <p className="text-sm text-gray-400">No supplemental selected yet.</p>
@@ -166,8 +210,12 @@ export default function StickySummary() {
                             {state.warmup.mobility || '—'}
                         </li>
                         <li>
-                            <span className="text-gray-400">Jumps/Throws dose: </span>
-                            {state.warmup.jumpsThrowsDose}
+                            <span className="text-gray-400">Jumps: </span>
+                            {typeof state.warmup.jumpsPerDay === 'number' ? state.warmup.jumpsPerDay : '—'}
+                        </li>
+                        <li>
+                            <span className="text-gray-400">Throws: </span>
+                            {typeof state.warmup.throwsPerDay === 'number' ? state.warmup.throwsPerDay : '—'}
                         </li>
                     </ul>
                 </div>
@@ -219,17 +267,6 @@ export default function StickySummary() {
                 </div>
 
                 <div className="pt-2 border-t border-gray-700">
-                    {/* Schedule summary */}
-                    <div className="mt-3 border border-gray-700 rounded p-3">
-                        <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm text-gray-300">Training Days</span>
-                            <span className="text-sm font-semibold">{(schedule.days || []).join(' · ') || '—'}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-300">Rotation</span>
-                            <span className="text-sm font-semibold">{schedule.rotation}</span>
-                        </div>
-                    </div>
 
                     <SectionHeading>Time & Warnings</SectionHeading>
                     <p className="text-sm text-gray-200">Estimated session: ~{Math.max(30, Math.min(120, Math.round(estMinutes)))} min</p>
