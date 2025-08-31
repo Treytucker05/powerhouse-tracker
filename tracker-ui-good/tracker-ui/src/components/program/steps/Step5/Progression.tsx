@@ -143,11 +143,11 @@ function Step5ProgressionInner() {
                             </div>
                             {(() => {
                                 const t = selectAssistanceTargets(programV2);
-                                const setField = (k: 'push'|'pull'|'core') => (e: React.ChangeEvent<HTMLInputElement>) => {
+                                const setField = (k: 'push' | 'pull' | 'core') => (e: React.ChangeEvent<HTMLInputElement>) => {
                                     const val = Math.max(0, Math.min(300, Number(e.target.value || 0)));
                                     setAssistanceTargets(programDispatch, { [k]: val } as any);
                                 };
-                                const Field = ({ label, k }: { label: string; k: 'push'|'pull'|'core' }) => (
+                                const Field = ({ label, k }: { label: string; k: 'push' | 'pull' | 'core' }) => (
                                     <label className="flex items-center justify-between gap-2 mb-2">
                                         <span className="text-xs text-gray-400 w-28">{label}</span>
                                         <input type="number" min={0} max={300} step={5} value={t[k]}

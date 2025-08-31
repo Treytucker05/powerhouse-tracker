@@ -2,6 +2,16 @@ import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProgramV2 } from "../methods/531/contexts/ProgramContextV2.jsx"; // real context (JSX module)
 import { startCycle as persistStartCycle } from "../state/programCycle";
+import {
+    selectTmPctChoice,
+    selectRoundingIncrement,
+    selectPhasePlan,
+    selectSeventhWeek,
+    selectSupplementalSchemeId,
+    selectAssistanceTargets,
+    selectAutomation,
+    selectLogging,
+} from "../methods/531/contexts/ProgramContextV2.jsx";
 
 /** ========= Types (from spec) ========= **/
 type WeeklyOption = "opt1" | "opt2"; // opt1: 65/75/85, 70/80/90, 75/85/95 ; opt2 per book, p.22
@@ -218,6 +228,8 @@ function HeaderSummary({ meta }: { meta: ReviewState["meta"] }) {
                 <Badge>Schedule: 4‑day</Badge>
                 <Badge>Next Cycle TM: +{meta.progression.upper_inc} / +{meta.progression.lower_inc}</Badge>
             </div>
+            {/* ProgramV2 chips */}
+            <ProgramChips />
         </header>
     );
 }
@@ -428,5 +440,36 @@ function FooterActions({ onBack, onStartCycle, startDisabled }: { onBack: () => 
                 Start Cycle
             </button>
         </footer>
+    );
+}
+
+/** ========= Program Chips from ProgramContextV2 ========= **/
+function ProgramChips() {
+    const { state } = useProgramV2();
+    const tmChoice = selectTmPctChoice(state) || Math.round(((state as any)?.tmPct || 0.85) * 100);
+    const units = (state as any)?.units || 'lb';
+    const roundingInc = selectRoundingIncrement(state);
+    const phase = selectPhasePlan(state);
+    const seventh = selectSeventhWeek(state) as any;
+    const schemeId = selectSupplementalSchemeId(state) as any;
+    const targets = selectAssistanceTargets(state);
+    const auto = selectAutomation(state) as any;
+    const logging = selectLogging(state) as any;
+    const autoOn = Object.entries(auto || {}).filter(([, v]) => !!v).map(([k]) => k.replace(/^auto/i, '').toLowerCase());
+    const schemeLabel = (id: string | undefined) => (id ? id.toUpperCase() : '—');
+    return (
+        <div className="mt-2 flex flex-wrap gap-2 text-xs">
+            <Badge>TM: {tmChoice}%</Badge>
+            <Badge>Units: {units}</Badge>
+            <Badge>Rounding inc: {roundingInc}</Badge>
+            <Badge>Pattern: {phase?.pattern || '2+1'}</Badge>
+            <Badge>7th‑Week: {seventh?.mode || 'auto'}{seventh?.criteria ? ` · ${seventh.criteria}` : ''}</Badge>
+            <Badge>Supplemental: {schemeLabel(schemeId)}</Badge>
+            <Badge>Targets P/P/C: {targets.push}/{targets.pull}/{targets.core}</Badge>
+            <Badge>Automation: {autoOn.length ? autoOn.join(', ') : 'none'}</Badge>
+            {logging?.trackAmrap ? (
+                <Badge>Est 1RM: {String(logging.est1rmFormula || 'default')}</Badge>
+            ) : null}
+        </div>
     );
 }
