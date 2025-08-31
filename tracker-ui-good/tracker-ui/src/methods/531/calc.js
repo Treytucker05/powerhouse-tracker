@@ -17,19 +17,45 @@ export function computeWarmups(lift, tm, weekLabel, roundingPref, units, pack) {
     });
 }
 
-export function computeMainSets(lift, tm, weekLabel, { amrap } = {}, roundingPref, units, pack) {
+export function computeMainSets(lift, tm, weekLabel, { amrap } = {}, roundingPref, units, pack, state) {
     if (!pack || !tm) return { rows: [], amrapLast: false };
     const wk = extractWeekByLabel(pack, weekLabel);
     const main = wk?.main || [];
     const rnd = roundingPref || { lbs: 5, kg: 2.5 };
+    // Determine phase to decide AMRAP policy: Leader (no AMRAP), Anchor (AMRAP on last set)
+    const phase = (state?.phasePlan?.leader && /3x5|3x3/.test(weekLabel)) ? 'leader'
+        : (state?.phasePlan?.anchor && /5\/3\/1/.test(weekLabel)) ? 'anchor' : null;
+    const isLeader = phase === 'leader' || /3x5|3x3/i.test(weekLabel);
+    const isAnchor = phase === 'anchor' || /5\/3\/1/i.test(weekLabel);
     const rows = main.map((s, idx) => {
         const pct = s.value ?? s.percentage ?? s.pct;
         const reps = s.reps ?? 0;
-        // Respect pack amrap flag; optionally force only for final heavy week
-        const isAmrap = Boolean(s.amrap && (amrap ? true : s.amrap));
+        // AMRAP policy: Leader weeks set amrap=false; Anchor weeks allow on last set only for classic 5/3/1
+        let isAmrap = false;
+        if (isLeader) {
+            isAmrap = false;
+        } else if (isAnchor) {
+            const last = idx === (main.length - 1);
+            isAmrap = Boolean(last && (s.amrap || amrap));
+        } else {
+            // default behavior
+            isAmrap = Boolean(s.amrap && (amrap ? true : s.amrap));
+        }
         const weight = roundLoad((pct / 100) * tm, units, rnd);
-        return { pct, reps, amrap: isAmrap, weight };
+        return { pct, reps, amrap: isAmrap, weight, percent_of: 'tm' };
     });
+    // Auto backoff: when enabled, append FSL/SSL line using schemeId
+    try {
+        const auto = state?.automation?.autoFsl;
+        const schemeId = state?.supplemental?.schemeId || state?.supplemental?.strategy;
+        if (auto && (schemeId === 'fsl' || schemeId === 'ssl') && rows.length >= 2) {
+            const refIdx = schemeId === 'fsl' ? 0 : 1;
+            const ref = rows[refIdx];
+            if (ref) {
+                rows.push({ pct: ref.pct, reps: typeof ref.reps === 'string' ? ref.reps : 5, amrap: false, weight: ref.weight, percent_of: 'tm', backoff: schemeId });
+            }
+        }
+    } catch { /* non-fatal */ }
     const amrapLast = rows.length ? Boolean(rows[rows.length - 1]?.amrap) : false;
     return { rows, amrapLast };
 }
