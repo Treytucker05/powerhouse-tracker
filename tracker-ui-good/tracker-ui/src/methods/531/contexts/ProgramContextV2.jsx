@@ -497,6 +497,11 @@ export const selectRoundingIncrement = (state) => state.roundingIncrement;
 export const setRoundingIncrement = (dispatch, value /* number */) =>
     dispatch({ type: 'SET_ROUNDING_INCREMENT', value });
 
+/** @returns {number} */
+export const selectTmPct = (state) => state.tmPct;
+export const setTmPct = (dispatch, tmPct /* number 0-1 */) =>
+    dispatch({ type: 'SET_TM_PCT', tmPct });
+
 /** @returns {2|3|4} */
 export const selectFrequencyDays = (state) => state.frequencyDays;
 export const setFrequencyDays = (dispatch, value /* 2|3|4 */) =>
@@ -511,6 +516,11 @@ export const setSplitStyle = (dispatch, value /* 'one_lift'|'full_body' */) =>
 export const selectPhasePlan = (state) => state.phasePlan;
 export const setPhasePlan = (dispatch, patch /* partial */) =>
     dispatch({ type: 'SET_PHASE_PLAN', value: patch });
+
+/** @returns {'2+1'|'3+1'} */
+export const selectPhasePattern = (state) => state?.phasePlan?.pattern;
+export const setPhasePattern = (dispatch, pattern /* '2+1'|'3+1' */) =>
+    dispatch({ type: 'SET_PHASE_PLAN', value: { pattern } });
 
 /** @returns {'fsl'|'bbb'|'bbs'|'ssl'} */
 export const selectSupplementalSchemeId = (state) => state?.supplemental?.schemeId;

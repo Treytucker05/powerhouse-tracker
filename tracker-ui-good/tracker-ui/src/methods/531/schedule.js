@@ -110,7 +110,7 @@ export function makeDay({ lift, weekLabel, state, pack, roundingPref, units }) {
         warmups: computeWarmups(lift, tm, weekLabel, roundingPref, units, pack),
         // Pass program state so computeMainSets can apply Leader/Anchor AMRAP rules and auto backoffs
         main: computeMainSets(lift, tm, weekLabel, { amrap: weekLabel === '5/3/1' }, roundingPref, units, pack, state),
-        supplemental: computeSupplemental(pack, lift, tm, state),
+        supplemental: computeSupplemental(pack, lift, tm, { ...state, weekLabel }),
         assistance: computeAssistance(pack, lift, state)
     };
     try {

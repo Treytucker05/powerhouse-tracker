@@ -449,6 +449,7 @@ function ProgramChips() {
     const tmChoice = selectTmPctChoice(state) || Math.round(((state as any)?.tmPct || 0.85) * 100);
     const units = (state as any)?.units || 'lb';
     const roundingInc = selectRoundingIncrement(state);
+    const roundingMode = (state as any)?.rounding || 'nearest';
     const phase = selectPhasePlan(state);
     const seventh = selectSeventhWeek(state) as any;
     const schemeId = selectSupplementalSchemeId(state) as any;
@@ -460,8 +461,7 @@ function ProgramChips() {
     return (
         <div className="mt-2 flex flex-wrap gap-2 text-xs">
             <Badge>TM: {tmChoice}%</Badge>
-            <Badge>Units: {units}</Badge>
-            <Badge>Rounding inc: {roundingInc}</Badge>
+            <Badge>Units/Rounding: {units}, {roundingMode} ±{roundingInc}</Badge>
             <Badge>Pattern: {phase?.pattern || '2+1'}</Badge>
             <Badge>7th‑Week: {seventh?.mode || 'auto'}{seventh?.criteria ? ` · ${seventh.criteria}` : ''}</Badge>
             <Badge>Supplemental: {schemeLabel(schemeId)}</Badge>
