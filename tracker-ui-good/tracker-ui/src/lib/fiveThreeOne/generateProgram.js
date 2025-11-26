@@ -5,7 +5,6 @@ import { deriveLiftDayMap, DAYS } from './scheduleHelpers.js';
 function liftLabel(key) {
     return ({
         press: 'Overhead Press',
-        press: 'Overhead Press',
         bench: 'Bench Press',
         squat: 'Squat',
         deadlift: 'Deadlift'

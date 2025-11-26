@@ -47,8 +47,7 @@ const LIFT_LABELS = {
     squat: 'Squat',
     bench: 'Bench Press',
     deadlift: 'Deadlift',
-    press: 'Overhead Press',
-    press: 'Overhead Press',
+    press: 'Overhead Press', // consolidated single key
 };
 
 function liftKeysFromOrder(order) {

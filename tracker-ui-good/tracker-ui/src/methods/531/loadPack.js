@@ -1,11 +1,12 @@
 // Minimal JSONC strip (handles // and /* */ comments)
+import { assetUrl } from '../../lib/assetUrl.js';
 const stripJsonc = (s) =>
     s
         .replace(/\/\*[\s\S]*?\*\//g, "") // block comments
         .replace(/(^|[^:])\/\/.*$/gm, "$1"); // line comments (naive)
 
 export async function loadPack531BBB() {
-    const url = "/methodology/packs/531.bbb.v1.jsonc";
+    const url = assetUrl('methodology/packs/531.bbb.v1.jsonc');
     try {
         const res = await fetch(url, { cache: "no-store" });
         if (!res.ok) return null;

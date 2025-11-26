@@ -15,7 +15,8 @@ export default function Step13Triumvirate({ data, updateData }) {
         },
         deadlift: {
             mainLift: 'deadlift',
-            supplemental: { name: 'Good Mornings', sets: 5, reps: 10, category: 'posterior_chain' },
+            // Book-accurate: Good Mornings 5×12 (previously 5×10)
+            supplemental: { name: 'Good Mornings', sets: 5, reps: 12, category: 'posterior_chain' },
             assistance: { name: 'Hanging Leg Raises', sets: 5, reps: 15, category: 'core' }
         },
         bench: {

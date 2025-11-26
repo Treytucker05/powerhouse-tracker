@@ -1,0 +1,482 @@
+// 531 BBB methodology pack (tracker-ui public copy)
+// Repaired after structural corruption (duplicate/misalplaced objects). Preserves tracker-ui schema.
+{
+    "meta": {
+        "method": "531",
+        "variant": "BBB",
+        "author": "Trey",
+        "compatibility": {
+            "minCoreVersion": "1.0.0",
+            "maxCoreVersion": "1.x.x"
+        }
+    },
+    "defaults": {
+        "units": "lbs",
+        "rounding": {
+            "lbs": 5,
+            "kg": 2.5
+        }
+    },
+    "exerciseCatalog": [
+        {
+            "id": "barbell.press.ohp",
+            "name": "Overhead Press",
+            "tags": [
+                "main",
+                "upper"
+            ]
+        },
+        {
+            "id": "barbell.deadlift.conv",
+            "name": "Deadlift",
+            "tags": [
+                "main",
+                "lower"
+            ]
+        },
+        {
+            "id": "barbell.bench.flat",
+            "name": "Bench Press",
+            "tags": [
+                "main",
+                "upper"
+            ]
+        },
+        {
+            "id": "barbell.squat.back",
+            "name": "Back Squat",
+            "tags": [
+                "main",
+                "lower"
+            ]
+        },
+        {
+            "id": "bw.pullup",
+            "name": "Pull-up",
+            "tags": [
+                "assist",
+                "pull",
+                "upper"
+            ]
+        },
+        {
+            "id": "core.ab_wheel",
+            "name": "Ab Wheel",
+            "tags": [
+                "assist",
+                "core"
+            ]
+        }
+    ],
+    "templates": [
+        {
+            "id": "bbb50",
+            "name": "Boring But Big 50% (Start)",
+            "effects": {
+                "supplemental": {
+                    "mode": "bbb",
+                    "pairing": "same",
+                    "intensity": {
+                        "kind": "percent_of",
+                        "of": "TM",
+                        "value": 50
+                    },
+                    "sets": 5,
+                    "reps": 10,
+                    "provenance": {
+                        "source": "book",
+                        "note": "Wendler guidance: begin BBB at ~50% TM"
+                    }
+                }
+            },
+            "provenance": {
+                "source": "book",
+                "note": "BBB start 50%"
+            }
+        },
+        {
+            "id": "bbb60",
+            "name": "Boring But Big 60%",
+            "effects": {
+                "supplemental": {
+                    "mode": "bbb",
+                    "pairing": "same",
+                    "intensity": {
+                        "kind": "percent_of",
+                        "of": "TM",
+                        "value": 60
+                    },
+                    "sets": 5,
+                    "reps": 10,
+                    "provenance": {
+                        "source": "book",
+                        "note": "Legacy 60% BBB option"
+                    }
+                }
+            },
+            "provenance": {
+                "source": "book",
+                "note": "BBB base 60%"
+            }
+        },
+        {
+            "id": "triumvirate",
+            "name": "Triumvirate",
+            "effects": {
+                "assistance": {
+                    "slots": [
+                        {
+                            "category": "assist_a",
+                            "sets": 5,
+                            "reps": "10-15"
+                        },
+                        {
+                            "category": "assist_b",
+                            "sets": 5,
+                            "reps": "10-15"
+                        }
+                    ],
+                    "provenance": {
+                        "source": "book",
+                        "note": "Two focused assistance movements"
+                    }
+                }
+            },
+            "provenance": {
+                "source": "book",
+                "note": "Triumvirate assistance volume"
+            }
+        },
+        {
+            "id": "jack_shit",
+            "name": "Jack Shit",
+            "effects": {
+                "assistance": {
+                    "slots": [],
+                    "provenance": {
+                        "source": "book",
+                        "note": "No assistance"
+                    }
+                }
+            },
+            "provenance": {
+                "source": "book",
+                "note": "Minimalist variant"
+            }
+        },
+        {
+            "id": "periodization_bible",
+            "name": "Periodization Bible",
+            "effects": {
+                "assistance": {
+                    "slots": [
+                        {
+                            "category": "push",
+                            "sets": 5,
+                            "reps": "10-20"
+                        },
+                        {
+                            "category": "pull",
+                            "sets": 5,
+                            "reps": "10-20"
+                        },
+                        {
+                            "category": "single_leg_or_core",
+                            "sets": 5,
+                            "reps": "10-20"
+                        }
+                    ],
+                    "provenance": {
+                        "source": "book",
+                        "note": "Balanced pattern coverage"
+                    }
+                }
+            },
+            "provenance": {
+                "source": "book",
+                "note": "Periodization Bible template"
+            }
+        },
+        {
+            "id": "bodyweight",
+            "name": "Bodyweight Focus",
+            "effects": {
+                "assistance": {
+                    "slots": [
+                        {
+                            "category": "upper_pull_bw",
+                            "sets": 5,
+                            "reps": "AMRAP"
+                        },
+                        {
+                            "category": "pushup_or_dip",
+                            "sets": 5,
+                            "reps": "AMRAP"
+                        },
+                        {
+                            "category": "core_bw",
+                            "sets": 5,
+                            "reps": "10-20"
+                        }
+                    ],
+                    "provenance": {
+                        "source": "book",
+                        "note": "Bodyweight emphasis (push/pull/core)"
+                    }
+                }
+            },
+            "provenance": {
+                "source": "book",
+                "note": "Bodyweight assistance variant"
+            }
+        }
+    ],
+    "progressions": {
+        "warmups": [
+            {
+                "kind": "percent_of",
+                "of": "TM",
+                "value": 40,
+                "reps": 5
+            },
+            {
+                "kind": "percent_of",
+                "of": "TM",
+                "value": 50,
+                "reps": 5
+            },
+            {
+                "kind": "percent_of",
+                "of": "TM",
+                "value": 60,
+                "reps": 3
+            }
+        ],
+        "weeks": [
+            {
+                "id": "w1_3x5",
+                "label": "3x5",
+                "main": [
+                    {
+                        "kind": "percent_of",
+                        "of": "TM",
+                        "value": 65,
+                        "reps": 5
+                    },
+                    {
+                        "kind": "percent_of",
+                        "of": "TM",
+                        "value": 75,
+                        "reps": 5
+                    },
+                    {
+                        "kind": "percent_of",
+                        "of": "TM",
+                        "value": 85,
+                        "reps": 5,
+                        "amrap": true
+                    }
+                ]
+            },
+            {
+                "id": "w2_3x3",
+                "label": "3x3",
+                "main": [
+                    {
+                        "kind": "percent_of",
+                        "of": "TM",
+                        "value": 70,
+                        "reps": 3
+                    },
+                    {
+                        "kind": "percent_of",
+                        "of": "TM",
+                        "value": 80,
+                        "reps": 3
+                    },
+                    {
+                        "kind": "percent_of",
+                        "of": "TM",
+                        "value": 90,
+                        "reps": 3,
+                        "amrap": true
+                    }
+                ]
+            },
+            {
+                "id": "w3_531",
+                "label": "5/3/1",
+                "main": [
+                    {
+                        "kind": "percent_of",
+                        "of": "TM",
+                        "value": 75,
+                        "reps": 5
+                    },
+                    {
+                        "kind": "percent_of",
+                        "of": "TM",
+                        "value": 85,
+                        "reps": 3
+                    },
+                    {
+                        "kind": "percent_of",
+                        "of": "TM",
+                        "value": 95,
+                        "reps": 1,
+                        "amrap": true
+                    }
+                ]
+            },
+            {
+                "id": "w4_deload",
+                "label": "Deload",
+                "main": [
+                    {
+                        "kind": "percent_of",
+                        "of": "TM",
+                        "value": 40,
+                        "reps": 5
+                    },
+                    {
+                        "kind": "percent_of",
+                        "of": "TM",
+                        "value": 50,
+                        "reps": 5
+                    },
+                    {
+                        "kind": "percent_of",
+                        "of": "TM",
+                        "value": 60,
+                        "reps": 5
+                    }
+                ],
+                "amrap_all": false
+            }
+        ]
+    },
+    "decisionTree": {
+        "questions": [
+            {
+                "id": "days_per_week",
+                "prompt": "How many training days per week?",
+                "options": [
+                    {
+                        "value": 4,
+                        "effects": {
+                            "schedule": {
+                                "frequency": 4
+                            }
+                        }
+                    },
+                    {
+                        "value": 3,
+                        "effects": {
+                            "schedule": {
+                                "frequency": 3
+                            }
+                        }
+                    },
+                    {
+                        "value": 2,
+                        "effects": {
+                            "schedule": {
+                                "frequency": 2
+                            }
+                        }
+                    },
+                    {
+                        "value": 1,
+                        "effects": {
+                            "schedule": {
+                                "frequency": 1
+                            }
+                        }
+                    }
+                ],
+                "provenance": {
+                    "source": "book",
+                    "note": "Common frequency variants"
+                }
+            },
+            {
+                "id": "assistance_volume",
+                "prompt": "Select assistance / supplemental emphasis",
+                "options": [
+                    {
+                        "value": "bbb50",
+                        "effects": {
+                            "templateKey": "bbb50"
+                        }
+                    },
+                    {
+                        "value": "bbb60",
+                        "effects": {
+                            "templateKey": "bbb60"
+                        }
+                    },
+                    {
+                        "value": "triumvirate",
+                        "effects": {
+                            "templateKey": "triumvirate"
+                        }
+                    },
+                    {
+                        "value": "jack_shit",
+                        "effects": {
+                            "templateKey": "jack_shit"
+                        }
+                    },
+                    {
+                        "value": "periodization_bible",
+                        "effects": {
+                            "templateKey": "periodization_bible"
+                        }
+                    },
+                    {
+                        "value": "bodyweight",
+                        "effects": {
+                            "templateKey": "bodyweight"
+                        }
+                    }
+                ],
+                "provenance": {
+                    "source": "book",
+                    "note": "Template selection"
+                }
+            },
+            {
+                "id": "tm_method",
+                "prompt": "How will you set Training Max (TM)?",
+                "options": [
+                    {
+                        "value": "direct_1rm",
+                        "effects": {
+                            "tm": {
+                                "method": "direct"
+                            }
+                        }
+                    },
+                    {
+                        "value": "rep_estimate",
+                        "effects": {
+                            "tm": {
+                                "method": "estimate"
+                            }
+                        }
+                    }
+                ],
+                "provenance": {
+                    "source": "book",
+                    "note": "TM determination"
+                }
+            }
+        ]
+    },
+    "program": {
+        "phases": []
+    },
+    "provenance": {
+        "source": "book"
+    }
+}

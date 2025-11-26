@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/api/supabaseClient';
 import { useNavigate } from 'react-router-dom';
-import './AuthPage.css';
+// Refactored to use existing design system classes (form-label, form-input, etc.) for visual consistency
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -16,9 +16,21 @@ export default function AuthPage() {
   // Redirect if already authenticated
   useEffect(() => {
     const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        navigate('/');
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+
+        if (error) {
+          console.warn('Auth session check error:', error);
+          // Don't block the auth page if session check fails
+          return;
+        }
+
+        if (session?.user) {
+          navigate('/');
+        }
+      } catch (error) {
+        console.warn('Auth check failed, continuing to auth page:', error);
+        // Allow user to proceed to auth page even if session check fails
       }
     };
     checkUser();
@@ -65,7 +77,21 @@ export default function AuthPage() {
         navigate('/');
       }
     } catch (err) {
-      setError(err.message);
+      // Enhanced error handling for common auth issues
+      let errorMessage = err.message;
+
+      if (err.message?.includes('Invalid login credentials')) {
+        errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+      } else if (err.message?.includes('Email not confirmed')) {
+        errorMessage = 'Please check your email and click the confirmation link before signing in.';
+      } else if (err.message?.includes('Failed to fetch') || err.message?.includes('network')) {
+        errorMessage = 'Network error. Please check your connection and try again.';
+      } else if (err.message?.includes('Rate limit')) {
+        errorMessage = 'Too many attempts. Please wait a moment before trying again.';
+      }
+
+      setError(errorMessage);
+      console.error('Auth error:', err);
     } finally {
       setLoading(false);
     }
@@ -115,38 +141,30 @@ export default function AuthPage() {
   return (
     <div className="auth-page">
       <div className="auth-container">
+        {/* Left gradient header */}
         <div className="auth-header">
           <h1>PowerHouse Tracker</h1>
           <p>Your intelligent training companion</p>
         </div>
 
+        {/* Right form panel */}
         <div className="auth-form-container">
           <div className="auth-tabs">
             <button
+              type="button"
               className={`auth-tab ${!isSignUp ? 'active' : ''}`}
-              onClick={() => {
-                setIsSignUp(false);
-                setError('');
-                setMessage('');
-              }}
-            >
-              Sign In
-            </button>
+              onClick={() => { setIsSignUp(false); setError(''); setMessage(''); }}
+            >Sign In</button>
             <button
+              type="button"
               className={`auth-tab ${isSignUp ? 'active' : ''}`}
-              onClick={() => {
-                setIsSignUp(true);
-                setError('');
-                setMessage('');
-              }}
-            >
-              Sign Up
-            </button>
+              onClick={() => { setIsSignUp(true); setError(''); setMessage(''); }}
+            >Sign Up</button>
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email" className="form-label">Email</label>
               <input
                 id="email"
                 type="email"
@@ -154,11 +172,11 @@ export default function AuthPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="Enter your email"
+                className="form-input"
               />
             </div>
-
             <div className="form-group">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password" className="form-label">Password</label>
               <input
                 id="password"
                 type="password"
@@ -167,12 +185,12 @@ export default function AuthPage() {
                 required
                 placeholder="Enter your password"
                 minLength={6}
+                className="form-input"
               />
             </div>
-
             {isSignUp && (
               <div className="form-group">
-                <label htmlFor="confirmPassword">Confirm Password</label>
+                <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
                 <input
                   id="confirmPassword"
                   type="password"
@@ -181,6 +199,7 @@ export default function AuthPage() {
                   required
                   placeholder="Confirm your password"
                   minLength={6}
+                  className="form-input"
                 />
               </div>
             )}
@@ -190,21 +209,19 @@ export default function AuthPage() {
 
             <button
               type="submit"
-              className="auth-button primary"
               disabled={loading}
+              className="auth-button primary"
             >
-              {loading ? 'Loading...' : isSignUp ? 'Sign Up' : 'Sign In'}
+              {loading ? 'Processing…' : (isSignUp ? 'Create Account' : 'Sign In')}
             </button>
           </form>
 
-          <div className="auth-divider">
-            <span>or</span>
-          </div>
+          <div className="auth-divider"><span>or</span></div>
 
           <button
             onClick={handleGoogleSignIn}
-            className="auth-button google"
             disabled={loading}
+            className="auth-button google"
           >
             <svg viewBox="0 0 24 24" width="20" height="20">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -216,46 +233,24 @@ export default function AuthPage() {
           </button>
 
           {!isSignUp && (
-            <div className="auth-footer">
+            <div className="auth-footer" style={{ textAlign: 'right' }}>
               <button
                 type="button"
-                className="link-button"
                 onClick={handleForgotPassword}
                 disabled={loading}
-              >
-                Forgot your password?
-              </button>
+                className="link-button"
+              >Forgot your password?</button>
             </div>
           )}
 
           <div className="auth-footer">
-            <p>
-              {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
-              <button
-                type="button"
-                className="link-button"
-                onClick={() => {
-                  setIsSignUp(!isSignUp);
-                  setError('');
-                  setMessage('');
-                }}
-              >
-                {isSignUp ? 'Sign In' : 'Sign Up'}
-              </button>
-            </p>
+            {isSignUp ? 'Already have an account? ' : "Need an account? "}
+            <button
+              type="button"
+              onClick={() => { setIsSignUp(!isSignUp); setError(''); setMessage(''); }}
+              className="link-button"
+            >{isSignUp ? 'Sign In' : 'Create one'}</button>
           </div>
-        </div>
-
-        <div className="auth-features">
-          <h3>Features</h3>
-          <ul>
-            <li>🎯 Smart volume progression tracking</li>
-            <li>📊 Advanced deload analysis</li>
-            <li>🧠 AI-powered recommendations</li>
-            <li>📈 Comprehensive progress analytics</li>
-            <li>💾 Automatic data backup</li>
-            <li>📱 Cross-device synchronization</li>
-          </ul>
         </div>
       </div>
     </div>

@@ -10,14 +10,21 @@ const AppShell = memo(function AppShell() {
   const location = useLocation();
 
   // Memoized auth handlers to prevent re-creation on every render
+  const protectedRoutes = ['/tracking', '/mesocycle', '/microcycle', '/macrocycle'];
+
+  const isProtectedPath = useCallback((path) => {
+    return protectedRoutes.some(route => path.startsWith(route));
+  }, [protectedRoutes]);
+
   const handleAuthStateChange = useCallback((event, session) => {
     setUser(session?.user ?? null);
-
-    // Only redirect to auth if we're not already there and no user
-    if (event === 'SIGNED_OUT' && location.pathname !== '/auth') {
-      navigate('/auth');
+    if (event === 'SIGNED_OUT') {
+      const path = location.pathname;
+      if (path !== '/auth' && isProtectedPath(path)) {
+        navigate('/auth');
+      }
     }
-  }, [navigate, location.pathname]);
+  }, [navigate, location.pathname, isProtectedPath]);
 
   useEffect(() => {
     let mounted = true;
@@ -36,6 +43,15 @@ const AppShell = memo(function AppShell() {
         }
       }
       setLoading(false);
+      // Single place initial guard: redirect only if current path is protected & not authenticated
+      try {
+        if (mounted) {
+          const path = location.pathname;
+          if (!session?.user && path !== '/auth' && isProtectedPath(path)) {
+            navigate('/auth');
+          }
+        }
+      } catch { /* noop */ }
     };
 
     getSession();
@@ -52,19 +68,7 @@ const AppShell = memo(function AppShell() {
     };
   }, [handleAuthStateChange]);
 
-  // Protected routes - redirect to auth if not logged in (only for specific routes)
-  useEffect(() => {
-    if (!loading && !user) {
-      const protectedRoutes = ['/tracking', '/mesocycle', '/microcycle', '/macrocycle'];
-      const isProtectedRoute = protectedRoutes.some(route =>
-        location.pathname.startsWith(route)
-      );
-
-      if (isProtectedRoute) {
-        navigate('/auth');
-      }
-    }
-  }, [user, loading, location.pathname, navigate]);
+  // Removed duplicate protected-route redirect effect; logic centralized in initial session fetch & auth state change handler.
 
   // Memoized sign out handler
   const handleSignOut = useCallback(async () => {

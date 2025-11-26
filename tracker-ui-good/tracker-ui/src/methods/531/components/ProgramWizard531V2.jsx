@@ -39,12 +39,21 @@ const USE_METHOD_PACKS = envFlag == null ? true : String(envFlag).toLowerCase() 
 // Per spec: require 4 valid TMs, units, rounding, TM% (0.90 or 0.85). Allow dev bypass via env.
 const LIFTS = ["squat", "bench", "deadlift", "press"];
 
+// helper: accept 0.90/0.85 or 90/85, return integer percent
+const readTmPercent = (s) => {
+    const raw = (s?.tmPercent ?? s?.tmPct ?? null);
+    if (raw == null) return null;
+    const val = raw <= 1 ? raw * 100 : raw;
+    return Math.round(val);
+};
+
 function isStep1Complete(state) {
     if (!state) return false;
     // Accept both 'lb' and 'lbs' plus 'kg'
     const unitsOk = state?.units === "lbs" || state?.units === "lb" || state?.units === "kg";
     const roundingOk = !!state?.rounding;
-    const tmPctOk = state?.tmPct === 0.9 || state?.tmPct === 0.85 || state?.tmPct === 0.90 || state?.tmPct === 0.850; // tolerate float formats
+    const tmPct = readTmPercent(state) ?? 90; // fallback to 90 if undefined (matches legacy default)
+    const tmPctOk = Number.isFinite(tmPct) && tmPct >= 80 && tmPct <= 95;
     // Build a tms object from current lifts if not already present
     const tmsSource = state?.tms || (() => {
         const out = {}; LIFTS.forEach(k => { out[k] = state?.lifts?.[k]?.tm; }); return out;
@@ -104,6 +113,19 @@ function WizardShell() {
     const { state, dispatch } = useProgramV2();
     const packRef = useRef(null);
 
+    // Optional debug mirror of training maxes (disabled by default). Enable via Vite env VITE_531_TM_DEBUG=true
+    useEffect(() => {
+        try {
+            const debugEnabled = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_531_TM_DEBUG === 'true');
+            if (debugEnabled && state?.trainingMaxes) {
+                localStorage.setItem('ph531.tm.debug', JSON.stringify(state.trainingMaxes));
+            } else if (!debugEnabled) {
+                // Clean up stale mirror when flag off
+                localStorage.removeItem('ph531.tm.debug');
+            }
+        } catch { /* ignore quota / access errors */ }
+    }, [state?.trainingMaxes]);
+
     // Sync stepIndex with URL parameter changes and update page title
     useEffect(() => {
         const urlStep = getStepIndexFromUrl();
@@ -137,7 +159,10 @@ function WizardShell() {
             case 0: // Fundamentals
                 if (!state?.units) errors.push("Units (lbs/kg) required");
                 if (!state?.rounding) errors.push("Rounding preference required");
-                if (!state?.tmPct) errors.push("Training max percentage required");
+                const _tm = readTmPercent(state);
+                if (!(Number.isFinite(_tm) && _tm >= 80 && _tm <= 95)) {
+                    warnings.push('Training max percentage (80–95%) required');
+                }
 
                 const tmsSource = state?.tms || {};
                 LIFTS.forEach(lift => {
@@ -496,6 +521,10 @@ function WizardShell() {
                         units
                     };
                 }
+                // Remove BBB supplemental during deload (Week 4, zero-based index 3)
+                if (w === 3) {
+                    supplementalOut = null;
+                }
 
                 let assistanceOut = { mode: assistance?.mode || "minimal" };
                 if (assistanceOut.mode === "custom" && assistance?.customPlan?.[liftKey]) {
@@ -522,28 +551,31 @@ function WizardShell() {
                     }
                 }
 
-                return {
+                const dayObj = {
                     day: idx + 1,
                     liftKey,
                     lift: humanLiftName(liftKey),
                     warmups,
                     main,
-                    // Always provide a supplemental object (prevents downstream undefined access)
-                    supplemental: supplementalOut || { type: 'none', sets: 0, reps: 0, percentOfTM: null },
                     assistance: assistanceOut,
                     conditioning: conditioningBlock
                 };
+                if (supplementalOut) dayObj.supplemental = supplementalOut;
+                return dayObj;
             });
             weeks.push({ week: w + 1, days: daysOut });
         }
 
+        const tmPctRaw = state?.tmPercent ?? state?.tmPct ?? 90;
+        const tmPct = Number(tmPctRaw);
         const payload = {
             meta: {
                 createdAt: new Date().toISOString(),
                 templateKey: templateKey || null,
                 flowMode: flowMode || "custom",
                 units,
-                loadingOption
+                loadingOption,
+                tmPercent: tmPct
             },
             trainingMaxes,
             rounding: { increment: roundingConfig.increment, mode: roundingConfig.mode },
@@ -593,6 +625,17 @@ function WizardShell() {
             if (stepIndex === 0) {
                 setStep1Error(null);
                 setStep1Missing([]);
+                // Explicitly persist current training maxes using unified action before leaving Fundamentals
+                try {
+                    const liftsMap = state?.lifts || {};
+                    const order = ['press', 'deadlift', 'bench', 'squat']; // dispatch order not critical, but stable
+                    order.forEach(lift => {
+                        const tmVal = liftsMap?.[lift]?.tm;
+                        if (Number.isFinite(tmVal) && tmVal > 0) {
+                            dispatch({ type: 'SET_TRAINING_MAX', lift, tm: tmVal });
+                        }
+                    });
+                } catch { /* no-op safeguard */ }
             }
             const nextStep = stepIndex + 1;
             setStepIndex(nextStep);
@@ -604,7 +647,11 @@ function WizardShell() {
             const missing = [];
             if (!(state?.units === 'lbs' || state?.units === 'lb' || state?.units === 'kg')) missing.push('units');
             if (!state?.rounding) missing.push('rounding');
-            if (!(state?.tmPct === 0.9 || state?.tmPct === 0.85 || state?.tmPct === 0.90 || state?.tmPct === 0.850)) missing.push('TM %');
+            {
+                const _tmPctRaw = state?.tmPercent ?? state?.tmPct ?? 90;
+                const _tmPct = Number(_tmPctRaw);
+                if (!(Number.isFinite(_tmPct) && _tmPct >= 80 && _tmPct <= 95)) missing.push('TM %');
+            }
             const liftsMissing = [];
             for (const k of LIFTS) {
                 const tm = state?.lifts?.[k]?.tm;
@@ -662,7 +709,7 @@ function WizardShell() {
         // Apply updated lift TMs
         for (const lift of Object.keys(nextState.lifts || {})) {
             const tmVal = nextState.lifts[lift].tm;
-            dispatch({ type: 'SET_TM', lift, tm: tmVal });
+            dispatch({ type: 'SET_TRAINING_MAX', lift, tm: tmVal });
         }
         dispatch({ type: 'SET_ADVANCED', advanced: { ...(state.advanced || {}), cycle: nextState.cycle } });
         console.info('Cycle advanced:', { cycle: nextState.cycle, nextTms: nextState.tms });
@@ -774,7 +821,7 @@ function WizardShell() {
 
                                 // Update the state with the new TMs and cycle info
                                 Object.entries(nextState.lifts || {}).forEach(([lift, liftData]) => {
-                                    dispatch({ type: 'SET_TM', lift, tm: liftData.tm });
+                                    dispatch({ type: 'SET_TRAINING_MAX', lift, tm: liftData.tm });
                                 });
 
                                 // Update cycle and history
@@ -798,7 +845,10 @@ function WizardShell() {
         // eslint-disable-next-line no-console
         console.debug("Step1 validation:", {
             canNext: allowStep1Next(state), stateSnapshot: {
-                units: state?.units, rounding: state?.rounding, tmPct: state?.tmPct,
+                units: state?.units,
+                rounding: state?.rounding,
+                tmPct: state?.tmPct,
+                tmPercent: state?.tmPercent,
                 tms: LIFTS.reduce((acc, k) => { acc[k] = state?.lifts?.[k]?.tm || null; return acc; }, {})
             }
         });

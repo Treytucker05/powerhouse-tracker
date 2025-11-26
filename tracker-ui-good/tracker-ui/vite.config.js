@@ -1,56 +1,43 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import path from "path";
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from 'path'
+const DIRNAME = new URL('.', import.meta.url).pathname
 
-// https://vite.dev/config/
 export default defineConfig({
-  // ✅ Required for GitHub Pages deployment
-  base: "/powerhouse-tracker/",
-
+  base: '/powerhouse-tracker/',
   plugins: [react()],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.resolve(DIRNAME, "./src"),
     },
   },
   build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
     rollupOptions: {
       output: {
         manualChunks: {
-          // React and React DOM
-          "react-vendor": ["react", "react-dom"],
-
-          // Chart.js and related
-          "chart-vendor": ["chart.js", "html2canvas", "jspdf"],
-
-          // UI libraries
-          "ui-vendor": [
-            "@heroicons/react",
-            "@radix-ui/react-tabs",
-            "lucide-react"
+          'react-vendor': ['react', 'react-dom'],
+          'chart-vendor': ['chart.js', 'html2canvas', 'jspdf'],
+          'ui-vendor': [
+            '@heroicons/react',
+            '@radix-ui/react-tabs',
+            'lucide-react'
           ],
-
-          // Data libraries
-          "data-vendor": [
-            "@supabase/supabase-js",
-            "@tanstack/react-query"
+          'data-vendor': [
+            '@supabase/supabase-js',
+            '@tanstack/react-query'
           ],
-
-          // DnD Kit
-          "dnd-vendor": [
-            "@dnd-kit/core",
-            "@dnd-kit/sortable",
-            "@dnd-kit/utilities"
+          'dnd-vendor': [
+            '@dnd-kit/core',
+            '@dnd-kit/sortable',
+            '@dnd-kit/utilities'
           ],
-
-          // Router
-          "router-vendor": ["react-router-dom"]
+          'router-vendor': ['react-router-dom']
         }
       }
     },
-    // Increase the chunk size warning limit to 1000 kB
     chunkSizeWarningLimit: 1000,
-    // Enable source maps for better debugging
     sourcemap: true
   }
 });

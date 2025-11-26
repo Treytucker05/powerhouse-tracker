@@ -5,11 +5,10 @@ import { buildWarmups, buildMainSets } from '../../../lib/fiveThreeOne/percentTa
 import { deriveLiftDayMap, DAYS } from '../../../lib/fiveThreeOne/scheduleHelpers.js';
 
 const LIFT_LABEL = {
-    press: 'Overhead Press',
+    press: 'Overhead Press', // single definition
     bench: 'Bench Press',
     squat: 'Squat',
-    deadlift: 'Deadlift',
-    press: 'Overhead Press' // in case schedule stores 'press'
+    deadlift: 'Deadlift'
 };
 
 function calcSetsForLift(tm, loadingOption, week, includeWarmups, roundTo = 5) {

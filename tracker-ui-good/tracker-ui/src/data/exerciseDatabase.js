@@ -12,6 +12,7 @@
  */
 
 // NOTE: This module avoids external CSV deps; parsing is minimal & robust for simple comma-separated files.
+// (assetUrl helper removed here per updated direct BASE_URL-safe fetch implementation.)
 // If fields can contain commas, consider migrating to a real CSV parser (e.g. papaparse) later.
 
 const EXERCISE_DB_STATE = {
@@ -135,20 +136,20 @@ function indexRows(rows) {
 export async function loadExerciseDatabase({ fetchImpl } = {}) {
     if (EXERCISE_DB_STATE.loaded) return EXERCISE_DB_STATE;
     // Attempt to fetch CSV from /data path relative to app root (adjust path if bundled differently)
-    const pathGuess = '/data/exercise_database.csv';
+    const csvUrl = new URL('data/exercise_database.csv', import.meta.env.BASE_URL).toString();
     let text = '';
     try {
         const fetchFn = fetchImpl || (typeof fetch !== 'undefined' ? fetch : null);
         if (!fetchFn) throw new Error('No fetch available in this environment');
-        const res = await fetchFn(pathGuess, { cache: 'no-store' });
+        const res = await fetchFn(csvUrl, { cache: 'no-store' });
         if (!res.ok) throw new Error('HTTP ' + res.status);
         text = await res.text();
         // HTML guard (wrong path or dev server fallback)
         if (text.trim().startsWith('<')) {
-            throw new Error('Received HTML instead of CSV at ' + pathGuess);
+            throw new Error('Received HTML instead of CSV at ' + csvUrl);
         }
     } catch (err) {
-        console.warn('[exerciseDatabase] Could not load CSV at', pathGuess, err.message);
+        console.warn('[exerciseDatabase] Could not load CSV at', csvUrl, err.message);
         // Provide empty placeholder
         indexRows([]);
         return EXERCISE_DB_STATE;

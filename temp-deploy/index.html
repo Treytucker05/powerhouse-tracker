@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/powerhouse-tracker/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+    rel="stylesheet">
+  <title>NASM Program Design Tracker</title>
+  <script type="module" crossorigin src="/powerhouse-tracker/assets/index-Dz8bHEFc.js"></script>
+  <link rel="modulepreload" crossorigin href="/powerhouse-tracker/assets/react-vendor-DoC2WAmd.js">
+  <link rel="modulepreload" crossorigin href="/powerhouse-tracker/assets/ui-vendor-BLoy3R85.js">
+  <link rel="modulepreload" crossorigin href="/powerhouse-tracker/assets/chart-vendor-DbvXzfx8.js">
+  <link rel="modulepreload" crossorigin href="/powerhouse-tracker/assets/data-vendor-CWegSrCC.js">
+  <link rel="modulepreload" crossorigin href="/powerhouse-tracker/assets/router-vendor-CDc5MEim.js">
+  <link rel="stylesheet" crossorigin href="/powerhouse-tracker/assets/index-CKBc8Iyh.css">
+</head>
+
+<body>
+  <div id="root"></div>
+
+
+  <script>
+(function () {
+  function postH() {
+    if (window.parent !== window) {
+      const h = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight,
+        document.documentElement.offsetHeight
+      // TODO: Replace with your actual allowed parent origin
+      const ALLOWED_PARENT_ORIGIN = 'https://your-allowed-domain.com';
+      window.parent.postMessage({ phxHeight: h }, ALLOWED_PARENT_ORIGIN);
+      window.parent.postMessage({ phxHeight: h }, '*');
+    }
+  }
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(postH).observe(document.body);
+  }
+  window.addEventListener('load', postH);
+  window.addEventListener('hashchange', postH);
+  setInterval(postH, 1000);
+})();
+</script>
+</body>
+
+</html>
