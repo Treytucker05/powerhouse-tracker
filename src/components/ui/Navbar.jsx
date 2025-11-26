@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Home, ClipboardList, Settings, User, LogOut } from 'lucide-react';
 import { useApp } from '../../context';
 import { supabase } from '../../lib/api/supabaseClient';
+import PowerHouseLogo from '../navigation/PowerHouseLogo';
 
 export default function Navbar() {
     const location = useLocation();
@@ -46,15 +47,8 @@ export default function Navbar() {
                     {/* Logo and Brand */}
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
-                            <Link to="/" className="flex items-center">
-                                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-                                    <span className="text-white font-bold text-sm">PH</span>
-                                </div>
-                                <div>
-                                    <div className="text-white font-semibold text-lg">PowerHouse</div>
-                                    <div className="text-gray-400 text-xs">RP Toolkit</div>
-                                </div>
-                            </Link>
+                            <PowerHouseLogo className="h-6" />
+                            <div className="text-gray-400 text-xs mt-1">RP Toolkit</div>
                         </div>
                     </div>
 

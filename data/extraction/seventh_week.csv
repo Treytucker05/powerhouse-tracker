@@ -1,0 +1,4 @@
+ProtocolId,Name,Kind,MainSets,Percentages,Criteria,Notes
+tm_test_basic,7th Week TM Test,TMTest,"1x5, 1x3, 1x1","85/90/95","Est TM vs bar speed; do NOT grind","TODO: verify page & percentages"
+pr_test_basic,7th Week PR Test,PRTest,"1xAMRAP","Top set % per anchor","PR on top set; no Jokers","TODO"
+deload_5s,7th Week Deload,Deload,"3x5","~40/50/60","Keep reps crisp; no grinders","TODO"
