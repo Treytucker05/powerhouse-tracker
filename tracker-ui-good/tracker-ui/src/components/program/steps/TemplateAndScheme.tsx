@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useBuilder } from '@/context/BuilderState';
 import { supabase, getCurrentUserId } from '@/lib/supabaseClient';
 import { TEMPLATES as TEMPLATE_DEFS, TEMPLATE_DETAILS, TEMPLATE_META, templateLabel } from '@/lib/builder/templates';
+import useSchedule from '@/store/scheduleStore';
 import BuilderProgress from './BuilderProgress';
 import { loadCsv } from '@/lib/loadCsv';
 import type { TemplateCsv } from '@/types/templates';
 import type { SupplementalRow } from '@/types/step3';
 
+// Helper: compute rough fit meters for selection summary
 function fitMeter(row: SupplementalRow) {
     const sets = parseInt(String(row.SupplementalSetsReps || "").match(/\d+/)?.[0] ?? "0", 10) || 0;
     const time = Math.min(5, Math.round(sets / 2) + (Number((row as any).AssistancePerCategoryMax || 0) > 75 ? 2 : 0));
@@ -16,14 +18,8 @@ function fitMeter(row: SupplementalRow) {
     const cond = Math.min(5, (Number((row as any).HardConditioningMax || 0) >= 3 ? 4 : 2));
     return { strength, hypertrophy, time, cond };
 }
-// Removed inline WorkoutPreview to avoid duplication with Step 4 comprehensive preview
 
-// --- Detailed Workout Definitions (UI only, not final programming engine) ---
-// Each template maps to 4 training days (classic) with main lift emphasis ordering.
-// We derive main lift order from standard 4-day 5/3/1 rotation: Press, Deadlift, Bench, Squat OR user preference later.
-// For now keep fixed order for preview.
-// Template/meta now imported from shared module
-
+// Meta snippet used by details panel (time, difficulty, focus, suitability)
 function renderTemplateMeta(id: string) {
     const meta = TEMPLATE_META[id];
     if (!meta) return null;
@@ -176,7 +172,10 @@ function TemplateComparisonTable({ templateIds, templates, onRemove, onSelect }:
 // scheme descriptor moved to shared module if needed later
 
 export default function TemplateAndScheme() {
-    const { step2, setStep2 } = useBuilder();
+    // Align with BuilderState context API: returns { state, setState }
+    const { state: builderState, setState: setBuilderState } = useBuilder();
+    const step2 = (builderState as any)?.step2 || {};
+    const setStep2 = (u: any) => setBuilderState({ step2: { ...((builderState as any)?.step2 || {}), ...u } });
     const navigate = useNavigate();
     const [expanded, setExpanded] = React.useState<string | null>(null);
     const [searchQuery, setSearchQuery] = React.useState('');
@@ -186,6 +185,52 @@ export default function TemplateAndScheme() {
     const [compareTemplates, setCompareTemplates] = React.useState<string[]>([]);
     const detailsRef = React.useRef<HTMLDivElement | null>(null);
     const prevExpanded = React.useRef<string | null>(null);
+
+    // Step 1 schedule context
+    const daysPerWeek = useSchedule(s => s.daysPerWeek);
+    const scheduleKey = (daysPerWeek ? `${daysPerWeek}D` : '') as '2D' | '3D' | '4D' | '';
+    // Source of truth: Step 1 schedule store. We only save split info into step2 on selection,
+    // but we do not read from it here to avoid stale persisted values.
+    const effectiveScheduleKey = scheduleKey;
+    const effectiveDaysPerWeek = (daysPerWeek || null) as number | null;
+
+    // Enrichment state (badges + tags)
+    type Enriched = { id: string; display_name?: string; tags?: string[]; badges?: { time_band?: string; difficulty?: string; focus?: string } | null; blurb?: string };
+    const [enriched, setEnriched] = useState<Enriched[] | null>(null);
+    const [enrichedMap, setEnrichedMap] = useState<Record<string, Enriched>>({});
+    const [infoFilter, setInfoFilter] = useState<'all' | 'detailed' | 'needs_research'>('all');
+    const [sortKey, setSortKey] = useState<'none' | 'difficulty' | 'time_band'>('none');
+
+    // Utility: slugify to underscore id
+    const slugUnderscore = (s: string) => s.toLowerCase().trim().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+
+    // Load enrichment (non-blocking)
+    useEffect(() => {
+        let alive = true;
+        (async () => {
+            try {
+                const res = await fetch(`${import.meta.env.BASE_URL}templates/enriched.json`, { cache: 'no-store' });
+                if (!res.ok) throw new Error(String(res.status));
+                const data = (await res.json()) as Enriched[];
+                if (!alive) return;
+                setEnriched(data);
+                const map: Record<string, Enriched> = {};
+                (data || []).forEach((d) => {
+                    if (!d) return;
+                    const idKey = String((d as any).id || '').trim();
+                    if (idKey) map[idKey] = d;
+                    const disp = String((d as any).display_name || '').trim();
+                    if (disp) map[slugUnderscore(disp)] = d;
+                });
+                setEnrichedMap(map);
+            } catch (e) {
+                // Non-blocking on failure
+                if (import.meta.env.DEV) console.warn('enriched.json load failed', e);
+                if (alive) { setEnriched([]); setEnrichedMap({}); }
+            }
+        })();
+        return () => { alive = false; };
+    }, []);
 
     // Map CSV template names to internal IDs
     const nameToId = (name: string) => {
@@ -311,15 +356,19 @@ export default function TemplateAndScheme() {
     }, [csvTemplates, expanded]);
 
     // Selected template CSV row for Selection Summary
+    // Helper to safely resolve a template id from multiple shapes
+    const getTemplateId = (t: any) => t?.templateId ?? t?.template?.id ?? t?.template ?? null;
+    const selectedTemplateId = getTemplateId(step2);
+
     const selectedCsvForSummary = React.useMemo(() => {
-        if (!step2.templateId) return null;
+        if (!selectedTemplateId) return null;
         const match = (csvTemplates || []).find((t: any) => {
             const key = String(t['Template Name'] ?? t.Template ?? t.display_name ?? '').trim();
             if (!key) return false;
-            return nameToId(key) === step2.templateId;
+            return nameToId(key) === selectedTemplateId;
         });
         return match || null;
-    }, [csvTemplates, step2.templateId]);
+    }, [csvTemplates, selectedTemplateId]);
 
     const onTemplate = (id: string) => {
         if (compareMode) {
@@ -363,7 +412,7 @@ export default function TemplateAndScheme() {
         prevExpanded.current = expanded;
     }, [expanded]);
     // Scheme selection moved to Step 3 (Customize)
-    const canNext = !!step2.templateId;
+    const canNext = !!selectedTemplateId;
 
     // Persist Step2 (template + scheme) debounced
     React.useEffect(() => {
@@ -406,7 +455,8 @@ export default function TemplateAndScheme() {
 
     // Filter templates based on search and filter criteria
     const filteredTemplates = React.useMemo(() => {
-        return availableTemplates.filter(template => {
+        // First stage: apply existing text/meta filters
+        let list = availableTemplates.filter(template => {
             const meta = (TEMPLATE_META as any)[template.id];
 
             // Search query filter (matches title or description)
@@ -429,8 +479,33 @@ export default function TemplateAndScheme() {
 
             return true;
         });
-    }, [searchQuery, difficultyFilter, focusFilter, availableTemplates]);
 
+        // Second stage: info filter using enrichment
+        if (infoFilter !== 'all') {
+            list = list.filter(t => {
+                const detail = enrichedMap[t.id] || null;
+                const mergedTags = ([] as string[])
+                    .concat((t as any).tags || [])
+                    .concat(detail?.tags || [])
+                    .filter(Boolean);
+                const hasDetail = !!detail;
+                const needsResearch = mergedTags.length === 0 || detail?.blurb === 'NEEDS_RESEARCH';
+                if (infoFilter === 'detailed') return hasDetail && !needsResearch;
+                return needsResearch; // needs_research
+            });
+        }
+
+        // Sorting by enrichment badges
+        if (sortKey !== 'none') {
+            const key = sortKey;
+            list = [...list].sort((a, b) => {
+                const ad = enrichedMap[a.id]?.badges?.[key] || '';
+                const bd = enrichedMap[b.id]?.badges?.[key] || '';
+                return String(ad).localeCompare(String(bd));
+            });
+        }
+        return list;
+    }, [searchQuery, difficultyFilter, focusFilter, availableTemplates, infoFilter, sortKey, enrichedMap]);
     // Get unique filter options
     const difficulties = React.useMemo(() => {
         const allDifficulties = availableTemplates
@@ -551,6 +626,33 @@ export default function TemplateAndScheme() {
                                         </button>
                                     </div>
                                 )}
+                                {/* Info Filter */}
+                                <div className="flex items-end gap-2">
+                                    <div className="min-w-[200px]">
+                                        <label className="block text-xs text-gray-400 mb-1">Info</label>
+                                        <div className="flex gap-2">
+                                            {(['all', 'detailed', 'needs_research'] as const).map(mode => (
+                                                <button
+                                                    key={mode}
+                                                    onClick={() => setInfoFilter(mode)}
+                                                    className={`px-2 py-1 text-xs rounded border ${infoFilter === mode ? 'border-red-500 text-red-300' : 'border-gray-600 text-gray-300 hover:border-gray-500'}`}
+                                                >{mode === 'all' ? 'All' : 'Detailed'}{mode === 'needs_research' ? ' (Needs Research)' : ''}</button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="min-w-[180px]">
+                                        <label className="block text-xs text-gray-400 mb-1">Sort</label>
+                                        <select
+                                            value={sortKey}
+                                            onChange={(e) => setSortKey(e.target.value as any)}
+                                            className="w-full px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                        >
+                                            <option value="none">Default</option>
+                                            <option value="difficulty">Difficulty</option>
+                                            <option value="time_band">Time Band</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Results Summary */}
@@ -568,10 +670,16 @@ export default function TemplateAndScheme() {
 
                         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {filteredTemplates.map(t => {
-                                const isSelected = step2.templateId === t.id;
+                                const isSelected = selectedTemplateId === t.id;
                                 const isExpanded = expanded === t.id;
                                 const isInComparison = compareTemplates.includes(t.id);
                                 const meta = (TEMPLATE_META as any)[t.id];
+                                const detail = enrichedMap[t.id];
+                                const tags = ([] as string[])
+                                    .concat((t as any).tags || [])
+                                    .concat(detail?.tags || [])
+                                    .filter(Boolean)
+                                    .slice(0, 8);
 
                                 let borderClass = 'border-gray-700 hover:border-gray-500 bg-gray-800/50';
                                 if (compareMode) {
@@ -623,6 +731,7 @@ export default function TemplateAndScheme() {
                                                 })()}
                                             </div>
                                             <p className="text-xs text-gray-300 leading-snug mb-2">{t.desc}</p>
+                                            {/* Built-in meta badges */}
                                             {meta && (
                                                 <div className="space-y-1">
                                                     <div className="flex flex-wrap gap-1">
@@ -633,8 +742,52 @@ export default function TemplateAndScheme() {
                                                         ))}
                                                     </div>
                                                     <div className="text-[10px] text-gray-500 leading-snug line-clamp-2">Best: {meta.suitability}</div>
+                                                    {/* Compatibility with days/week (text line) */}
+                                                    {effectiveScheduleKey && (
+                                                        <div className={`text-[10px] mt-0.5 ${meta.supports?.includes(daysPerWeek as 2 | 3 | 4) ? 'text-emerald-300' : 'text-amber-300'}`}>
+                                                            {meta.supports?.includes((effectiveDaysPerWeek as any) as 2 | 3 | 4)
+                                                                ? `Works with your ${effectiveDaysPerWeek}-day plan${meta.splits?.[effectiveScheduleKey] ? ` • ${meta.splits[effectiveScheduleKey]}` : ''}`
+                                                                : `Not ideal for your ${effectiveDaysPerWeek}-day plan`}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             )}
+                                            {/* 2D/3D/4D badges (always show) */}
+                                            <div className="flex items-center gap-1 mt-1">
+                                                {(['2D', '3D', '4D'] as const).map(k => {
+                                                    const n = Number(k[0]) as 2 | 3 | 4;
+                                                    const supported = ((meta?.supports || []) as Array<2 | 3 | 4>).includes(n);
+                                                    const cls = supported
+                                                        ? 'bg-emerald-900/30 border-emerald-600 text-emerald-300'
+                                                        : 'bg-gray-900/30 border-gray-700 text-gray-400';
+                                                    return <span key={k} className={`px-1.5 py-0.5 rounded border text-[10px] ${cls}`}>{k}</span>;
+                                                })}
+                                            </div>
+                                            {/* Enriched badges */}
+                                            {detail && (
+                                                <div className="mt-2 flex flex-wrap gap-1">
+                                                    {detail.badges?.time_band && (
+                                                        <span className="px-2 py-0.5 rounded-full bg-gray-800 border border-gray-700 text-[10px]">⏱ {detail.badges.time_band}</span>
+                                                    )}
+                                                    {detail.badges?.difficulty && (
+                                                        <span className="px-2 py-0.5 rounded-full bg-gray-800 border border-gray-700 text-[10px]">⚙️ {detail.badges.difficulty}</span>
+                                                    )}
+                                                    {detail.badges?.focus && (
+                                                        <span className="px-2 py-0.5 rounded-full bg-gray-800 border border-gray-700 text-[10px]">🎯 {detail.badges.focus}</span>
+                                                    )}
+                                                </div>
+                                            )}
+                                            {/* Tags / Needs Research */}
+
+                                            <div className="mt-2 flex flex-wrap gap-1">
+                                                {tags.length > 0 ? (
+                                                    tags.map((tg) => (
+                                                        <span key={tg} className="px-2 py-0.5 rounded bg-gray-900 border border-gray-700 text-[10px] text-gray-300">{tg}</span>
+                                                    ))
+                                                ) : (
+                                                    <span className="px-2 py-0.5 rounded bg-gray-800 border border-gray-700 text-[10px] text-gray-400">Needs Research</span>
+                                                )}
+                                            </div>
                                         </div>
                                     </button>
                                 );
@@ -672,19 +825,61 @@ export default function TemplateAndScheme() {
                                             templateIds={compareTemplates}
                                             templates={csvTemplates}
                                             onRemove={removeFromComparison}
-                                            onSelect={(id) => setStep2({ templateId: id })}
+                                            onSelect={(id) => {
+                                                const meta = (TEMPLATE_META as any)[id] || null;
+                                                const splitLabel = scheduleKey && meta?.splits?.[scheduleKey] ? meta.splits[scheduleKey] : null;
+                                                setStep2({ templateId: id, template: id, splitKey: scheduleKey || null, splitLabel: splitLabel || null, daysPerWeek });
+                                            }}
                                         />
                                     </>
                                 ) : (
                                     <>
                                         <h3 className="font-semibold mb-2 text-sm">Template Details</h3>
-                                        {!expanded && <p className="text-xs text-gray-500">Select a template card above to view its details.</p>}
+                                        {!expanded && !selectedTemplateId && (
+                                            <p className="text-xs text-gray-500">Select a template card above to view its details.</p>
+                                        )}
+                                        {expanded && !selectedTemplateId && (
+                                            <div className="text-xs text-gray-400">Previewing. Click "Use This Template" to select.</div>
+                                        )}
                                         {expanded && (
                                             <div className="space-y-3">
                                                 <div className="flex items-center gap-2">
                                                     <h4 className="text-sm font-medium">{availableTemplates.find(t => t.id === expanded)?.title || TEMPLATE_DEFS.find(t => t.id === expanded)?.title || templateLabel(expanded)}</h4>
-                                                    {step2.templateId === expanded && <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-600/70 text-white">Selected</span>}
+                                                    {selectedTemplateId === expanded && <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-600/70 text-white">Selected</span>}
                                                 </div>
+                                                {(() => {
+                                                    const meta = (TEMPLATE_META as any)[expanded];
+                                                    if (!meta) return null;
+                                                    const ok = meta.supports?.includes((effectiveDaysPerWeek as any) as 2 | 3 | 4);
+                                                    const split = (effectiveScheduleKey && meta.splits?.[effectiveScheduleKey]) ? ` • ${meta.splits[effectiveScheduleKey]}` : '';
+                                                    return (
+                                                        <div className={`text-[11px] ${ok ? 'text-emerald-300' : 'text-amber-300'}`}>
+                                                            {ok ? `Works with your ${effectiveDaysPerWeek}-day plan${split}` : `Not ideal for your ${effectiveDaysPerWeek}-day plan`}
+                                                        </div>
+                                                    );
+                                                })()}
+                                                {(() => {
+                                                    const meta = (TEMPLATE_META as any)[expanded];
+                                                    if (!meta) return null;
+                                                    const tm = meta.recommendedTmPct;
+                                                    const tmLabel = tm && typeof tm === 'object' && typeof tm.min === 'number' && typeof tm.max === 'number'
+                                                        ? `TM ${Math.round(tm.min * 100)}–${Math.round(tm.max * 100)}%`
+                                                        : (typeof tm === 'number' ? `TM ${Math.round(tm * 100)}%` : null);
+                                                    const pol = [
+                                                        meta.amrapPolicy === 'off' ? 'AMRAP: Off' : (meta.amrapPolicy ? `AMRAP: ${meta.amrapPolicy}` : null),
+                                                        meta.jokerPolicy === 'not_used' ? 'Jokers: No' : (meta.jokerPolicy ? `Jokers: ${meta.jokerPolicy}` : null),
+                                                        meta.tmIncrements ? `TM inc: +${meta.tmIncrements.upper}/+${meta.tmIncrements.lower} lb per cycle` : null,
+                                                        meta.deloadPolicy ? '7th Week: Yes (between phases)' : null,
+                                                        expanded === '5_s_pro_ssl' ? 'SSL %: 75/80/85 TM' : null
+                                                    ].filter(Boolean).join(' · ');
+                                                    if (!tmLabel && !pol) return null;
+                                                    return (
+                                                        <div className="text-[10px] text-gray-300">
+                                                            {tmLabel && <div>{tmLabel}</div>}
+                                                            {pol && <div>Policies: {pol}</div>}
+                                                        </div>
+                                                    );
+                                                })()}
                                                 {/* CSV-backed details */}
                                                 {selectedCsv ? (
                                                     <div className="space-y-1 text-xs text-gray-300">
@@ -698,10 +893,14 @@ export default function TemplateAndScheme() {
                                                     <div className="text-xs text-gray-500">No details available.</div>
                                                 )}
                                                 <div className="flex gap-2 pt-1">
-                                                    {step2.templateId !== expanded && (
+                                                    {selectedTemplateId !== expanded && (
                                                         <button
                                                             type="button"
-                                                            onClick={() => setStep2({ templateId: expanded })}
+                                                            onClick={() => {
+                                                                const meta = (TEMPLATE_META as any)[expanded] || null;
+                                                                const splitLabel = scheduleKey && meta?.splits?.[scheduleKey] ? meta.splits[scheduleKey] : null;
+                                                                setStep2({ templateId: expanded, template: expanded, splitKey: scheduleKey || null, splitLabel: splitLabel || null, daysPerWeek });
+                                                            }}
                                                             className="text-xs px-3 py-1.5 rounded bg-red-600 hover:bg-red-500 text-white font-medium"
                                                         >Use This Template</button>
                                                     )}
@@ -724,7 +923,9 @@ export default function TemplateAndScheme() {
                 <aside className="col-span-12 lg:col-span-4 space-y-4">
                     <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-4 text-sm" data-testid="selection-summary">
                         <h3 className="font-semibold mb-2">Selection Summary</h3>
-                        {!selectedCsvForSummary ? (
+                        {!selectedTemplateId ? (
+                            <div className="text-xs text-gray-500">Choose a template first.</div>
+                        ) : !selectedCsvForSummary ? (
                             <div className="text-xs text-gray-500">No template selected.</div>
                         ) : (
                             <div className="text-sm text-gray-300 space-y-1">
@@ -734,6 +935,15 @@ export default function TemplateAndScheme() {
                                 <p><strong className="text-gray-400">Assistance:</strong> {selectedCsvForSummary['Assistance'] || '—'}</p>
                                 <p><strong className="text-gray-400">Conditioning:</strong> {selectedCsvForSummary['Conditioning'] || '—'}</p>
                                 <p><strong className="text-gray-400">Notes:</strong> {selectedCsvForSummary['Notes'] || '—'}</p>
+                                {(() => {
+                                    const k = (step2 as any)?.splitKey as '2D' | '3D' | '4D' | null;
+                                    const label = (step2 as any)?.splitLabel as string | null;
+                                    const d = (step2 as any)?.daysPerWeek as number | null;
+                                    if (!k && !label && !d) return null;
+                                    return (
+                                        <p className="mt-1"><strong className="text-gray-400">Split:</strong> {d ? `${d}-day` : ''} {k || ''} {label ? `• ${label}` : ''}</p>
+                                    );
+                                })()}
                                 {/* Fit Meter */}
                                 {(() => {
                                     try {
@@ -743,10 +953,22 @@ export default function TemplateAndScheme() {
                                                 <span>Strength ★{"★".repeat(fit.strength)}{"☆".repeat(5 - fit.strength)}</span>
                                                 <span>Hypertrophy ★{"★".repeat(fit.hypertrophy)}{"☆".repeat(5 - fit.hypertrophy)}</span>
                                                 <span>Time ★{"★".repeat(fit.time)}{"☆".repeat(5 - fit.time)}</span>
-                                                <span>Cond Headroom ★{"★".repeat(fit.cond)}{"☆".repeat(5 - fit.cond)}</span>
+                                                <span title="How much conditioning volume this template tolerates without hurting recovery.">Conditioning Room ★{"★".repeat(fit.cond)}{"☆".repeat(5 - fit.cond)}</span>
                                             </div>
                                         );
                                     } catch { return null; }
+                                })()}
+                                {(() => {
+                                    const id = selectedTemplateId as string;
+                                    const meta = (TEMPLATE_META as any)[id];
+                                    if (!meta) return null;
+                                    const ok = meta.supports?.includes((effectiveDaysPerWeek as any) as 2 | 3 | 4);
+                                    const split = (effectiveScheduleKey && meta.splits?.[effectiveScheduleKey]) ? ` • ${meta.splits[effectiveScheduleKey]}` : '';
+                                    return (
+                                        <div className={`mt-2 text-xs ${ok ? 'text-emerald-300' : 'text-amber-300'}`}>
+                                            {ok ? `Works with your ${effectiveDaysPerWeek}-day plan${split}` : `Not ideal for your ${effectiveDaysPerWeek}-day plan`}
+                                        </div>
+                                    );
                                 })()}
                                 <div className="pt-2">
                                     <button

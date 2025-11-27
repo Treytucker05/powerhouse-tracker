@@ -31,6 +31,12 @@ export default function Step2TemplateGallery({ data, updateData }) {
         });
     }, []);
 
+    // Load additions (ids, assistance_targets, equipment) for persistence on selection
+    const [tplAdditions, setTplAdditions] = useState([]);
+    useEffect(() => {
+        loadCsv(`${import.meta.env.BASE_URL}methodology/extraction/templates_additions.csv`).then(setTplAdditions).catch(() => setTplAdditions([]));
+    }, []);
+
     // Helper to find row by name
     const byName = useMemo(() => {
         const map = {};
@@ -105,7 +111,44 @@ export default function Step2TemplateGallery({ data, updateData }) {
         return { counts, warnings };
     }, [assistance.perDay, byName, exLoaded, st.template]);
 
-    const choose = (id) => set({ template: id });
+    const choose = (id) => {
+        // Persist template id
+        set({ template: id });
+        // Try to persist assistance targets + equipment if available
+        const normId = String(id || '').toLowerCase();
+        const idMap = { bbb: 'bbb', triumvirate: 'triumvirate', periodization_bible: 'periodization_bible', bodyweight: 'bodyweight', jack_shit: 'jack_shit' };
+        const mapped = idMap[normId] || normId;
+        let row = tplAdditions.find(r => String(r.id || '').toLowerCase() === mapped);
+        if (!row) {
+            // Fallback by display name contains
+            const title = (TILES.find(t => t.id === id)?.title || '').toLowerCase();
+            row = tplAdditions.find(r => String(r.display_name || '').toLowerCase().includes(title));
+        }
+        const split = (v) => String(v || '').split(/[|,;/]/g).map(s => s.trim().toLowerCase()).filter(Boolean);
+        if (row) {
+            const targets = split(row.assistance_targets);
+            const equipment = split(row.equipment);
+            // Runtime constraint flags
+            const prEnabled = String(row.pr_sets_allowed || '').toLowerCase() === 'true';
+            const jokersEnabled = String(row.jokers_allowed || '').toLowerCase() === 'true';
+            const deloadProtocolId = row.seventh_week_default || undefined;
+            const daysDefault = Number(row.days_per_week) || undefined;
+            const tmDefault = Number(row.tm_default_pct) || undefined;
+            const patch = {
+                assistanceTargets: targets.length ? targets : ["push", "pull", "single_leg", "core"],
+                equipment,
+                prEnabled,
+                jokersEnabled,
+                deloadProtocolId,
+            };
+            if (daysDefault && daysDefault >= 1 && daysDefault <= 7) patch.schedule = { ...(st.schedule || {}), frequency: String(daysDefault) };
+            if (tmDefault) patch.tm = { ...(st.tm || {}), default_pct: tmDefault };
+            updateData && updateData(patch);
+        } else {
+            // Persist sensible defaults if no additions row available
+            updateData && updateData({ assistanceTargets: ["push", "pull", "single_leg", "core"], equipment: [] });
+        }
+    };
 
     return (
         <div className="space-y-6">
@@ -153,6 +196,16 @@ export default function Step2TemplateGallery({ data, updateData }) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {TILES.map(t => {
                     const active = st.template === t.id;
+                    const normId = String(t.id).toLowerCase();
+                    const mapped = { bbb: 'bbb', triumvirate: 'triumvirate', periodization_bible: 'periodization_bible', bodyweight: 'bodyweight', jack_shit: 'jack_shit' }[normId] || normId;
+                    const row = tplAdditions.find(r => String(r.id || '').toLowerCase() === mapped);
+                    const devBadge = row ? {
+                        pr: String(row.pr_sets_allowed || '') || '?',
+                        jokers: String(row.jokers_allowed || '') || '?',
+                        seventh: row.seventh_week_default || '?',
+                        days: row.days_per_week || '?',
+                        tm: row.tm_default_pct || '?'
+                    } : null;
                     return (
                         <button
                             key={t.id}
@@ -161,6 +214,23 @@ export default function Step2TemplateGallery({ data, updateData }) {
                         >
                             <div className="text-white font-semibold">{t.title}</div>
                             <div className="text-sm text-gray-300 mt-1">{t.blurb}</div>
+                            <div className="mt-2 flex items-center gap-3 text-xs">
+                                <a
+                                    className="text-blue-300 hover:underline"
+                                    href={`#/templates/${String(t.id).toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+                                    target="_blank" rel="noreferrer"
+                                    onClick={(e) => e.stopPropagation()}
+                                >Details</a>
+                                {import.meta?.env?.DEV && (
+                                    <span className="px-2 py-0.5 rounded bg-gray-800 border border-gray-700 text-gray-300">
+                                        PR: {devBadge ? (String(devBadge.pr).toLowerCase() === 'true' ? '✅' : '🚫') : '?'} |
+                                        Jokers: {devBadge ? (String(devBadge.jokers).toLowerCase() === 'true' ? '✅' : '🚫') : '?'} |
+                                        7W: {devBadge ? devBadge.seventh : '?'} |
+                                        Days: {devBadge ? devBadge.days : '?'} |
+                                        TM: {devBadge ? devBadge.tm : '?'}
+                                    </span>
+                                )}
+                            </div>
                             {active && (
                                 <div className="mt-3 inline-flex items-center gap-2 text-green-300 bg-green-900/20 border border-green-700 px-2 py-1 rounded">
                                     <CheckCircle className="w-4 h-4" />

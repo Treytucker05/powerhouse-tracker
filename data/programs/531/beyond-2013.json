@@ -1,0 +1,698 @@
+{
+    "programId": "531",
+    "version": "Beyond 5/3/1 (2013)",
+    "source": {
+        "sourceTitle": "Beyond 5/3/1: Simple Training for Extraordinary Results",
+        "edition": null,
+        "year": 2013,
+        "pageRanges": [
+            "p.31–37",
+            "p.38–39",
+            "p.45",
+            "p.48–50",
+            "p.59–61",
+            "p.72–74",
+            "p.124–126"
+        ]
+    },
+    "allowedUnits": [
+        "lb",
+        "kg"
+    ],
+    "lifts": {
+        "squat": {
+            "name": "Squat",
+            "aliases": [],
+            "tmCap": null
+        },
+        "bench": {
+            "name": "Bench Press",
+            "aliases": [
+                "Bench"
+            ],
+            "tmCap": null
+        },
+        "deadlift": {
+            "name": "Deadlift",
+            "aliases": [],
+            "tmCap": null
+        },
+        "press": {
+            "name": "Press",
+            "aliases": [
+                "Overhead Press"
+            ],
+            "tmCap": null
+        }
+    },
+    "tmRule": {
+        "type": "percentage_of_1rm",
+        "factor": 0.9
+    },
+    "tmProgression": {
+        "perCycle": {
+            "upper": 5,
+            "lower": 10
+        },
+        "unit": "lb",
+        "perWeek": null
+    },
+    "rounding": {
+        "increment": 5,
+        "unit": "lb",
+        "minBar": 45,
+        "availablePlates": [
+            45,
+            35,
+            25,
+            10,
+            5,
+            2.5
+        ]
+    },
+    "options": {
+        "allowJokers": true,
+        "allowPRSets": true,
+        "supersetAssistance": true,
+        "restSeconds": {
+            "main": null,
+            "supplemental": null,
+            "assistance": null
+        },
+        "warmupNote": null,
+        "conditioningNote": null
+    },
+    "weeks": [
+        {
+            "id": "w1-5s",
+            "label": "3x5",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.65,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.75,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.85,
+                    "reps": "5+",
+                    "prSet": true,
+                    "amrap": true
+                }
+            ],
+            "deload": null,
+            "notes": []
+        },
+        {
+            "id": "w2-3s",
+            "label": "3x3",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.70,
+                    "reps": 3
+                },
+                {
+                    "percentOfTM": 0.80,
+                    "reps": 3
+                },
+                {
+                    "percentOfTM": 0.90,
+                    "reps": "3+",
+                    "prSet": true,
+                    "amrap": true
+                }
+            ],
+            "deload": null,
+            "notes": []
+        },
+        {
+            "id": "w3-531",
+            "label": "5/3/1",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.75,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.85,
+                    "reps": 3
+                },
+                {
+                    "percentOfTM": 0.95,
+                    "reps": "1+",
+                    "prSet": true,
+                    "amrap": true
+                }
+            ],
+            "deload": null,
+            "notes": []
+        },
+        {
+            "id": "svr-w1-3x3-90",
+            "label": "SVR W1 — 3x3+ @ 90%",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.9,
+                    "reps": "3+",
+                    "prSet": true,
+                    "amrap": true
+                },
+                {
+                    "percentOfTM": 0.9,
+                    "reps": "3+",
+                    "prSet": true,
+                    "amrap": true
+                },
+                {
+                    "percentOfTM": 0.9,
+                    "reps": "3+",
+                    "prSet": true,
+                    "amrap": true
+                }
+            ],
+            "deload": null,
+            "notes": [
+                "SVR guidance: three AMRAP triples at ~90% of TM; keep a rep in reserve if needed."
+            ]
+        },
+        {
+            "id": "svr-w2-5x5-ssl",
+            "label": "SVR W2 — 5x5 @ ~80% (SSL)",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.8,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.8,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.8,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.8,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.8,
+                    "reps": 5
+                }
+            ],
+            "deload": null,
+            "notes": [
+                "Five sets of five around second-set load."
+            ]
+        },
+        {
+            "id": "svr-w3-531-singles",
+            "label": "SVR W3 — 5/3/1 + singles",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.75,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.85,
+                    "reps": 3
+                },
+                {
+                    "percentOfTM": 0.95,
+                    "reps": "1+",
+                    "prSet": true,
+                    "amrap": true
+                },
+                {
+                    "percentOfTM": 0.95,
+                    "reps": 1,
+                    "joker": true
+                },
+                {
+                    "percentOfTM": 1.0,
+                    "reps": 1,
+                    "joker": true
+                }
+            ],
+            "deload": null,
+            "notes": [
+                "Add 1–3 heavy singles after the top set; keep bar speed."
+            ]
+        }
+    ],
+    "schedules": [
+        {
+            "id": "bbb-template-1-4d",
+            "label": "BBB Template One (same-lift 5x10)",
+            "days": [
+                {
+                    "name": "Day 1",
+                    "mainLift": "press",
+                    "secondaryLift": null,
+                    "assistanceProfileId": "bbb-default",
+                    "notes": [
+                        "Lat 5x10; Abs."
+                    ]
+                },
+                {
+                    "name": "Day 2",
+                    "mainLift": "deadlift",
+                    "secondaryLift": null,
+                    "assistanceProfileId": "bbb-default",
+                    "notes": [
+                        "Lat 5x10; Abs."
+                    ]
+                },
+                {
+                    "name": "Day 3",
+                    "mainLift": "bench",
+                    "secondaryLift": null,
+                    "assistanceProfileId": "bbb-default",
+                    "notes": [
+                        "Lat 5x10."
+                    ]
+                },
+                {
+                    "name": "Day 4",
+                    "mainLift": "squat",
+                    "secondaryLift": null,
+                    "assistanceProfileId": "bbb-default",
+                    "notes": [
+                        "Abs."
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "bbb-template-2-4d",
+            "label": "BBB Template Two (opposite 5x10)",
+            "days": [
+                {
+                    "name": "Day 1",
+                    "mainLift": "press",
+                    "secondaryLift": "bench",
+                    "assistanceProfileId": "bbb-default",
+                    "notes": [
+                        "Opposite-lift 5x10."
+                    ]
+                },
+                {
+                    "name": "Day 2",
+                    "mainLift": "deadlift",
+                    "secondaryLift": "squat",
+                    "assistanceProfileId": "bbb-default",
+                    "notes": [
+                        "Opposite-lift 5x10."
+                    ]
+                },
+                {
+                    "name": "Day 3",
+                    "mainLift": "bench",
+                    "secondaryLift": "press",
+                    "assistanceProfileId": "bbb-default",
+                    "notes": [
+                        "Opposite-lift 5x10."
+                    ]
+                },
+                {
+                    "name": "Day 4",
+                    "mainLift": "squat",
+                    "secondaryLift": "deadlift",
+                    "assistanceProfileId": "bbb-default",
+                    "notes": [
+                        "Opposite-lift 5x10."
+                    ]
+                }
+            ]
+        }
+    ],
+    "supplemental": [
+        {
+            "id": "bbb-5x10-30",
+            "name": "BBB 5x10 @30%",
+            "type": "fixed",
+            "sets": 5,
+            "reps": 10,
+            "percentOfTM": 0.3,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "Prep phase 30–40%."
+            ]
+        },
+        {
+            "id": "bbb-5x10-40",
+            "name": "BBB 5x10 @40%",
+            "type": "fixed",
+            "sets": 5,
+            "reps": 10,
+            "percentOfTM": 0.4,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "Prep phase 30–40%."
+            ]
+        },
+        {
+            "id": "bbb-5x10-50",
+            "name": "BBB 5x10 @50%",
+            "type": "fixed",
+            "sets": 5,
+            "reps": 10,
+            "percentOfTM": 0.5,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "Challenge start."
+            ]
+        },
+        {
+            "id": "bbb-5x10-60",
+            "name": "BBB 5x10 @60%",
+            "type": "fixed",
+            "sets": 5,
+            "reps": 10,
+            "percentOfTM": 0.6,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "Challenge mid."
+            ]
+        },
+        {
+            "id": "bbb-5x10-70",
+            "name": "BBB 5x10 @70%",
+            "type": "fixed",
+            "sets": 5,
+            "reps": 10,
+            "percentOfTM": 0.7,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "Challenge end."
+            ]
+        },
+        {
+            "id": "bbb-var1-from-first",
+            "name": "BBB Var I: First Set Last 5x10",
+            "type": "from_week_set",
+            "sourceSet": "first",
+            "sets": 5,
+            "reps": 10,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "Use 1st work-set load."
+            ]
+        },
+        {
+            "id": "bbb-var2-w1",
+            "name": "BBB Var II W1",
+            "type": "fixed",
+            "sets": 5,
+            "reps": 10,
+            "percentOfTM": 0.65,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "W1 of Var II."
+            ]
+        },
+        {
+            "id": "bbb-var2-w2",
+            "name": "BBB Var II W2",
+            "type": "fixed",
+            "sets": 5,
+            "reps": 8,
+            "percentOfTM": 0.70,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "W2 of Var II."
+            ]
+        },
+        {
+            "id": "bbb-var2-w3",
+            "name": "BBB Var II W3",
+            "type": "fixed",
+            "sets": 5,
+            "reps": 5,
+            "percentOfTM": 0.75,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "W3 of Var II."
+            ]
+        },
+        {
+            "id": "bbb-5x5-80",
+            "name": "BBB 5x5 @80%",
+            "type": "fixed",
+            "sets": 5,
+            "reps": 5,
+            "percentOfTM": 0.8,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "Post-deload phase."
+            ]
+        },
+        {
+            "id": "bbb-5x3-90",
+            "name": "BBB 5x3 @90%",
+            "type": "fixed",
+            "sets": 5,
+            "reps": 3,
+            "percentOfTM": 0.9,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "After 5x5 block."
+            ]
+        }
+    ],
+    "assistance": {
+        "targets": {
+            "lat": {
+                "min": 50,
+                "max": 50,
+                "unit": "reps"
+            },
+            "abs": {
+                "min": 50,
+                "max": 50,
+                "unit": "reps"
+            },
+            "low_back": {
+                "min": 30,
+                "max": 45,
+                "unit": "reps"
+            }
+        },
+        "pools": {
+            "lat": [
+                "chin-ups",
+                "pull-ups",
+                "t-bar row",
+                "face pulls",
+                "band pull-aparts",
+                "bent-over laterals",
+                "rows",
+                "lat pulldown"
+            ],
+            "abs": [
+                "sit-ups",
+                "crunches",
+                "planks",
+                "leg raises",
+                "ab wheel"
+            ],
+            "low_back": [
+                "back raises",
+                "reverse hypers"
+            ]
+        },
+        "rules": {
+            "superset": true,
+            "totalTimeMinutes": null,
+            "perDayExerciseCount": null
+        }
+    },
+    "assistanceProfiles": [
+        {
+            "id": "bbb-default",
+            "label": "BBB Lat+Abs",
+            "overrides": {
+                "targets": {
+                    "lat": {
+                        "min": 50,
+                        "max": 50,
+                        "unit": "reps"
+                    },
+                    "abs": {
+                        "min": 50,
+                        "max": 50,
+                        "unit": "reps"
+                    }
+                },
+                "rules": {
+                    "superset": true,
+                    "totalTimeMinutes": null,
+                    "perDayExerciseCount": 2
+                }
+            }
+        }
+    ],
+    "templates": [
+        {
+            "id": "bbb-one-core",
+            "name": "BBB Template One + BBB 5x10 @50%",
+            "scheduleId": "bbb-template-1-4d",
+            "weekOrder": [
+                "w1-5s",
+                "w2-3s",
+                "w3-531"
+            ],
+            "supplementalByDay": {
+                "0": "bbb-5x10-50",
+                "1": "bbb-5x10-50",
+                "2": "bbb-5x10-50",
+                "3": "bbb-5x10-50"
+            },
+            "assistanceProfileId": "bbb-default",
+            "notes": [
+                "Adjust to 60–70% in later cycles."
+            ]
+        },
+        {
+            "id": "bbb-var1-core",
+            "name": "BBB Variation I (First Set Last 5x10)",
+            "scheduleId": "bbb-template-1-4d",
+            "weekOrder": [
+                "w1-5s",
+                "w2-3s",
+                "w3-531",
+                "w1-5s",
+                "w2-3s",
+                "w3-531"
+            ],
+            "supplementalByDay": {
+                "0": "bbb-var1-from-first",
+                "1": "bbb-var1-from-first",
+                "2": "bbb-var1-from-first",
+                "3": "bbb-var1-from-first"
+            },
+            "assistanceProfileId": "bbb-default",
+            "notes": [
+                "6-week map 65/70/75% source-set load."
+            ]
+        },
+        {
+            "id": "svr-4d",
+            "name": "SVR — 3-week wave",
+            "scheduleId": "bbb-template-1-4d",
+            "weekOrder": [
+                "svr-w1-3x3-90",
+                "svr-w2-5x5-ssl",
+                "svr-w3-531-singles"
+            ],
+            "notes": [
+                "SVR: W1 3x3+ @90, W2 5x5 @~80, W3 5/3/1 + singles."
+            ]
+        },
+        {
+            "id": "bbb-challenge-50-2wk",
+            "name": "BBB Challenge — 2 weeks @ 50%",
+            "scheduleId": "bbb-template-1-4d",
+            "weekOrder": [
+                "w1-5s",
+                "w2-3s"
+            ],
+            "supplementalByDay": {
+                "0": "bbb-5x10-50",
+                "1": "bbb-5x10-50",
+                "2": "bbb-5x10-50",
+                "3": "bbb-5x10-50"
+            },
+            "assistanceProfileId": "bbb-default",
+            "notes": [
+                "Run as first block of the 6-week challenge."
+            ]
+        },
+        {
+            "id": "bbb-challenge-60-2wk",
+            "name": "BBB Challenge — 2 weeks @ 60%",
+            "scheduleId": "bbb-template-1-4d",
+            "weekOrder": [
+                "w3-531",
+                "w1-5s"
+            ],
+            "supplementalByDay": {
+                "0": "bbb-5x10-60",
+                "1": "bbb-5x10-60",
+                "2": "bbb-5x10-60",
+                "3": "bbb-5x10-60"
+            },
+            "assistanceProfileId": "bbb-default",
+            "notes": [
+                "Run as second block of the 6-week challenge."
+            ]
+        },
+        {
+            "id": "bbb-challenge-70-2wk",
+            "name": "BBB Challenge — 2 weeks @ 70%",
+            "scheduleId": "bbb-template-1-4d",
+            "weekOrder": [
+                "w2-3s",
+                "w3-531"
+            ],
+            "supplementalByDay": {
+                "0": "bbb-5x10-70",
+                "1": "bbb-5x10-70",
+                "2": "bbb-5x10-70",
+                "3": "bbb-5x10-70"
+            },
+            "assistanceProfileId": "bbb-default",
+            "notes": [
+                "Run as final block of the 6-week challenge."
+            ]
+        }
+    ],
+    "notes": [
+        "TM begins at ~90% of 1RM; cycles raise TM 5/10 lb.",
+        "Core 5/3/1 weeks: 65/75/85 (5+), 70/80/90 (3+), 75/85/95 (1+).",
+        "BBB Template One/Two day orders specified.",
+        "BBB Prep: 5x10 at 30–40% for 6 weeks; later 50%.",
+        "BBB Var I: 5x10 with first work-set load.",
+        "BBB Var II: 65%×10, 70%×8, 75%×5 across weeks.",
+        "BBB Challenge 6-wk: 50/50/60/60/70/70%.",
+        "BBB 5x5 @80% and BBB 5x3 @90% detailed.",
+        "Assistance: rows/chins etc; superset with pressing; abs and low back options.",
+        "SVR: W1 3x3+ @90; W2 5x5; W3 5/3/1 then singles.",
+        "Copyright year confirmed."
+    ]
+}

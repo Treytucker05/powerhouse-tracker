@@ -14,6 +14,7 @@ export * from './contexts/ProgramContextV2.jsx'; // includes hooks/utilities if 
 // Engines (explicit exports to prevent name collisions)
 export * from './engines/FiveThreeOneEngine.v2.js';
 export { computeAssistanceLoad, buildAssistanceForDay } from './engines/AssistanceEngine.v2.js';
+export { getAssistanceTargets } from './engines/assistance.ts';
 
 // Assistance rules (normalizeAssistance, assistanceFor, expectedAssistanceCount)
 export * from './assistanceRules.js';

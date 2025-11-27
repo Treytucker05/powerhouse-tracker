@@ -287,6 +287,16 @@ export function AppProvider({ children }) {
 
     // Removed window focus refresh logic – Supabase auto refresh covers most cases.
 
+    // Mirror training maxes from currentProgram into a compatibility key for consumers that expect it
+    useEffect(() => {
+        try {
+            const tm = state?.currentProgram?.trainingMaxes || state?.currentProgram?.step1?.trainingMaxes;
+            if (tm && typeof window !== 'undefined' && window.localStorage) {
+                window.localStorage.setItem('trainingMaxes', JSON.stringify(tm));
+            }
+        } catch { /* ignore */ }
+    }, [state?.currentProgram]);
+
     // Load user data from Supabase
     const loadUserData = async (userId) => {
         try {
@@ -299,9 +309,29 @@ export function AppProvider({ children }) {
                 dispatch({ type: APP_ACTIONS.SET_ASSESSMENT, payload: results.user_assessments });
             }
 
-            // Process program data
+            // Process program data with resilient fallbacks when cloud row absent
             if (results.user_programs) {
-                dispatch({ type: APP_ACTIONS.SAVE_PROGRAM, payload: results.user_programs });
+                const row = results.user_programs;
+                const programPayload = row?.program || row?.data || row; // prefer jsonb column if present
+                dispatch({ type: APP_ACTIONS.SAVE_PROGRAM, payload: programPayload });
+            } else {
+                // Try local mirrors: active program -> builder v2 -> bare trainingMaxes
+                try {
+                    const active = JSON.parse(localStorage.getItem('ph531.activeProgram.v2') || 'null');
+                    if (active) {
+                        dispatch({ type: APP_ACTIONS.SAVE_PROGRAM, payload: active });
+                    } else {
+                        const v2 = JSON.parse(localStorage.getItem('ph_program_v2') || 'null');
+                        if (v2) {
+                            dispatch({ type: APP_ACTIONS.SAVE_PROGRAM, payload: v2 });
+                        } else {
+                            const tm = JSON.parse(localStorage.getItem('trainingMaxes') || 'null');
+                            if (tm) {
+                                dispatch({ type: APP_ACTIONS.SAVE_PROGRAM, payload: { trainingMaxes: tm, source: 'localFallback' } });
+                            }
+                        }
+                    }
+                } catch { /* ignore */ }
             }
 
             // Process timeline data
@@ -321,10 +351,16 @@ export function AppProvider({ children }) {
             dispatch({ type: APP_ACTIONS.SET_ASSESSMENT, payload: assessment });
         }
 
-        const program = loadFromLocalStorage('currentProgram');
-        if (program) {
-            dispatch({ type: APP_ACTIONS.SAVE_PROGRAM, payload: program });
+        let program = loadFromLocalStorage('currentProgram');
+        if (!program) {
+            // Recover program from other keys if needed
+            try {
+                program = JSON.parse(localStorage.getItem('ph531.activeProgram.v2') || 'null')
+                    || JSON.parse(localStorage.getItem('ph_program_v2') || 'null')
+                    || (localStorage.getItem('trainingMaxes') ? { trainingMaxes: JSON.parse(localStorage.getItem('trainingMaxes')) } : null);
+            } catch { /* ignore */ }
         }
+        if (program) dispatch({ type: APP_ACTIONS.SAVE_PROGRAM, payload: program });
 
         const timeline = loadFromLocalStorage('userTimeline');
         if (timeline) {
@@ -389,7 +425,8 @@ export function AppProvider({ children }) {
             dispatch({ type: APP_ACTIONS.SAVE_PROGRAM, payload: finalProgramData });
 
             if (state.user) {
-                await syncToSupabase('user_programs', finalProgramData, state.user.id);
+                // Store under a single jsonb column to avoid schema drift
+                await syncToSupabase('user_programs', { program: finalProgramData }, state.user.id);
             }
 
             syncToLocalStorage('currentProgram', finalProgramData);

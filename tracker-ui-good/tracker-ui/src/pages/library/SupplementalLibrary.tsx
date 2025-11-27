@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { LibraryButtons } from "@/components/program/steps/LibraryButtons";
 import BuilderProgress from "@/components/program/steps/BuilderProgress";
-import { loadCsv } from "@/lib/loadCsv";
+import { loadSupplementalLibrary } from "@/lib/data/loadLibraries";
 
 type Row = Record<string, string>;
 
@@ -9,19 +9,19 @@ export default function SupplementalLibrary() {
     const [rows, setRows] = useState<Row[]>([]);
     const [query, setQuery] = useState("");
     const [loading, setLoading] = useState(true);
+    const [source, setSource] = useState<"json" | "csv">("csv");
     const [err, setErr] = useState<string | null>(null);
 
     useEffect(() => {
         setLoading(true);
-        loadCsv(`${import.meta.env.BASE_URL}methodology/extraction/supplemental.csv`)
-            .then((data) => {
-                const clean = (data as Row[]).filter(
-                    (r) => r && ((r["Scheme"] || r["scheme"]) ?? "").toString().trim().length > 0
-                );
+        loadSupplementalLibrary<Row>()
+            .then(({ rows, source }) => {
+                const clean = (rows as Row[]).filter((r) => ((r["Scheme"] || r["scheme"]) ?? "").toString().trim().length > 0);
                 setRows(clean);
+                setSource(source);
                 setErr(null);
             })
-            .catch((e) => setErr(e?.message || "Failed to load CSV"))
+            .catch((e) => setErr(e?.message || "Failed to load data"))
             .finally(() => setLoading(false));
     }, []);
 
@@ -64,9 +64,7 @@ export default function SupplementalLibrary() {
                 <div className="flex items-center justify-between mb-4">
                     <div>
                         <h1 className="text-2xl font-semibold">Supplemental Work Library</h1>
-                        <p className="text-gray-400 text-sm">
-                            CSV-driven list from <code>supplemental.csv</code>. Use search to filter.
-                        </p>
+                        <p className="text-gray-400 text-sm">Data source: <span className="font-mono uppercase">{source}</span></p>
                     </div>
                 </div>
 

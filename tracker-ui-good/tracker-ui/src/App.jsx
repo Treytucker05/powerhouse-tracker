@@ -14,7 +14,6 @@ import DesignCustomize from './components/program/steps/DesignCustomize.tsx';
 import ProgramPreview from './components/program/steps/ProgramPreview.tsx';
 import ProgramProgression from './components/program/steps/ProgramProgression.tsx';
 // IA scaffold pages
-import Hub from './pages/Hub.tsx';
 import Step1Fundamentals from './pages/build/Step1Fundamentals.tsx';
 import Step2TemplateAndSchemePage from './pages/build/Step2TemplateAndSchemePage.tsx';
 import Step3Customize from './pages/build/Step3Customize.tsx';
@@ -72,6 +71,7 @@ import CalendarPage from './pages/calendar/CalendarPage';
 import Step6Calendar from '@/components/program/steps/Step6Calendar';
 import PreviewPage from '@/pages/preview/PreviewPage';
 import { useFinalPlan } from './store/finalPlanStore';
+import TemplateDetail from './pages/TemplateDetail.jsx';
 
 // Loading component
 const LoadingSpinner = () => (
@@ -96,10 +96,12 @@ function App() {
             <Route path="/login" element={<AuthPage />} />
             <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/auth/update-password" element={<AuthUpdatePassword />} />
+            {/* Hard redirect legacy /hub to Dashboard */}
+            <Route path="/hub" element={<Navigate to="/" replace />} />
             <Route path="/" element={<AppShell />}>
               {/* Dashboard at root */}
               <Route index element={<Home />} />
-              <Route path="hub" element={<ProtectRoute><Hub /></ProtectRoute>} />
+              <Route path="hub" element={<Navigate to="/" replace />} />
 
               {/* Program Design entry now routes to unified Program component (includes methodology selection + 5/3/1) */}
               <Route path="program-design" element={<ProtectRoute><Program /></ProtectRoute>} />
@@ -117,15 +119,18 @@ function App() {
                 element={
                   <ProtectRoute>
                     <BuilderStateProvider>
-                      <Routes>
-                        <Route path="step1" element={<LockGuard><Step1Fundamentals /></LockGuard>} />
-                        <Route path="step2" element={<LockGuard><Step2TemplateAndSchemePage /></LockGuard>} />
-                        <Route path="step3" element={<LockGuard><Step3Customize /></LockGuard>} />
-                        <Route path="step4" element={<LockGuard><Step4Preview /></LockGuard>} />
-                        <Route path="step5" element={<LockGuard><Step5Progression /></LockGuard>} />
-                        <Route path="step6" element={<Step6Calendar />} />
-                        <Route path="*" element={<Navigate to="/build/step1" replace />} />
-                      </Routes>
+                      <ProgramV2Provider>
+                        <Routes>
+                          <Route path="step1" element={<LockGuard><Step1Fundamentals /></LockGuard>} />
+                          <Route path="step2" element={<LockGuard><Step2TemplateAndSchemePage /></LockGuard>} />
+                          <Route path="step3" element={<LockGuard><Step3Customize /></LockGuard>} />
+                          <Route path="step4" element={<LockGuard><Step4Preview /></LockGuard>} />
+                          <Route path="step5" element={<LockGuard><Step5Progression /></LockGuard>} />
+                          <Route path="step6" element={<Step6Calendar />} />
+                          <Route path="templates/:id" element={<TemplateDetail />} />
+                          <Route path="*" element={<Navigate to="/build/step1" replace />} />
+                        </Routes>
+                      </ProgramV2Provider>
                     </BuilderStateProvider>
                   </ProtectRoute>
                 }

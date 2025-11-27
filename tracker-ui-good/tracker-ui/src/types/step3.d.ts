@@ -45,15 +45,28 @@ export interface ConditioningRow {
 
 export type Step3Selection = {
     supplemental?: SupplementalRow;
+    /** Optional structured supplemental config used by the Step 3 editor */
+    supplementalConfig?: {
+        type: 'FSL' | 'SSL' | 'BBB' | 'Fixed';
+        setsReps: string; // e.g., "5x5", "3x5", "5x3"
+        weeklyPercents: number[]; // e.g., [65,70,75]
+    };
     assistance: {
         mode: "Template" | "Preset" | "Custom";
         volumePreset: "Minimal" | "Standard" | "Loaded"; // 0–25, 25–50, 50–100
         picks: Record<"Push" | "Pull" | "Single-Leg/Core" | "Core", string[]>; // exercise names
         perCategoryTarget: Record<string, number>; // target reps per category
+        /** Optional per-day plan (press/deadlift/bench/squat) for sets×reps planning */
+        perDay?: Record<'press' | 'deadlift' | 'bench' | 'squat', AssistancePlanItem[]>;
     };
     warmup: {
         mobility: string; // name
+        mobilityPreset?: 'Agile 8' | 'NOV' | 'Custom';
+        // Legacy combined dose; still used by older UI
         jumpsThrowsDose: number; // default 10 or 15
+        // New split fields for Step 3 cards
+        jumpsPerDay?: number; // default 20
+        throwsPerDay?: number; // default 10
         jump?: string;
         throw?: string;
         novFullPrep?: boolean;
@@ -63,12 +76,27 @@ export type Step3Selection = {
         easyDays: number;
         modalities: string[]; // selected activities
         preferredDays?: string[]; // M/T/W/...
+        allowOverage?: boolean; // allow violating the 50% rule to proceed
     };
     cycle?: {
         includeDeload: boolean;
+        leaderCycles?: number; // 2–3
+        week7Variant?: 'Deload' | 'TM Test';
+        anchorPairing?: string; // e.g., 'PR sets + SSL'
         notes?: string;
     };
 };
+
+/** Assistance plan item used in per-day planning */
+export interface AssistancePlanItem {
+    name: string;
+    sets: number;
+    reps: number | string;
+    load?: { type: 'percentTM' | 'bw' | 'fixed'; value?: number; liftRef?: string };
+    /** Optional week mask for which weeks this item applies (e.g., [1,2,3]) */
+    weeks?: number[];
+    notes?: string;
+}
 
 export interface SeventhWeekRow {
     ProtocolId: string;

@@ -1,0 +1,902 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://example.com/schemas/531-program.schema.json",
+    "title": "5/3/1 Program Data",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "programId",
+        "version",
+        "source",
+        "lifts",
+        "tmRule",
+        "tmProgression",
+        "rounding",
+        "weeks",
+        "schedules"
+    ],
+    "properties": {
+        "programId": {
+            "const": "531"
+        },
+        "version": {
+            "type": "string"
+        },
+        "source": {
+            "$ref": "#/$defs/Source"
+        },
+        "allowedUnits": {
+            "type": "array",
+            "items": {
+                "enum": [
+                    "lb",
+                    "kg"
+                ]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        },
+        "lifts": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "squat",
+                "bench",
+                "deadlift",
+                "press"
+            ],
+            "properties": {
+                "squat": {
+                    "$ref": "#/$defs/Lift"
+                },
+                "bench": {
+                    "$ref": "#/$defs/Lift"
+                },
+                "deadlift": {
+                    "$ref": "#/$defs/Lift"
+                },
+                "press": {
+                    "$ref": "#/$defs/Lift"
+                }
+            }
+        },
+        "tmRule": {
+            "$ref": "#/$defs/TmRule"
+        },
+        "tmProgression": {
+            "$ref": "#/$defs/TmProgression"
+        },
+        "rounding": {
+            "$ref": "#/$defs/Rounding"
+        },
+        "options": {
+            "$ref": "#/$defs/Options"
+        },
+        "weeks": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/WeekScheme"
+            },
+            "minItems": 1,
+            "uniqueItems": false
+        },
+        "schedules": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/Schedule"
+            },
+            "minItems": 1,
+            "uniqueItems": false
+        },
+        "supplemental": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/SupplementalTemplate"
+            },
+            "minItems": 0
+        },
+        "assistance": {
+            "$ref": "#/$defs/Assistance"
+        },
+        "assistanceProfiles": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/AssistanceProfile"
+            },
+            "minItems": 0
+        },
+        "templates": {
+            "description": "Prebuilt program variants combining schedule, week order, supplemental and assistance profiles.",
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/ProgramTemplate"
+            },
+            "minItems": 0
+        },
+        "notes": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "maxLength": 200
+            },
+            "minItems": 0
+        }
+    },
+    "$defs": {
+        "Id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "description": "kebab-case id"
+        },
+        "LiftId": {
+            "enum": [
+                "squat",
+                "bench",
+                "deadlift",
+                "press"
+            ]
+        },
+        "PercentOfTM": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 2,
+            "description": "Decimal fraction of TM (e.g., 0.65 for 65%)"
+        },
+        "Reps": {
+            "oneOf": [
+                {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 50
+                },
+                {
+                    "type": "string",
+                    "pattern": "^[0-9]+\\+$",
+                    "description": "AMRAP style like '5+'"
+                }
+            ]
+        },
+        "Source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "sourceTitle"
+            ],
+            "properties": {
+                "sourceTitle": {
+                    "type": "string"
+                },
+                "edition": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "year": {
+                    "type": [
+                        "integer",
+                        "null"
+                    ]
+                },
+                "pageRanges": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 0
+                }
+            }
+        },
+        "Lift": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "aliases": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 0,
+                    "uniqueItems": true
+                },
+                "tmCap": {
+                    "type": [
+                        "number",
+                        "null"
+                    ]
+                }
+            }
+        },
+        "TmRule": {
+            "description": "How to compute Training Max from input max.",
+            "oneOf": [
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "type",
+                        "factor"
+                    ],
+                    "properties": {
+                        "type": {
+                            "const": "percentage_of_1rm"
+                        },
+                        "factor": {
+                            "type": "number",
+                            "minimum": 0,
+                            "maximum": 1
+                        }
+                    }
+                },
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "type",
+                        "note"
+                    ],
+                    "properties": {
+                        "type": {
+                            "const": "other"
+                        },
+                        "note": {
+                            "type": "string"
+                        }
+                    }
+                }
+            ]
+        },
+        "TmProgression": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "perCycle",
+                "unit"
+            ],
+            "properties": {
+                "perCycle": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "upper",
+                        "lower"
+                    ],
+                    "properties": {
+                        "upper": {
+                            "type": "number"
+                        },
+                        "lower": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "unit": {
+                    "enum": [
+                        "lb",
+                        "kg"
+                    ]
+                },
+                "perWeek": {
+                    "type": [
+                        "number",
+                        "null"
+                    ],
+                    "description": "Optional linear weekly TM increase (rare)"
+                }
+            }
+        },
+        "Rounding": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "increment",
+                "unit",
+                "minBar"
+            ],
+            "properties": {
+                "increment": {
+                    "type": "number"
+                },
+                "unit": {
+                    "enum": [
+                        "lb",
+                        "kg"
+                    ]
+                },
+                "minBar": {
+                    "type": "number"
+                },
+                "availablePlates": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    },
+                    "minItems": 0,
+                    "description": "Optional plate sizes per side"
+                }
+            }
+        },
+        "Options": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "allowJokers": {
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                },
+                "allowPRSets": {
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                },
+                "supersetAssistance": {
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                },
+                "restSeconds": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "main": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        },
+                        "supplemental": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        },
+                        "assistance": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        }
+                    }
+                },
+                "warmupNote": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                },
+                "conditioningNote": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            }
+        },
+        "WorkSet": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "percentOfTM",
+                "reps"
+            ],
+            "properties": {
+                "percentOfTM": {
+                    "$ref": "#/$defs/PercentOfTM"
+                },
+                "reps": {
+                    "$ref": "#/$defs/Reps"
+                },
+                "prSet": {
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                },
+                "amrap": {
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                },
+                "joker": {
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                },
+                "note": {
+                    "type": [
+                        "string",
+                        "null"
+                    ]
+                }
+            }
+        },
+        "WeekScheme": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "id",
+                "mainSets"
+            ],
+            "properties": {
+                "id": {
+                    "$ref": "#/$defs/Id"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "mainSets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/WorkSet"
+                    },
+                    "minItems": 1
+                },
+                "deload": {
+                    "type": [
+                        "boolean",
+                        "null"
+                    ]
+                },
+                "notes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 0
+                }
+            }
+        },
+        "Day": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "name",
+                "mainLift"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "mainLift": {
+                    "$ref": "#/$defs/LiftId"
+                },
+                "secondaryLift": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/LiftId"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "assistanceProfileId": {
+                    "anyOf": [
+                        {
+                            "$ref": "#/$defs/Id"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "notes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 0
+                }
+            }
+        },
+        "Schedule": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "id",
+                "days"
+            ],
+            "properties": {
+                "id": {
+                    "$ref": "#/$defs/Id"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "days": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/Day"
+                    },
+                    "minItems": 2,
+                    "maxItems": 6
+                }
+            }
+        },
+        "SupplementalTemplate": {
+            "oneOf": [
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "id",
+                        "type",
+                        "sets",
+                        "reps",
+                        "percentOfTM"
+                    ],
+                    "properties": {
+                        "id": {
+                            "$ref": "#/$defs/Id"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "const": "fixed"
+                        },
+                        "sets": {
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        "reps": {
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        "percentOfTM": {
+                            "$ref": "#/$defs/PercentOfTM"
+                        },
+                        "onMainLiftDay": {
+                            "type": [
+                                "boolean",
+                                "null"
+                            ]
+                        },
+                        "appliesTo": {
+                            "enum": [
+                                "main_lift",
+                                "specific_lift"
+                            ],
+                            "default": "main_lift"
+                        },
+                        "liftId": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/$defs/LiftId"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        },
+                        "restSeconds": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        },
+                        "notes": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "id",
+                        "type",
+                        "sourceSet",
+                        "sets",
+                        "reps"
+                    ],
+                    "properties": {
+                        "id": {
+                            "$ref": "#/$defs/Id"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "const": "from_week_set"
+                        },
+                        "sourceSet": {
+                            "enum": [
+                                "first",
+                                "second",
+                                "third",
+                                "top"
+                            ]
+                        },
+                        "sets": {
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        "reps": {
+                            "type": "integer",
+                            "minimum": 1
+                        },
+                        "onMainLiftDay": {
+                            "type": [
+                                "boolean",
+                                "null"
+                            ]
+                        },
+                        "appliesTo": {
+                            "enum": [
+                                "main_lift",
+                                "specific_lift"
+                            ],
+                            "default": "main_lift"
+                        },
+                        "liftId": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/$defs/LiftId"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        },
+                        "restSeconds": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        },
+                        "notes": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                        "id",
+                        "type",
+                        "sets"
+                    ],
+                    "properties": {
+                        "id": {
+                            "$ref": "#/$defs/Id"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "type": {
+                            "const": "custom"
+                        },
+                        "sets": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/$defs/WorkSet"
+                            },
+                            "minItems": 1
+                        },
+                        "onMainLiftDay": {
+                            "type": [
+                                "boolean",
+                                "null"
+                            ]
+                        },
+                        "appliesTo": {
+                            "enum": [
+                                "main_lift",
+                                "specific_lift"
+                            ],
+                            "default": "main_lift"
+                        },
+                        "liftId": {
+                            "anyOf": [
+                                {
+                                    "$ref": "#/$defs/LiftId"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        },
+                        "restSeconds": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        },
+                        "notes": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "AssistanceTargets": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "min": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "max": {
+                        "type": [
+                            "integer",
+                            "null"
+                        ]
+                    },
+                    "unit": {
+                        "enum": [
+                            "reps",
+                            "minutes",
+                            "sets",
+                            null
+                        ]
+                    }
+                }
+            }
+        },
+        "Assistance": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "targets": {
+                    "$ref": "#/$defs/AssistanceTargets"
+                },
+                "pools": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "minItems": 0,
+                        "uniqueItems": true
+                    }
+                },
+                "rules": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "superset": {
+                            "type": [
+                                "boolean",
+                                "null"
+                            ]
+                        },
+                        "totalTimeMinutes": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        },
+                        "perDayExerciseCount": {
+                            "type": [
+                                "integer",
+                                "null"
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "AssistanceProfile": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "id": {
+                    "$ref": "#/$defs/Id"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "overrides": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "targets": {
+                            "$ref": "#/$defs/AssistanceTargets"
+                        },
+                        "rules": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "superset": {
+                                    "type": [
+                                        "boolean",
+                                        "null"
+                                    ]
+                                },
+                                "totalTimeMinutes": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                },
+                                "perDayExerciseCount": {
+                                    "type": [
+                                        "integer",
+                                        "null"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "ProgramTemplate": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "id",
+                "name",
+                "scheduleId",
+                "weekOrder"
+            ],
+            "properties": {
+                "id": {
+                    "$ref": "#/$defs/Id"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "scheduleId": {
+                    "$ref": "#/$defs/Id"
+                },
+                "weekOrder": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 1
+                },
+                "supplementalByDay": {
+                    "description": "Map day index (0-based) to supplemental template id",
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/$defs/Id"
+                    }
+                },
+                "assistanceProfileId": {
+                    "$ref": "#/$defs/Id"
+                },
+                "notes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 0
+                }
+            }
+        }
+    }
+}

@@ -1,76 +1,120 @@
 #!/usr/bin/env node
-// Minimal UI validator: ensure tags parse, booleans are lowercase if present, and fields exist
+/*
+ UI templates validator:
+ - supplemental_scheme ∈ {fsl,ssl,bbb,bbs}
+ - seventh_week_mode ∈ {deload,tm_test}
+ - tm_pct_default ∈ {85,90} (accepts synonyms: tm_default_pct)
+ Also performs light sanity on percent_of='tm' rows when present.
+*/
 import fs from 'fs';
 import path from 'path';
 
-const root = process.cwd();
-const file = path.join(root, 'data', 'extraction', 'templates_additions.csv');
+const ROOT = process.cwd();
+const okSchemes = new Set(['fsl', 'ssl', 'bbb', 'bbs']);
+const okSeventh = new Set(['deload', 'tm_test']);
+const okTmPct = new Set(['85', '90', 85, 90]);
 
-function readCsvRows(fp) {
-    const txt = fs.readFileSync(fp, 'utf8').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-    const lines = txt.split('\n').filter(Boolean);
-    const rows = [];
-    let header = null;
-    for (let idx = 0; idx < lines.length; idx++) {
-        const line = lines[idx];
-        let cells = [];
+function readJSON(p) {
+    return JSON.parse(fs.readFileSync(p, 'utf8'));
+}
+function readCSV(p) {
+    const text = fs.readFileSync(p, 'utf8');
+    const lines = text.split(/\r?\n/).filter(Boolean);
+    if (lines.length === 0) return [];
+    const headers = lines[0].split(',').map(h => h.trim());
+    return lines.slice(1).map((ln, idx) => {
+        const cols = [];
         let cur = '';
         let inQ = false;
-        for (let i = 0; i < line.length; i++) {
-            const ch = line[i];
+        for (let i = 0; i < ln.length; i++) {
+            const ch = ln[i];
             if (ch === '"') {
-                if (inQ && line[i + 1] === '"') { cur += '"'; i++; }
+                if (inQ && ln[i + 1] === '"') { cur += '"'; i++; }
                 else inQ = !inQ;
             } else if (ch === ',' && !inQ) {
-                cells.push(cur);
-                cur = '';
+                cols.push(cur); cur = '';
             } else {
                 cur += ch;
             }
         }
-        cells.push(cur);
-        if (!header) header = cells;
-        else rows.push(cells);
-    }
-    return { header, rows };
+        cols.push(cur);
+        const row = {};
+        headers.forEach((h, i) => { row[h] = (cols[i] ?? '').trim(); });
+        (row).__line = idx + 2;
+        return row;
+    });
 }
 
-let errors = 0;
-try {
-    const { header, rows } = readCsvRows(file);
-    const h = (n) => header.indexOf(n);
-    const idx = {
-        id: h('id'),
-        display_name: h('display_name'),
-        tags: h('tags'),
-        pr_sets_allowed: h('pr_sets_allowed'),
-        jokers_allowed: h('jokers_allowed'),
-    };
-    for (const [k, v] of Object.entries(idx)) {
-        if (v < 0) { console.error(`[error] Missing header column: ${k}`); errors++; }
-    }
-    rows.forEach((r, i) => {
-        const rowNum = i + 2;
-        const id = r[idx.id];
-        const name = r[idx.display_name];
-        if (!id) { console.error(`[error] Row ${rowNum}: missing id`); errors++; }
-        if (!name) { console.error(`[error] Row ${rowNum}: missing display_name`); errors++; }
-        const tags = (r[idx.tags] || '').split('|').filter(Boolean);
-        const tagOk = tags.every(t => t.includes(':'));
-        if (!tagOk) { console.error(`[error] Row ${rowNum}: tag missing group prefix (expected group:key)`); errors++; }
-        // Booleans must be lowercase
-        const bools = ['pr_sets_allowed', 'jokers_allowed'];
-        bools.forEach(col => {
-            const v = r[idx[col]];
-            if (v && v !== 'true' && v !== 'false' && v !== '""') {
-                console.error(`[error] Row ${rowNum}: ${col} must be lowercase true/false (found: ${v})`);
-                errors++;
+function fail(msg) { console.error(`ERROR: ${msg}`); process.exitCode = 1; }
+function info(msg) { console.log(msg); }
+
+function checkProgram(prog, label) {
+    try {
+        const scheme = prog?.supplemental_scheme ?? prog?.supplemental?.schemeId ?? prog?.program?.supplemental?.schemeId;
+        if (scheme && !okSchemes.has(String(scheme).toLowerCase())) fail(`${label}: invalid supplemental_scheme '${scheme}'`);
+        const mode = prog?.seventh_week_mode ?? prog?.seventhWeek?.mode;
+        if (mode && !okSeventh.has(String(mode).toLowerCase())) fail(`${label}: invalid seventh_week_mode '${mode}'`);
+        const weeks = prog?.weeks || prog?.program?.weeks || [];
+        for (const w of weeks) {
+            const days = w.days || [];
+            for (const d of days) {
+                const main = d.main || d.mainSets || d.main_work;
+                if (main && Array.isArray(main.sets || main.rows)) {
+                    const rows = main.sets || main.rows;
+                    rows.forEach((r, idx) => {
+                        if (r && 'percent_of' in r && r.percent_of !== 'tm') fail(`${label}: main set percent_of not 'tm' (week ${w.week}, set ${idx + 1})`);
+                    });
+                }
+                const supp = d.supplemental;
+                if (supp && typeof supp === 'object' && 'percent_of' in supp && supp.percent_of !== 'tm') fail(`${label}: supplemental percent_of not 'tm'`);
             }
-        });
-    });
-    if (errors) process.exit(1);
-    console.log('Validation complete. Rows needing backfill if --write used: 0');
-} catch (e) {
-    console.error('[error] UI validation failed:', e.message);
-    process.exit(1);
+        }
+    } catch (e) {
+        fail(`${label}: exception ${e.message}`);
+    }
 }
+
+function checkTemplatesCsv(filePath) {
+    if (!fs.existsSync(filePath)) return;
+    const rows = readCSV(filePath);
+    for (const r of rows) {
+        const tm = r.tm_pct_default ?? r.tm_default_pct;
+        if (tm != null && String(tm).trim() !== '') {
+            if (!okTmPct.has(tm)) fail(`${filePath}:${r.__line} tm_pct_default must be 85 or 90 (got '${tm}')`);
+        }
+        const seventh = r.seventh_week_default ?? r.seventh_week_mode;
+        if (seventh && !okSeventh.has(String(seventh).toLowerCase())) fail(`${filePath}:${r.__line} seventh_week_default must be deload|tm_test (got '${seventh}')`);
+    }
+}
+
+function main() {
+    // JSON sources (optional): UI preview or sample program JSONs
+    const inputs = [];
+    const previewPath = path.join(ROOT, 'tracker-ui-good', 'tracker-ui', 'public', 'preview', 'program.json');
+    if (fs.existsSync(previewPath)) inputs.push({ path: previewPath, json: readJSON(previewPath) });
+    const programsDir = path.join(ROOT, 'data', 'programs', '531');
+    if (fs.existsSync(programsDir)) {
+        for (const f of fs.readdirSync(programsDir)) {
+            if (f.endsWith('.json')) {
+                const p = path.join(programsDir, f);
+                inputs.push({ path: p, json: readJSON(p) });
+            }
+        }
+    }
+    inputs.forEach(({ path: p, json }) => checkProgram(json, p));
+
+    // CSV sources: additions (both workspace and built public mirror if present)
+    const csvCandidates = [
+        path.join(ROOT, 'tracker-ui-good', 'tracker-ui', 'data', 'extraction', 'templates_additions.csv'),
+        path.join(ROOT, 'tracker-ui-good', 'tracker-ui', 'public', 'methodology', 'extraction', 'templates_additions.csv')
+    ];
+    csvCandidates.forEach(checkTemplatesCsv);
+
+    if (process.exitCode) {
+        console.error('Template UI validation failed.');
+        process.exit(process.exitCode);
+    }
+    console.log('Template UI validation passed.');
+}
+
+main();

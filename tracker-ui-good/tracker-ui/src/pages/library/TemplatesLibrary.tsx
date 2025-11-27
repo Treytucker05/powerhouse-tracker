@@ -2,17 +2,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { LibraryButtons } from "@/components/program/steps/LibraryButtons";
 import BuilderProgress from "@/components/program/steps/BuilderProgress";
-import { loadCsv } from "@/lib/loadCsv";
-import type { TemplateCsv } from "@/types/templates";
-import { useTagCatalog } from "@/ui/tags/useTagCatalog";
-import { withDerived } from "@/lib/templates/display";
-import { deriveSessionTimeChip, deriveDifficultyChip } from "@/lib/tags/resolve";
-import { TagChips } from "@/components/TagChips";
+import { loadTemplatesLibrary } from "@/lib/data/loadLibraries";
 
 type Row = Record<string, string>;
 
 export default function TemplatesLibrary() {
     const [rows, setRows] = useState<Row[]>([]);
+    const [source, setSource] = useState<"json" | "csv">("csv");
     const [query, setQuery] = useState("");
     const [tagFilters, setTagFilters] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
@@ -21,109 +17,10 @@ export default function TemplatesLibrary() {
 
     useEffect(() => {
         setLoading(true);
-        const MERGED_URL = `${import.meta.env.BASE_URL}methodology/extraction/templates_merged.csv`;
-        const MASTER_URL = `${import.meta.env.BASE_URL}methodology/extraction/templates_master.csv`;
-        const ADDITIONS_URL = `${import.meta.env.BASE_URL}methodology/extraction/templates_additions.csv`;
         (async () => {
             try {
-                // Prefer unified merged CSV if available
-                const mergedTry = await loadCsv<any>(MERGED_URL).catch(() => [] as any[]);
-                if (Array.isArray(mergedTry) && mergedTry.length > 0 && mergedTry[0]?.display_name) {
-                    const mapped: Row[] = mergedTry.map((r) => ({
-                        "Template Name": String(r.display_name || '').trim(),
-                        "Book": String(r.source_book || '').trim(),
-                        "Page": String(r.source_pages || '').trim(),
-                        "Main Work": String(r.core_scheme || '').trim(),
-                        "Supplemental": String(r.supplemental || '').trim(),
-                        "Assistance": String(r.assistance_guideline || '').trim(),
-                        "Conditioning": String(r.conditioning_guideline || '').trim(),
-                        "Leader/Anchor": String(r.leader_anchor || '').trim(),
-                        "Notes": String(r.ui_notes || '').trim(),
-                        category: String((r as any).category || ''),
-                        __id: String((r as any).id || ''),
-                        __source_book: String(r.source_book || ''),
-                        __source_pages: String(r.source_pages || ''),
-                        __tags: String((r as any).tags || '').trim(),
-                        // carry through UI strings into derived display
-                        ui_main: r.ui_main || '',
-                        ui_supplemental: r.ui_supplemental || '',
-                        ui_assistance: r.ui_assistance || '',
-                        ui_conditioning: r.ui_conditioning || '',
-                        ui_notes: r.ui_notes || '',
-                        time_per_session_min: r.time_per_session_min || '',
-                        experience: r.experience || '',
-                    }));
-                    const withDisplay = mapped.map((r) => withDerived(r as any));
-                    const hydrated = withDisplay.map((r) => {
-                        const disp = (r as any).__display || {};
-                        const keys = String(disp.tags || (r as any).__tags || "")
-                            .split("|")
-                            .map((t) => t.trim())
-                            .filter(Boolean);
-                        const tagChips = keys.map((key) => {
-                            const meta = getTagMeta(key);
-                            return { text: meta.label || key, color: (meta as any).color, key } as any;
-                        });
-                        const infoChips: any[] = [];
-                        const timeChip = deriveSessionTimeChip((r as any).time_per_session_min);
-                        if (timeChip) infoChips.push({ text: timeChip });
-                        const diffChip = deriveDifficultyChip((r as any).experience);
-                        if (diffChip) infoChips.push({ text: diffChip });
-                        const la = (r as any).leader_anchor_fit;
-                        if (la) infoChips.push({ text: la });
-                        return { ...(r as any), __display: { ...disp, tagChips, infoChips } } as any;
-                    });
-                    setRows(hydrated as any);
-                    setErr(null);
-                    setLoading(false);
-                    return;
-                }
-
-                const master = await loadCsv<Row>(MASTER_URL).catch(() => [] as Row[]);
-                const additions = await loadCsv<TemplateCsv>(ADDITIONS_URL).catch(() => [] as TemplateCsv[]);
-
-                // Filter empty master rows
-                const cleanMaster = (master as Row[]).filter(
-                    (r) => r && r["Template Name"] && r["Template Name"].trim().length > 0
-                );
-
-                // Merge additions: map to master-like display with extra columns
-                const mappedAdds: Row[] = (additions || []).map((r) => ({
-                    "Template Name": (r.display_name || "").trim(),
-                    "Book": (r.source_book || "").trim(),
-                    "Page": (r.source_pages || "").trim(),
-                    "Main Work": (r.core_scheme || "").trim(),
-                    "Supplemental": (r.supplemental || "").trim(),
-                    "Assistance": (r.assistance_guideline || "").trim(),
-                    "Conditioning": (r.conditioning_guideline || "").trim(),
-                    "Leader/Anchor": (r.leader_anchor || "").trim(),
-                    "Notes": (r.notes || "").trim(),
-                    category: (r as any).category || "",
-                    __id: (r.id || "").trim(),
-                    __source_book: (r.source_book || "").trim(),
-                    __source_pages: (r.source_pages || "").trim(),
-                    __tags: String((r as any).tags || "").trim(),
-                }));
-
-                // De-dupe by kebab id when available, otherwise by normalized name
-                const idFrom = (row: Row) => {
-                    if ((row as any).__id) return String((row as any).__id);
-                    const name = String(row["Template Name"] || "").toLowerCase().trim();
-                    return name
-                        .replace(/^(jack sh\*t|jack shit)$/, 'jackshit')
-                        .replace(/[^a-z0-9]+/g, '-');
-                };
-                const byId = new Map<string, Row>();
-                cleanMaster.forEach((r) => {
-                    const id = idFrom(r);
-                    if (id) byId.set(id, r);
-                });
-                mappedAdds.forEach((r) => {
-                    const id = idFrom(r);
-                    if (!id) return;
-                    byId.set(id, r); // prefer additions
-                });
-                const merged = Array.from(byId.values()).sort((a, b) => {
+                const { rows, source } = await loadTemplatesLibrary<Row>();
+                const sorted = [...rows].sort((a, b) => {
                     const ca = String((a as any).category || '').toLowerCase();
                     const cb = String((b as any).category || '').toLowerCase();
                     if (ca !== cb) return ca < cb ? -1 : 1;
@@ -131,33 +28,11 @@ export default function TemplatesLibrary() {
                     const tb = String((b["Template Name"] || (b as any).display_name || "")).toLowerCase();
                     return ta < tb ? -1 : ta > tb ? 1 : 0;
                 });
-
-                // attach derived display fields
-                const withDisplay = merged.map((r) => withDerived(r as any));
-                // Attach unified chips derived from tags + simple metadata so table matches cards
-                const hydrated = withDisplay.map((r) => {
-                    const disp = (r as any).__display || {};
-                    const keys = String(disp.tags || (r as any).__tags || "")
-                        .split("|")
-                        .map((t) => t.trim())
-                        .filter(Boolean);
-                    const tagChips = keys.map((key) => {
-                        const meta = getTagMeta(key);
-                        return { text: meta.label || key, color: (meta as any).color, key } as any;
-                    });
-                    const infoChips: any[] = [];
-                    const timeChip = deriveSessionTimeChip((r as any).time_per_session_min);
-                    if (timeChip) infoChips.push({ text: timeChip });
-                    const diffChip = deriveDifficultyChip((r as any).experience);
-                    if (diffChip) infoChips.push({ text: diffChip });
-                    const la = (r as any).leader_anchor_fit;
-                    if (la) infoChips.push({ text: la });
-                    return { ...(r as any), __display: { ...disp, tagChips, infoChips } } as any;
-                });
-                setRows(hydrated as any);
+                setRows(sorted);
+                setSource(source);
                 setErr(null);
             } catch (e: any) {
-                setErr(e?.message || "Failed to load CSV");
+                setErr(e?.message || "Failed to load library data");
             } finally {
                 setLoading(false);
             }
@@ -230,7 +105,7 @@ export default function TemplatesLibrary() {
                     <div>
                         <h1 className="text-2xl font-semibold">Templates Library</h1>
                         <p className="text-gray-400 text-sm">
-                            CSV-driven list from <code>templates_master.csv</code>. Use search to filter.
+                            Data source: <span className="font-mono uppercase">{source}</span>
                         </p>
                     </div>
                     <div className="flex gap-2">

@@ -1,13 +1,16 @@
 import React, { createContext, useContext, useEffect, useMemo, useReducer } from 'react';
-import type { Step3Selection } from '../types/step3';
+import type { AssistancePlanItem, Step3Selection } from '../types/step3';
 
 type Step3State = Step3Selection;
 
 type Action =
     | { type: 'RESET' }
     | { type: 'SET_SUPPLEMENTAL'; payload: Step3State['supplemental'] }
+    | { type: 'SET_SUPP_CONFIG'; payload: NonNullable<Step3State['supplementalConfig']> }
     | { type: 'SET_ASSISTANCE'; payload: Partial<Step3State['assistance']> }
     | { type: 'SET_ASSISTANCE_PICKS'; payload: Step3State['assistance']['picks'] }
+    | { type: 'SET_ASSISTANCE_PER_DAY'; payload: Partial<Record<'press' | 'deadlift' | 'bench' | 'squat', AssistancePlanItem[]>> }
+    | { type: 'CLEAR_ASSISTANCE_DAY'; payload: 'press' | 'deadlift' | 'bench' | 'squat' }
     | { type: 'SET_WARMUP'; payload: Partial<Step3State['warmup']> }
     | { type: 'SET_CONDITIONING'; payload: Partial<Step3State['conditioning']> }
     | { type: 'SET_CYCLE'; payload: Partial<NonNullable<Step3State['cycle']>> }
@@ -15,15 +18,20 @@ type Action =
 
 const INITIAL: Step3State = {
     supplemental: undefined,
+    supplementalConfig: undefined,
     assistance: {
         mode: 'Preset',
         volumePreset: 'Standard',
         picks: { Push: [], Pull: [], 'Single-Leg/Core': [], Core: [] },
         perCategoryTarget: { Push: 50, Pull: 50, 'Single-Leg/Core': 50, Core: 50 },
+        perDay: { press: [], deadlift: [], bench: [], squat: [] },
     },
     warmup: {
         mobility: '',
+        mobilityPreset: 'Agile 8',
         jumpsThrowsDose: 10,
+        jumpsPerDay: 20,
+        throwsPerDay: 10,
         novFullPrep: false,
     },
     conditioning: {
@@ -31,9 +39,13 @@ const INITIAL: Step3State = {
         easyDays: 3,
         modalities: [],
         preferredDays: [],
+        allowOverage: false,
     },
     cycle: {
         includeDeload: true,
+        leaderCycles: 2,
+        week7Variant: 'Deload',
+        anchorPairing: '',
         notes: '',
     },
 };
@@ -44,10 +56,21 @@ function reducer(state: Step3State, action: Action): Step3State {
             return { ...INITIAL };
         case 'SET_SUPPLEMENTAL':
             return { ...state, supplemental: action.payload };
+        case 'SET_SUPP_CONFIG':
+            return { ...state, supplementalConfig: action.payload };
         case 'SET_ASSISTANCE':
             return { ...state, assistance: { ...state.assistance, ...action.payload } };
         case 'SET_ASSISTANCE_PICKS':
             return { ...state, assistance: { ...state.assistance, picks: action.payload } };
+        case 'SET_ASSISTANCE_PER_DAY': {
+            const prev = state.assistance.perDay || { press: [], deadlift: [], bench: [], squat: [] };
+            return { ...state, assistance: { ...state.assistance, perDay: { ...prev, ...action.payload } } };
+        }
+        case 'CLEAR_ASSISTANCE_DAY': {
+            const prev = state.assistance.perDay || { press: [], deadlift: [], bench: [], squat: [] };
+            const next = { ...prev, [action.payload]: [] } as Record<'press' | 'deadlift' | 'bench' | 'squat', AssistancePlanItem[]>;
+            return { ...state, assistance: { ...state.assistance, perDay: next } };
+        }
         case 'SET_WARMUP':
             return { ...state, warmup: { ...state.warmup, ...action.payload } };
         case 'SET_CONDITIONING':
@@ -89,8 +112,11 @@ type Step3ContextValue = {
     actions: {
         reset: () => void;
         setSupplemental: (row: Step3State['supplemental']) => void;
+        setSupplementalConfig: (cfg: NonNullable<Step3State['supplementalConfig']>) => void;
         setAssistance: (patch: Partial<Step3State['assistance']>) => void;
         setAssistancePicks: (picks: Step3State['assistance']['picks']) => void;
+        setAssistancePerDay: (patch: Partial<Record<'press' | 'deadlift' | 'bench' | 'squat', AssistancePlanItem[]>>) => void;
+        clearAssistanceDay: (day: 'press' | 'deadlift' | 'bench' | 'squat') => void;
         setWarmup: (patch: Partial<Step3State['warmup']>) => void;
         setConditioning: (patch: Partial<Step3State['conditioning']>) => void;
         setCycle: (patch: Partial<NonNullable<Step3State['cycle']>>) => void;
@@ -111,8 +137,11 @@ export function Step3Provider({ children }: { children: React.ReactNode }) {
         () => ({
             reset: () => dispatch({ type: 'RESET' }),
             setSupplemental: (row) => dispatch({ type: 'SET_SUPPLEMENTAL', payload: row }),
+            setSupplementalConfig: (cfg) => dispatch({ type: 'SET_SUPP_CONFIG', payload: cfg }),
             setAssistance: (patch) => dispatch({ type: 'SET_ASSISTANCE', payload: patch }),
             setAssistancePicks: (picks) => dispatch({ type: 'SET_ASSISTANCE_PICKS', payload: picks }),
+            setAssistancePerDay: (patch) => dispatch({ type: 'SET_ASSISTANCE_PER_DAY', payload: patch }),
+            clearAssistanceDay: (day) => dispatch({ type: 'CLEAR_ASSISTANCE_DAY', payload: day }),
             setWarmup: (patch) => dispatch({ type: 'SET_WARMUP', payload: patch }),
             setConditioning: (patch) => dispatch({ type: 'SET_CONDITIONING', payload: patch }),
             setCycle: (patch) => dispatch({ type: 'SET_CYCLE', payload: patch }),

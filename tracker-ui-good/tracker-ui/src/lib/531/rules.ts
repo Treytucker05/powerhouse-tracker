@@ -44,13 +44,18 @@ export function estimateSessionMinutes(args: {
     mainPattern: '531' | '3/5/1' | '5s PRO';
     supplementalSets: number;
     assistanceTargets: Record<string, number>;
-    jumpsThrows: number;
+    jumpsThrows?: number; // legacy combined dose
+    jumpsPerDay?: number; // split dose
+    throwsPerDay?: number; // split dose
 }) {
     const main = TIME.MAIN_SET;
     const supp = args.supplementalSets * TIME.SUPP_SET;
     const assistTotal = Object.values(args.assistanceTargets).reduce((a, b) => a + b, 0);
     const assistance = assistTotal * TIME.ASSIST_REP;
-    const jt = args.jumpsThrows * TIME.JUMP_THROW;
+    const jtDose = Number.isFinite(args.jumpsPerDay as number) || Number.isFinite(args.throwsPerDay as number)
+        ? ((args.jumpsPerDay || 0) + (args.throwsPerDay || 0))
+        : (args.jumpsThrows || 0);
+    const jt = jtDose * TIME.JUMP_THROW;
     return Math.round(main + supp + assistance + jt);
 }
 

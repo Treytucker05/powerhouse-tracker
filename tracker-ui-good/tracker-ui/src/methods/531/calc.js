@@ -1,6 +1,8 @@
 import { extractWarmups, extractWeekByLabel } from "./packAdapter.js";
+import { buildClassicMainSets } from './engines/mainSets.js';
 // Static import of assistance rules (was inline require) to avoid duplicate module instantiation
 import { assistanceFor } from './assistanceRules.js';
+import { buildSupplemental } from './engines/supplemental.js';
 
 // Shared compute helpers (lift + TM + week context). These unify 3-day and 4-day previews.
 // Signatures kept simple & stable for plug-and-play usage across schedule builders.
@@ -17,31 +19,56 @@ export function computeWarmups(lift, tm, weekLabel, roundingPref, units, pack) {
     });
 }
 
-export function computeMainSets(lift, tm, weekLabel, { amrap } = {}, roundingPref, units, pack) {
-    if (!pack || !tm) return { rows: [], amrapLast: false };
-    const wk = extractWeekByLabel(pack, weekLabel);
-    const main = wk?.main || [];
+export function computeMainSets(lift, tm, weekLabel, { amrap } = {}, roundingPref, units, pack, state) {
+    if (!tm) return { rows: [], amrapLast: false };
     const rnd = roundingPref || { lbs: 5, kg: 2.5 };
-    const rows = main.map((s, idx) => {
-        const pct = s.value ?? s.percentage ?? s.pct;
-        const reps = s.reps ?? 0;
-        // Respect pack amrap flag; optionally force only for final heavy week
-        const isAmrap = Boolean(s.amrap && (amrap ? true : s.amrap));
-        const weight = roundLoad((pct / 100) * tm, units, rnd);
-        return { pct, reps, amrap: isAmrap, weight };
-    });
+    // Prefer pack-defined week when provided (preserves template-specific AMRAP flags & values)
+    try {
+        const wk = pack ? extractWeekByLabel(pack, weekLabel) : null;
+        if (wk && Array.isArray(wk.main) && wk.main.length) {
+            const rows = wk.main.map(s => {
+                const pct = s.value ?? s.percentage ?? s.pct;
+                const reps = s.reps ?? 0;
+                const weight = roundLoad((pct / 100) * tm, units, rnd);
+                return { pct, reps, amrap: Boolean(s.amrap), weight, percent_of: 'tm' };
+            });
+            const amrapLast = rows.length ? Boolean(rows[rows.length - 1]?.amrap) : false;
+            return { rows, amrapLast };
+        }
+    } catch { /* ignore and fallback to classic */ }
+    // Otherwise use classic engine to build rows; enforces percent_of='tm' and AMRAP policy
+    const classic = buildClassicMainSets({ tm, weekLabel, units, roundingPref: rnd, state });
+    let rows = classic.rows;
+    // Auto backoff: when enabled, append FSL/SSL line using schemeId
+    try {
+        const auto = state?.automation?.autoFsl;
+        const schemeId = state?.supplemental?.schemeId || state?.supplemental?.strategy;
+        if (auto && (schemeId === 'fsl' || schemeId === 'ssl') && rows.length >= 2) {
+            const refIdx = schemeId === 'fsl' ? 0 : 1;
+            const ref = rows[refIdx];
+            if (ref) {
+                rows.push({ pct: ref.pct, reps: typeof ref.reps === 'string' ? ref.reps : 5, amrap: false, weight: ref.weight, percent_of: 'tm', backoff: schemeId });
+            }
+        }
+    } catch { /* non-fatal */ }
     const amrapLast = rows.length ? Boolean(rows[rows.length - 1]?.amrap) : false;
     return { rows, amrapLast };
 }
 
 export function computeSupplemental(pack, lift, tm, state) {
+    if (!tm) return null;
     const sup = state?.supplemental;
     if (!sup) return null;
-    const mode = sup.strategy || sup.mode;
-    if (mode !== 'bbb') return null; // future: extend for FSL, SSL, etc.
-    // BBB default intensity adjusted from legacy 60% to 50% (still overrideable)
+    const schemeId = sup.schemeId || sup.strategy || sup.mode;
+    const weekLabel = state?.weekLabel || state?.currentWeekLabel; // optional, usually passed via schedule/makeDay meta
+    const roundingIncrement = (state?.roundingIncrement != null)
+        ? state.roundingIncrement
+        : ((state?.units === 'kg' || state?.units === 'kgs') ? 2.5 : 5);
+    const built = buildSupplemental({ schemeId, weekLabel, tm, roundingIncrement });
+    if (built) return built;
+    // Only apply BBB fallback when the selected scheme is BBB; otherwise return null
+    if (String(schemeId || '').toLowerCase() !== 'bbb') return null;
     const pct = sup.percentOfTM ?? sup.intensity?.value ?? 50;
-    if (!tm) return null;
     const units = state?.units || 'lbs';
     const rounding = state?.roundingPref || { lbs: 5, kg: 2.5 };
     const load = roundLoad((tm * pct) / 100, units, rounding);

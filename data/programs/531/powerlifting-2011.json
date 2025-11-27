@@ -1,0 +1,445 @@
+{
+    "programId": "531",
+    "version": "powerlifting-2011",
+    "source": {
+        "sourceTitle": "5/3/1 for Powerlifting: Simple and Effective Training for Maximal Strength",
+        "edition": null,
+        "year": 2011,
+        "pageRanges": [
+            "pp. 9-12",
+            "pp. 16-18",
+            "pp. 29-33",
+            "pp. 49-55",
+            "pp. 64-66",
+            "pp. 107-115"
+        ]
+    },
+    "allowedUnits": [
+        "lb",
+        "kg"
+    ],
+    "lifts": {
+        "squat": {
+            "name": "Back Squat",
+            "aliases": [
+                "parallel squat"
+            ],
+            "tmCap": null
+        },
+        "bench": {
+            "name": "Bench Press",
+            "aliases": [
+                "flat barbell bench"
+            ],
+            "tmCap": null
+        },
+        "deadlift": {
+            "name": "Deadlift",
+            "aliases": [
+                "conventional deadlift"
+            ],
+            "tmCap": null
+        },
+        "press": {
+            "name": "Standing Press",
+            "aliases": [
+                "military press",
+                "overhead press"
+            ],
+            "tmCap": null
+        }
+    },
+    "tmRule": {
+        "type": "percentage_of_1rm",
+        "factor": 0.9
+    },
+    "tmProgression": {
+        "perCycle": {
+            "upper": 5,
+            "lower": 10
+        },
+        "unit": "lb",
+        "perWeek": null
+    },
+    "rounding": {
+        "increment": 5,
+        "unit": "lb",
+        "minBar": 45
+    },
+    "options": {
+        "allowJokers": null,
+        "allowPRSets": true,
+        "supersetAssistance": true,
+        "restSeconds": {
+            "main": 180,
+            "supplemental": 90,
+            "assistance": 60
+        },
+        "warmupNote": "Simple warm-up sets: 40%x5, 50%x5, 60%x3 then work sets.",
+        "conditioningNote": "Hard conditioning on lower days, easy on upper days."
+    },
+    "weeks": [
+        {
+            "id": "std-w1-3x5",
+            "label": "Standard 3x5",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.65,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.75,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.85,
+                    "reps": "5+",
+                    "prSet": true,
+                    "amrap": true
+                }
+            ],
+            "notes": [
+                "Standard table shown. "
+            ]
+        },
+        {
+            "id": "std-w2-3x3",
+            "label": "Standard 3x3",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.70,
+                    "reps": 3
+                },
+                {
+                    "percentOfTM": 0.80,
+                    "reps": 3
+                },
+                {
+                    "percentOfTM": 0.90,
+                    "reps": "3+",
+                    "prSet": true,
+                    "amrap": true
+                }
+            ],
+            "notes": [
+                "Standard table shown. "
+            ]
+        },
+        {
+            "id": "std-w3-531",
+            "label": "Standard 5/3/1",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.75,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.85,
+                    "reps": 3
+                },
+                {
+                    "percentOfTM": 0.95,
+                    "reps": "1+",
+                    "prSet": true,
+                    "amrap": true
+                }
+            ],
+            "notes": [
+                "Standard table shown. "
+            ]
+        },
+        {
+            "id": "std-w4-deload",
+            "label": "Deload 3x5",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.40,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.50,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.60,
+                    "reps": 5
+                }
+            ],
+            "deload": true,
+            "notes": [
+                "Standard table shown. "
+            ]
+        },
+        {
+            "id": "pl-w1-3x3",
+            "label": "Powerlifting Var: 3x3 + singles",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.70,
+                    "reps": 3
+                },
+                {
+                    "percentOfTM": 0.80,
+                    "reps": 3
+                },
+                {
+                    "percentOfTM": 0.90,
+                    "reps": "3+",
+                    "prSet": true,
+                    "amrap": true
+                }
+            ],
+            "notes": [
+                "Add 2–3 heavy singles after sets. "
+            ]
+        },
+        {
+            "id": "pl-w2-3x5",
+            "label": "Powerlifting Var: 3x5 (no max)",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.65,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.75,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.85,
+                    "reps": 5
+                }
+            ],
+            "notes": [
+                "Do not AMRAP on week 2. "
+            ]
+        },
+        {
+            "id": "pl-w3-531",
+            "label": "Powerlifting Var: 5/3/1 + singles",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.75,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.85,
+                    "reps": 3
+                },
+                {
+                    "percentOfTM": 0.95,
+                    "reps": "1+",
+                    "prSet": true,
+                    "amrap": true
+                }
+            ],
+            "notes": [
+                "Add 2–3 heavy singles after sets. "
+            ]
+        },
+        {
+            "id": "pl-w4-deload",
+            "label": "Powerlifting Var: Deload 3x5",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.40,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.50,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.60,
+                    "reps": 5
+                }
+            ],
+            "deload": true,
+            "notes": [
+                "Deload week. "
+            ]
+        }
+    ],
+    "schedules": [
+        {
+            "id": "four-day-nov",
+            "label": "N.O.V. 4-day",
+            "days": [
+                {
+                    "name": "Mon",
+                    "mainLift": "press",
+                    "notes": [
+                        "Superset sets with chins/pulldowns. "
+                    ]
+                },
+                {
+                    "name": "Tue",
+                    "mainLift": "deadlift"
+                },
+                {
+                    "name": "Thu",
+                    "mainLift": "bench",
+                    "notes": [
+                        "Superset sets with chins/pulldowns. "
+                    ]
+                },
+                {
+                    "name": "Fri",
+                    "mainLift": "squat"
+                }
+            ]
+        }
+    ],
+    "supplemental": [
+        {
+            "id": "bbb-50",
+            "name": "Boring But Big 50%",
+            "type": "fixed",
+            "sets": 5,
+            "reps": 10,
+            "percentOfTM": 0.5,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": 90,
+            "notes": [
+                "BBB 5x10 at 50–60% TM. "
+            ]
+        },
+        {
+            "id": "bbb-60",
+            "name": "Boring But Big 60%",
+            "type": "fixed",
+            "sets": 5,
+            "reps": 10,
+            "percentOfTM": 0.6,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": 90,
+            "notes": [
+                "BBB 5x10 at 50–60% TM. "
+            ]
+        },
+        {
+            "id": "first-set-last",
+            "name": "First Set Last (repeat)",
+            "type": "from_week_set",
+            "sourceSet": "first",
+            "sets": 1,
+            "reps": 5,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": 120,
+            "notes": [
+                "Repeat first set for extra volume; often push reps. "
+            ]
+        }
+    ],
+    "assistance": {
+        "targets": {},
+        "pools": {
+            "upper_push": [
+                "dumbbell bench press",
+                "weighted dips",
+                "dumbbell shoulder press",
+                "incline press",
+                "floor press"
+            ],
+            "upper_pull": [
+                "chin-up",
+                "lat pulldown",
+                "bent-over row",
+                "chest-supported row",
+                "face pull",
+                "rear lateral",
+                "Kroc row"
+            ],
+            "lower_posterior": [
+                "good morning",
+                "leg curl",
+                "back raise",
+                "reverse hyper",
+                "glute ham raise"
+            ],
+            "core": [
+                "ab wheel",
+                "hanging leg raise",
+                "weighted sit-up",
+                "dumbbell side bend"
+            ]
+        },
+        "rules": {
+            "superset": true,
+            "totalTimeMinutes": null,
+            "perDayExerciseCount": 2
+        }
+    },
+    "assistanceProfiles": [
+        {
+            "id": "superset-pulls",
+            "label": "Superset Pulls on Press/Bench",
+            "overrides": {
+                "targets": {},
+                "rules": {
+                    "superset": true,
+                    "totalTimeMinutes": null,
+                    "perDayExerciseCount": 2
+                }
+            }
+        }
+    ],
+    "templates": [
+        {
+            "id": "nov-powerlifting",
+            "name": "N.O.V. Powerlifting Var",
+            "scheduleId": "four-day-nov",
+            "weekOrder": [
+                "pl-w1-3x3",
+                "pl-w2-3x5",
+                "pl-w3-531",
+                "pl-w4-deload"
+            ],
+            "supplementalByDay": {
+                "0": "bbb-50",
+                "1": "bbb-50",
+                "2": "bbb-50",
+                "3": "bbb-50"
+            },
+            "assistanceProfileId": "superset-pulls",
+            "notes": [
+                "Primary variation uses 3x3→3x5→5/3/1→deload with singles on W1 and W3. "
+            ]
+        },
+        {
+            "id": "nov-standard",
+            "name": "N.O.V. Standard 5/3/1",
+            "scheduleId": "four-day-nov",
+            "weekOrder": [
+                "std-w1-3x5",
+                "std-w2-3x3",
+                "std-w3-531",
+                "std-w4-deload"
+            ],
+            "supplementalByDay": {
+                "0": "bbb-50",
+                "1": "bbb-50",
+                "2": "bbb-50",
+                "3": "bbb-50"
+            },
+            "assistanceProfileId": "superset-pulls",
+            "notes": [
+                "Standard 5/3/1 wave. "
+            ]
+        }
+    ],
+    "notes": [
+        "TM = 90% of 1RM. ",
+        "Standard and powerlifting week % tables shown. ",
+        "Powerlifting var adds heavy singles on weeks 1 and 3; week 2 not AMRAP. ",
+        "+5 lb upper, +10 lb lower per cycle. ",
+        "N.O.V. 4-day uses Press, Deadlift, Bench, Squat; superset pulls on press/bench days. ",
+        "Main rest ~3–5 min; assistance ~1–2 min. "
+    ]
+}

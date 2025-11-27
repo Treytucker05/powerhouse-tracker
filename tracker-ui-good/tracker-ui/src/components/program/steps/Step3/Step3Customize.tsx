@@ -6,6 +6,10 @@ import WarmupJumpsThrowsTab from './tabs/WarmupJumpsThrowsTab';
 import ConditioningTab from './tabs/ConditioningTab';
 import SupplementalTab from './tabs/SupplementalTab';
 import BuilderProgress from '../BuilderProgress';
+import { loadCsv } from '@/lib/loadCsv';
+import type { SupplementalRow } from '@/types/step3';
+import { useStep3 } from '@/store/step3Store';
+import { useBuilder } from '@/context/BuilderState';
 
 type TabKey = 'supplemental' | 'assistance' | 'warmup' | 'conditioning';
 
@@ -58,6 +62,8 @@ function LeftPane({ active }: { active: TabKey }) {
 export default function Step3Customize() {
     const [active, setActive] = useState<TabKey>('supplemental');
     const loc = useLocation();
+    const { state: builderState } = useBuilder();
+    const { state: step3, actions } = useStep3();
     useEffect(() => {
         try {
             const params = new URLSearchParams(loc.search);
@@ -68,6 +74,53 @@ export default function Step3Customize() {
             else if (tab === 'supplemental') setActive('supplemental');
         } catch { }
     }, [loc.search]);
+
+    // Bridge: auto-seed Step 3 supplemental from Step 2 selection when possible
+    useEffect(() => {
+        let cancelled = false;
+        const templateId = (builderState as any)?.step2?.templateId as string | undefined;
+        // Only run if we have a template and no supplemental seeded yet (or mismatched)
+        const currentTemplateName = step3.supplemental?.Template;
+        if (!templateId || currentTemplateName) return;
+
+        const matchRow = (rows: SupplementalRow[]) => {
+            const by = (pred: (r: SupplementalRow) => boolean) => rows.find(pred);
+            switch (templateId) {
+                case '5_s_pro_5x5_fsl':
+                    // Leader, 5s PRO, FSL 5x5, Percent = FSL
+                    return (
+                        by(r => r.Phase === 'Leader' && r.MainPattern === '5s PRO' && r.SupplementalScheme === 'FSL' && /5\s*x\s*5/i.test(r.SupplementalSetsReps)) ||
+                        by(r => r.Phase === 'Leader' && r.SupplementalScheme === 'FSL')
+                    );
+                case '5_s_pro_ssl':
+                    // Leader, 5s PRO, SSL 5x5
+                    return (
+                        by(r => r.Phase === 'Leader' && r.MainPattern === '5s PRO' && r.SupplementalScheme === 'SSL' && /5\s*x\s*5/i.test(r.SupplementalSetsReps)) ||
+                        by(r => r.Phase === 'Leader' && r.SupplementalScheme === 'SSL')
+                    );
+                default:
+                    return undefined;
+            }
+        };
+
+        (async () => {
+            try {
+                const path = `${import.meta.env.BASE_URL}methodology/extraction/supplemental.csv`;
+                const rows = await loadCsv<SupplementalRow>(path).catch(() => []);
+                if (cancelled) return;
+                const row = matchRow((rows || []) as SupplementalRow[]);
+                if (row) {
+                    actions.setSupplemental(row);
+                    // Defer applying defaults to StickySummary if the handoff flag is set
+                }
+            } catch {
+                // non-blocking if CSV fails; user can pick manually
+            }
+        })();
+
+        return () => { cancelled = true; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [(builderState as any)?.step2?.templateId]);
     return (
         <div className="min-h-[60vh]">
             {/* Step navigation + Library quick-links (restored) */}

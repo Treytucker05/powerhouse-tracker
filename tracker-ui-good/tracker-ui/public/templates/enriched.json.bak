@@ -1,0 +1,1265 @@
+[
+  {
+    "id": "5_s_pro_5x5_fsl",
+    "display_name": "5's PRO + 5x5 FSL",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "fsl",
+      "volume_mod",
+      "leader",
+      "anchor"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "five_and_dime_leader",
+    "display_name": "Five and Dime (Leader)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "leviathan",
+    "display_name": "Leviathan",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "fsl",
+      "volume_mod",
+      "leader",
+      "anchor",
+      "leviathan"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "boring_but_big",
+    "display_name": "Boring But Big",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "triumvirate",
+    "display_name": "Triumvirate",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader",
+      "triumvirate"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "periodization_bible",
+    "display_name": "Periodization Bible",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader",
+      "periodization_bible"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "bodyweight",
+    "display_name": "Bodyweight",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "jackshit",
+    "display_name": "Jack Sh*t",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader",
+      "jackshit"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "hardgainers_leaders",
+    "display_name": "Hardgainers (Leaders)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "Strength"
+    },
+    "tags": [
+      "5s_pro",
+      "no_pr",
+      "fsl",
+      "volume_mod",
+      "leader",
+      "hardgainers"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "hardgainers_anchor",
+    "display_name": "Hardgainers (Anchor)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "anchor",
+      "hardgainers"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "7th_week_protocol",
+    "display_name": "7th Week Protocol",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "full_body_full_boring",
+    "display_name": "Full Body, Full Boring",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "fsl",
+      "volume_mod",
+      "leader"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "boring_but_strong",
+    "display_name": "Boring But Strong",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "leader",
+      "boring_but_strong"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "beach_body_challenge",
+    "display_name": "Beach Body Challenge",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "leader"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "krypteia",
+    "display_name": "Krypteia",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "leader",
+      "krypteia"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "leaders_3_month",
+    "display_name": "Leaders (3-month)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "Strength"
+    },
+    "tags": [
+      "5s_pro",
+      "no_pr",
+      "ssl",
+      "strength",
+      "fsl",
+      "volume_mod",
+      "leader"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "anchor_1_month",
+    "display_name": "Anchor (1-month)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "fsl",
+      "volume_mod",
+      "anchor"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "5_s_pro_ssl",
+    "display_name": "5's PRO + SSL",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "Strength"
+    },
+    "tags": [
+      "ssl",
+      "strength",
+      "leader"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "svr_ii",
+    "display_name": "SVR II",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "leader",
+      "svr"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "first_set_last_fsl",
+    "display_name": "First Set Last (FSL)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "fsl",
+      "volume_mod",
+      "leader",
+      "anchor"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "second_set_last_ssl",
+    "display_name": "Second Set Last (SSL)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "Strength"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "ssl",
+      "strength",
+      "leader"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "full_body_template",
+    "display_name": "Full Body Template",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "fsl",
+      "volume_mod",
+      "leader"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "bbs_13_week_challenge",
+    "display_name": "BBS 13-week Challenge",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "fsl",
+      "volume_mod",
+      "leader"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "god_is_a_beast",
+    "display_name": "God is a Beast",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "leader",
+      "anchor"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "leviathan_anchor",
+    "display_name": "Leviathan (Anchor)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "fsl",
+      "volume_mod",
+      "anchor",
+      "leviathan"
+    ],
+    "blurb": "NEEDS_RESEARCH",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "spinal-tap-1",
+    "display_name": "Spinal Tap (All weeks in one day)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "Advanced",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "jokers",
+      "leader"
+    ],
+    "blurb": "Very high stress; TM increases each workout.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "spinal-tap-2",
+    "display_name": "Spinal Tap (Triples Only)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "jokers",
+      "leader"
+    ],
+    "blurb": "Best used on deadlift; purely triples across.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "spinal-tap-anchor-black-army",
+    "display_name": "Spinal Tap — Anchor (Black Army Jacket)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "anchor"
+    ],
+    "blurb": "Use bar speed to decide Jokers; don’t force PRs.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "anchor-5x5-3-1-guidelines",
+    "display_name": "Anchor — 5×5/3/1 Guidelines",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "anchor"
+    ],
+    "blurb": "Used by multiple Anchor templates.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "strength-circuits",
+    "display_name": "5/3/1 Strength Circuits",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader",
+      "anchor"
+    ],
+    "blurb": "Perfect form; never more than 80% TM; not for beginners.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "full-body-leader-anchor",
+    "display_name": "Full Body (Leader/Anchor",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "jokers",
+      "leader",
+      "anchor"
+    ],
+    "blurb": "Follows Leader/Anchor model",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "full-body-v2",
+    "display_name": "Full Body (v2)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader",
+      "anchor"
+    ],
+    "blurb": "Classic v2 update to the 2E full body; simple assistance.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "full-boring",
+    "display_name": "Full Body — Full Boring (high DL freq)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "blurb": "Beginners OK; advanced lifters limit DL stress.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "full-body-pc",
+    "display_name": "Full Body + Power Clean",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "leader",
+      "anchor"
+    ],
+    "blurb": "PC primes the heavy work days; alternate PC/DL as needed.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "full-body",
+    "display_name": "Full Body (3‑day)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "leader",
+      "anchor"
+    ],
+    "blurb": "Squat appears on all days in certain setups.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "bbb-standard-6wk",
+    "display_name": "Boring But Big — 6‑Week",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "blurb": "Map weeks exactly: W1 50, W2 50, W3 60, W4 60, W5 70, W6 70.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "bbb-variation-1",
+    "display_name": "Boring But Big — Variation I",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "blurb": "6-week progression; do required reps on main, then 5x10 @ first-set percent.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "bbb-variation-2",
+    "display_name": "Boring But Big — Variation II (10/8/5)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "blurb": "Week-to-week set/rep change for BBB work.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "bbb-6wk",
+    "display_name": "Boring But Big (6‑Week Challenge)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "leader"
+    ],
+    "blurb": "Push last 5/3/1 set weekly but keep BBB prescription.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "bbb-base",
+    "display_name": "Boring But Big (Base)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "leader"
+    ],
+    "blurb": "Start at 30–40% TM if new to BBB; deload options vary.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "bbb-var1",
+    "display_name": "Boring But Big (Variation I)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "leader"
+    ],
+    "blurb": "Template One only; very taxing.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "bbb-var2",
+    "display_name": "Boring But Big (Variation II)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "leader"
+    ],
+    "blurb": "Moderate variant—logical volume ramp.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "bbb-13wk",
+    "display_name": "Boring But Big — 13‑Week Challenge",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "blurb": "Spans 27 weeks if you chain 5x5→5x3→5x1; see book mapping.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "bbb-5x5",
+    "display_name": "Boring But Big — 5x5 @ 80%",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "blurb": "Often follows BBB 5x10 block.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "bbb-5x3",
+    "display_name": "Boring But Big — 5x3 @ 90%",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "leader"
+    ],
+    "blurb": "Typically run after 5x5 variation.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "six-week-cycle-scaffold",
+    "display_name": "6‑Week Cycle Scaffold",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [],
+    "blurb": "Also includes 3/5/1 order option.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "bbb-5x1",
+    "display_name": "Boring But Big (5x1 @ TM)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "anchor"
+    ],
+    "blurb": "27‑week longform progression end‑cap.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "six-week-cycle",
+    "display_name": "6‑Week Cycle (2 cycles no deload)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [],
+    "blurb": "“Increase TM after week 3” rule.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "deload-menu",
+    "display_name": "Deload Menu (5 styles)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [],
+    "blurb": "“Choose deload that matches fatigue & goals.”",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "assistance-vol",
+    "display_name": "Assistance Volume Guidelines",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [],
+    "blurb": "Volume must reflect conditioning load",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "god-is-a-beast-leader",
+    "display_name": "God Is A Beast (Leader)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "leader"
+    ],
+    "blurb": "Pieces of BBS + Spinal Tap; longer full cycle; patience required.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "beyond-base",
+    "display_name": "Beyond 5/3/1 (Training Maximally)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "leader",
+      "anchor"
+    ],
+    "blurb": "Auto‑regulated heavy singles with structured down sets.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "jokers-fsl",
+    "display_name": "Jokers + First Set Last (kit)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "anchor"
+    ],
+    "blurb": "Use PR set then Jokers when strong; balance with FSL volume.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "svr",
+    "display_name": "SVR (3/5/1 + singles)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "anchor",
+      "svr"
+    ],
+    "blurb": "Week 3 keep working up for 3–5 singles; attempt max if good.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "strength-challenge",
+    "display_name": "Strength Challenge (Beyond)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets"
+    ],
+    "blurb": "Clear deload and conditioning rules included.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "rule-of-10",
+    "display_name": "Rule of 10 (per week)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "leader",
+      "anchor"
+    ],
+    "blurb": "Hit total 10 reps across as many sets as needed",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "bbs",
+    "display_name": "Boring But Strong (BBS 10×5)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "boring_but_strong"
+    ],
+    "blurb": "5/3/1 Forever",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "fives-pro-forever",
+    "display_name": "5’s PRO Forever",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "531_pr",
+      "pr_sets",
+      "leader"
+    ],
+    "blurb": "PR sets limited; per‑lift supplemental volume is the lever.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "leviathan-system",
+    "display_name": "Leviathan",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "leviathan"
+    ],
+    "blurb": "Singles, doubles or triples leading to TM; then supplemental selection.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "spinal-tap-5spro-leader",
+    "display_name": "Spinal Tap — 5’s PRO (Leader)",
+    "badges": {
+      "time_band": "varies",
+      "difficulty": "All Levels",
+      "focus": "General"
+    },
+    "tags": [
+      "leader"
+    ],
+    "blurb": "Exact 9 work sets ladder; pair assistance each set. No extra reps on work sets.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "football_winter_8wk_weightroom",
+    "display_name": "Winter Strength & Conditioning — 8 Week Cycle (Weight Room)",
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    },
+    "tags": [
+      "frequency:3d",
+      "scheme:531",
+      "assistance:template",
+      "season:off_season",
+      "population:team"
+    ],
+    "blurb": "Extra 3x5 at 55/65/75% are submax; chins between sets; start too light. (p.132–135)",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "football_winter_8wk_skill_field",
+    "display_name": "Jumps/Throws/Speed — First 8 Weeks (Skill)",
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    },
+    "tags": [
+      "frequency:3d",
+      "conditioning:jumps_throws",
+      "season:off_season",
+      "population:skill"
+    ],
+    "blurb": "Falling-start sprints; Box Jumps at 80% of max; Week 4 deload; full recovery between reps.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "football_winter_8wk_linemen_field",
+    "display_name": "Jumps/Throws/Speed — First 8 Weeks (Linemen)",
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    },
+    "tags": [
+      "frequency:3d",
+      "conditioning:jumps_throws",
+      "season:off_season",
+      "population:linemen"
+    ],
+    "blurb": "Push-up start accelerations; introduce Kneeling Coil Throw; Week 4 deload.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "football_summer9_skill_field",
+    "display_name": "Going Into the Summer — 9 Weeks (Skill) [Field]",
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    },
+    "tags": [
+      "frequency:3d",
+      "conditioning:jumps_throws",
+      "season:off_season",
+      "population:skill"
+    ],
+    "blurb": "15–20 min football skills; increased sprint distances; Box-from-Box, Depth Jumps; deload in Weeks 4 and 9.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "football_summer9_linemen_field",
+    "display_name": "Going Into the Summer — 9 Weeks (Linemen) [Field]",
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    },
+    "tags": [
+      "frequency:3d",
+      "conditioning:jumps_throws",
+      "season:off_season",
+      "population:linemen"
+    ],
+    "blurb": "Linemen emphasis on Coil Throws; deload Weeks 4 and 9; same 3-day field structure.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "football_summer9_weightroom",
+    "display_name": "Going Into the Summer — 9 Week Training Cycle (Weight Room)",
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    },
+    "tags": [
+      "frequency:3d",
+      "scheme:531",
+      "assistance:template",
+      "season:off_season",
+      "population:team"
+    ],
+    "blurb": "Lower weight-room volume; more speed; deload Week 6 (use deload %); typical assistance listed per day.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "football_precamp6_skill_field",
+    "display_name": "Summer Pre-Camp — 6 Weeks (Skill) [Field]",
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    },
+    "tags": [
+      "frequency:3d",
+      "conditioning:jumps_throws",
+      "season:off_season",
+      "population:skill"
+    ],
+    "blurb": "Adds 30–40 yd runs, Hurdles, Double Broad Throw; Week 4 deload.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "football_precamp6_linemen_field",
+    "display_name": "Summer Pre-Camp — 6 Weeks (Linemen) [Field]",
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    },
+    "tags": [
+      "frequency:3d",
+      "conditioning:jumps_throws",
+      "season:off_season",
+      "population:linemen"
+    ],
+    "blurb": "Linemen keep Coil Throws focus; Week 4 deload; same 3-day structure.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "football_precamp6_weightroom",
+    "display_name": "Summer Pre-Camp — 6 Week Training Cycle (Weight Room)",
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    },
+    "tags": [
+      "frequency:3d",
+      "scheme:531",
+      "assistance:template",
+      "season:off_season",
+      "population:team"
+    ],
+    "blurb": "Simple, repeatable Mon/Wed/Fri lift order; Week 4 deload (use deload %); assistance kept efficient.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "football_inseason_2day_weightroom",
+    "display_name": "In‑Season Training — 2‑Day (Weight Room)",
+    "badges": {
+      "time_band": "45–60m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    },
+    "tags": [
+      "frequency:2d",
+      "scheme:531",
+      "assistance:template",
+      "conditioning:sport_specific",
+      "season:in_season",
+      "constraints:time_crunched",
+      "population:team"
+    ],
+    "blurb": "No PR sets; TM=90%; Mon/Wed lifts; ~30–45 min; minimal assistance; integrate in‑season conditioning schedule (football intervals + tempo runs).",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  },
+  {
+    "id": "football_inseason_conditioning",
+    "display_name": "In‑Season Conditioning — Weekly Schedule",
+    "badges": {
+      "time_band": "25–35m",
+      "difficulty": "Intermediate",
+      "focus": "General"
+    },
+    "tags": [
+      "frequency:5d",
+      "conditioning:sport_specific",
+      "season:in_season",
+      "population:team"
+    ],
+    "blurb": "Intervals: 3–6s all‑out with 20–90s rest; start with 90s rest and reduce toward 20–30s; Tue/Thu tempo per position charts; Fri dealer’s choice or intervals; integrates around Mon/Wed lifts.",
+    "best_for": "NEEDS_RESEARCH",
+    "avoid_if": "NEEDS_RESEARCH",
+    "pitfalls": "NEEDS_RESEARCH"
+  }
+]

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { LibraryButtons } from "@/components/program/steps/LibraryButtons";
 import BuilderProgress from "@/components/program/steps/BuilderProgress";
-import { loadCsv } from "@/lib/loadCsv";
+import { loadWarmupsLibrary } from "@/lib/data/loadLibraries";
 
 type Row = Record<string, string>;
 const CANONICAL_FILE = "warmups.csv";
@@ -12,6 +12,7 @@ export default function WarmupsLibrary() {
     const [loading, setLoading] = useState(true);
     const [err, setErr] = useState<string | null>(null);
     const [loadedFile] = useState<string | null>(CANONICAL_FILE);
+    const [source, setSource] = useState<"json" | "csv">("csv");
 
     useEffect(() => {
         let cancelled = false;
@@ -19,20 +20,17 @@ export default function WarmupsLibrary() {
 
         (async () => {
             try {
-                const path = `${import.meta.env.BASE_URL}methodology/extraction/${CANONICAL_FILE}`;
-                const data = await loadCsv(path);
+                const { rows, source } = await loadWarmupsLibrary<Row>();
                 if (cancelled) return;
-                const clean = (data as Row[]).filter((r) => {
+                const clean = (rows as Row[]).filter((r) => {
                     const proto = r["Protocol"] || r["protocol"] || r["Warmup"] || r["Name"] || "";
                     return proto.trim().length > 0;
                 });
                 setRows(clean);
+                setSource(source);
                 setErr(null);
             } catch (e: any) {
-                setErr(
-                    `No warm-ups CSV found. Expected ${CANONICAL_FILE} under public/methodology/extraction. ` +
-                    `Ensure data/extraction/${CANONICAL_FILE} exists so copy:csv moves it.`
-                );
+                setErr(e?.message || "Failed to load data");
             } finally {
                 if (!cancelled) setLoading(false);
             }
@@ -78,7 +76,7 @@ export default function WarmupsLibrary() {
                 <div className="flex items-center justify-between mb-4">
                     <div>
                         <h1 className="text-2xl font-semibold">Warm-ups Library</h1>
-                        <p className="text-gray-400 text-sm">CSV-driven list from <code>{CANONICAL_FILE}</code>.</p>
+                        <p className="text-gray-400 text-sm">Data source: <span className="font-mono uppercase">{source}</span></p>
                     </div>
                 </div>
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function AuthUpdatePassword() {
     const [pw1, setPw1] = useState('');
@@ -8,6 +8,17 @@ export default function AuthUpdatePassword() {
     const [error, setError] = useState('');
     const [ok, setOk] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
+    const getNextPath = () => {
+        try {
+            const params = new URLSearchParams(location.search);
+            const next = params.get('next');
+            const target = next && next.startsWith('/') ? next : '/';
+            return target === '/hub' ? '/' : target;
+        } catch {
+            return '/';
+        }
+    };
 
     const submit = async (e) => {
         e.preventDefault();
@@ -16,7 +27,7 @@ export default function AuthUpdatePassword() {
         const { error } = await supabase.auth.updateUser({ password: pw1 });
         if (error) { setError(error.message); return; }
         setOk(true);
-        setTimeout(() => navigate('/hub'), 800);
+        setTimeout(() => navigate(getNextPath()), 800);
     };
 
     return (

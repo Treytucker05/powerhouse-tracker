@@ -1,9 +1,12 @@
-import { Routes, Route } from "react-router-dom";
-import { useApp } from "./context";
-import Program from "./pages/Program";
-import Auth from "./pages/Auth";
-import Navbar from "./components/ui/Navbar";
-import ProtectedRoute from "./components/ui/ProtectedRoute";
+import React from 'react'
+import { Routes, Route } from 'react-router-dom'
+import ProgramWizard531 from './methods/531/components/ProgramWizard531'
+import { useApp } from './context'
+import Assessment from './components/Assessment'
+import Program from './pages/Program'
+import Auth from './pages/Auth'
+import Navbar from './components/ui/Navbar'
+import ProtectedRoute from './components/ui/ProtectedRoute'
 
 function App() {
     const { loading } = useApp();
@@ -50,17 +53,19 @@ function App() {
                                         </a>
                                     </div>
                                 </div>
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/program"
-                        element={
-                            <ProtectedRoute>
-                                <Program />
-                            </ProtectedRoute>
-                        }
-                    />
+                            </div>
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/program" element={
+                        <ProtectedRoute>
+                            <Program />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/program-design/step/2" element={
+                        <ProtectedRoute>
+                            <ProgramWizard531 initialStep={2} />
+                        </ProtectedRoute>
+                    } />
                 </Routes>
             </main>
         </div>

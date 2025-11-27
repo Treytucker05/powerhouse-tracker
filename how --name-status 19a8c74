@@ -1,0 +1,16 @@
+[33mcommit f3462d55db68c343b161db1d8230de97eb390879[m
+Author: Treytucker05 <treytucker05@yahoo.com>
+Date:   Sat Aug 23 03:35:59 2025 -0500
+
+    feat(data): add conditioning and jumps/throws CSV containers, types, loader, header validation, and library wiring
+
+M	tracker-ui-good/tracker-ui/data/extraction/conditioning.csv
+A	tracker-ui-good/tracker-ui/data/extraction/jumps_throws.csv
+M	tracker-ui-good/tracker-ui/scripts/validate-data.mjs
+M	tracker-ui-good/tracker-ui/src/App.jsx
+M	tracker-ui-good/tracker-ui/src/components/program/steps/LibraryButtons.tsx
+A	tracker-ui-good/tracker-ui/src/lib/csv/registry.ts
+A	tracker-ui-good/tracker-ui/src/lib/data/loadConditioningAndJumps.ts
+M	tracker-ui-good/tracker-ui/src/pages/library/ConditioningLibrary.tsx
+A	tracker-ui-good/tracker-ui/src/pages/library/JumpsThrowsLibrary.tsx
+M	tracker-ui-good/tracker-ui/src/types/step3.d.ts

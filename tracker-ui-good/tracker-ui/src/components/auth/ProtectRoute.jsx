@@ -24,7 +24,8 @@ export function ProtectRoute({ children }) {
 
     if (isLoading && !devBypass) return <LoadingScreen />;
     if (!user && !devBypass) {
-        return <Navigate to={`/login?next=${encodeURIComponent(loc.pathname + loc.search)}`} replace />;
+        const next = encodeURIComponent(loc.pathname + (loc.search || ''));
+        return <Navigate to={`/login?next=${next}`} replace />;
     }
     return children;
 }

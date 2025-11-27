@@ -1,0 +1,27 @@
+# 5/3/1 Templates
+
+- [5's PRO + 5x5 FSL](./5-s-pro-5x5-fsl.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [Five and Dime (Leader)](./five-and-dime-leader.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [Leviathan](./leviathan-system.md) — PR: 🚫, Jokers: 🚫, Days/wk: 34, TM: 90%
+- [Boring But Big](./boring-but-big.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [Triumvirate](./triumvirate.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [Periodization Bible](./periodization-bible.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [Bodyweight](./bodyweight.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [Jack Sh*t](./jack-sh-t.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [Hardgainers (Leaders)](./hardgainers-leaders.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [Hardgainers (Anchor)](./hardgainers-anchor.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [7th Week Protocol](./7th-week-protocol.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [Full Body, Full Boring](./full-body-full-boring.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [Boring But Strong](./boring-but-strong.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [Beach Body Challenge](./beach-body-challenge.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [Krypteia](./krypteia.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [Leaders (3-month)](./leaders-3-month.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [Anchor (1-month)](./anchor-1-month.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [5's PRO + SSL](./5-s-pro-ssl.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [SVR II](./svr-ii.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [First Set Last (FSL)](./first-set-last-fsl.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [Second Set Last (SSL)](./second-set-last-ssl.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [Full Body Template](./full-body-template.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [BBS 13-week Challenge](./bbs-13-week-challenge.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [God is a Beast](./god-is-a-beast.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
+- [Leviathan (Anchor)](./leviathan-anchor.md) — PR: 🚫, Jokers: 🚫, Days/wk: 4, TM: 90%
