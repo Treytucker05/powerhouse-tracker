@@ -15,7 +15,7 @@ export function computeAssistanceLoad({
     if (method === 'bodyweight') return { label: 'BW', weight: null, units };
     if (method === 'percentOfBodyweight') {
         const raw = (bodyweight || 0) * percent;
-    const w = roundToIncrement(raw, roundingIncrement, roundingMode);
+        const w = roundToIncrement(raw, roundingIncrement, roundingMode);
         return { label: `${w} ${units}`, weight: w, units };
     }
     // percentOfTM

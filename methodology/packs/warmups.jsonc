@@ -1,0 +1,99 @@
+{
+    "id": "warmups.catalog",
+    "type": "warmup",
+    "name": "5/3/1 Warm-Up Schemes",
+    "version": "1.0.0",
+    "schemes": [
+        {
+            "schemeType": "standard",
+            "setsRepsPct": [
+                {
+                    "pct": 0.40,
+                    "reps": 5
+                },
+                {
+                    "pct": 0.50,
+                    "reps": 5
+                },
+                {
+                    "pct": 0.60,
+                    "reps": 3
+                }
+            ],
+            "whenToUse": "Default warm-up for regular training sessions when time and recovery are not constrained.",
+            "populationSuitability": [
+                "beginners",
+                "intermediate",
+                "advanced",
+                "older lifters"
+            ],
+            "notes": "Wendler’s standard warm-up ladder, applied uniformly to all main lifts.",
+            "citations": [
+                "oaicite:0",
+                "oaicite:1"
+            ]
+        },
+        {
+            "schemeType": "minimalist",
+            "setsRepsPct": [
+                {
+                    "pct": 0.50,
+                    "reps": 5
+                },
+                {
+                    "pct": 0.70,
+                    "reps": 3
+                }
+            ],
+            "whenToUse": "Used when short on time or needing to conserve energy (e.g. quick sessions, experienced lifters who warm up quickly).",
+            "populationSuitability": [
+                "experienced lifters",
+                "advanced lifters",
+                "time-crunched lifters"
+            ],
+            "notes": "A streamlined warm-up using the fewest sets necessary to be ready for heavy work. Perform only what’s needed to prime your body for the top set – typically 1–2 quick ramp-up sets – thereby saving time and reducing fatigue. Treat even light sets seriously.",
+            "citations": [
+                "oaicite:2",
+                "oaicite:3",
+                "oaicite:4",
+                "oaicite:5"
+            ]
+        },
+        {
+            "schemeType": "jumps_integrated",
+            "setsRepsPct": [
+                {
+                    "pct": 0.40,
+                    "reps": 5
+                },
+                {
+                    "pct": 0.50,
+                    "reps": 5
+                },
+                {
+                    "pct": 0.60,
+                    "reps": 3
+                }
+            ],
+            "jumpsThrows": [
+                "Box jumps",
+                "Broad jumps",
+                "Medicine ball throws"
+            ],
+            "whenToUse": "For athletic-focused sessions – when developing explosiveness is a goal alongside strength (athletic emphasis).",
+            "populationSuitability": [
+                "athletes",
+                "intermediate lifters",
+                "advanced lifters"
+            ],
+            "notes": "Integrates explosive movements (jumps or throws) into the warm-up for CNS priming and power development. Perform ~10–20 total explosive reps (about 2–3 sets of 3–5 reps). Do these after a brief general warm-up but before heavy lifting. Emphasize quality over quantity.",
+            "citations": [
+                "oaicite:6",
+                "oaicite:7",
+                "oaicite:8",
+                "oaicite:9",
+                "oaicite:10"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,28 @@
+{
+    "id": "template.time_requirements",
+    "type": "metadata",
+    "name": "5/3/1 Template Time Requirements",
+    "version": "1.0.0",
+    "timeRequirements": {
+        "Boring But Big": {
+            "typical_session_minutes": "60-75",
+            "optional_conditioning_minutes": "10-15"
+        },
+        "Triumvirate": {
+            "typical_session_minutes": "45-60",
+            "optional_conditioning_minutes": "15-20"
+        },
+        "I'm Not Doing Jack Sh*t": {
+            "typical_session_minutes": "30-45",
+            "optional_conditioning_minutes": "20-30"
+        },
+        "Periodization Bible": {
+            "typical_session_minutes": "70-90",
+            "optional_conditioning_minutes": "10-20"
+        },
+        "Bodyweight": {
+            "typical_session_minutes": "45-60",
+            "optional_conditioning_minutes": "15-20"
+        }
+    }
+}

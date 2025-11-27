@@ -1,0 +1,101 @@
+{
+    "id": "deload_stall.protocols",
+    "type": "recovery",
+    "name": "Deload & Stall/Reset Protocols",
+    "version": "1.0.0",
+    "deloadMethods": [
+        {
+            "name": "40/50/60 Protocol",
+            "description": "The standard 5/3/1 deload week: after three hard weeks, the 4th week is a light week using approximately 40%, 50%, and 60% of your Training Max for 3 sets of 5 reps. This week is designed to facilitate recovery by doing only easy sets (no rep maxes).",
+            "whenToUse": "Default deload for most 5/3/1 cycles. Wendler recommends deloading every fourth week to allow your body and mind to rest and come back stronger.",
+            "exceptions": "Typically skipped in very low-frequency routines (e.g. training 1-2 times/week) where accumulated fatigue is lower. In advanced multi-cycle structures (Leader/Anchor cycles), lifters often defer the deload until after a couple of cycles, using a special 7th Week Protocol deload between Leader and Anchor phases instead.",
+            "citations": [
+                "oaicite:0",
+                "oaicite:1",
+                "oaicite:2",
+                "oaicite:3",
+                "oaicite:4",
+                "oaicite:5",
+                "oaicite:6",
+                "oaicite:7",
+                "oaicite:8",
+                "oaicite:9",
+                "oaicite:10"
+            ]
+        },
+        {
+            "name": "7th Week Protocol",
+            "description": "A deload method introduced in later 5/3/1 programming (\"5/3/1 Forever\") as an alternative to the monthly deload. The 7th Week Protocol can serve as a lighter \"break\" week or a test week after several training cycles. It typically involves a week of reduced work (or a Training Max test) to recuperate or verify progress.",
+            "whenToUse": "Used approximately every 6-7 weeks, often between Leader and Anchor cycles in advanced 5/3/1 templates. For example, after 2 or 3 back-to-back cycles without a deload (Leaders), a 7th Week Protocol week is inserted as the deload before proceeding to the Anchor phase.",
+            "exceptions": "Not necessary if you are following the original 4-week cycle structure (which already includes a deload every 4th week). The 7th Week Protocol essentially replaces those frequent deloads with a less frequent but slightly longer break, so it's used in specific templates rather than alongside the standard deload.",
+            "citations": [
+                "oaicite:11",
+                "oaicite:12",
+                "oaicite:14",
+                "oaicite:15"
+            ]
+        }
+    ],
+    "stallReset": {
+        "indicators": [
+            {
+                "text": "Inability to hit the prescribed reps and sets for a lift – the weights start feeling too heavy to complete the required reps.",
+                "citations": [
+                    "oaicite:17"
+                ]
+            },
+            {
+                "text": "Multiple lifts stalling at once accompanied by overall fatigue (feeling like training is catching up with you).",
+                "citations": [
+                    "oaicite:18"
+                ]
+            },
+            {
+                "text": "No further progress in rep performance over successive workouts (e.g. only managing the minimum reps on your top set each week with no improvement).",
+                "citations": [
+                    "oaicite:19"
+                ]
+            }
+        ],
+        "resetAmounts": [
+            {
+                "text": "Decrease the Training Max by about 10% (reset to ~90% of your current estimated 1RM).",
+                "citations": [
+                    "oaicite:20"
+                ]
+            },
+            {
+                "text": "Alternatively, drop the Training Max by roughly the equivalent of 1-2 training cycles (reduce ~5-10 lbs upper or ~10-20 lbs lower)."
+            }
+        ],
+        "strategies": [
+            {
+                "situation": "One lift stalls while others are still progressing",
+                "action": "Reset the stalled lift’s Training Max downward (around a 10% reduction) while continuing the other lifts as normal.",
+                "citations": [
+                    "oaicite:21",
+                    "oaicite:22"
+                ]
+            },
+            {
+                "situation": "Overall stall (several lifts plateau and fatigue accumulates)",
+                "action": "Take a full deload week to recover, then recalculate and reduce all your Training Maxes before resuming (reset each TM by ~10%).",
+                "citations": [
+                    "oaicite:23"
+                ]
+            },
+            {
+                "situation": "Borderline case (barely hitting minimum reps, but not failing yet)",
+                "action": "Consider holding your Training Max steady for the next cycle (instead of increasing it) or only taking a smaller increase.",
+                "citations": [
+                    "oaicite:24"
+                ]
+            }
+        ],
+        "citations": [
+            "oaicite:25",
+            "oaicite:26",
+            "oaicite:27"
+        ]
+    }
+}

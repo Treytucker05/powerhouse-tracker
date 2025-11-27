@@ -1,0 +1,115 @@
+{
+    "version": "1.0.0",
+    "lastUpdated": "2025-08-18T00:00:00Z",
+    "assistance": {
+        "Push": {
+            "primary": [
+                "DB Press contentReference[db_press]",
+                "Dips contentReference[dips]",
+                "Push-ups contentReference[push_ups]"
+            ]
+        },
+        "Pull": {
+            "primary": [
+                "Chin-ups contentReference[chins]",
+                "Rows contentReference[rows]",
+                "Face Pull contentReference[face_pull]"
+            ]
+        },
+        "Single-leg": {
+            "primary": [
+                "Lunge contentReference[lunge]",
+                "Split Squat contentReference[split_squat]",
+                "Reverse Lunge contentReference[reverse_lunge]"
+            ]
+        },
+        "Core": {
+            "primary": [
+                "Hanging Leg Raise contentReference[hlr]",
+                "Plank contentReference[plank]",
+                "Ab Wheel contentReference[ab_wheel]"
+            ]
+        }
+    },
+    "warmups": [
+        {
+            "schemeType": "standard",
+            "setsRepsPct": [
+                {
+                    "pct": 40,
+                    "reps": 5
+                },
+                {
+                    "pct": 50,
+                    "reps": 5
+                },
+                {
+                    "pct": 60,
+                    "reps": 3
+                }
+            ],
+            "notes": "General ramp to first work set"
+        },
+        {
+            "schemeType": "minimalist",
+            "setsRepsPct": [
+                {
+                    "pct": 50,
+                    "reps": 5
+                },
+                {
+                    "pct": 60,
+                    "reps": 3
+                }
+            ],
+            "notes": "Time-constrained warmup"
+        },
+        {
+            "schemeType": "jumps_integrated",
+            "setsRepsPct": [
+                {
+                    "pct": 40,
+                    "reps": 5
+                },
+                {
+                    "pct": 50,
+                    "reps": 5
+                }
+            ],
+            "notes": "Pair light explosive jumps before warmup sets"
+        }
+    ],
+    "conditioning": {
+        "conditioningActivities": [
+            {
+                "activity": "prowler pushes",
+                "intensity": "hard",
+                "examples": "Heavy low handle pushes",
+                "whenToUse": "Power/conditioning focus"
+            },
+            {
+                "activity": "hill sprints",
+                "intensity": "hard",
+                "examples": "6-10 x 40m",
+                "whenToUse": "Explosive conditioning"
+            },
+            {
+                "activity": "jumps",
+                "intensity": "easy",
+                "examples": "Broad jumps, box jumps",
+                "whenToUse": "Primer / neural activation"
+            },
+            {
+                "activity": "walks",
+                "intensity": "easy",
+                "examples": "Weighted vest walk, brisk walk",
+                "whenToUse": "Recovery / aerobic base"
+            }
+        ],
+        "weeklyGuidelines": {
+            "easySessionsPerWeek": 3,
+            "hardSessionsPerWeek": 2,
+            "notes": "Adjust based on recovery and phase; keep hard sessions away from heavy lower days when possible."
+        }
+    }
+}

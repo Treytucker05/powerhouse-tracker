@@ -161,7 +161,8 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
         // mode: 'convert' | 'keep'
         setLocalState(prev => {
             if (prev.units === unit) return prev;
-            const factor = unit === 'kg' ? 0.45359237 : 2.20462262; // LB -> KG or KG -> LB
+            // Use constants for comparison to avoid stray literals
+            const factor = unit === UNITS.KG ? 0.45359237 : 2.20462262; // LB -> KG or KG -> LB
             const nextLifts = { ...prev.lifts };
             Object.keys(nextLifts).forEach(k => {
                 ['oneRM', 'repWeight', 'tmOverride'].forEach(field => {
@@ -388,7 +389,7 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
                 <div className="flex items-center justify-start mb-2 gap-4">
                     <h3 className="text-lg font-semibold text-white tracking-wide uppercase">Settings</h3>
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 lg:gap-4 items-start">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 lg:gap-4 items-start">
                     {/* Units */}
                     <div>
                         <label className="block text-[12px] font-semibold text-gray-300 mb-1 uppercase tracking-wide">Units</label>
@@ -422,19 +423,20 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
                     {/* Rounding */}
                     <div>
                         <label className="block text-[12px] font-semibold text-gray-300 mb-1 uppercase tracking-wide">Rounding</label>
-                        <select
-                            value={localState.rounding}
-                            onChange={(e) => updateLocalState({ rounding: e.target.value })}
-                            className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none mb-1"
-                        >
-                            <option value="ceil">Round up</option>
-                            <option value="nearest">Nearest</option>
-                            <option value="floor">Round down</option>
-                        </select>
+                        <div className="flex gap-2 mb-1">
+                            {['nearest', 'floor', 'ceil'].map(mode => (
+                                <ToggleButton
+                                    key={mode}
+                                    on={localState.rounding === mode}
+                                    onClick={() => updateLocalState({ rounding: mode })}
+                                    className="text-xs px-4"
+                                >{mode === 'nearest' ? 'Nearest' : mode === 'floor' ? 'Down' : 'Up'}</ToggleButton>
+                            ))}
+                        </div>
                         <ul className="text-[12px] leading-snug text-gray-400 space-y-0.5">
-                            <li><span className="text-gray-400 font-medium">Round up:</span> Always to next increment (slightly heavier).</li>
+                            <li><span className="text-gray-400 font-medium">Up:</span> Always to next increment (slightly heavier).</li>
                             <li><span className="text-gray-400 font-medium">Nearest:</span> Standard rounding (recommended).</li>
-                            <li><span className="text-gray-400 font-medium">Round down:</span> Slightly lighter / conservative.</li>
+                            <li><span className="text-gray-400 font-medium">Down:</span> Slightly lighter / conservative.</li>
                         </ul>
                     </div>
 
@@ -454,10 +456,33 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
                                 >{p}%</ToggleButton>
                             ))}
                         </div>
+                        {/* Helper copy (responsive truncated on small screens) */}
+                        <span
+                            className="block text-[12px] text-gray-400 mt-1 md:hidden"
+                            style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                            title="Wendler default: 90% TM. Conservative: 85%."
+                        >Wendler default: 90% TM. Conservative: 85%.</span>
+                        <span className="hidden md:block text-[12px] text-gray-400 mt-1">Wendler default: 90% TM. Conservative: 85%.</span>
                         <ul className="text-[12px] leading-snug text-gray-400 space-y-0.5">
                             <li><span className="text-gray-400 font-medium">90%:</span> Standard starting point for most lifters.</li>
                             <li><span className="text-gray-400 font-medium">85%:</span> Conservative (new lifters, return from layoff/injury).</li>
                         </ul>
+                    </div>
+
+                    {/* Deadlift style (global preference) */}
+                    <div>
+                        <label className="block text-[12px] font-semibold text-gray-300 mb-1 uppercase tracking-wide">Deadlift Style</label>
+                        <div className="flex gap-2 mb-1">
+                            {[{ id: 'dead_stop', label: 'Dead Stop' }, { id: 'touch_and_go', label: 'Touch & Go' }].map(opt => (
+                                <ToggleButton
+                                    key={opt.id}
+                                    on={state.deadliftRepStyle === opt.id}
+                                    onClick={() => dispatch({ type: 'SET_DEADLIFT_REP_STYLE', payload: opt.id })}
+                                    className="text-xs px-4"
+                                >{opt.label}</ToggleButton>
+                            ))}
+                        </div>
+                        <p className="text-[12px] leading-snug text-gray-400">Applies to warm-ups and any rep descriptions. You can still do either in training.</p>
                     </div>
                 </div>
             </div>
@@ -486,6 +511,13 @@ export default function Step1Fundamentals({ onValidChange, flashToken, missing =
                 <div className="grid md:grid-cols-2 gap-4 md:gap-5">
                     {Object.keys(localState.lifts).map(renderLiftRow)}
                 </div>
+                {/* Rounding helper copy under TM table */}
+                <p
+                    className="mt-3 text-[12px] text-gray-400 md:hidden"
+                    style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                    title="Weights are rounded to 5 lb / 2.5 kg after % calculations."
+                >Weights are rounded to 5 lb / 2.5 kg after % calculations.</p>
+                <p className="mt-3 text-[12px] text-gray-400 hidden md:block">Weights are rounded to 5 lb / 2.5 kg after % calculations.</p>
             </div>
 
             {/* Info Boxes */}

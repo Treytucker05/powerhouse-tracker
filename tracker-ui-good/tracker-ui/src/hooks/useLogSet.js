@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 // TODO(treytucker): stub implementation for test stabilization; replace with real logging pipeline by 2025-08-31
-import { supabase, getCurrentUserId } from '../lib/api/supabaseClient';
+import { supabase, getCurrentUserId } from '@/lib/supabaseClient';
 import { useActiveSession } from './useActiveSession';
 
 /**

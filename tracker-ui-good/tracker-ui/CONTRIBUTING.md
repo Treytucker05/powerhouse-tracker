@@ -19,7 +19,7 @@ Focused quality gate with incremental coverage expansion.
 6. Open PR; CI must be green.
 
 ## Supabase Testing
-- Always import client from `src/lib/api/supabaseClient.js`.
+- Import the Supabase client from `@/lib/supabaseClient` (unified TypeScript source).
 - Extend the central mock there only.
 
 ## React Testing Warnings

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/api/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 
 export function useExercises() {
   const [exercises, setExercises] = useState([]);

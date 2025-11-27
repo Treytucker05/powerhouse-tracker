@@ -5,11 +5,17 @@ import path from 'path';
 export default defineConfig({
   test: {
     environment: 'jsdom',
-    setupFiles: './vitest.setup.js',
+    setupFiles: [
+      './vitest.setup.js', // legacy polyfills & helpers
+      './tracker-ui-good/tracker-ui/src/test/setup.ts', // global noise filters & supabase mock
+    ],
   },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      // Map project-wide "@" to the tracker-ui-good subproject src so root test runs resolve UI imports
+      '@': fileURLToPath(new URL('./tracker-ui-good/tracker-ui/src', import.meta.url)),
+      '@packs': fileURLToPath(new URL('./tracker-ui-good/tracker-ui/src/packs', import.meta.url)),
+      '@lib': fileURLToPath(new URL('./tracker-ui-good/tracker-ui/src/lib', import.meta.url)),
     },
   },
 });

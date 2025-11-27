@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useRecentWorkouts } from '../../hooks/useRecentWorkouts.js'
 
 // Mock the entire module
-vi.mock('../../lib/api/supabaseClient', () => {
+vi.mock('@/lib/supabaseClient', () => {
   const mockLimit = vi.fn()
   const mockOrder = vi.fn().mockReturnValue({ limit: mockLimit })
   const mockEq2 = vi.fn().mockReturnValue({ order: mockOrder })
@@ -38,7 +38,7 @@ describe('useRecentWorkouts', () => {
         },
       },
     })
-    mockSupabaseModule = await import('../../lib/api/supabaseClient')
+    mockSupabaseModule = await import('@/lib/supabaseClient')
     vi.clearAllMocks()
   })
 

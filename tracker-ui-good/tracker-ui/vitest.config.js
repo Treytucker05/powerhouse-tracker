@@ -27,7 +27,7 @@ export default defineConfig({
             '__tests__/**', // root-level duplicates outside src
             '**/*.e2e.{test,spec}.**',
         ],
-        setupFiles: ['src/tests/setupTests.ts'],
+        setupFiles: ['src/tests/setupTests.ts', './vitest.setup.ts'],
         threads: false,
         restoreMocks: true,
         css: false,
@@ -67,8 +67,7 @@ export default defineConfig({
                 // (Reinstated) Skeleton now covered by dedicated test
                 // Additional Phase 1 temporary exclusions for low coverage modules (will be targeted in Phase 2)
                 'src/components/navigation/TopNav.jsx',
-                'src/layout/AppShell.jsx'
-                ,
+                'src/layout/AppShell.jsx',
                 // Temp exclusions (low function coverage) to achieve Phase 1 green; will add targeted tests later
                 // 'src/components/dashboard/SimpleVolumeChart.jsx', // reinstated for coverage in Step 8
                 // 'src/components/dashboard/PowerHouseVolumeChart.jsx', // reinstated for coverage in Step 9
@@ -87,6 +86,8 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': fileURLToPath(new URL('./src', import.meta.url)),
+            '@lib': fileURLToPath(new URL('./src/lib', import.meta.url)),
+            '@packs': fileURLToPath(new URL('./src/packs', import.meta.url)),
         },
         dedupe: ['react', 'react-dom']
     }

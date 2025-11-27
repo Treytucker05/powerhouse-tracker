@@ -1,10 +1,11 @@
 // src/components/program/steps/Step2TemplateGallery.jsx
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Info, CheckCircle, AlertTriangle, Dumbbell, Layers, Activity } from 'lucide-react';
 import StepStatusPill from './_shared/StepStatusPill.jsx';
 import { STEP_IDS } from './_registry/stepRegistry.js';
 import { TEMPLATE_IDS } from '../../../lib/fiveThreeOne/assistanceRules.js';
 import { useExerciseDB } from '../../../contexts/ExerciseDBContext.jsx';
+import { loadCsv } from '@/lib/loadCsv';
 
 const TILES = [
     { id: TEMPLATE_IDS.BBB, title: 'Boring But Big', blurb: 'Main 5/3/1 + 5×10 supplemental. Simple, high volume, great for muscle.', color: 'border-red-500' },
@@ -15,11 +16,20 @@ const TILES = [
 ];
 
 export default function Step2TemplateGallery({ data, updateData }) {
+    const [templates, setTemplates] = useState([]);
     const st = data || {};
     const set = (patch) => updateData({ ...st, ...patch });
     const cfg = st.templateConfig || { bbbPair: 'same', bbbPercent: 60, bwTarget: 75 };
     const assistance = st.assistance || { options: { bbb: { percent: cfg.bbbPercent || 60, pairMode: cfg.bbbPair || 'same' } }, perDay: { press: [], deadlift: [], bench: [], squat: [] } };
     const { loaded: exLoaded, categoriesMap, exercises } = useExerciseDB();
+
+    // Load templates CSV once
+    useEffect(() => {
+        loadCsv(`${import.meta.env.BASE_URL}methodology/extraction/templates_master.csv`).then((rows) => {
+            console.log("CSV Loaded:", rows);
+            setTemplates(rows);
+        });
+    }, []);
 
     // Helper to find row by name
     const byName = useMemo(() => {
@@ -99,9 +109,23 @@ export default function Step2TemplateGallery({ data, updateData }) {
 
     return (
         <div className="space-y-6">
+            {templates.length > 0 && (
+                <div className="mb-6 p-4 bg-neutral-900 rounded-lg">
+                    <h3 className="text-lg font-bold text-white mb-2">Loaded Templates (CSV)</h3>
+                    <ul className="list-disc list-inside text-gray-300">
+                        {templates.map((t, i) => (
+                            <li key={i}>
+                                {t["Template Name"]} — {t["Supplemental"]}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+
             <div className="flex items-start justify-between">
                 <div>
                     <h3 className="text-xl font-semibold text-white mb-1">Step 2: Choose Assistance Template</h3>
+
                     <p className="text-gray-400 text-sm">This choice drives your supplemental and accessory work. You can customize in the next step.</p>
                 </div>
                 <StepStatusPill stepId={STEP_IDS.TEMPLATE_GALLERY} data={st} />
@@ -122,6 +146,8 @@ export default function Step2TemplateGallery({ data, updateData }) {
                     </div>
                 </div>
             </div>
+
+
 
             {/* Template tiles */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

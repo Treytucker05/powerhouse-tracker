@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { supabase, getCurrentUserId } from '../lib/api/supabaseClient'
+import { supabase, getCurrentUserId } from '@/lib/supabaseClient'
 
 export const useWeekStatus = () => {
   return useQuery({
@@ -15,10 +15,10 @@ export const useWeekStatus = () => {
         const now = new Date()
         const currentDay = now.getDay() // 0 = Sunday, 1 = Monday, etc.
         const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay // Adjust for Sunday = 0
-        
+
         const monday = new Date(now.getTime() + mondayOffset * 24 * 60 * 60 * 1000)
         monday.setHours(0, 0, 0, 0)
-        
+
         const sunday = new Date(monday.getTime() + 6 * 24 * 60 * 60 * 1000)
         sunday.setHours(23, 59, 59, 999)
 
@@ -38,7 +38,7 @@ export const useWeekStatus = () => {
         // Build days array for the week
         const days = []
         const sessionsMap = new Map()
-        
+
         // Map sessions by date
         data?.forEach(session => {
           sessionsMap.set(session.date, session)
@@ -52,10 +52,10 @@ export const useWeekStatus = () => {
           const dayDate = new Date(monday.getTime() + i * 24 * 60 * 60 * 1000)
           const dateString = dayDate.toISOString().split('T')[0]
           const session = sessionsMap.get(dateString)
-          
+
           let status = 'rest' // default
           let focus = 'Rest Day'
-          
+
           if (session) {
             if (session.completed) {
               status = 'completed'

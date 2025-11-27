@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import TopNav from '@/components/navigation/TopNav';
+import { AppProvider } from '@/context/AppContext';
 
 // Helper to get link element by partial label (exact text node may include icon spacing)
 function getLink(label) {
@@ -14,7 +15,9 @@ describe('TopNav', () => {
     it('renders key navigation links', () => {
         render(
             <MemoryRouter initialEntries={['/']}>
-                <TopNav />
+                <AppProvider>
+                    <TopNav />
+                </AppProvider>
             </MemoryRouter>
         );
         expect(getLink('Dashboard')).toBeTruthy();
@@ -25,7 +28,9 @@ describe('TopNav', () => {
     it('marks dashboard link active on root route', () => {
         render(
             <MemoryRouter initialEntries={['/']}>
-                <TopNav />
+                <AppProvider>
+                    <TopNav />
+                </AppProvider>
             </MemoryRouter>
         );
         const dash = getLink('Dashboard');

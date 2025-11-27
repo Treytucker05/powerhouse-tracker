@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, CheckCircle, Target, Calendar, TrendingUp, Zap, Settings, Play, RefreshCw, RotateCcw } from 'lucide-react';
 import * as EngineModule from '../../lib/engines/FiveThreeOneEngine.js';
-import { supabase } from '../../lib/api/supabaseClient';
+import { supabase } from '@/lib/supabaseClient';
 import { syncToSupabase, loadFromSupabase } from '../../context/appHelpers';
 import { toast } from 'react-toastify';
 
@@ -14,7 +14,8 @@ import { useProgramV2 } from '../../methods/531/contexts/ProgramContextV2.jsx';
 import Step1MaxTesting from './steps/Step1MaxTesting';
 import ScheduleSelectionStep from './steps/ScheduleSelectionStep';
 import Step2CoreLifts from './steps/Step2CoreLifts';
-import Step3ScheduleWarmup from './steps/Step3ScheduleWarmup';
+import Step3ScheduleWarmup from './steps/Step3ScheduleWarmup'; // legacy consolidated (kept temporarily)
+import Step3CustomizeDesign from './steps/Step3CustomizeDesign'; // spec-compliant Step 3
 import Step4CycleStructure from './steps/Step4CycleStructure';
 import Step5Week1Execution from './steps/Step5Week1Execution';
 import Step6Week2Execution from './steps/Step6Week2Execution';
@@ -414,19 +415,10 @@ export default function FiveThreeOneWorkflow() {
                     />
                 );
             case 'warmup':
-                // Force all sections to show by providing complete stub data
+                // New Step 3 Customize Design per UI spec (legacy component retained for reference)
                 return (
-                    <Step3ScheduleWarmup
-                        data={{
-                            trainingMaxes: programData?.step1?.trainingMaxes || {},
-                            schedule: { frequency: '4day' },
-                            warmup: { policy: 'standard' },
-                            supplemental: { type: 'fsl' },
-                            programmingApproach: 'basic',
-                            leaderAnchorPattern: '2+1',
-                            assistanceConfig: { mode: 'minimal' },
-                            equipmentMap: { barbell: true, plates: true, bench: true, squat_rack: true }
-                        }}
+                    <Step3CustomizeDesign
+                        data={programData.step3 || {}}
                         updateData={(partial) =>
                             setProgramData(prev => ({
                                 ...prev,
@@ -438,7 +430,11 @@ export default function FiveThreeOneWorkflow() {
             case 'cycle':
                 return (
                     <Step4CycleStructure
-                        data={programData.step4 || { trainingMaxes: programData?.step1?.trainingMaxes || {} }}
+                        data={programData.step4 || {
+                            trainingMaxes: programData?.step1?.trainingMaxes || {},
+                            deadliftStyle: programData?.step1?.deadliftStyle || 'touch_and_go',
+                            tmPct: programData?.step1?.tmPct || 0.90
+                        }}
                         updateData={(partial) =>
                             setProgramData(prev => ({
                                 ...prev,
@@ -656,10 +652,8 @@ export default function FiveThreeOneWorkflow() {
         switch (currentStepId) {
             case 'maxes':
                 {
-                    const tms = programData?.step1?.trainingMaxes;
-                    if (!tms) return false;
-                    const required = ['squat', 'bench', 'deadlift', 'overhead_press'];
-                    return required.every(k => typeof tms[k] === 'number' && tms[k] > 0);
+                    const tms = programData?.step1?.trainingMaxes || {};
+                    return Object.values(tms).some(v => typeof v === 'number' && v > 0);
                 }
             case 'core_lifts':
                 {
@@ -902,14 +896,40 @@ export default function FiveThreeOneWorkflow() {
                         Save to Profile
                     </button>
 
-                    <button
-                        onClick={handleNext}
-                        disabled={!isStepValid()}
-                        className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-700 transition-colors"
-                    >
-                        Next
-                        <ChevronRight className="w-4 h-4" />
-                    </button>
+                    {(() => {
+                        const step = steps[currentStep]?.id;
+                        let label = 'Next';
+                        let btnClass = 'bg-red-600 hover:bg-red-700';
+                        let warnPartial = false;
+                        if (step === 'maxes') {
+                            const tms = programData?.step1?.trainingMaxes || {};
+                            const count = Object.values(tms).filter(v => typeof v === 'number' && v > 0).length;
+                            if (count === 4) {
+                                label = 'Continue to Core Lifts →';
+                                btnClass = 'bg-red-600 hover:bg-red-700';
+                            } else {
+                                label = `Continue → (${count} of 4 lifts entered)`;
+                                btnClass = 'bg-amber-500 hover:bg-amber-600';
+                                warnPartial = true;
+                            }
+                        }
+                        return (
+                            <button
+                                onClick={() => {
+                                    if (!isStepValid()) return; // safeguard
+                                    if (warnPartial) {
+                                        toast.info("You can add missing lifts later, but you'll need all 4 to generate your program.");
+                                    }
+                                    handleNext();
+                                }}
+                                disabled={!isStepValid()}
+                                className={`flex items-center gap-2 px-4 py-2 ${btnClass} text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors`}
+                            >
+                                {label}
+                                <ChevronRight className="w-4 h-4" />
+                            </button>
+                        );
+                    })()}
                 </div>
             </div>
         </div>

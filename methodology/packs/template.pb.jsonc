@@ -1,0 +1,53 @@
+{
+    "id": "template.pb",
+    "type": "template",
+    "name": "Periodization Bible",
+    "version": "1.0.0",
+    "params": {
+        "structure": "3 targeted assistance categories per day",
+        "examples": {
+            "upper": [
+                "chest/shoulder",
+                "lats/upper_back",
+                "triceps"
+            ],
+            "citations": [
+                "oaicite:15",
+                "oaicite:16"
+            ]
+        },
+        "volume": {
+            "sets": 5,
+            "reps": "10–20",
+            "citations": [
+                "oaicite:17",
+                "oaicite:18"
+            ]
+        },
+        "guidelines": {
+            "citations": [
+                "oaicite:19",
+                "oaicite:20"
+            ]
+        },
+        "deload": {
+            "policy": "standard",
+            "citations": [
+                "oaicite:21"
+            ]
+        },
+        "recommendedFor": {
+            "tags": [
+                "size",
+                "comprehensive"
+            ],
+            "citations": [
+                "oaicite:22",
+                "oaicite:23"
+            ]
+        }
+    },
+    "citations": [
+        "oaicite:14"
+    ]
+}

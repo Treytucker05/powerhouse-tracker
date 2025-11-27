@@ -1,0 +1,91 @@
+{
+    "id": "sport_integration",
+    "type": "integration",
+    "name": "5/3/1 Sport Integration Protocols",
+    "version": "1.0.0",
+    "sportIntegration": [
+        {
+            "sport": "Football",
+            "level": "High School",
+            "principles": [
+                "Strength training limited to 2 days per week during the season to emphasize recovery and on-field performance.",
+                "Minimize lower-body training fatigue in-season (some coaches even drop heavy squats to reduce stress before games).",
+                "Keep weight-room workouts brief and basic – athletes already do a lot on the field, so avoid excessive volume or assistance work.",
+                "Prioritize sport performance over weight-room PRs: in-season focus is #1 doing well in sport, #2 getting stronger gradually."
+            ],
+            "sampleWeek": "Approx. 2 lifting sessions per week (e.g., Mon & Wed) with 5/3/1 core lifts – squat and bench on one day, deadlift and press on the other. Practice 4–5 days a week (weekday team practices) with a game on Friday. Conditioning is kept short and explosive (e.g. prowler pushes or hill sprints 1–2 times weekly)."
+        },
+        {
+            "sport": "Football",
+            "level": "College",
+            "principles": [
+                "During the competitive season, use two 5/3/1 lifting days per week to balance strength work with rigorous practice and game schedules.",
+                "Include explosive training (power cleans, jumps) after warm-ups to develop power without extending gym time.",
+                "Keep assistance work targeted and time-efficient – focus on muscle groups important for injury prevention (e.g. hamstrings, upper back, core) rather than high-volume bodybuilding.",
+                "Maintain training economy: athletes must also train speed, agility, and skills, so strength sessions are concise and efficient."
+            ],
+            "sampleWeek": "Two lifting days scheduled around team practices (e.g., Monday and Thursday). Each session pairs two main lifts with 5/3/1 sets (Day1 – Squat & Bench; Day2 – Deadlift & Press). If included, power cleans or similar explosive lifts are done before the main strength work. Daily practices (and additional conditioning drills) cover most conditioning, with any extra work (short sprints, sled pushes) used sparingly."
+        },
+        {
+            "sport": "Wrestling",
+            "level": "High School",
+            "principles": [
+                "Limit lifting frequency to ~2 days per week during the long wrestling season to avoid cumulative fatigue.",
+                "Make in-season strength work a secondary priority – the primary focus is performing well in matches; strength gains are maintained or slowly improved without sacrificing mat performance.",
+                "Avoid very strenuous accessory lifts in-season to protect joints (e.g., skip heavy Good Mornings and use lighter posterior-chain movements like RDLs instead).",
+                "Account for weight-class goals: build or keep strength while managing body weight (5/3/1 allows strength gains even without weight gain)."
+            ],
+            "sampleWeek": "Typically 2 short weight-room sessions per week (e.g., one day Squat & Bench, another Deadlift & Press using 5/3/1 prescribed reps). Practices and drills occur almost daily, providing intensive conditioning, so additional conditioning work (hill sprints, sled drags) is minimal. Emphasis is on recovery during off-days to ensure readiness for weekly meets/tournaments."
+        },
+        {
+            "sport": "Wrestling",
+            "level": "College",
+            "principles": [
+                "Use a twice-per-week 5/3/1 lifting schedule in-season to accommodate frequent practices and meets.",
+                "Focus on improving relative strength (strength-to-weight ratio) – avoid excessive hypertrophy or fatigue that could impair endurance and speed.",
+                "Incorporate explosive movements (power cleans, box jumps) into training to enhance power, but keep lifting sessions brief due to other training demands.",
+                "Tailor assistance work to common injury areas for wrestlers (neck, shoulders, knees) with low volume prehab exercises (e.g. neck harness, rear delt work, single-leg work)."
+            ],
+            "sampleWeek": "Two lifting days per week in-season (e.g., early-week and mid-week) with main lifts (5/3/1 Squat & Bench on one day, Deadlift & Press on the other). Near-daily wrestling practice and conditioning drills cover most physical conditioning. Any extra conditioning (hill sprints or Prowler pushes) is high-intensity and limited in volume to avoid overtraining. Lifting sessions are scheduled to allow recovery before competition days."
+        },
+        {
+            "sport": "Powerlifting",
+            "level": "Competitive",
+            "principles": [
+                "Follow standard 5/3/1 cycles leading up to a meet, then adjust in final weeks to peak for competition.",
+                "In the last month (final 3–4 weeks), do not perform high-rep AMRAP sets – stick to prescribed reps and focus on bar speed and technique to avoid excessive fatigue.",
+                "Work up to planned opener weights (~85% of target max) during heavy weeks prior to the meet (on 3×3 week and 5/3/1 week) to build confidence with heavy singles.",
+                "Deload 1–2 weeks out from the meet; take the entire meet week off from heavy lifting to allow full recovery and optimal performance on the platform."
+            ],
+            "sampleWeek": "Typical 5/3/1 four-day split (one day each for squat, bench, deadlift, press) is maintained in the earlier prep phase. As the meet approaches, training may reduce intensity on non-competition lifts and drop most assistance work (often using a \"Jack Sh*t\" style approach with only the main lifts) to prioritize recovery for heavy squats, bench presses, and deadlifts.",
+            "prepTimeline": [
+                {
+                    "weeksOut": 8,
+                    "focus": "Accumulation – continue normal 5/3/1 training cycles with rep PR sets and full assistance work to build strength and volume."
+                },
+                {
+                    "weeksOut": 4,
+                    "focus": "Peak – begin peaking phase. Perform heavy singles (~opener weight ~85% 1RM) on 3-rep and 1-rep weeks. Do not exceed prescribed reps in final weeks."
+                },
+                {
+                    "weeksOut": 1,
+                    "focus": "Taper – enter a taper/deload. Take 1–2 weeks of reduced training before the meet (often a full rest week right before). Focus on recovery modalities and technique review; no maximal lifting during meet week."
+                }
+            ]
+        }
+    ],
+    "twoDayProtocols": [
+        {
+            "mode": "maintenance",
+            "schedule": "Week1 – Day1: Squat (5/3/1), Day2: Bench (5/3/1); Week2 – Day1: Deadlift (5/3/1), Day2: Press (5/3/1).",
+            "assistance": "Jack Sh*t (no assistance exercises beyond the main lifts).",
+            "notes": "Ideal for in-season periods or extremely busy lifters who need to maintain strength with minimal training stress. Goal is to preserve strength and recovery – all four big lifts are still trained (spread over two weeks), but extra volume is eliminated."
+        },
+        {
+            "mode": "progression",
+            "schedule": "Each week: Day1 – Squat & Bench (5/3/1 for both), Day2 – Deadlift & Press (5/3/1 for both).",
+            "assistance": "Minimalist 'Triumvirate-lite' – ~1 push, 1 pull, 1 core assistance per session.",
+            "notes": "Used when training time is limited to 2 days but goal is continued strength progress. Workouts are intensive, hitting two big lifts per day and a few essential assistance lifts for balance and weak points. Consistency yields steady gains."
+        }
+    ]
+}

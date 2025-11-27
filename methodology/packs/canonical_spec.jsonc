@@ -1,0 +1,239 @@
+{
+    "id": "canonical.spec_and_principles",
+    "type": "spec",
+    "name": "5/3/1 JSON Specification & Principles Mapping",
+    "version": "1.0.0",
+    "autoregulationCues": [
+        {
+            "cue": "Stalling on one particular lift",
+            "decision": "Reset (reduce) the training max for that lift by about 10%",
+            "notes": "If a single lift stalls before the others, you don’t need a full reset of the program – just decrease the training max for the one stalled lift and continue. Wendler describes this as taking “three steps forward and one step back,” dropping the max and building up again:contentReference[oaicite:0]{index=0}."
+        },
+        {
+            "cue": "Stalling on multiple lifts / feeling overall fatigue catching up",
+            "decision": "Take a full deload week and recalculate training maxes downward",
+            "notes": "If you plateau on several lifts at once and feel run down, it’s a red flag that you need to recover. Wendler advises taking a deload week in this case, then recalculating (lowering) your maxes before continuing the next cycle:contentReference[oaicite:1]{index=1}."
+        },
+        {
+            "cue": "On a given day, pushing the AMRAP (as many reps as possible) set would require grinding to failure",
+            "decision": "Do only the prescribed reps (skip the all-out AMRAP effort)",
+            "notes": "Wendler notes that you should rarely go to absolute failure on the last set. If you’re not feeling it or recovery is a concern, it’s OK to just hit the required reps and move on:contentReference[oaicite:2]{index=2}. In practice, you often stop with about one rep left in the tank rather than pushing until your form breaks down."
+        },
+        {
+            "cue": "Assistance work is impacting recovery or performance",
+            "decision": "Reduce assistance volume/intensity (avoid going to failure on assistance lifts)",
+            "notes": "Assistance exercises are meant to supplement the main lifts, not detract from them. Wendler says assistance work should “not affect your recovery and overall performance,” so he rarely takes it to failure:contentReference[oaicite:3]{index=3}. If you find you’re too fatigued from assistance (e.g. soreness or CNS fatigue carrying over), cut back the number of sets or choose easier variations."
+        },
+        {
+            "cue": "Not fully recovered by the next training session",
+            "decision": "Add more rest days or adjust the training schedule",
+            "notes": "Ensure you have “appropriate rest” between training days. Wendler suggests asking: *Did I recover enough from my last workout to have an optimal session today?*:contentReference[oaicite:4]{index=4}. If the answer is no, space your lifting days out more (for example, use a 3-days-per-week template instead of 4) or improve your recovery practices."
+        },
+        {
+            "cue": "No progress for a prolonged period (weights stuck at same numbers for months)",
+            "decision": "Lower your training max and rebuild (swallow your ego and reduce the weight)",
+            "notes": "Lifters who refuse to lighten the load can stagnate. Wendler observes that many lifters “stay at the same weight for months” with no progress and balk at the idea of reducing weight, but in reality *they aren’t getting stronger anyway*:contentReference[oaicite:5]{index=5}. If you haven’t hit a PR in a while, it’s a cue to reset with a lighter training max rather than grinding in place."
+        }
+    ],
+    "programPrinciples": [
+        {
+            "principle": "Emphasize Big, Multi-Joint Movements",
+            "type": "guideline",
+            "check": "Base the program around the four major compound lifts – squat, bench press, deadlift, and overhead press. These multi-joint movements recruit the most muscle mass and drive overall strength gains:contentReference[oaicite:6]{index=6}. If your training day isn’t centered on a big lift, you’re straying from the 5/3/1 core philosophy."
+        },
+        {
+            "principle": "Start Too Light",
+            "type": "guideline",
+            "check": "Begin with a training max that is deliberately low (approximately 90% of your true max). This provides room to progress for many cycles. It’s tempting to start heavy, but that is usually ego talking – and *“nothing will destroy a lifter faster…than ego.”* Starting lighter prevents early plateaus:contentReference[oaicite:7]{index=7}:contentReference[oaicite:8]{index=8}. Monitor that you hit all prescribed reps easily in the first cycle; if not, you likely started too heavy."
+        },
+        {
+            "principle": "Progress Slowly",
+            "type": "guideline",
+            "check": "Be patient and use small, incremental weight increases cycle-to-cycle. Slow progress might not be exciting day to day, but it yields longer-term results:contentReference[oaicite:9]{index=9}. For example, adding 5 pounds to your bench press in a month may seem minor, but over a year that could be ~60 pounds. The 5/3/1 method caps monthly increases at 5 lb (upper body) or 10 lb (lower body) by design:contentReference[oaicite:10]{index=10}. Monitor that you are making steady progress; even 5-pound jumps are progress."
+        },
+        {
+            "principle": "Break Personal Records (PRs)",
+            "type": "guideline",
+            "check": "Focus on beating your own rep records rather than constantly testing one-rep maxes. 5/3/1’s AMRAP sets allow you to set PRs at various rep ranges:contentReference[oaicite:11]{index=11}. Continuously breaking these personal records indicates you’re getting stronger, even if your one-rep max isn’t tested often. Track your rep PRs each week and aim to surpass them in future cycles, as this is a key driver of progress in the program."
+        },
+        {
+            "principle": "Train Optimally, Not Maximally",
+            "type": "guideline",
+            "check": "You don’t need to lift at 100% of your capacity to get strong – in fact, you’ll get stronger by training submaximally (with perfect form and room for improvement). Wendler emphasizes that you “don’t have to train maximally to get strong…just train optimally”:contentReference[oaicite:12]{index=12}. Sticking to the prescribed percentages (based on a reduced training max) ensures you build strength without burning out. If you find yourself constantly missing lifts or grinding every rep, you’re violating this principle."
+        },
+        {
+            "principle": "Training Economy (Balance and Simplicity)",
+            "type": "guideline",
+            "check": "Do only what is needed to get stronger – no more, no less. Every assistance exercise in your program should have a purpose (e.g. to address a weak point or maintain balance):contentReference[oaicite:13]{index=13}. If an exercise doesn’t have a strong rationale, scrap it. Wendler advises keeping workouts concise and effective: get the main work done, then some supplemental volume, and leave. This also means balancing training – push vs pull, upper vs lower – so no area is neglected:contentReference[oaicite:14]{index=14}."
+        },
+        {
+            "principle": "Ego Lifting / Starting Too Heavy",
+            "type": "redFlag",
+            "check": "Warning sign: you struggle to hit the prescribed reps early in a cycle or stall out after only a couple cycles. This is often because you set your training max too high out of ego. Wendler warns that lifters who let ego dictate their starting weights tend to plateau and get frustrated:contentReference[oaicite:15]{index=15}. If you catch yourself missing reps, it’s a red flag – you should **never** miss prescribed reps in 5/3/1. The fix is to reset with a lower training max (see “Start Too Light”)."
+        },
+        {
+            "principle": "Neglecting Deloads/Recovery",
+            "type": "redFlag",
+            "check": "If you feel chronically fatigued, joints aching, or motivation waning, check if you’ve been skipping deload weeks. 5/3/1 is built around a 4th-week deload for a reason:contentReference[oaicite:16]{index=16}. A red flag is thinking you can go hard every week indefinitely. Monitor your fatigue: the program expects you to back off on Week 4 (light 3x5 with ~40–60% weights, *no AMRAP*):contentReference[oaicite:17]{index=17}. Ignoring this can lead to burnout or injury. Always prioritize recovery as much as training."
+        },
+        {
+            "principle": "Excess Assistance Volume (\"Too much crap\")",
+            "type": "redFlag",
+            "check": "Sign: your workouts are turning into marathon sessions of endless exercises, or your main lifts are stagnating while you chase a pump. Wendler recounts being given a “laundry list” of assistance moves for his deadlift and saying *“No thanks.”* Instead, he picked one or two that mattered:contentReference[oaicite:18]{index=18}. Doing “way too much” assistance is a common mistake:contentReference[oaicite:19]{index=19}. Monitor if your session is bloated with accessories; if so, trim it down to the few that directly help your main lifts. Quality > quantity."
+        },
+        {
+            "principle": "Program Hopping / Losing Focus",
+            "type": "redFlag",
+            "check": "5/3/1 is meant to be run consistently over many cycles. If you find yourself constantly wanting to change programs or add new elements on a whim, remind yourself of the core principles. Wendler writes that whenever he feels sidetracked or eager to try something totally different, he “revisits these rules to make sure I’m doing things the right way”:contentReference[oaicite:20]{index=20}. A lack of adherence is a red flag; progress comes from sticking to the plan. Consistency and patience are key."
+        }
+    ],
+    "canonicalSpecification": {
+        "schemes": [
+            {
+                "name": "5/3/1",
+                "structure": "Standard 4-week wave: Week 1 – 3 sets of 5 reps (last set 5+), Week 2 – 3 sets of 3 reps (last set 3+), Week 3 – 5/3/1 (one set of 5, one of 3, one of 1, last set 1+), Week 4 – deload (approx 3x5 at 40–60% of training max, no rep-out):contentReference[oaicite:21]{index=21}:contentReference[oaicite:22]{index=22}. Each week’s percentages are based on the training max (e.g. ~65/75/85% in 3x5 week). The “+” indicates the final set is taken for as many reps as possible.",
+                "notes": "This is the core cycle for 5/3/1. After Week 4, you increase your training max and repeat the cycle:contentReference[oaicite:23]{index=23}. Hitting the prescribed reps is mandatory; any extra reps are gravy for building strength."
+            },
+            {
+                "name": "3/5/1",
+                "structure": "A variant where the order of the 5s and 3s weeks is swapped. Week 1 – 3x3 (last set 3+), Week 2 – 3x5 (last set 5, often no plus-set), Week 3 – 5/3/1 heavy week (1+ on last set, sometimes followed by an optional heavy single above 95%). Then Week 4 deload. This puts the heaviest lifting right before the deload week.",
+                "notes": "The 3/5/1 layout is often used when prepping for powerlifting meets or when one wants to add joker sets/heavy singles in Week 3. By doing 3s in week 1 and 5s in week 2 (usually with the 5s week done more moderately), you ensure you are fresh for the week 3 all-out lifts. *Note:* This variation is mentioned in later 5/3/1 discussions but is not explicitly described in the original manual.",
+                "source": "N/A (not covered in the 531 manual)"
+            },
+            {
+                "name": "5s Pro (5s Progression)",
+                "structure": "A rep-scheme variation where you perform 5 reps for every work set in Weeks 1–3, **without** AMRAP on the last set. In practice, it means doing 5/5/5, 3/3/3, 5/3/1 for the prescribed reps only (no “+” sets).",
+                "notes": "This approach eliminates the high-rep sets and focuses on bar speed and volume at a moderate intensity. Wendler hints at this approach when he says sometimes it’s best to “do the required reps and move on” instead of going to failure on the last set:contentReference[oaicite:24]{index=24}. 5s Pro is often used with additional volume work (like Boring But Big) since you’re not exhausting yourself on PR sets."
+            }
+        ],
+        "templates": [
+            {
+                "name": "Boring But Big (BBB)",
+                "structure": "After completing the 5/3/1 work sets for the main lift, you perform **5 sets of 10 reps** of that same lift as assistance (usually at about 50% of your training max):contentReference[oaicite:25]{index=25}:contentReference[oaicite:26]{index=26}. Typically, one additional assistance exercise is added (often an antagonist movement for balance) for 5 sets of 10-15 reps. For example, on Bench Press day you might do Bench 5×10, then Dumbbell Rows 5×10.",
+                "assistanceLogic": "BBB prioritizes volume on the main lifts to build muscle and reinforce technique. Wendler advises to start very light on the 5×10 sets – ~30-40% of your max for the first cycle – because **it will make you sore**:contentReference[oaicite:27]{index=27}. Over time, around 50-60% of TM is common for these sets:contentReference[oaicite:28]{index=28}. You do **not** need to progress the weight of the 5×10 every week in a linear fashion; the focus is simply on getting the volume in (hence “boring, but big”). Many lifters keep the 5×10 weight the same for a cycle or gradually increase it if it becomes too easy."
+            },
+            {
+                "name": "Triumvirate",
+                "structure": "Each training session consists of **3 exercises: the main lift + 2 assistance movements**:contentReference[oaicite:29]{index=29}. This means after your 5/3/1 sets on the big lift, you pick two supplementary exercises and do a few sets of each (commonly 5 sets of 10-15 reps). For example, a sample Triumvirate workout for squat day is: Squat 5/3/1, then Leg Press 5×15 and Leg Curl 5×10:contentReference[oaicite:30]{index=30}. For the overhead press day, it might be Press 5/3/1, then Dips 5×15 and Chin-ups 5×10:contentReference[oaicite:31]{index=31}:contentReference[oaicite:32]{index=32}.",
+                "assistanceLogic": "The Triumvirate forces you to choose the **most effective** assistance exercises, since you’re limited to two. Wendler calls this the “smart man’s way” because it curbs the tendency to add endless accessories:contentReference[oaicite:33]{index=33}. Typically, you’d pick one assistance for a related muscle group and one for a complementary/opposite group. e.g. on upper body days, a pushing exercise (dip or dumbbell press) and a pulling exercise (chin-ups or rows); on lower body days, something for quads and something for hamstrings. The key is to select movements that give you the biggest bang for your buck and address your weaknesses. If you keep it to 3 exercises total, you ensure focus and adequate recovery:contentReference[oaicite:34]{index=34}."
+            },
+            {
+                "name": "I'm Not Doing Jack Shit",
+                "structure": "This template is brutally simple: you do **only the main 5/3/1 lift** in the workout and nothing else:contentReference[oaicite:35]{index=35}. No assistance work at all – finish your required sets (and optional PR set) on the big lift, then you’re done.",
+                "assistanceLogic": "There is none – that’s the point. Wendler jokes that this is his favorite template (even though he doesn’t generally recommend it) for times when he’s extremely short on time or energy:contentReference[oaicite:36]{index=36}. The advantage is you can put all your focus into the primary lift and hitting a PR, with zero distractions:contentReference[oaicite:37]{index=37}. The obvious disadvantage is the **lack of volume and balance**:contentReference[oaicite:38]{index=38} – you’re not doing anything to build muscle or address weak points beyond what the main lift provides. Use this template sparingly (e.g., “I’m Not Doing Shit” days when life is hectic, or as a mental agreement that if you hit a PR, you’ll call it quits early:contentReference[oaicite:39]{index=39})."
+            },
+            {
+                "name": "Periodization Bible",
+                "structure": "A template inspired by Dave Tate’s “Periodization Bible” article:contentReference[oaicite:40]{index=40}. Each day, after the main lift, you do **3 assistance categories** for 5 sets of 10-20 reps each:contentReference[oaicite:41]{index=41}. The categories are organized by muscle groups: for upper body days – one chest/shoulders exercise, one lats/upper back exercise, and one triceps exercise:contentReference[oaicite:42]{index=42}; for lower body days – one hamstring/posterior chain exercise, one quad-focused exercise, and one core (abs or lower back) exercise:contentReference[oaicite:43]{index=43}:contentReference[oaicite:44]{index=44}.",
+                "assistanceLogic": "This approach ensures balance by hitting multiple areas each session, basically turning 5/3/1 into a full-body assistance routine around the main lifts. You have flexibility in exercise selection (e.g., choose any movement from the given category list – barbell rows or dumbbell rows for “lats,” lunges or leg press for “quads,” etc.) and you can rotate them as needed:contentReference[oaicite:45]{index=45}. The volume is fairly high (3 assistance moves of 5x10-20), so monitor that it doesn’t interfere with recovery:contentReference[oaicite:46]{index=46}. The Periodization Bible template is great for hypertrophy and bringing up weak points, as long as you keep the assistance efforts submaximal and focus on form."
+            },
+            {
+                "name": "Bodyweight-Only Assistance",
+                "structure": "In this template, **all assistance work is done with bodyweight exercises**:contentReference[oaicite:47]{index=47}. After each main lift, you perform high-rep bodyweight movements for push, pull, single-leg, and core categories. For example, a 4-day setup might be: \n- Press day: 5/3/1 Press, then Dips and Chin-ups for volume;\n- Deadlift day: 5/3/1 Deadlift, then Glute-Ham Raises and Hanging Leg Raises;\n- Bench day: 5/3/1 Bench, then Push-ups and Chin-ups;\n- Squat day: 5/3/1 Squat, then Lunges (or 1-Leg Squats) and Sit-ups.\nEach chosen exercise is typically done for a fairly high total reps (Wendler recommends aiming for **75-100 total reps** of each bodyweight movement per session):contentReference[oaicite:48]{index=48}.",
+                "assistanceLogic": "Bodyweight assistance reduces training stress on the joints while still building muscle and work capacity. Wendler likes this template for phases when he wants to feel “athletic and healthy”:contentReference[oaicite:49]{index=49}. It’s especially good for beginners (to master basic movements) and older lifters who need to limit stress:contentReference[oaicite:50]{index=50}. The idea is to pick a handful of bodyweight exercises (push-ups, pull-ups, dips, lunges, step-ups, sit-ups, etc.) and accumulate volume. Since loading is via bodyweight, progress comes by adding reps, sets, or more challenging bodyweight variants (like feet-elevated push-ups, or harder pistol squats) rather than adding weight:contentReference[oaicite:51]{index=51}."
+            }
+        ],
+        "assistance": {
+            "push": {
+                "variations": [
+                    "Dips",
+                    "Push-ups",
+                    "Dumbbell Bench Press / Incline Press",
+                    "Dumbbell Overhead Press",
+                    "Chest Press (machines or bodyweight)",
+                    "Triceps Pushdowns / Extensions"
+                ],
+                "source": ":contentReference[oaicite:52]{index=52}"
+            },
+            "pull": {
+                "variations": [
+                    "Chin-ups / Pull-ups",
+                    "Dumbbell Rows (e.g. Kroc rows)",
+                    "Barbell Bent-Over Rows",
+                    "T-Bar Rows",
+                    "Lat Pulldowns",
+                    "Face Pulls / Shrugs"
+                ],
+                "source": ":contentReference[oaicite:53]{index=53}"
+            },
+            "singleLeg": {
+                "variations": [
+                    "Lunges (forward, reverse, walking lunges)",
+                    "Step-ups",
+                    "One-Leg Squats (Pistols or Bulgarian split squats)",
+                    "Split Squats (variations)"
+                ],
+                "source": ":contentReference[oaicite:54]{index=54}:contentReference[oaicite:55]{index=55}"
+            },
+            "core": {
+                "variations": [
+                    "Sit-ups / Crunches",
+                    "Hanging Leg Raises",
+                    "Ab Wheel Rollouts",
+                    "Back Extensions (45° or horizontal back raises)",
+                    "Reverse Hyperextensions",
+                    "Good Mornings",
+                    "Side Bends"
+                ],
+                "source": ":contentReference[oaicite:56]{index=56}"
+            }
+        },
+        "conditioning": {
+            "hard": {
+                "examples": [
+                    "Hill Sprints",
+                    "Prowler Pushes or Sled Drags/Sprints",
+                    "Track Sprints or Running Hills",
+                    "Barbarian-style conditioning (car pushes, weighted sled pulls)"
+                ],
+                "source": ":contentReference[oaicite:57]{index=57}:contentReference[oaicite:58]{index=58}"
+            },
+            "easy": {
+                "examples": [
+                    "Walking (brisk walking for distance)",
+                    "Light jogging or cycling",
+                    "Other low-intensity cardio (swimming laps, etc.)"
+                ],
+                "source": ":contentReference[oaicite:59]{index=59}"
+            },
+            "notes": "Wendler recommends doing conditioning 3-4 times per week. He favors *hard conditioning* – things like hill sprints or pushing the Prowler – which get you in shape without a huge time investment and also toughen you up:contentReference[oaicite:60]{index=60}. These high-intensity methods will challenge your legs and lungs similar to a heavy lifting session. *Easy conditioning* (like walking or easy aerobics) can be done on recovery days for blood flow and fat loss; Wendler himself used walking to drop weight when he was out of shape:contentReference[oaicite:61]{index=61}, though he jokes about not relying on walking if you can handle harder work:contentReference[oaicite:62]{index=62}."
+        },
+        "progression": {
+            "trainingMax": "Define your initial strength levels conservatively. After finding or estimating your one-rep max for each lift, set your \"Training Max\" to **90% of that 1RM** (i.e., use 90% of your max as the basis for all 5/3/1 percentages):contentReference[oaicite:63]{index=63}. This “start too light” approach is critical to allow months of progress.",
+            "increments": "After each 4-week cycle, **increase the training max** for the next cycle by no more than **+5 pounds for upper-body lifts** (bench press, overhead press) and **+10 pounds for lower-body lifts** (squat, deadlift):contentReference[oaicite:64]{index=64}. These small, fixed jumps ensure slow, steady progression. (For lighter or less advanced lifters, Wendler notes you can opt for even smaller jumps – e.g. +2.5 lbs / +5 lbs – if you have micro-plates available:contentReference[oaicite:65]{index=65}.)",
+            "deload": "5/3/1 uses a built-in **deload every fourth week**. In the deload week, you perform about 3 sets of 5 reps at roughly 40%, 50%, 60% of your training max (or similar light loads):contentReference[oaicite:66]{index=66}. Importantly, **do not perform an AMRAP** on deload week sets – the intent is to recuperate:contentReference[oaicite:67]{index=67}. This light week allows your body and mind to recover, preparing you for the next cycle’s heavier weights.",
+            "resetProtocol": "Run each cycle as long as you continue to hit the prescribed reps (and ideally set rep PRs). If a particular lift stalls (you fail to hit the minimum reps in a week), it’s time to reset that one lift. Wendler’s reset protocol: take the weight **10% off** that lift’s training max in your next cycle:contentReference[oaicite:68]{index=68}. This provides a reset (a step back) so you can build momentum forward again. You do not necessarily reset all lifts – only the ones that have truly plateaued:contentReference[oaicite:69]{index=69} (unless you’ve stalled on all, in which case a full reset may be needed).",
+            "notes": "With the 90% training max and small increments, you should be able to progress for multiple cycles before hitting a wall. In fact, Wendler remarks that if you begin correctly, you can expect to go **at least 5-7 cycles** before stalling:contentReference[oaicite:70]{index=70}. When you do eventually stall, don’t panic – simply reset as described and continue. The program is cyclical by nature: progress for many months, reset slightly, and build up again, always aiming to break your old rep PRs in subsequent cycles."
+        },
+        "populations": {
+            "beginner": {
+                "assistance": "Favor basic bodyweight movements and very simple assistance to reinforce technique (e.g. push-ups, chin-ups, dips, bodyweight squats):contentReference[oaicite:71]{index=71}. Beginners should focus on mastering form rather than piling on tons of accessory work.",
+                "TM": "Use the standard 90% training max rule. If you’re so new that you can’t even ballpark a 1RM, test a rep max (e.g. work up to a heavy 5 rep set) to estimate it:contentReference[oaicite:72]{index=72}. It’s crucial not to overshoot your max – err on the lighter side so you can hone technique.",
+                "progression": "Run the program as written. Beginners often make fast progress, but 5/3/1 will deliberately slow you down to ingrain consistency. Expect to add 5–10 lbs to your lifts each cycle. Stick with the prescribed jumps and resist testing your max too soon. With a light start, a novice could string together many cycles before needing any reset:contentReference[oaicite:73]{index=73}.",
+                "deload": "Take deload weeks as scheduled. Even if you feel you could skip them (common for novices who recover quickly), use them to practice lifts with light weight and focus on form. This builds good habits and prevents burnout early on.",
+                "notes": "The 5/3/1 philosophy for beginners is about building a base. The program’s simplicity is an asset – it keeps novice lifters focused on the big exercises and progressive overload without fancy tricks. Wendler even says if someone truly cannot estimate a max or follow basic percentages, they might not be ready for 5/3/1:contentReference[oaicite:74]{index=74}. But for those who have a little training under their belt, 5/3/1 will teach patience and proper training stress. Ensure as a beginner that you log every session, note your rep PRs, and strive to beat them next cycle. Progress may feel slow, but it will be steady and measurable."
+            },
+            "female": {
+                "assistance": "No fundamental changes from the base program – female lifters should still center on big lifts and use similar assistance (pull-ups, dips, rows, etc.) appropriate for their strength level. There’s nothing in 5/3/1 that inherently needs altering based on gender; focus is still on strength and balanced development.",
+                "TM": "Use 90% of actual max as TM (or even 85-90% if nervous about starting too high). Women sometimes have a lower one-rep max relative to rep work, which means the 90% rule is usually safe or even conservative. The key is, as always, start a bit lighter than you think so you can hit your reps.",
+                "progression": "Consider using smaller incremental jumps if the standard +5/+10 feels too large. Wendler notes that even +2.5 lbs for upper body and +5 lbs for lower body per cycle can work well:contentReference[oaicite:75]{index=75} (this often applies to lighter lifters generally, many of whom are female). This allows more cycles before plateau. In terms of rep work, women often can perform more reps at a given percentage of 1RM, so AMRAP sets might be very high-rep – this is fine, just ensure form stays solid.",
+                "deload": "Follow the normal deload protocol every 4th week. Women typically recover quickly, but the deload is still important for long-term progress and joint health. It’s a chance to consolidate gains and prepare for the next wave.",
+                "notes": "5/3/1 has been successfully used by many female lifters. For example, Wendler cites lifter Leigh An J. who benched 135×10 and 175×1 in competition using a training max of only 140 lbs – demonstrating the effectiveness of training sub-maximally and still hitting PRs when it counts:contentReference[oaicite:76]{index=76}. In practice, female lifters might find they can push the AMRAP sets for more reps since their endurance is often higher; this is an advantage in building strength. The core advice remains: train consistently, don’t be in a hurry to increase the TM, and focus on beating rep PRs. The program’s structure does not change for women, aside from the option of smaller weight increases and listening to one’s recovery needs."
+            },
+            "older": {
+                "assistance": "Emphasize joint-friendly assistance work. Wendler suggests using bodyweight exercises for older lifters to reduce stress on the joints:contentReference[oaicite:77]{index=77}. Movements like chins, dips (if shoulders tolerate them), push-ups, bodyweight squats or lunges, sled drags, etc., build strength with lower impact. Keep the volume reasonable to avoid excessive soreness.",
+                "TM": "Use 90% or even 85% of your max if you have many years of lifting (and accumulated wear and tear). It’s better for masters lifters to start extra light. This gives more headroom for progress and spares the joints. In practice, an older lifter might choose a training max that’s 5-10% lower than a younger lifter of equal ability – there’s no harm in going lighter and progressing slower.",
+                "progression": "Make use of the smallest increments possible. The standard +5/+10 works, but if you feel strain, you could progress at +2.5/+5 (microloading) to prolong steady gains:contentReference[oaicite:78]{index=78}. Pay close attention to recovery between sessions; an older athlete might benefit from a 3-days/week version of 5/3/1 or even the 2-days/week template to allow more recovery time:contentReference[oaicite:79]{index=79}. Auto-regulation becomes important: if you’re feeling beat up, it’s okay to skip the AMRAP or take an extra rest day.",
+                "deload": "Never skip deload weeks. For older lifters, the deload might be the most critical week in each cycle for staying healthy. Use the deload to focus on mobility, stretching, and light technique work. If needed, you might implement a deload every 2nd or 3rd week instead of 4th – some masters do well with a \"2 steps forward, 1 step back\" approach. At minimum, adhere to the 4th week deload and truly back off the intensity during it.",
+                "notes": "5/3/1 can be an excellent approach for older (Masters) lifters because of its moderation and flexibility. Wendler explicitly notes the bodyweight assistance template “is great for older lifters who want to limit the stress” on their bodies:contentReference[oaicite:80]{index=80}. Additionally, he provides a 2-day/week training split that can be ideal for older trainees or anyone who needs extra recovery:contentReference[oaicite:81]{index=81}. In that setup, you might squat and bench on Monday, press and deadlift on Thursday, for example. The slower pace doesn’t impede progress; many older lifters actually progress for longer because they don’t burn out. The key is to listen to your body: focus on quality of reps over quantity, and prioritize recovery modalities (sleep, nutrition, mobility). 5/3/1’s mantra of \"start too light, progress slowly\" is perfectly suited to the older lifter."
+            },
+            "inSeasonAthlete": {
+                "assistance": "Minimize assistance work. Wendler advises in-season athletes or anyone very busy to cut volume drastically: maybe **1-2 assistance exercises total** in a workout, or even none on some days:contentReference[oaicite:82]{index=82}. The focus while in-season is maintaining strength on the big lifts, not building muscle or hitting accessory PRs. Stick to essential movements that support your sport (for example, some light jumps or core work if needed), but keep it sparse.",
+                "TM": "Use a conservative training max during the season – possibly stick to 85-90% of your off-season max, or even lower. This ensures you’re not over-extending yourself in the weight room when you also have practices and games. The goal in-season is often maintenance, so it’s okay if you’re working with submaximal weights; you can ramp up again in the off-season.",
+                "progression": "It may be wise to **hold the training max steady for multiple cycles** in-season, rather than increasing each month. Alternatively, you can run 5/3/1 with the usual increases but be ready to reset sooner if fatigue accumulates. Another tweak: you might skip the AMRAP sets when your sport activities are intense – doing just the prescribed 5/3/1 reps to avoid undue fatigue. The key is auto-regulating: if you are feeling worn down from sport, don’t attempt rep PRs that week. Consistency (lifting some weight weekly) is more important than pushing for new highs in-season.",
+                "deload": "If you’re using a 2-days-per-week 5/3/1 schedule during the season, you might not need a full deload every fourth week since overall lifting frequency is lower. However, remain attentive to signs of fatigue. You can still implement a deload week (or lighter sessions) as needed, especially during the most competitive or intense weeks of your sport. Wendler’s two-day template effectively builds in more rest days by default:contentReference[oaicite:83]{index=83}, but you should still back off if recovery falters.",
+                "notes": "Wendler makes it clear that you *can* get stronger (or at least maintain strength) training two days a week:contentReference[oaicite:84]{index=84}, which is often ideal for in-season athletes. A common approach is to split the 4 main lifts over 2 days (e.g., Day 1: Squat & Bench, Day 2: Deadlift & Press:contentReference[oaicite:85]{index=85}), doing the 5/3/1 sets for two lifts in one session. This reduces gym time and leaves more recovery capacity for sport. In-season, the motto is *\"do what’s necessary and nothing more.\"* Keep the lifts heavy enough to preserve strength but don’t chase fatigue. Many athletes will maintain or even gain strength in-season by sticking to the basic plan, using pristine technique, and not missing reps. The 5/3/1 program’s flexibility allows it to accommodate these adjustments so you can integrate it with sport training effectively."
+            }
+        }
+    }
+}

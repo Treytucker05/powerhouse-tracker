@@ -1,0 +1,13 @@
+{
+    "activities": [
+        "prowler pushes",
+        "hill sprints",
+        "jumps",
+        "walks"
+    ],
+    "presets": [
+        "minimal",
+        "standard",
+        "extensive"
+    ]
+}

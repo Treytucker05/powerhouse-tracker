@@ -36,6 +36,7 @@ export const AssistanceCatalog = {
         { id: "pistol_box", name: "Box Pistol (assisted)", equip: ["bw"], sets: 3, reps: "6-10/leg" },
         { id: "walking_lunge_bw", name: "Walking Lunge (BW)", equip: ["bw"], sets: 3, reps: "12-20/leg" },
         { id: "cossack_squat", name: "Cossack Squat", equip: ["bw"], sets: 3, reps: "8-12/side" },
+        { id: "leg_press", name: "Leg Press", equip: ["machine"], sets: 5, reps: "15" },
     ],
     posterior: [
         { id: "back_ext", name: "Back Extension", equip: ["machine", "bw"], sets: 3, reps: "10-15" },

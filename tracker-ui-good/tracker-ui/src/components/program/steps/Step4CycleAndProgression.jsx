@@ -110,22 +110,42 @@ export default function Step4CycleAndProgression({ data, updateData }) {
                     <div>
                         <div className="text-white font-medium mb-2">Loading Option</div>
                         <div className="flex gap-2">
-                            {[1, 2].map(opt => (
-                                <button key={opt} onClick={() => setLoadingOption(opt)} className={`px-3 py-1 rounded border ${loading.option === opt ? 'border-red-500 ring-2 ring-red-600' : 'border-gray-600 hover:bg-gray-700/40'} text-white`}>
-                                    Option {opt}
-                                </button>
-                            ))}
+                            {[1, 2].map(opt => {
+                                const active = loading.option === opt;
+                                return (
+                                    <button
+                                        key={opt}
+                                        onClick={() => setLoadingOption(opt)}
+                                        className={`px-3 py-1 rounded-md transition select-none outline-none ${active
+                                            ? 'bg-red-600 text-white border-2 border-red-300 shadow-md ring-2 ring-red-400/70 ring-offset-1 ring-offset-gray-900'
+                                            : 'bg-gray-900/40 text-red-200 border border-red-700/70 hover:border-red-500/70 hover:bg-red-900/20'}`}
+                                    >
+                                        {active ? <span className="mr-1">✓</span> : null}
+                                        Option {opt}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
 
                     <div>
                         <div className="text-white font-medium mb-2">Preview Week</div>
                         <div className="flex gap-2">
-                            {[1, 2, 3, 4].map(wk => (
-                                <button key={wk} onClick={() => setPreviewWeek(wk)} className={`px-3 py-1 rounded border ${loading.previewWeek === wk ? 'border-red-500 ring-2 ring-red-600' : 'border-gray-600 hover:bg-gray-700/40'} text-white`}>
-                                    Week {wk}
-                                </button>
-                            ))}
+                            {[1, 2, 3, 4].map(wk => {
+                                const active = loading.previewWeek === wk;
+                                return (
+                                    <button
+                                        key={wk}
+                                        onClick={() => setPreviewWeek(wk)}
+                                        className={`px-3 py-1 rounded-md transition select-none outline-none ${active
+                                            ? 'bg-red-600 text-white border-2 border-red-300 shadow-md ring-2 ring-red-400/70 ring-offset-1 ring-offset-gray-900'
+                                            : 'bg-gray-900/40 text-red-200 border border-red-700/70 hover:border-red-500/70 hover:bg-red-900/20'}`}
+                                    >
+                                        {active ? <span className="mr-1">✓</span> : null}
+                                        Week {wk}
+                                    </button>
+                                );
+                            })}
                         </div>
                         <p className="text-xs text-gray-400 mt-2">Week 4 is deload (no AMRAP).</p>
                     </div>

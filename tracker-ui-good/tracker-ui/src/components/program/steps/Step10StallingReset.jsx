@@ -24,14 +24,14 @@ export default function Step10StallingReset({ data = {}, updateData }) {
         third_reset: 80     // 80% of current TM (rare)
     };
 
-    // Calculate proper rounding to nearest 5 lbs
-    const roundToNearest5 = (weight) => roundToIncrement(weight, roundingIncrement);
+    // Use central rounding helper directly (previous local wrapper removed)
+    const round = (weight) => roundToIncrement(weight, roundingIncrement);
 
     // Calculate reset training max
     const calculateResetTM = (currentTM, resetType = 'first_reset') => {
         if (!currentTM) return 0;
         const percentage = resetPercentages[resetType];
-        return roundToNearest5(currentTM * (percentage / 100));
+        return round(currentTM * (percentage / 100));
     };
 
     // Lift names mapping
@@ -115,7 +115,7 @@ export default function Step10StallingReset({ data = {}, updateData }) {
 
     // Handle manual reset TM
     const handleManualResetTM = (lift, value) => {
-        const newTM = roundToNearest5(parseInt(value) || 0);
+        const newTM = round(parseInt(value) || 0);
         const newResetTMs = { ...resetTrainingMaxes, [lift]: newTM };
         setResetTrainingMaxes(newResetTMs);
         updateStepData({ resetTrainingMaxes: newResetTMs });

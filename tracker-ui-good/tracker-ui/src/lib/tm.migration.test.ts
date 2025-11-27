@@ -1,4 +1,4 @@
-/// <reference types="vitest" />
+import { describe, it, expect } from 'vitest';
 import { migrateProgramV2, getTmPct } from './tm.ts';
 
 describe('tm migration utilities', () => {

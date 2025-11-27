@@ -1,0 +1,99 @@
+{
+    "id": "population.teen",
+    "type": "population",
+    "name": "Teen 5/3/1 Modifications",
+    "version": "1.0.0",
+    "groups": [
+        {
+            "ageGroup": "13–15",
+            "tmPercent": "≈85–90% of actual max (conservative TM).",
+            "citations_tm": [
+                "oaicite:0",
+                "oaicite:1"
+            ],
+            "progression": {
+                "upper": "+2.5–5 lb per cycle (upper-body).",
+                "citations_upper": [
+                    "oaicite:2"
+                ],
+                "lower": "+5–10 lb per cycle (lower-body).",
+                "citations_lower": [
+                    "oaicite:3"
+                ]
+            },
+            "assistanceVolume": "Low to moderate volume; basic bodyweight (e.g. dips, chins) 3–5×10–15 reps.",
+            "citations_assist": [
+                "oaicite:4",
+                "oaicite:5"
+            ],
+            "technicalFocus": [
+                "Master form on all core lifts.",
+                "Build base with big compound lifts.",
+                "Prioritize submax effort – no max attempts.",
+                "Develop flexibility, conditioning, athletic balance."
+            ],
+            "citations_tech": [
+                "oaicite:6",
+                "oaicite:7",
+                "oaicite:8",
+                "oaicite:9"
+            ],
+            "exampleCycle": "W1 – 65/75/85%×5+; W2 – 70/80/90%×3+; W3 – 75/85/95%×1+; W4 – 40/50/60%×5 (deload).",
+            "citations_cycle": [
+                "oaicite:10"
+            ],
+            "notes": "Start light, progress slowly. Always deload in Week 4. Avoid frequent 1RM testing (wait 3–4 cycles). Keep ego in check; focus on long-term gains.",
+            "citations_notes": [
+                "oaicite:11",
+                "oaicite:12",
+                "oaicite:13",
+                "oaicite:14"
+            ]
+        },
+        {
+            "ageGroup": "15–19",
+            "tmPercent": "90% of actual max (standard TM).",
+            "citations_tm": [
+                "oaicite:15"
+            ],
+            "progression": {
+                "upper": "Up to +5 lb per cycle (bench/press).",
+                "citations_upper": [
+                    "oaicite:16"
+                ],
+                "lower": "Up to +10 lb per cycle (squat/deadlift).",
+                "citations_lower": [
+                    "oaicite:17"
+                ]
+            },
+            "assistanceVolume": "Moderate; 3–5×10–15 reps. BBB (5×10) recommended but manageable.",
+            "citations_assist": [
+                "oaicite:18",
+                "oaicite:19"
+            ],
+            "technicalFocus": [
+                "Maintain technique as loads rise.",
+                "Focus on rep PRs, not frequent 1RM tests.",
+                "Embrace slow progression, avoid plateaus.",
+                "Balance training with recovery and conditioning."
+            ],
+            "citations_tech": [
+                "oaicite:20",
+                "oaicite:21",
+                "oaicite:22",
+                "oaicite:23",
+                "oaicite:24"
+            ],
+            "exampleCycle": "W1 – 65/75/85%×5+; W2 – 70/80/90%×3+; W3 – 75/85/95%×1+; W4 – 40/50/60%×5 (deload).",
+            "citations_cycle": [
+                "oaicite:25"
+            ],
+            "notes": "Train submaximally; build momentum. Always deload. Avoid ego lifting; never skip planned training to max. Support with nutrition and rest.",
+            "citations_notes": [
+                "oaicite:26",
+                "oaicite:27",
+                "oaicite:28"
+            ]
+        }
+    ]
+}

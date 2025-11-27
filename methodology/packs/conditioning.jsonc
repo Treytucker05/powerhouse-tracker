@@ -1,0 +1,124 @@
+{
+    "id": "conditioning.catalog",
+    "type": "conditioning",
+    "name": "5/3/1 Conditioning",
+    "version": "1.0.0",
+    "conditioningActivities": [
+        {
+            "activity": "prowler pushes",
+            "intensity": "hard",
+            "examples": "6–10 x 40-yard sled pushes with moderate load (~15–20 minutes); or push a very heavy Prowler ~40 yards total in multiple efforts.",
+            "citations": [
+                "oaicite:0",
+                "oaicite:1"
+            ],
+            "whenToUse": "Often post-lifting or on conditioning-only days. Wendler suggests heavy prowler after squats/deads; lighter prowler on off/upper-body days.",
+            "whenToUse_citations": [
+                "oaicite:2"
+            ],
+            "populationSuitability": [
+                "intermediate",
+                "advanced"
+            ]
+        },
+        {
+            "activity": "hill sprints",
+            "intensity": "hard",
+            "examples": "All-out uphill sprints, ~10–20 total reps. Wendler sets 20 sprints as a session goal. Choose 30–60 yd hill; beat prior performance.",
+            "citations": [
+                "oaicite:3",
+                "oaicite:4"
+            ],
+            "whenToUse": "Separate conditioning days or after upper lifts. Avoid the day before heavy squat/dead; can do after those lifts instead. Wendler: 'just get it done'.",
+            "whenToUse_citations": [
+                "oaicite:5"
+            ],
+            "populationSuitability": [
+                "intermediate",
+                "advanced"
+            ]
+        },
+        {
+            "activity": "jumps",
+            "intensity": "hard",
+            "examples": "Explosive jumps, ~10–15 total reps (box/broad jumps), sets of 3–5. Stop when speed drops.",
+            "citations": [
+                "oaicite:6"
+            ],
+            "whenToUse": "Ideal pre-lifting as neural primer. Also possible post-lift or off-days. Keep volume low, focus on quality not exhaustion.",
+            "whenToUse_citations": [
+                "oaicite:7"
+            ],
+            "populationSuitability": [
+                "beginner",
+                "intermediate",
+                "advanced"
+            ]
+        },
+        {
+            "activity": "walks",
+            "intensity": "easy",
+            "examples": "30–40 minutes brisk walking; add vest or incline treadmill for difficulty.",
+            "citations": [
+                "oaicite:8"
+            ],
+            "whenToUse": "Rest days or post-training active recovery. Can be done daily; low-impact so it won’t hurt recovery.",
+            "whenToUse_citations": [
+                "oaicite:9"
+            ],
+            "populationSuitability": [
+                "beginner",
+                "intermediate",
+                "advanced"
+            ]
+        }
+    ],
+    "schedule": [
+        {
+            "day": "Mon",
+            "lifting": "Press",
+            "conditioning": "prowler pushes"
+        },
+        {
+            "day": "Tue",
+            "lifting": null,
+            "conditioning": "walks"
+        },
+        {
+            "day": "Wed",
+            "lifting": "Deadlift",
+            "conditioning": null
+        },
+        {
+            "day": "Thu",
+            "lifting": null,
+            "conditioning": "hill sprints"
+        },
+        {
+            "day": "Fri",
+            "lifting": "Bench",
+            "conditioning": "jumps"
+        },
+        {
+            "day": "Sat",
+            "lifting": null,
+            "conditioning": null
+        },
+        {
+            "day": "Sun",
+            "lifting": "Squat",
+            "conditioning": "prowler pushes"
+        }
+    ],
+    "weeklyGuidelines": {
+        "easySessionsPerWeek": 2,
+        "hardSessionsPerWeek": 2,
+        "notes": "Wendler recommends conditioning 3–4x/week. Mix of easy/hard (often 1 easy, 1 medium, 1 hard). Avoid intense conditioning immediately before heavy squat/dead days; ok on off/upper-body days. Apply '50% Rule' on hard sessions—don’t go all-out every time.",
+        "citations": [
+            "oaicite:10",
+            "oaicite:11",
+            "oaicite:12",
+            "oaicite:13"
+        ]
+    }
+}

@@ -1,0 +1,3 @@
+RuleId,AllowedPattern,AllowedWeeks,MaxJokers,IncrementHint,StopCondition,Notes
+JKR_BASE,5/3/1|3/5/1,Week3,3,+5–10% per single,Stop before bar speed degrades,Base Joker guidance; Source: Beyond 5/3/1 (2013).
+JKR_ANCHOR_ONLY,5/3/1|3/5/1,Week3,2,+2.5–5% per single,Anchor only; skip on bad days,Anchor-restricted per Forever (2017).

@@ -1,0 +1,87 @@
+{
+    "id": "injury.management",
+    "type": "injury",
+    "name": "5/3/1 Injury Management & Post-Injury Restart",
+    "version": "1.0.0",
+    "injuryManagement": {
+        "knee": {
+            "substitutions": "Use pain-free alternatives. Front squats instead of back squats, trap-bar deadlifts instead of conventional, or even leg press when needed. Knee sleeves can also help for warmth/support.",
+            "substitutions_citations": [
+                "oaicite:0",
+                "oaicite:1",
+                "oaicite:2",
+                "oaicite:3"
+            ],
+            "volumeModifications": "Reduce lower-body training volume. Favor bodyweight assistance (lunges, single-leg squats). Avoid high-volume templates like BBB squats. Allow longer recovery between heavy lower-body sessions if needed.",
+            "volumeModifications_citations": [
+                "oaicite:4",
+                "oaicite:5"
+            ],
+            "intensityModifications": "Lower TM for squats/deads. Stick to required reps; skip AMRAPs/Jokers. Focus on perfect form and moderate loads. 'Get your prescribed weights and leave' applies during rehab.",
+            "intensityModifications_citations": [
+                "oaicite:6",
+                "oaicite:7"
+            ]
+        },
+        "shoulder": {
+            "substitutions": "Front squats for painful low-bar squats. Push press instead of strict press. Dumbbell presses or push-ups instead of flat bench if needed. Some lifters find overhead work tolerable when horizontal pressing hurts.",
+            "substitutions_citations": [
+                "oaicite:8",
+                "oaicite:9",
+                "oaicite:10"
+            ],
+            "volumeModifications": "Cut pressing volume/frequency. Eliminate painful assistance (e.g., dips). Add pulling/stability work (rows, face pulls). Favor slightly higher-rep pressing to reduce joint strain.",
+            "volumeModifications_citations": [
+                "oaicite:11",
+                "oaicite:12"
+            ],
+            "intensityModifications": "Reset TM conservatively. Focus on form with lighter loads. Consider close-grip bench to protect shoulders. Do not push AMRAP sets; perform prescribed reps only until recovered.",
+            "intensityModifications_citations": [
+                "oaicite:13",
+                "oaicite:14"
+            ]
+        },
+        "back": {
+            "substitutions": "Trap-bar deadlifts instead of conventional. Front squats, belt squats, or machine squats instead of back squats. Stick with chosen substitute for full cycles.",
+            "substitutions_citations": [
+                "oaicite:15",
+                "oaicite:16"
+            ],
+            "volumeModifications": "Limit spinal loading. Reduce deadlift frequency/sets. Skip heavy back-intensive assistance. Use single-leg and core work (split squats, lunges, leg presses). Add gentle posterior-chain work (back raises, reverse hypers). Minimal assistance may be best (Jack Sh*t).",
+            "volumeModifications_citations": [
+                "oaicite:17",
+                "oaicite:18",
+                "oaicite:19",
+                "oaicite:20"
+            ],
+            "intensityModifications": "Lower TM significantly. Prioritize form over weight. Stick to prescribed reps; no PRs/Jokers. Belt up for heavy sets. Stay submaximal until healthy.",
+            "intensityModifications_citations": [
+                "oaicite:21",
+                "oaicite:22"
+            ]
+        }
+    },
+    "postInjuryRestart": {
+        "startingTMReduction": "Restart with a much lower TM. Standard = 90% of max, post-injury = ~85% or a 2–3 cycle rollback. Example: if TM was 300, restart ~270 or lower.",
+        "startingTMReduction_citations": [
+            "oaicite:23",
+            "oaicite:24",
+            "oaicite:25"
+        ],
+        "supplementalRecommendations": "Use minimal supplemental templates. Triumvirate (main lift + 2 assistance) or Jack Sh*t (main lift only). Avoid BBB or other high-volume assistance.",
+        "supplementalRecommendations_citations": [
+            "oaicite:26",
+            "oaicite:27"
+        ],
+        "assistanceReintroduction": "Start with bodyweight/core-only assistance. Push-ups, chin-ups, air squats, planks, bird-dogs. Slowly re-add weighted assistance once stable. Keep reps higher and effort moderate.",
+        "assistanceReintroduction_citations": [
+            "oaicite:28",
+            "oaicite:29"
+        ],
+        "timelineForAMRAP": "Delay AMRAPs for 1–2 cycles. Run '5’s Pro' (prescribed reps only). After ~6–8 weeks of pain-free training, cautiously add AMRAPs back. Keep reps in reserve. Prioritize longevity over short-term PRs.",
+        "timelineForAMRAP_citations": [
+            "oaicite:30",
+            "oaicite:31"
+        ]
+    }
+}

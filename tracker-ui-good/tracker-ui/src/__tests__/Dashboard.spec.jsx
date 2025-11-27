@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { supabase } from '../lib/api/supabaseClient'
+import { supabase } from '@/lib/supabaseClient'
 import Dashboard from '../pages/Dashboard';
 import * as state from '../lib/state/trainingState';
 

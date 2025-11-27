@@ -34,7 +34,7 @@ describe('useWeekStatus branch coverage (happy/edge paths)', () => {
             { date: currentWeekDate(2), completed: true, planned: false, focus: 'Upper', id: '3' }, // completed unplanned
             { date: currentWeekDate(3), completed: false, planned: false, focus: null, id: '4' } // scheduled (neither)
         ];
-        vi.doMock('@/lib/api/supabaseClient', () => ({
+        vi.doMock('@/lib/supabaseClient', () => ({
             getCurrentUserId: vi.fn().mockResolvedValue('user-123'),
             supabase: {
                 from: () => ({
@@ -57,7 +57,7 @@ describe('useWeekStatus branch coverage (happy/edge paths)', () => {
     });
 
     it('handles empty week (no sessions)', async () => {
-        vi.doMock('@/lib/api/supabaseClient', () => ({
+        vi.doMock('@/lib/supabaseClient', () => ({
             getCurrentUserId: vi.fn().mockResolvedValue('user-123'),
             supabase: { from: () => ({ select: () => ({ eq: () => ({ gte: () => ({ lte: () => ({ order: vi.fn().mockResolvedValue({ data: [], error: null }) }) }) }) }) }) }
         }));
@@ -75,7 +75,7 @@ describe('useWeekStatus branch coverage (happy/edge paths)', () => {
             { date: currentWeekDate(0), completed: true, planned: true, focus: 'Upper', id: '1' },
             { date: currentWeekDate(2), completed: false, planned: true, focus: 'Lower', id: '2' }
         ];
-        vi.doMock('@/lib/api/supabaseClient', () => ({
+        vi.doMock('@/lib/supabaseClient', () => ({
             getCurrentUserId: vi.fn().mockResolvedValue('user-123'),
             supabase: { from: () => ({ select: () => ({ eq: () => ({ gte: () => ({ lte: () => ({ order: vi.fn().mockResolvedValue({ data: sessions, error: null }) }) }) }) }) }) }
         }));

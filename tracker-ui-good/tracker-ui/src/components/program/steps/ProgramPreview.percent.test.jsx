@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, cleanup } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import ProgramPreview531 from './ProgramPreview531.jsx';
 
@@ -16,18 +16,21 @@ function makeData(tmPct = 0.85) {
 }
 
 describe('ProgramPreview531 TM percent display', () => {
-    function findTmLine() {
-        return screen.getByText((_, el) => !!el && /Training Max %:\s*\d+%/.test(el.textContent));
+    function latestTmLine() {
+        const all = screen.queryAllByTestId('tm-percent-display');
+        return all[all.length - 1];
     }
 
     it('shows 85 when tmPct=0.85', () => {
         render(<ProgramPreview531 data={makeData(0.85)} updateData={() => { }} />);
-        const el = findTmLine();
-        expect(el.textContent).toMatch(/85%/);
+        const el = latestTmLine();
+        expect(el).toHaveTextContent(/85%/);
+        cleanup();
     });
     it('shows 90 when tmPct=0.90', () => {
         render(<ProgramPreview531 data={makeData(0.90)} updateData={() => { }} />);
-        const el = findTmLine();
-        expect(el.textContent).toMatch(/90%/);
+        const el = latestTmLine();
+        expect(el).toHaveTextContent(/90%/);
+        cleanup();
     });
 });

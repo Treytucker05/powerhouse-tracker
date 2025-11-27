@@ -34,7 +34,7 @@ describe('storage.js error path coverage', () => {
     it('saveMacrocycle falls back to localStorage when supabase upsert returns error', async () => {
         vi.resetModules();
         process.env.NODE_ENV = 'development'; // enable supabase path
-        vi.doMock('@/lib/api/supabaseClient', () => ({
+        vi.doMock('@/lib/supabaseClient', () => ({
             supabase: {
                 from: () => ({
                     upsert: () => ({
@@ -63,7 +63,7 @@ describe('storage.js error path coverage', () => {
 
         vi.resetModules();
         process.env.NODE_ENV = 'development';
-        vi.doMock('@/lib/api/supabaseClient', () => ({
+        vi.doMock('@/lib/supabaseClient', () => ({
             supabase: {
                 from: () => ({
                     select: () => ({
@@ -84,7 +84,7 @@ describe('storage.js error path coverage', () => {
 
         vi.resetModules();
         process.env.NODE_ENV = 'development';
-        vi.doMock('@/lib/api/supabaseClient', () => ({
+        vi.doMock('@/lib/supabaseClient', () => ({
             supabase: {
                 from: () => ({
                     select: () => ({
@@ -103,7 +103,7 @@ describe('storage.js error path coverage', () => {
     it('handles supabase object lacking from() (user not authenticated edge) gracefully', async () => {
         vi.resetModules();
         process.env.NODE_ENV = 'development';
-        vi.doMock('@/lib/api/supabaseClient', () => ({
+        vi.doMock('@/lib/supabaseClient', () => ({
             supabase: {}, // truthy but missing from -> triggers TypeError caught by try/catch
             getCurrentUserId: () => Promise.resolve(null)
         }));

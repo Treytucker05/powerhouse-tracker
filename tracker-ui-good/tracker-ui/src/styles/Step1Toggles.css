@@ -1,0 +1,16 @@
+/* Step 1 Toggle Styles */
+.toggle-selected {
+    background-color: #ef4444;
+    /* red-500 */
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.toggle-unselected {
+    background-color: transparent;
+    border: 1px solid #666666;
+    color: #e5e7eb;
+    /* gray-200 */
+    font-weight: 400;
+}

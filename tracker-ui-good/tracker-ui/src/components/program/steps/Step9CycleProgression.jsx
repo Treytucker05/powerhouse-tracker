@@ -24,14 +24,14 @@ export default function Step9CycleProgression({ data = {}, updateData }) {
         deadlift: 10        // Lower body
     };
 
-    // Calculate proper rounding to nearest 5 lbs
-    const roundToNearest5 = (weight) => roundToIncrement(weight, roundingIncrement);
+    // Use central rounding helper directly (previously wrapped by local roundToNearest5)
+    const round = (weight) => roundToIncrement(weight, roundingIncrement);
 
     // Calculate new training max with standard increment
     const calculateNewTM = (currentTM, lift) => {
         if (!currentTM) return 0;
         const increment = incrementRules[lift] || 5;
-        return roundToNearest5(currentTM + increment);
+        return round(currentTM + increment);
     };
 
     // Lift names mapping
@@ -87,7 +87,7 @@ export default function Step9CycleProgression({ data = {}, updateData }) {
     const handleManualTM = (lift, value) => {
         const newTMs = {
             ...newTrainingMaxes,
-            [lift]: roundToNearest5(parseInt(value) || 0)
+            [lift]: round(parseInt(value) || 0)
         };
         setNewTrainingMaxes(newTMs);
         updateStepData({ newTrainingMaxes: newTMs });
@@ -100,19 +100,19 @@ export default function Step9CycleProgression({ data = {}, updateData }) {
 
         switch (decision) {
             case 'increase':
-                newTM = roundToNearest5(currentTM + (incrementRules[lift] * 1.5)); // 1.5x normal increment
+                newTM = round(currentTM + (incrementRules[lift] * 1.5)); // 1.5x normal increment
                 break;
             case 'standard':
                 newTM = calculateNewTM(currentTM, lift);
                 break;
             case 'conservative':
-                newTM = roundToNearest5(currentTM + (incrementRules[lift] * 0.5)); // Half increment
+                newTM = round(currentTM + (incrementRules[lift] * 0.5)); // Half increment
                 break;
             case 'maintain':
                 newTM = currentTM;
                 break;
             case 'reduce':
-                newTM = roundToNearest5(currentTM * 0.9); // 90% of current
+                newTM = round(currentTM * 0.9); // 90% of current
                 break;
             default:
                 newTM = calculateNewTM(currentTM, lift);

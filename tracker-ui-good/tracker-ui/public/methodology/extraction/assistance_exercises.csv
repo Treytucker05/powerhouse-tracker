@@ -1,0 +1,21 @@
+Category,Exercise,Equipment,Difficulty,BackStressFlag,Notes
+Pull,Chin-up,Bar,None,Low,"Bodyweight scalable; add weight as needed"
+Push,Dip,Dip Bars,None,Low,"Classic push assistance"
+Single-Leg/Core,Split Squat,Dumbbells,Medium,Low,"Great unilateral work"
+Pull,Barbell Row,Barbell,Medium,High,"Avoid heavy rows on BBS lower days"
+Core,Ab Wheel,Ab Wheel,Easy,Low,"Progress volume 25-100 reps"
+Exercise,Category
+Dips,Push
+Chin-ups,Pull
+DB Rows,Pull
+Back Extension,Posterior
+Ab Wheel,Core
+Romanian Deadlift,Posterior
+Hanging Leg Raises,Core
+Push-Ups,Push
+Sit-Ups,Core
+Single-Leg Squat,Single-Leg
+Face Pulls,Pull
+Lateral Raises,Push
+Plank,Core
+Glute Bridge,Posterior

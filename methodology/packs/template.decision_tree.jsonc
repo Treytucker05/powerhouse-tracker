@@ -1,0 +1,518 @@
+{
+    "id": "template.decision_tree",
+    "type": "selector",
+    "name": "5/3/1 Template Decision Tree",
+    "version": "1.0.0",
+    "decisionTree": {
+        "beginner": {
+            "strength": {
+                "2_days": [
+                    {
+                        "template": "Triumvirate",
+                        "note": "Stick to the basics – main lifts with a couple of key assistance moves for balanced strength gains. This limits each session to essential exercises, ideal when training only twice a week."
+                    },
+                    {
+                        "template": "Bodyweight",
+                        "note": "All assistance done with bodyweight exercises to build base strength with less fatigue. Good option if very busy – it keeps stress low and suits beginners learning proper form."
+                    }
+                ],
+                "3_days": [
+                    {
+                        "template": "Triumvirate",
+                        "note": "Focus on 3 exercises per session (the main lift plus 2 assistance). This provides balanced development and practice on big lifts without excessive volume, which is great for a novice strength focus."
+                    },
+                    {
+                        "template": "Bodyweight",
+                        "note": "Use bodyweight assistance (pull-ups, push-ups, etc.) for easier recovery. This helps beginners build muscle endurance and athleticism while keeping the focus on getting stronger in the main lifts."
+                    }
+                ],
+                "4_days": [
+                    {
+                        "template": "Triumvirate",
+                        "note": "Emphasize the main lifts and two effective assistance exercises each workout. This “smart” approach ensures all major muscle groups get work for strength without overwhelming a beginner."
+                    },
+                    {
+                        "template": "Bodyweight",
+                        "note": "Optionally, bodyweight assistance can be used to reduce joint stress. This still covers fundamental movements (e.g. chin-ups, dips) to support strength gains, but in a joint-friendly manner."
+                    }
+                ],
+                "5_days": [
+                    {
+                        "template": "Triumvirate",
+                        "note": "Follow a standard four-day 5/3/1 rotation of main lifts with minimal but effective assistance. The fifth day can be used for conditioning or rest, rather than adding more lifting, to support strength progress."
+                    },
+                    {
+                        "template": "Bodyweight",
+                        "note": "Alternatively, incorporate a day of bodyweight assistance work (e.g. circuits of pull-ups, push-ups) for extra practice and fitness. This keeps the weekly training load manageable for a beginner."
+                    }
+                ]
+            },
+            "hypertrophy": {
+                "2_days": [
+                    {
+                        "template": "Triumvirate",
+                        "note": "With only two sessions, focus on big lifts plus a couple of assistance exercises to stimulate muscle growth efficiently. This approach hits the major muscle groups without overextending session length."
+                    },
+                    {
+                        "template": "Boring But Big",
+                        "note": "If time allows, add volume by doing 5×10 “down sets” on the main lifts. This classic high-volume template builds muscle, but start very light on these sets to avoid excessive fatigue in long workouts."
+                    }
+                ],
+                "3_days": [
+                    {
+                        "template": "Boring But Big",
+                        "note": "Perform the 5/3/1 sets, then follow with 5 sets of 10 reps on the same lift. This simple volume-heavy template is very effective for adding size, though you should begin with light weights for the 5×10 sets."
+                    },
+                    {
+                        "template": "Triumvirate",
+                        "note": "If recovery is an issue, use a 3-exercise plan (main lift + 2 assistance). It’s less volume than BBB but still enough to promote hypertrophy while being easier to recover from on a three-day schedule."
+                    }
+                ],
+                "4_days": [
+                    {
+                        "template": "Boring But Big",
+                        "note": "The go-to for size: after the main work, do 5 sets of 10 with the main lift. This popular template delivers high volume for muscle growth, so expect soreness and ensure you eat and rest well."
+                    },
+                    {
+                        "template": "Periodization Bible",
+                        "note": "Use multiple assistance exercises (e.g. chest, back, triceps after bench) for 5 sets each. This broad approach hits each muscle group thoroughly, supporting hypertrophy in all areas while keeping you “balanced, strong and big”."
+                    }
+                ],
+                "5_days": [
+                    {
+                        "template": "Boring But Big",
+                        "note": "Focus on four days of main lifts with 5×10 volume work for hypertrophy. The additional fifth day can be used for light accessory or conditioning work, as the BBB template already provides plenty of muscle-building volume."
+                    },
+                    {
+                        "template": "Periodization Bible",
+                        "note": "Incorporate varied assistance across the week targeting all major muscle groups. This comprehensive template ensures even development (e.g., hitting chest, back, legs, core) and can be spread over the extra training day if needed for recovery."
+                    }
+                ]
+            },
+            "conditioning": {
+                "2_days": [
+                    {
+                        "template": "Bodyweight",
+                        "note": "Keep assistance to bodyweight movements to reduce systemic fatigue. Two short strength sessions (main lifts only or with light bodyweight work) free up time and energy to focus on conditioning and “getting in shape”."
+                    },
+                    {
+                        "template": "Triumvirate",
+                        "note": "If strength training is kept very brief, just do the main lifts and one or two simple assistance moves. This scaled-down routine prioritizes getting the core work done, allowing a beginner to focus on fat-burning and conditioning."
+                    }
+                ],
+                "3_days": [
+                    {
+                        "template": "Bodyweight",
+                        "note": "Use bodyweight assistance (chins, dips, etc.) so the strength work doesn’t interfere with conditioning. This lets a beginner build some strength and muscle endurance while prioritizing cardio or sport training on other days."
+                    },
+                    {
+                        "template": "Triumvirate",
+                        "note": "Alternatively, do the main lifts with just a couple of basic assistance exercises. By limiting volume, this approach preserves energy for conditioning work and general fitness improvements outside the weight room."
+                    }
+                ],
+                "4_days": [
+                    {
+                        "template": "Bodyweight",
+                        "note": "Perform the main lifts and stick to bodyweight assistance to keep workouts easier on recovery. This approach builds relative strength and endurance, fitting well with a primary focus on conditioning."
+                    },
+                    {
+                        "template": "Triumvirate",
+                        "note": "If desired, use a minimal 3-exercise format (e.g. main lift, one push, one pull). This gives a bit more weight training stimulus but still limits volume, aligning with a goal of improving conditioning and fitness."
+                    }
+                ],
+                "5_days": [
+                    {
+                        "template": "Bodyweight",
+                        "note": "Emphasize bodyweight assistance on main lift days for an athletic, low-stress routine. With five training days available, keep each lifting session short and allocate separate days or time blocks to conditioning work."
+                    },
+                    {
+                        "template": "Triumvirate",
+                        "note": "Another option is short, focused lifting sessions (one main lift + 2 simple assists). Spread over four days, this leaves a fifth day for conditioning-only workouts, supporting a general fitness or weight loss goal."
+                    }
+                ]
+            },
+            "weight_loss_general_fitness": {
+                "2_days": [
+                    {
+                        "template": "Bodyweight",
+                        "note": "Focus on big lifts and bodyweight accessory exercises for efficient full-body workouts. This approach helps burn calories and build foundational strength, suiting a beginner trying to improve general fitness on limited days."
+                    },
+                    {
+                        "template": "Triumvirate",
+                        "note": "Keep the lifting simple: main lifts plus one or two assistance moves per session. This ensures you maintain strength and muscle while leaving enough time and energy for cardio work essential to weight loss."
+                    }
+                ],
+                "3_days": [
+                    {
+                        "template": "Bodyweight",
+                        "note": "Use bodyweight assistance circuits (push-ups, pull-ups, single-leg squats, etc.) after main lifts. This elevates heart rate and muscle endurance, aligning with a fat-loss and fitness goal while being easier to recover from."
+                    },
+                    {
+                        "template": "Triumvirate",
+                        "note": "Include two basic assistance exercises per workout (e.g. one upper-body and one lower/core). This keeps strength training moderate and balanced, leaving room for additional cardio and helping with overall fitness and weight loss."
+                    }
+                ],
+                "4_days": [
+                    {
+                        "template": "Triumvirate",
+                        "note": "Keep a balanced routine of main lifts plus a couple of assistance moves. This provides strength and muscle stimulus to maintain lean mass while allowing recovery capacity for extra conditioning (critical for fat loss and general health)."
+                    },
+                    {
+                        "template": "Bodyweight",
+                        "note": "If fatigue is an issue, use bodyweight-only assistance for easier recovery. High-rep bodyweight work adds a cardio element to lifting sessions, supporting weight loss without overly taxing a beginner’s recovery."
+                    }
+                ],
+                "5_days": [
+                    {
+                        "template": "Triumvirate",
+                        "note": "Adhere to the main lift + minimal assistance approach on four days, using the extra day for conditioning. Short, frequent workouts help keep metabolism up and stress manageable while focusing on fat loss."
+                    },
+                    {
+                        "template": "Bodyweight",
+                        "note": "For a lighter approach, incorporate bodyweight assistance across the week. Frequent practice of bodyweight moves can improve fitness and burn calories, complementing a weight-loss regimen without excessive strain."
+                    }
+                ]
+            }
+        },
+        "intermediate": {
+            "strength": {
+                "2_days": [
+                    {
+                        "template": "Triumvirate",
+                        "note": "Perform two main lifts per session (e.g. squat and bench) with a handful of assistance lifts total. Keeping each workout concise and centered on fundamentals allows you to still gain strength on a tight schedule."
+                    },
+                    {
+                        "template": "I'm Not Doing Jack Sht",
+                        "note": "If extremely pressed for time, do the bare minimum: the main lifts only. This template (not for beginners) lets an intermediate lifter focus entirely on hitting the core lifts, which is effective for strength when time or recovery is limited."
+                    }
+                ],
+                "3_days": [
+                    {
+                        "template": "Triumvirate",
+                        "note": "Limit each training day to the main lift and two supplementary exercises. This balance helps you progress on the big lifts while covering essential assistance work, facilitating strength gains with improved recovery from three-day training."
+                    },
+                    {
+                        "template": "Periodization Bible",
+                        "note": "Use a structured assistance scheme targeting key muscle groups each day (e.g. chest, back, triceps on pressing days). This comprehensive approach keeps you \"balanced, strong and big\" by addressing weak points, beneficial for an intermediate lifter seeking strength."
+                    }
+                ],
+                "4_days": [
+                    {
+                        "template": "Triumvirate",
+                        "note": "Stick with the proven 5/3/1 setup of one main lift and 2 assistance exercises per workout. This offers enough volume for strength gains and balance (push/pull/legs) without detracting from your performance on the main lifts."
+                    },
+                    {
+                        "template": "Periodization Bible",
+                        "note": "Incorporate three assistance moves after each main lift to thoroughly work supporting muscles. This template has no glaring weaknesses and ensures all areas progress in concert, which can help an intermediate lifter continue getting stronger."
+                    }
+                ],
+                "5_days": [
+                    {
+                        "template": "Triumvirate",
+                        "note": "Use short, focused workouts (one main lift plus two assistance) spread over four days. The extra fifth day can be dedicated to lighter accessory or conditioning work, allowing you to train frequently without burning out while pursuing strength."
+                    },
+                    {
+                        "template": "I'm Not Doing Jack Sht",
+                        "note": "Alternatively, perform one main lift per day with no additional assistance. This ultra-minimal approach lets you train almost daily; each session is brief but focused on hitting a PR on the big lift, which can be effective if you recover well."
+                    }
+                ]
+            },
+            "hypertrophy": {
+                "2_days": [
+                    {
+                        "template": "Boring But Big",
+                        "note": "Prioritize volume even with limited days: do your main lifts and then 5×10 sets on at least one big exercise each session. This provides a robust hypertrophy stimulus, though sessions will be longer and you must manage intensity carefully."
+                    },
+                    {
+                        "template": "Triumvirate",
+                        "note": "If extended high-volume work is impractical, stick with a few compound assistance lifts after the mains. It won’t pack on size as fast as BBB, but it still covers major muscle groups and may be more sustainable within two weekly workouts."
+                    }
+                ],
+                "3_days": [
+                    {
+                        "template": "Boring But Big",
+                        "note": "Use the BBB template to accumulate muscle-building volume after your main work. Even on a three-day schedule, performing 5×10 for the day’s main lift (or a variant) will greatly increase hypertrophy, as long as you start light and progress gradually."
+                    },
+                    {
+                        "template": "Triumvirate",
+                        "note": "Opt for a moderate-volume approach if needed: main lift plus two targeted assistance moves. This approach yields hypertrophy through consistency and focus on key lifts, and may suit intermediates who find BBB too taxing every session."
+                    }
+                ],
+                "4_days": [
+                    {
+                        "template": "Boring But Big",
+                        "note": "The primary size-building template: do the 5/3/1 sets, then 5 sets of 10 on that lift. With four dedicated training days, you can hammer each main lift with high-rep work to maximize muscle gain (the simplicity and popularity of BBB attest to its effectiveness)."
+                    },
+                    {
+                        "template": "Periodization Bible",
+                        "note": "Fill in each workout with 3 assistance categories (push, pull, legs/core) for 5 sets of 10-20 reps. This method, inspired by Dave Tate, effectively turns 5/3/1 into a full-body bodybuilding routine, ensuring all muscle groups get plenty of growth stimulus."
+                    }
+                ],
+                "5_days": [
+                    {
+                        "template": "Boring But Big",
+                        "note": "Keep four days of BBB work for the main lifts to drive hypertrophy. The additional day can be used for extra accessory (arms, calves, etc.) or recovery, as the BBB template’s high volume on big lifts already provides the bulk of hypertrophy stimulus."
+                    },
+                    {
+                        "template": "Periodization Bible",
+                        "note": "Employ a broad assistance plan hitting each muscle group thoroughly across the week. With five training days, you can distribute the volume if needed – this comprehensive approach will build size everywhere while maintaining balance."
+                    }
+                ]
+            },
+            "conditioning": {
+                "2_days": [
+                    {
+                        "template": "Bodyweight",
+                        "note": "On a two-day split, stick to main lifts and bodyweight moves so you don’t sap energy needed for conditioning. This gives you a basic strength stimulus and uses low-stress assistance (e.g. bodyweight circuits) to complement your primary focus on conditioning."
+                    },
+                    {
+                        "template": "I'm Not Doing Jack Sht",
+                        "note": "For maximal recovery, you can even do just the 5/3/1 lifts and skip assistance entirely. An intermediate lifter can maintain strength this way, devoting the rest of their limited training time to conditioning work (hill sprints, Prowler pushes, etc.)."
+                    }
+                ],
+                "3_days": [
+                    {
+                        "template": "Bodyweight",
+                        "note": "Use bodyweight assistance (pull-ups, dips, etc.) and keep volume modest. This way, your three lifting sessions per week build some strength and muscle endurance without impeding recovery, leaving you fresh for conditioning workouts."
+                    },
+                    {
+                        "template": "I'm Not Doing Jack Sht",
+                        "note": "If conditioning is the clear priority, you can limit lifting days to just the essentials. Hitting the main lifts and immediately getting out (or even supersetting them with light exercises) will maximize the time and energy you have for conditioning."
+                    }
+                ],
+                "4_days": [
+                    {
+                        "template": "I'm Not Doing Jack Sht",
+                        "note": "Perform quick sessions centered on the main lift only. Training four days with this bare-bones lifting lets you maintain strength and discipline while devoting the majority of your effort to conditioning (done separately or after the short lifts)."
+                    },
+                    {
+                        "template": "Bodyweight",
+                        "note": "Alternatively, include a small dose of bodyweight assistance after each main lift. This keeps you feeling athletic and healthy while still being very easy on recovery, which is ideal when you’re pushing conditioning hard."
+                    }
+                ],
+                "5_days": [
+                    {
+                        "template": "I'm Not Doing Jack Sht",
+                        "note": "Do one big lift per day and nothing else. This frequency with minimal volume means each workout is short, allowing you to incorporate conditioning work either after lifting or on separate days without overload."
+                    },
+                    {
+                        "template": "Bodyweight",
+                        "note": "If desired, add brief bodyweight assistance circuits to some of your lifting days. These will elevate heart rate and work muscle endurance a bit, fitting nicely with a conditioning-focused routine and five-day schedule."
+                    }
+                ]
+            },
+            "weight_loss_general_fitness": {
+                "2_days": [
+                    {
+                        "template": "Bodyweight",
+                        "note": "Do the main lifts and then high-rep bodyweight moves (push-ups, lunges, etc.) to ramp up calorie burn. Two full-body sessions like this per week can build strength and boost metabolism for fat loss without excessive volume."
+                    },
+                    {
+                        "template": "I'm Not Doing Jack Sht",
+                        "note": "Alternatively, keep the lifting extremely simple with just the main lifts. Rely on heavy work to preserve muscle and strength, and handle the fat loss through diet and dedicated conditioning on other days. This minimal approach spares recovery for the things that directly drive weight loss."
+                    }
+                ],
+                "3_days": [
+                    {
+                        "template": "Bodyweight",
+                        "note": "Leverage bodyweight assistance in circuits to keep your heart rate up during workouts. By combining strength work with moves like chins and sit-ups, you support fat loss and fitness without needing extra gym days."
+                    },
+                    {
+                        "template": "Triumvirate",
+                        "note": "Perform the 5/3/1 lifts with a couple of assistance exercises (e.g. one upper-body and one lower/core). This maintains muscle and strength while leaving you with enough recovery capacity to add cardio on other days for weight loss."
+                    }
+                ],
+                "4_days": [
+                    {
+                        "template": "Triumvirate",
+                        "note": "Stick with the fundamental lifts plus minimal assistance to preserve muscle during a cut. Four days of this straightforward training will keep you strong and help maintain balance (push/pull/legs), while you focus on diet and perhaps add light conditioning to drive weight loss."
+                    },
+                    {
+                        "template": "Bodyweight",
+                        "note": "Swap in bodyweight assistance if joint stress or fatigue is a concern as you lose weight. High-rep bodyweight work adds a cardio element to lifting sessions, supporting weight loss without overly taxing a beginner’s recovery."
+                    }
+                ],
+                "5_days": [
+                    {
+                        "template": "Triumvirate",
+                        "note": "Divide the 5/3/1 routine over four days (one lift each day) with brief assistance, and use the fifth day for extra conditioning or rest. This frequent-but-brief training approach helps keep your metabolism high and ensures each session isn’t too taxing, which is ideal for fat loss and overall fitness."
+                    },
+                    {
+                        "template": "Bodyweight",
+                        "note": "Emphasize bodyweight training across your week to allow daily activity without overtraining. For instance, complement the four main lift days with bodyweight exercises and perhaps use the extra day for an active recovery circuit; this approach can accelerate fat loss while being kind to your joints."
+                    }
+                ]
+            }
+        },
+        "advanced": {
+            "strength": {
+                "2_days": [
+                    {
+                        "template": "I'm Not Doing Jack Sht",
+                        "note": "Rely on just the primary lifts each session. An advanced lifter can maintain or even build strength by concentrating on hitting rep PRs on the two big lifts each day, then leaving – freeing up recovery for other athletic or life demands."
+                    },
+                    {
+                        "template": "Triumvirate",
+                        "note": "Include minimal assistance (perhaps one exercise per main lift) to address any critical weak point without overloading. This keeps the workouts focused and heavy, aligning with a pure strength goal while making the most of only two gym days."
+                    }
+                ],
+                "3_days": [
+                    {
+                        "template": "Triumvirate",
+                        "note": "Keep to the main lifts and a couple of assistance exercises that give the most bang for your buck. At an advanced level, this ensures you target strength on the big movements and only supplement where it’s most needed, while benefiting from extra recovery days."
+                    },
+                    {
+                        "template": "Periodization Bible",
+                        "note": "Apply a targeted assistance template covering all major muscle groups through the week. This systematic approach can help bust plateaus by strengthening supporting muscles (e.g. heavy ab work for squats, upper back work for bench), which is often key for advanced lifters."
+                    }
+                ],
+                "4_days": [
+                    {
+                        "template": "Triumvirate",
+                        "note": "Use the classic four-day 5/3/1 setup focusing on quality over quantity in assistance. Hitting the main lift hard and doing 1-2 extremely effective assistance lifts (e.g. dips, chins) per workout allows an advanced lifter to improve or maintain strength without burnout."
+                    },
+                    {
+                        "template": "Periodization Bible",
+                        "note": "Consider the more expansive assistance approach to leave no weaknesses unaddressed. With four sessions, you can systematically work each muscle group (e.g. adding hamstring and quad work on lower body days) to ensure balanced strength, all while not doing so much that it hampers your main lifts."
+                    }
+                ],
+                "5_days": [
+                    {
+                        "template": "Triumvirate",
+                        "note": "Perform one core lift per day with a small dose of assistance. This high-frequency, low-volume approach keeps each session crisp and lets you train five days by distributing work – ideal for advanced lifters who thrive on frequent practice of the lifts."
+                    },
+                    {
+                        "template": "I'm Not Doing Jack Sht",
+                        "note": "If maximum focus on the main lifts is preferred, do them alone and nothing else. Using five short sessions (each devoted to one big lift) an advanced athlete can fully concentrate on heavy, quality sets and incorporate additional conditioning or recovery work on other days."
+                    }
+                ]
+            },
+            "hypertrophy": {
+                "2_days": [
+                    {
+                        "template": "Boring But Big",
+                        "note": "Even with just two days, you can employ BBB by focusing on one big lift per session and hitting 5×10 volume on it. This allows an advanced lifter to target hypertrophy on key lifts (e.g. squat one day, bench the other) intensely, albeit at the cost of very demanding workouts."
+                    },
+                    {
+                        "template": "Periodization Bible",
+                        "note": "Use a broad spread of assistance lifts to cover the whole body over the two sessions. For example, you might do pressing plus upper-body assistance on one day and lower-body assistance on the other. This way, even training twice a week, all muscle groups get the high-rep work needed for growth."
+                    }
+                ],
+                "3_days": [
+                    {
+                        "template": "Boring But Big",
+                        "note": "Utilize BBB on your main lifts to maximize muscle gain. Across three days, rotate which lifts get the 5×10 treatment so you accumulate volume on all major lifts over time. This high-volume strategy will add size, and advanced lifters can adjust the intensity of BBB sets as needed."
+                    },
+                    {
+                        "template": "Periodization Bible",
+                        "note": "Incorporate a variety of assistance each session to ensure complete development. An advanced lifter can benefit from the diversity (different angles and movements) to spur new growth, making this template an effective alternative if doing 5×10 on the same lift every week becomes too monotonous or taxing."
+                    }
+                ],
+                "4_days": [
+                    {
+                        "template": "Boring But Big",
+                        "note": "Go all-in on volume: after each main lift, perform 5 sets of 10 reps of a big movement. Advanced lifters can push BBB hard (with appropriate deloads) to drive hypertrophy, as it’s a straightforward way to accumulate a lot of reps on compound lifts."
+                    },
+                    {
+                        "template": "Periodization Bible",
+                        "note": "Take a comprehensive approach by hitting multiple assistance lifts for 5 sets each after the main work. This effectively turns your 5/3/1 days into well-rounded bodybuilding sessions, which can be ideal for advanced lifters seeking hypertrophy while still training the main lifts for strength."
+                    }
+                ],
+                "5_days": [
+                    {
+                        "template": "Boring But Big",
+                        "note": "Continue with the BBB framework for four main lift days, and use the fifth day for any additional hypertrophy work (arms, calves or conditioning as active recovery). This maximizes muscle-building stimulus on the big lifts while leveraging the extra day to bring up smaller muscles or rest."
+                    },
+                    {
+                        "template": "Periodization Bible",
+                        "note": "Spread out a high-volume assistance plan over the week. With five training days, an advanced lifter can dedicate more time to each muscle group, potentially splitting assistance work into a separate short session – a strategy to accumulate volume without overly prolonging any single workout."
+                    }
+                ]
+            },
+            "conditioning": {
+                "2_days": [
+                    {
+                        "template": "I'm Not Doing Jack Sht",
+                        "note": "Concentrate on the two main lifts each workout and nothing more. This ensures your strength training is quick and to the point, allowing an advanced athlete to spend the bulk of training efforts on conditioning (which might include hard conditioning sessions on non-lifting days)."
+                    },
+                    {
+                        "template": "Bodyweight",
+                        "note": "If you prefer some assistance, use bodyweight movements sparingly after the main lifts. These add a bit of volume without much fatigue, helping maintain muscle and mobility while still keeping the focus on conditioning and recovery."
+                    }
+                ],
+                "3_days": [
+                    {
+                        "template": "I'm Not Doing Jack Sht",
+                        "note": "Keep the lifting minimal – just hit your big lift PR sets and call it a day. With three strength workouts taking very little time, you can dedicate more sessions or energy to conditioning work (prowler pushes, hill sprints, etc.) which is your main goal."
+                    },
+                    {
+                        "template": "Bodyweight",
+                        "note": "Include a small amount of bodyweight assistance (such as dips or abs) after your main lifts if desired. This will help maintain muscular endurance and core strength without detracting from your ability to recover and perform in conditioning workouts."
+                    }
+                ],
+                "4_days": [
+                    {
+                        "template": "I'm Not Doing Jack Sht",
+                        "note": "Use four very short lifting sessions (just the main lifts) to maintain strength. This routine demands little recovery, so you can push conditioning on most days. Essentially, you’re doing the bare minimum in the weight room to keep strength while prioritizing conditioning."
+                    },
+                    {
+                        "template": "Bodyweight",
+                        "note": "Optionally do some bodyweight accessory work (like pull-ups, push-ups) alongside the main lifts. This will give you a slight extra training effect and keep you feeling athletic, yet it’s still easy to recover from so you can continue to focus on conditioning."
+                    }
+                ],
+                "5_days": [
+                    {
+                        "template": "I'm Not Doing Jack Sht",
+                        "note": "Train one main lift per day with no assistance. This daily minimalistic lifting keeps your strength sessions very short, freeing up plenty of time for conditioning on all or most days. It’s a strategy an advanced lifter can use to maintain strength during a conditioning-focused phase."
+                    },
+                    {
+                        "template": "Bodyweight",
+                        "note": "Add a few quick bodyweight exercises to some of those short lifting days if you want to maintain muscle endurance. They can even be done circuit-style for extra conditioning. Just ensure they don’t interfere with recovery, given the high frequency of training."
+                    }
+                ]
+            },
+            "weight_loss_general_fitness": {
+                "2_days": [
+                    {
+                        "template": "Bodyweight",
+                        "note": "Perform core lifts and bodyweight circuits in the same session to maximize calorie burn and maintain muscle. An advanced lifter can utilize their experience to push the intensity of bodyweight moves (like high-rep chins, dips, etc.) ensuring these two weekly workouts aid fat loss and fitness."
+                    },
+                    {
+                        "template": "I'm Not Doing Jack Sht",
+                        "note": "Alternatively, keep the lifting extremely simple with just the main lifts. Rely on heavy work to preserve muscle and strength, and handle the fat loss through diet and dedicated conditioning on other days. This minimal approach spares recovery for the things that directly drive weight loss."
+                    }
+                ],
+                "3_days": [
+                    {
+                        "template": "Bodyweight",
+                        "note": "Use bodyweight assistance for a conditioning effect during your lifting sessions. Three days of lifting with moves like push-ups, inverted rows, and lunges after the main lift will support muscle retention and calorie burning, complementing a weight-loss plan."
+                    },
+                    {
+                        "template": "Triumvirate",
+                        "note": "Use a balanced mix of a main lift and a couple of assistance lifts at each workout. This keeps your strength training effective but not exhaustive, allowing you to incorporate cardio and recover well – key factors in general fitness and fat loss for an advanced lifter."
+                    }
+                ],
+                "4_days": [
+                    {
+                        "template": "Triumvirate",
+                        "note": "Stick with the fundamental lifts plus minimal assistance to preserve muscle during a cut. Four days of this straightforward training will keep you strong and help maintain balance (push/pull/legs), while you focus on diet and perhaps add light conditioning to drive weight loss."
+                    },
+                    {
+                        "template": "Bodyweight",
+                        "note": "Swap in bodyweight assistance if joint stress or fatigue is a concern as you lose weight. High-rep moves like bodyweight squats or step-ups can keep your workouts intense enough to burn calories, but are generally easier to recover from than heavy lifting when in a caloric deficit."
+                    }
+                ],
+                "5_days": [
+                    {
+                        "template": "Triumvirate",
+                        "note": "Spread your lifting across four days (one main lift each day with minimal assistance), and devote the fifth day to extra conditioning or rest. This frequent training schedule keeps your metabolism active and ensures each session isn’t too taxing, which is ideal for fat loss and overall fitness."
+                    },
+                    {
+                        "template": "Bodyweight",
+                        "note": "Emphasize bodyweight training across your week to allow daily activity without overtraining. For instance, complement the four main lift days with bodyweight exercises and perhaps use the extra day for an active recovery circuit; this approach can accelerate fat loss while being kind to your joints."
+                    }
+                ]
+            }
+        }
+    }
+}

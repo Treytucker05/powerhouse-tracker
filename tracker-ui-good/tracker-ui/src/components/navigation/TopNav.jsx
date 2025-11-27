@@ -1,4 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
+import HeaderAuthButton from '@/components/auth/HeaderAuthButton';
 import { Avatar } from "../ui/avatar";
 import {
   Dumbbell,
@@ -14,10 +15,15 @@ import {
   ChevronDown
 } from "lucide-react";
 import { useState } from "react";
+import { useFinalPlan } from '@/store/finalPlanStore';
+import { Link as RRLink, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
-export default function TopNav({ user, onSignOut }) {
+export default function TopNav({ user }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const { locked, reset, plan } = useFinalPlan();
+  const navigate = useNavigate();
 
   const navItems = [
     { to: "/", label: "Dashboard", icon: Home },
@@ -96,15 +102,7 @@ export default function TopNav({ user, onSignOut }) {
           )}
 
           {/* Logout Button */}
-          {user && onSignOut && (
-            <button
-              onClick={onSignOut}
-              className="p-2 bg-red-600 rounded-full transition-colors hover:bg-red-700"
-              title="Sign Out"
-            >
-              <LogOut className="w-4 h-4 text-white" />
-            </button>
-          )}
+          <HeaderAuthButton />
         </div>
 
         {/* Mobile Hamburger Menu */}
@@ -121,6 +119,39 @@ export default function TopNav({ user, onSignOut }) {
           </button>
         </div>
       </div>
+
+      {locked && (
+        <div className="bg-emerald-900/30 border-t border-b border-emerald-700 text-emerald-200 text-sm">
+          <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-center md:gap-3">
+              <span>
+                Plan Locked — saved {plan?.createdAt ? new Date(plan.createdAt).toLocaleString() : 'this session'}.
+              </span>
+              <span
+                className="text-emerald-300/80"
+                title={`Rotation: ${plan?.schedule?.rotation ?? '-'} • Test: ${plan?.progression?.plan?.testAfterAnchor ?? '-'}`}
+              >
+                Template: {plan?.step3?.supplemental?.Template || 'Custom'} • Days/wk: {plan?.schedule?.daysPerWeek ?? '-'} • Weeks: {plan?.progression?.weeks?.length ?? '-'}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                className="px-2 py-1 text-xs rounded border border-emerald-600 hover:bg-emerald-800"
+                onClick={() => navigate('/build/step6')}
+              >View</button>
+              <button
+                className="px-2 py-1 text-xs rounded border border-gray-600 hover:bg-gray-800 text-gray-200"
+                onClick={() => {
+                  if (window.confirm('Reset final plan and unlock Steps 1–5?')) {
+                    reset();
+                    toast.info('Final plan reset. Steps 1–5 unlocked.');
+                  }
+                }}
+              >Reset</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Mobile Navigation Menu */}
       {isMobileMenuOpen && (
@@ -159,18 +190,7 @@ export default function TopNav({ user, onSignOut }) {
             </NavLink>
 
             {/* Mobile Logout */}
-            {user && onSignOut && (
-              <button
-                onClick={() => {
-                  onSignOut();
-                  setIsMobileMenuOpen(false);
-                }}
-                className="flex items-center gap-3 w-full px-3 py-2 text-gray-300 hover:text-white hover:bg-red-600 rounded-md transition-colors"
-              >
-                <LogOut className="w-5 h-5" />
-                Sign Out
-              </button>
-            )}
+            <HeaderAuthButton />
           </div>
         </div>
       )}

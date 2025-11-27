@@ -1,0 +1,25 @@
+{
+    "id": "template.ssl",
+    "type": "template",
+    "name": "Second Set Last (SSL)",
+    "version": "1.0.0",
+    "params": {
+        "definition": "Use weight from second work set for volume",
+        "percentages": [
+            0.75,
+            0.80,
+            0.85
+        ],
+        "volume": {
+            "common": "≈5×5",
+            "citations": [
+                "oaicite:40"
+            ]
+        },
+        "purpose": "Heavier volume than FSL; higher intensity"
+    },
+    "citations": [
+        "oaicite:38",
+        "oaicite:39"
+    ]
+}

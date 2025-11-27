@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useWeeklyVolume } from '../../hooks/useWeeklyVolume'
 
 // Mock the supabase client
-vi.mock('../../lib/api/supabaseClient', () => ({
+vi.mock('@/lib/supabaseClient', () => ({
   supabase: {
     from: vi.fn(() => ({
       select: vi.fn(() => ({
@@ -83,7 +83,7 @@ describe('useWeeklyVolume', () => {
 
   it('handles authentication error gracefully', async () => {
     // Obtain the mocked module and force auth failure for this invocation
-    const supabaseModule = await import('../../lib/api/supabaseClient')
+    const supabaseModule = await import('@/lib/supabaseClient')
     supabaseModule.getCurrentUserId.mockResolvedValueOnce(null)
 
     const { result } = renderHook(() => useWeeklyVolume(), { wrapper })

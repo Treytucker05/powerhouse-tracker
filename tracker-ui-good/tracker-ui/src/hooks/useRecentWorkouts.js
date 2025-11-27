@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase, getCurrentUserId } from '../lib/api/supabaseClient.js';
+import { supabase, getCurrentUserId } from '@/lib/supabaseClient';
 
 // Fallback seed (used when auth missing or errors)
 const FALLBACK_WORKOUTS = [

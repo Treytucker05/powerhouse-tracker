@@ -1,0 +1,264 @@
+{
+    "version": "1.0.0",
+    "lastUpdated": "2025-08-18T00:00:00Z",
+    "schemes": {
+        "scheme_531": {
+            "id": "scheme_531",
+            "name": "5/3/1 Classic",
+            "weeks": [
+                {
+                    "isDeload": false,
+                    "sets": [
+                        {
+                            "reps": 5,
+                            "percentage": 65,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 5,
+                            "percentage": 75,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 5,
+                            "percentage": 85,
+                            "isAmrap": true
+                        }
+                    ]
+                },
+                {
+                    "isDeload": false,
+                    "sets": [
+                        {
+                            "reps": 3,
+                            "percentage": 70,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 3,
+                            "percentage": 80,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 3,
+                            "percentage": 90,
+                            "isAmrap": true
+                        }
+                    ]
+                },
+                {
+                    "isDeload": false,
+                    "sets": [
+                        {
+                            "reps": 5,
+                            "percentage": 75,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 3,
+                            "percentage": 85,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 1,
+                            "percentage": 95,
+                            "isAmrap": true
+                        }
+                    ]
+                },
+                {
+                    "isDeload": true,
+                    "sets": [
+                        {
+                            "reps": 5,
+                            "percentage": 40,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 5,
+                            "percentage": 50,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 5,
+                            "percentage": 60,
+                            "isAmrap": false
+                        }
+                    ]
+                }
+            ]
+        },
+        "scheme_351": {
+            "id": "scheme_351",
+            "name": "3/5/1",
+            "weeks": [
+                {
+                    "isDeload": false,
+                    "sets": [
+                        {
+                            "reps": 3,
+                            "percentage": 70,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 3,
+                            "percentage": 80,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 3,
+                            "percentage": 90,
+                            "isAmrap": true
+                        }
+                    ]
+                },
+                {
+                    "isDeload": false,
+                    "sets": [
+                        {
+                            "reps": 5,
+                            "percentage": 65,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 5,
+                            "percentage": 75,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 5,
+                            "percentage": 85,
+                            "isAmrap": false
+                        }
+                    ]
+                },
+                {
+                    "isDeload": false,
+                    "sets": [
+                        {
+                            "reps": 5,
+                            "percentage": 75,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 3,
+                            "percentage": 85,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 1,
+                            "percentage": 95,
+                            "isAmrap": true
+                        }
+                    ]
+                },
+                {
+                    "isDeload": true,
+                    "sets": [
+                        {
+                            "reps": 5,
+                            "percentage": 40,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 5,
+                            "percentage": 50,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 5,
+                            "percentage": 60,
+                            "isAmrap": false
+                        }
+                    ]
+                }
+            ]
+        },
+        "scheme_5spro": {
+            "id": "scheme_5spro",
+            "name": "5s Pro",
+            "weeks": [
+                {
+                    "isDeload": false,
+                    "sets": [
+                        {
+                            "reps": 5,
+                            "percentage": 65,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 5,
+                            "percentage": 75,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 5,
+                            "percentage": 85,
+                            "isAmrap": false
+                        }
+                    ]
+                },
+                {
+                    "isDeload": false,
+                    "sets": [
+                        {
+                            "reps": 5,
+                            "percentage": 70,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 5,
+                            "percentage": 80,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 5,
+                            "percentage": 90,
+                            "isAmrap": false
+                        }
+                    ]
+                },
+                {
+                    "isDeload": false,
+                    "sets": [
+                        {
+                            "reps": 5,
+                            "percentage": 75,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 5,
+                            "percentage": 85,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 5,
+                            "percentage": 95,
+                            "isAmrap": false
+                        }
+                    ]
+                },
+                {
+                    "isDeload": true,
+                    "sets": [
+                        {
+                            "reps": 5,
+                            "percentage": 40,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 5,
+                            "percentage": 50,
+                            "isAmrap": false
+                        },
+                        {
+                            "reps": 5,
+                            "percentage": 60,
+                            "isAmrap": false
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

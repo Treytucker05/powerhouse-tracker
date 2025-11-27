@@ -239,7 +239,7 @@ export default function ProgramPreview531({ data, updateData }) {
                             <div>
                                 <span className="text-gray-400">Frequency:</span> {data.schedule?.frequency || '4-day'}
                             </div>
-                            <div>
+                            <div data-testid="tm-percent-display">
                                 <span className="text-gray-400">Training Max %:</span> {Math.round(getTmPct(data) * 100)}%
                             </div>
                             <div>

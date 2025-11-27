@@ -1,0 +1,7 @@
+{
+    "defaults": {
+        "leader": 2,
+        "anchor": 1,
+        "seventhWeek": true
+    }
+}

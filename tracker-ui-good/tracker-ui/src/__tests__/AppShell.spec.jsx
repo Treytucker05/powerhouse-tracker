@@ -1,30 +1,31 @@
+// Mock must be defined before components import Supabase
+vi.mock('@/lib/supabaseClient', () => ({
+  supabase: {
+    auth: {
+      getSession: vi.fn(async () => ({ data: { session: null } })),
+      onAuthStateChange: vi.fn((cb) => {
+        cb('SIGNED_OUT', { user: null });
+        return { data: { subscription: { unsubscribe: vi.fn() } } };
+      }),
+      signOut: vi.fn(async () => ({ error: null }))
+    }
+  }
+}));
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import AppShell from '../layout/AppShell';
+import { AppProvider } from '@/context/AppContext';
 
-// Mock Supabase client (correct path)
-vi.mock('../lib/api/supabaseClient', () => {
-  return {
-    supabase: {
-      auth: {
-        getSession: vi.fn().mockResolvedValue({
-          data: { session: null }
-        }),
-        onAuthStateChange: vi.fn().mockReturnValue({
-          data: { subscription: { unsubscribe: vi.fn() } }
-        }),
-        signOut: vi.fn().mockResolvedValue({ error: null }),
-      },
-    },
-  };
-});
+// (Duplicate mock removed)
 
 describe('<AppShell />', () => {
   it('contains header with PowerHouse Tracker branding', async () => {
     render(
       <BrowserRouter>
-        <AppShell />
+        <AppProvider>
+          <AppShell />
+        </AppProvider>
       </BrowserRouter>
     );
     const power = await screen.findByText(/Power/i);
@@ -36,7 +37,9 @@ describe('<AppShell />', () => {
   it('contains navigation links', async () => {
     render(
       <BrowserRouter>
-        <AppShell />
+        <AppProvider>
+          <AppShell />
+        </AppProvider>
       </BrowserRouter>
     );
     const dashboardLinks = await screen.findAllByText('Dashboard');
@@ -50,7 +53,9 @@ describe('<AppShell />', () => {
   it('renders with dark theme background', () => {
     const { container } = render(
       <BrowserRouter>
-        <AppShell />
+        <AppProvider>
+          <AppShell />
+        </AppProvider>
       </BrowserRouter>
     );
     const mainContainer = container.querySelector('div');

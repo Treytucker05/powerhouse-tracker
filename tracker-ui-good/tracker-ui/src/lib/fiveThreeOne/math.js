@@ -15,7 +15,8 @@ export function percentOfTM(tm, pct, inc = 5, mode = 'nearest') {
 
 // minimal unit helpers (reads user pref from localStorage)
 export function getUnit() {
-    return (typeof localStorage !== 'undefined' ? localStorage.getItem('unit') : 'lb' || 'lb').toLowerCase();
+    const raw = (typeof localStorage !== 'undefined' ? localStorage.getItem('unit') : 'lb') || 'lb';
+    return typeof raw === 'string' ? raw.toLowerCase() : 'lb';
 }
 
 export function setUnit(unit) {
@@ -30,3 +31,7 @@ export function toDisplayWeight(value, mode = 'nearest') {
     // Assuming storage is already in user unit. Extend later if needed.
     return roundToIncrement(Number(value || 0), getIncrementForUnit(), mode);
 }
+
+// Backward compatibility: legacy modules imported roundToIncrement from this file.
+// Re-export the centralized implementations so existing callers continue to work.
+export { roundToIncrement, roundUpToIncrement, roundDownToIncrement } from '../math/rounding.ts';

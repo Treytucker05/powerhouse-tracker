@@ -1,0 +1,162 @@
+{
+    "id": "populations.modifications",
+    "type": "population_rules",
+    "name": "Population-Specific 5/3/1 Modifications",
+    "version": "1.0.0",
+    "populations": {
+        "beginner": {
+            "criteria": "Training age under ~1 year or no structured barbell experience.",
+            "criteria_citations": [
+                "oaicite:0"
+            ],
+            "adjustments": {
+                "starting_max_percent": "Begin with a training max around 90% of actual 1RM (use 10% less than your true max). Some novices even use 85% and still gain well.",
+                "starting_max_percent_citations": [
+                    "oaicite:1",
+                    "oaicite:2",
+                    "oaicite:3"
+                ],
+                "progression_increments": "After each 4-week cycle, add no more than +5 lb to upper-body lifts and +10 lb to lower-body lifts. Resist ramping up too fast; steady, slow progression is key.",
+                "progression_increments_citations": [
+                    "oaicite:4",
+                    "oaicite:5"
+                ],
+                "assistance_volume": "Focus on basic movements and bodyweight exercises for high reps; ~75 total reps per assistance exercise each session.",
+                "assistance_volume_citations": [
+                    "oaicite:6",
+                    "oaicite:7"
+                ],
+                "deload_frequency": "Take a deload week every fourth week; the light week aids recovery for body and mind.",
+                "deload_frequency_citations": [
+                    "oaicite:8",
+                    "oaicite:9"
+                ]
+            }
+        },
+        "female_general": {
+            "criteria": "General adult female lifters (not competitive athletes).",
+            "adjustments": {
+                "progression_model": "Use smaller weight jumps each cycle (e.g., +5 lb squat/deadlift; +2.5 lb bench/press).",
+                "progression_model_citations": [
+                    "oaicite:10",
+                    "oaicite:11"
+                ],
+                "deload_timing": "If helpful, align deload week with menstrual cycle.",
+                "deload_timing_citations": [
+                    "oaicite:12"
+                ],
+                "assistance_focus": "Emphasize fundamentals and conditioning (pull-ups, dips, prowler/hill sprints) rather than only light isolation work.",
+                "assistance_focus_citations": [
+                    "oaicite:13"
+                ],
+                "specific_considerations": "Start with a low TM (≤90% 1RM) and prioritize perfect form. 5’s progression with a low TM is recommended; include conditioning.",
+                "specific_considerations_citations": [
+                    "oaicite:14",
+                    "oaicite:15"
+                ]
+            }
+        },
+        "older_40plus": {
+            "criteria": "Lifters ~40+ with accumulated training mileage.",
+            "criteria_citations": [
+                "oaicite:16"
+            ],
+            "adjustments": {
+                "recovery_strategies": "Prioritize recovery; consider 8–10 day training ‘weeks’. Ensure sleep, diet, mobility, and aerobic work.",
+                "recovery_strategies_citations": [
+                    "oaicite:17",
+                    "oaicite:18",
+                    "oaicite:19"
+                ],
+                "injury_prevention": "Work around injuries; keep TM conservative (~90%); avoid grinding. Make prehab/mobility routine.",
+                "injury_prevention_citations": [
+                    "oaicite:20",
+                    "oaicite:21"
+                ],
+                "progression_modifications": "Progress even more slowly if needed; smaller increments and extra deloads are fine. Start light, progress gradually.",
+                "progression_modifications_citations": [
+                    "oaicite:22"
+                ],
+                "volume_modifications": "Limit excessive volume. Consider ‘I’m Not Doing Jack Shit’ during achy periods or lower-volume 5/3/1 variants (e.g., Pyramid).",
+                "volume_modifications_citations": [
+                    "oaicite:23",
+                    "oaicite:24"
+                ]
+            }
+        },
+        "older_50plus": {
+            "criteria": "Lifters 50+ (note: ‘older’ is more about training mileage than age).",
+            "criteria_citations": [
+                "oaicite:25"
+            ],
+            "adjustments": {
+                "recovery_strategies": "Apply 40+ recovery principles more strictly; space heavy sessions; prioritize sleep and low-intensity activity.",
+                "recovery_strategies_citations": [
+                    "oaicite:26"
+                ],
+                "injury_prevention": "Use joint-friendly variations (trap-bar DL, neutral-grip presses) as needed; maintain daily mobility.",
+                "progression_modifications": "Keep progression very conservative; reset TM more frequently to sustain momentum.",
+                "volume_modifications": "Reduce assistance volume when recovery lags; keep training balanced and enjoyable.",
+                "volume_modifications_citations": [
+                    "oaicite:27"
+                ]
+            }
+        },
+        "in_season": {
+            "contact": {
+                "criteria": "In-season athletes in contact sports (football, rugby, wrestling).",
+                "adjustments": {
+                    "volume_management": "Greatly reduce lifting volume; train ~2 days/week; keep assistance to ~1–2 exercises per lift (2–4 total) focused on recovery.",
+                    "volume_management_citations": [
+                        "oaicite:28",
+                        "oaicite:29"
+                    ],
+                    "intensity_maintenance": "Maintain strength with heavier intensities but fewer total reps; hit prescribed reps, push PRs only when fresh; avoid grinding.",
+                    "intensity_maintenance_citations": [
+                        "oaicite:30"
+                    ],
+                    "training_frequency": "Lift twice per week (e.g., squat/bench early, deadlift/press later). Often no formal deload needed in-season at 2x/week.",
+                    "training_frequency_citations": [
+                        "oaicite:31",
+                        "oaicite:32"
+                    ],
+                    "sport_specific_considerations": "Schedule lower-body work away from games; prioritize mobility/prehab (neck/shoulders). Goal is strength maintenance; gains are a bonus."
+                }
+            },
+            "field": {
+                "criteria": "In-season athletes in field sports (soccer, basketball, lacrosse).",
+                "adjustments": {
+                    "volume_management": "Limit weight-room volume; two short lifting sessions per week are sufficient; keep assistance minimal.",
+                    "volume_management_citations": [
+                        "oaicite:33"
+                    ],
+                    "intensity_maintenance": "Lift relatively heavy for maintenance without exhaustive sets; hit required reps, occasional extra reps if fresh.",
+                    "training_frequency": "Typically 2 days/week (one upper focus, one lower focus); with high sport demands, formal deloads can be skipped or shortened.",
+                    "training_frequency_citations": [
+                        "oaicite:34",
+                        "oaicite:35"
+                    ],
+                    "sport_specific_considerations": "Place lifting after games or on light practice days; support speed/agility/endurance; include unilateral/core work without overloading."
+                }
+            },
+            "endurance": {
+                "criteria": "In-season endurance athletes (track & field, cross-country).",
+                "adjustments": {
+                    "volume_management": "Minimize lifting volume; sometimes only 1 lifting day/week during peak seasons; sessions brief, possibly two main lifts.",
+                    "volume_management_citations": [
+                        "oaicite:36",
+                        "oaicite:37"
+                    ],
+                    "intensity_maintenance": "Use low-rep, high-quality sets to maintain neuromuscular strength; avoid high-rep hypertrophy work.",
+                    "training_frequency": "Train as infrequently as needed; one full-body session per week or one every other week. Over two weeks, hit all four lifts (two lifts per week) on a one-day schedule; no formal deload needed with such low frequency.",
+                    "training_frequency_citations": [
+                        "oaicite:38",
+                        "oaicite:39",
+                        "oaicite:40"
+                    ],
+                    "sport_specific_considerations": "Choose lifts that aid strength without impairing mobility or adding excess mass; include core stability/injury-prevention work; maintain full ROM and technique."
+                }
+            }
+        }
+    }
+}

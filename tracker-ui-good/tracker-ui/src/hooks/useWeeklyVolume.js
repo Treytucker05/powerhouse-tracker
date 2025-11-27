@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
-import { supabase, getCurrentUserId } from '../lib/api/supabaseClient'
+import { supabase, getCurrentUserId } from '@/lib/supabaseClient'
 
 export const useWeeklyVolume = () => {
   const queryClient = useQueryClient()
@@ -12,7 +12,7 @@ export const useWeeklyVolume = () => {
     }
 
     window.addEventListener('volume:updated', handleVolumeUpdate)
-    
+
     return () => {
       window.removeEventListener('volume:updated', handleVolumeUpdate)
     }
@@ -52,7 +52,7 @@ export const useWeeklyVolume = () => {
         data?.forEach(record => {
           const weekStart = new Date(record.week_start_date)
           const weekLabel = `Week ${Math.ceil((endDate.getTime() - weekStart.getTime()) / (7 * 24 * 60 * 60 * 1000))}`
-          
+
           if (!weekMap.has(weekLabel)) {
             weekMap.set(weekLabel, { weekLabel, volumes: {} })
           }
@@ -68,8 +68,8 @@ export const useWeeklyVolume = () => {
         const weeks = ['Week 4', 'Week 3', 'Week 2', 'Week 1'] // Most recent first
         weeks.forEach(weekLabel => {
           if (!weekMap.has(weekLabel)) {
-            weekMap.set(weekLabel, { 
-              weekLabel, 
+            weekMap.set(weekLabel, {
+              weekLabel,
               volumes: {
                 Chest: { sets: 0, mrvPercentage: 0 },
                 Back: { sets: 0, mrvPercentage: 0 },
