@@ -6,6 +6,7 @@ import { getWarmupsByPolicy } from '../../../lib/fiveThreeOne/warmup.js';
 import { calcMainSets } from '../../../lib/fiveThreeOne/compute531.js';
 import { getAllStepStatuses } from './_registry/stepRegistry.js';
 import { percentOfTM, toDisplayWeight } from '../../../lib/fiveThreeOne/math.js';
+import { getTmPct } from '../../../lib/tm.ts';
 
 export default function ProgramPreview531({ data, updateData }) {
     const stepStatuses = useMemo(() => getAllStepStatuses(data), [data]);
@@ -239,7 +240,7 @@ export default function ProgramPreview531({ data, updateData }) {
                                 <span className="text-gray-400">Frequency:</span> {data.schedule?.frequency || '4-day'}
                             </div>
                             <div>
-                                <span className="text-gray-400">Training Max %:</span> {data.trainingMaxes?.tmPercent || 90}%
+                                <span className="text-gray-400">Training Max %:</span> {Math.round(getTmPct(data) * 100)}%
                             </div>
                             <div>
                                 <span className="text-gray-400">Loading Option:</span> {data.cycle?.loadingOption || 1}
@@ -280,7 +281,7 @@ export default function ProgramPreview531({ data, updateData }) {
                         <h4 className="font-semibold mb-3">Training Maxes</h4>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                             {Object.entries(data.trainingMaxes || {}).map(([lift, value]) => {
-                                if (lift === 'tmPercent' || lift === 'rounding' || !value) return null;
+                                if (lift === 'tmPct' || lift === 'rounding' || !value) return null; // legacy tmPercent removed
                                 return (
                                     <div key={lift}>
                                         <span className="text-gray-400 capitalize">{lift.replace('_', ' ')}:</span>

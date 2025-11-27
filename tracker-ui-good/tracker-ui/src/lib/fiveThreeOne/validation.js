@@ -25,9 +25,10 @@ export function validateFundamentals(state) {
     }
 
     // TM percent (global) should be reasonable
-    const tmPct = state?.tmPercent ?? 90;
-    if (!(tmPct >= 80 && tmPct <= 95)) {
-        errors.push(`TM percentage should be 80-95% (got ${tmPct}%)`);
+    // Canonical: tmPct decimal (0.85-0.95). Accept legacy integer fallback for migration.
+    const rawPct = (typeof state?.tmPct === 'number' && state.tmPct > 0 && state.tmPct <= 1) ? state.tmPct : 0.90;
+    if (!(rawPct >= 0.80 && rawPct <= 0.95)) {
+        errors.push(`TM percentage should be 80-95% (got ${Math.round(rawPct * 100)}%)`);
     }
 
     // Rounding increment

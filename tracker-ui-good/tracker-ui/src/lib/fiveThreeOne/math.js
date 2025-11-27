@@ -1,34 +1,32 @@
 // src/lib/fiveThreeOne/math.js
+// Delegates rounding to centralized math utilities to ensure consistent behavior & alias handling.
+import { roundToIncrement } from '../math/rounding.ts';
+
 export function e1RM(weight, reps) {
     const w = Number(weight || 0), r = Number(reps || 0);
     if (!w || !r) return 0;
     return +(w * r * 0.0333 + w).toFixed(1);
 }
 
-export function roundToIncrement(value, inc = 5) {
-    if (!Number.isFinite(value)) return 0;
-    return Math.round(value / inc) * inc;
-}
-
-export function percentOfTM(tm, pct, inc = 5) {
+export function percentOfTM(tm, pct, inc = 5, mode = 'nearest') {
     const v = Number(tm || 0) * (Number(pct || 0) / 100);
-    return roundToIncrement(v, inc);
+    return roundToIncrement(v, inc, mode);
 }
 
 // minimal unit helpers (reads user pref from localStorage)
 export function getUnit() {
-    return (localStorage.getItem('unit') || 'lb').toLowerCase();
+    return (typeof localStorage !== 'undefined' ? localStorage.getItem('unit') : 'lb' || 'lb').toLowerCase();
 }
 
 export function setUnit(unit) {
-    localStorage.setItem('unit', unit.toLowerCase());
+    if (typeof localStorage !== 'undefined') localStorage.setItem('unit', unit.toLowerCase());
 }
 
 export function getIncrementForUnit() {
     return getUnit() === 'kg' ? 2.5 : 5;
 }
 
-export function toDisplayWeight(value) {
+export function toDisplayWeight(value, mode = 'nearest') {
     // Assuming storage is already in user unit. Extend later if needed.
-    return roundToIncrement(Number(value || 0), getIncrementForUnit());
+    return roundToIncrement(Number(value || 0), getIncrementForUnit(), mode);
 }

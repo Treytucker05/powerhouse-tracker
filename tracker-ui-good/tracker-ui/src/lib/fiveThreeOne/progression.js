@@ -1,5 +1,6 @@
 // src/lib/fiveThreeOne/progression.js
-import { roundToIncrement, classifyLift } from './compute531.js';
+import { classifyLift } from './compute531.js';
+import { roundToIncrement, roundUpToIncrement } from '../math/rounding.ts';
 
 /**
  * Apply standard TM increments across lifts (does not mutate input)
@@ -30,5 +31,5 @@ export function applyIncrements(lifts, inc = { upper: 5, lower: 10 }, rounding =
 export function resetTM(currentTM, ratio = 0.9, rounding = { increment: 5, mode: 'nearest' }) {
     if (!Number.isFinite(currentTM)) return currentTM;
     const raw = currentTM * ratio;
-    return roundToIncrement(raw, rounding?.increment ?? 5, 'ceiling');
+    return roundUpToIncrement(raw, rounding?.increment ?? 5);
 }

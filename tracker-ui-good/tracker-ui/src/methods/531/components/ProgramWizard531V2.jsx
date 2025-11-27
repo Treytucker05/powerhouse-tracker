@@ -15,7 +15,9 @@ import { ChevronRight, CheckCircle2, Info, AlertTriangle, RotateCcw } from 'luci
 import ToggleButton from './ToggleButton.jsx';
 import { useNavigate, useParams } from "react-router-dom";
 import { useProgramV2 } from "../contexts/ProgramContextV2.jsx";
-import { buildMainSetsForLift, buildWarmupSets, roundToIncrement } from "../"; // barrel export
+import { buildMainSetsForLift, buildWarmupSets } from "../"; // barrel export
+import { getTmPct } from '../../../lib/tm.ts';
+import { roundToIncrement } from '../../../lib/math/rounding.ts';
 // Conditioning planner (HIIT/LISS distribution)
 import { buildConditioningPlan, planConditioningFromState } from '../../../lib/fiveThreeOne/conditioningPlanner.js';
 import { loadPack531BBB } from "../loadPack";
@@ -39,20 +41,15 @@ const USE_METHOD_PACKS = envFlag == null ? true : String(envFlag).toLowerCase() 
 // Per spec: require 4 valid TMs, units, rounding, TM% (0.90 or 0.85). Allow dev bypass via env.
 const LIFTS = ["squat", "bench", "deadlift", "press"];
 
-// helper: accept 0.90/0.85 or 90/85, return integer percent
-const readTmPercent = (s) => {
-    const raw = (s?.tmPercent ?? s?.tmPct ?? null);
-    if (raw == null) return null;
-    const val = raw <= 1 ? raw * 100 : raw;
-    return Math.round(val);
-};
+// helper: canonical tmPct decimal -> integer percent
+const readTmPercent = (s) => Math.round(getTmPct(s) * 100);
 
 function isStep1Complete(state) {
     if (!state) return false;
     // Accept both 'lb' and 'lbs' plus 'kg'
     const unitsOk = state?.units === "lbs" || state?.units === "lb" || state?.units === "kg";
     const roundingOk = !!state?.rounding;
-    const tmPct = readTmPercent(state) ?? 90; // fallback to 90 if undefined (matches legacy default)
+    const tmPct = readTmPercent(state) ?? 90;
     const tmPctOk = Number.isFinite(tmPct) && tmPct >= 80 && tmPct <= 95;
     // Build a tms object from current lifts if not already present
     const tmsSource = state?.tms || (() => {
@@ -566,8 +563,7 @@ function WizardShell() {
             weeks.push({ week: w + 1, days: daysOut });
         }
 
-        const tmPctRaw = state?.tmPercent ?? state?.tmPct ?? 90;
-        const tmPct = Number(tmPctRaw);
+        const tmPct = Math.round(getTmPct(state) * 100);
         const payload = {
             meta: {
                 createdAt: new Date().toISOString(),
@@ -575,7 +571,7 @@ function WizardShell() {
                 flowMode: flowMode || "custom",
                 units,
                 loadingOption,
-                tmPercent: tmPct
+                // tmPct only; legacy tmPercent removed
             },
             trainingMaxes,
             rounding: { increment: roundingConfig.increment, mode: roundingConfig.mode },
@@ -648,8 +644,7 @@ function WizardShell() {
             if (!(state?.units === 'lbs' || state?.units === 'lb' || state?.units === 'kg')) missing.push('units');
             if (!state?.rounding) missing.push('rounding');
             {
-                const _tmPctRaw = state?.tmPercent ?? state?.tmPct ?? 90;
-                const _tmPct = Number(_tmPctRaw);
+                const _tmPct = readTmPercent(state);
                 if (!(Number.isFinite(_tmPct) && _tmPct >= 80 && _tmPct <= 95)) missing.push('TM %');
             }
             const liftsMissing = [];
@@ -848,7 +843,6 @@ function WizardShell() {
                 units: state?.units,
                 rounding: state?.rounding,
                 tmPct: state?.tmPct,
-                tmPercent: state?.tmPercent,
                 tms: LIFTS.reduce((acc, k) => { acc[k] = state?.lifts?.[k]?.tm || null; return acc; }, {})
             }
         });

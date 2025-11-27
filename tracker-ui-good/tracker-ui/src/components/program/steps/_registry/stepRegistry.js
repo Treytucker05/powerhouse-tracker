@@ -41,7 +41,7 @@ export const STEP_IDS = {
 export const DEFAULT_WIZARD_STATE = {
     units: 'lb',
     rounding: { increment: 5, mode: 'nearest' },
-    tmPercent: 90,
+    tmPct: 0.90,   // canonical decimal (0.80–0.95 typical)
     lifts: { squat: {}, bench: {}, deadlift: {}, press: {} },
     coreLiftsEnabled: { squat: true, bench: true, deadlift: true, press: true },
     template: null,

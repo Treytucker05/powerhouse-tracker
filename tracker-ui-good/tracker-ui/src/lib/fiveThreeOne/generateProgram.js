@@ -82,7 +82,10 @@ export function generateFiveThreeOneProgram(state = {}) {
 
     const cfg = {
         version: '531-v1',
-        tmPercentage: state?.tmPercent || state?.tmPercentage || 90,
+        // Canonical: prefer decimal tmPct (0.80–0.95) -> export as integer percent
+        tmPercentage: (typeof state?.tmPct === 'number' && state.tmPct <= 1)
+            ? Math.round(state.tmPct * 100)
+            : (state?.tmPercentage || 90),
         loadingOption: Number(state?.loading?.option ?? state?.loadingOption ?? 1),
         roundingIncrement: Number(state?.rounding?.increment ?? state?.roundingIncrement ?? 5),
         includeWarmups: true,

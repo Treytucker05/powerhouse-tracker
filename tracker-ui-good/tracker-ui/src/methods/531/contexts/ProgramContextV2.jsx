@@ -7,6 +7,7 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { applyTemplate } from '../../../lib/templates/index.js';
 import { UNITS } from '../../../lib/units.ts';
+import { migrateProgramV2 as migrateTm } from '../../../lib/tm.ts';
 // Assistance normalization (used for convert-to-custom action)
 import { normalizeAssistance } from '../assistance/index.js';
 
@@ -150,8 +151,8 @@ export const initialProgramV2 = {
 
 const ProgramContextV2 = createContext();
 
-// Migration: ensure trainingMax alias present & tmPct canonical decimal & remove tmPercent
-export function migrateProgramV2(p) {
+// Core structural migration (pre tm.ts canonicalization). Ensures trainingMax alias present & basic tmPct normalization.
+function migrateProgramCore(p) {
     if (!p || typeof p !== 'object') return p;
     const next = { ...p };
     if (next.tmPercent != null && (next.tmPct == null || next.tmPct > 1)) {
@@ -171,6 +172,11 @@ export function migrateProgramV2(p) {
         next.lifts = lifts;
     }
     return next;
+}
+
+// Public migration: compose legacy structural migration with tm.ts canonical decimal migration
+export function migrateProgramV2(p) {
+    return migrateTm(migrateProgramCore(p));
 }
 
 function reducerV2(state, action) {

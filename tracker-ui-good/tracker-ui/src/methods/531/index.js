@@ -20,3 +20,7 @@ export * from './assistanceRules.js';
 
 // Optional default-style aliases (if consumers want explicit names)
 // (Note: underlying engine files export only functions; no default export provided.)
+
+// Rounding utilities (needed by several step components importing from barrel)
+// Fixes runtime import error: barrel previously did not re-export roundToIncrement
+export { roundToIncrement, roundUpToIncrement, roundDownToIncrement } from '../../lib/math/rounding.ts';
