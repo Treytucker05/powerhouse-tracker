@@ -1,0 +1,22 @@
+key,group,label,description,color
+template:football,Template,Football,Templates sourced from 5/3/1 for Football (2011),#16a34a
+scheme:531,Scheme,5/3/1,Classic 5/3/1 loading,#60a5fa
+supplemental:fsl,Supplemental,FSL,First Set Last variants,#10b981
+supplemental:bbb,Supplemental,BBB,Boring But Big,#f59e0b
+assistance:template,Assistance,Balanced Assistance,Balanced assistance categories,#14b8a6
+season:off_season,Season,Off-Season,Off-season templates,#22c55e
+season:in_season,Season,In-Season,In-season templates,#eab308
+population:team,Population,Team,Team-wide plans,#8b5cf6
+population:skill,Population,Skill,Skill position guidance,#8b5cf6
+population:linemen,Population,Linemen,Line position guidance,#8b5cf6
+conditioning:sport_specific,Conditioning,Sport-Specific,Football intervals/tempo,#06b6d4
+goal:balanced,Goal,Balanced Development,General balanced programming,#a3e635
+assistance:movement-families,Assistance,Movement Families,"Three movement categories per day (e.g., pull, push, core)",#14b8a6
+phase:anchor,Phase,Anchor,,#fb923c
+phase:leader,Phase,Leader,,#f87171
+template:forever,Template,Forever,,#f43f5e
+scheme:5x5-531,Scheme,5x5 531,,#60a5fa
+scheme:spinal-tap,Scheme,Spinal Tap,,#60a5fa
+scheme:351,Scheme,351,,#60a5fa
+supplemental:ssl,Supplemental,Ssl,,#84cc16
+assistance:circuits,Assistance,Circuits,,#14b8a6
