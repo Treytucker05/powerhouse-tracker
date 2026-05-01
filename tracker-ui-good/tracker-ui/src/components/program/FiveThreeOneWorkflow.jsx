@@ -430,7 +430,11 @@ export default function FiveThreeOneWorkflow() {
             case 'cycle':
                 return (
                     <Step4CycleStructure
-                        data={programData.step4 || { trainingMaxes: programData?.step1?.trainingMaxes || {} }}
+                        data={programData.step4 || {
+                            trainingMaxes: programData?.step1?.trainingMaxes || {},
+                            deadliftStyle: programData?.step1?.deadliftStyle || 'touch_and_go',
+                            tmPct: programData?.step1?.tmPct || 0.90
+                        }}
                         updateData={(partial) =>
                             setProgramData(prev => ({
                                 ...prev,
@@ -648,10 +652,8 @@ export default function FiveThreeOneWorkflow() {
         switch (currentStepId) {
             case 'maxes':
                 {
-                    const tms = programData?.step1?.trainingMaxes;
-                    if (!tms) return false;
-                    const required = ['squat', 'bench', 'deadlift', 'overhead_press'];
-                    return required.every(k => typeof tms[k] === 'number' && tms[k] > 0);
+                    const tms = programData?.step1?.trainingMaxes || {};
+                    return Object.values(tms).some(v => typeof v === 'number' && v > 0);
                 }
             case 'core_lifts':
                 {
@@ -894,14 +896,40 @@ export default function FiveThreeOneWorkflow() {
                         Save to Profile
                     </button>
 
-                    <button
-                        onClick={handleNext}
-                        disabled={!isStepValid()}
-                        className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-red-700 transition-colors"
-                    >
-                        Next
-                        <ChevronRight className="w-4 h-4" />
-                    </button>
+                    {(() => {
+                        const step = steps[currentStep]?.id;
+                        let label = 'Next';
+                        let btnClass = 'bg-red-600 hover:bg-red-700';
+                        let warnPartial = false;
+                        if (step === 'maxes') {
+                            const tms = programData?.step1?.trainingMaxes || {};
+                            const count = Object.values(tms).filter(v => typeof v === 'number' && v > 0).length;
+                            if (count === 4) {
+                                label = 'Continue to Core Lifts →';
+                                btnClass = 'bg-red-600 hover:bg-red-700';
+                            } else {
+                                label = `Continue → (${count} of 4 lifts entered)`;
+                                btnClass = 'bg-amber-500 hover:bg-amber-600';
+                                warnPartial = true;
+                            }
+                        }
+                        return (
+                            <button
+                                onClick={() => {
+                                    if (!isStepValid()) return; // safeguard
+                                    if (warnPartial) {
+                                        toast.info("You can add missing lifts later, but you'll need all 4 to generate your program.");
+                                    }
+                                    handleNext();
+                                }}
+                                disabled={!isStepValid()}
+                                className={`flex items-center gap-2 px-4 py-2 ${btnClass} text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors`}
+                            >
+                                {label}
+                                <ChevronRight className="w-4 h-4" />
+                            </button>
+                        );
+                    })()}
                 </div>
             </div>
         </div>

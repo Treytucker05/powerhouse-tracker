@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useSettings } from '../../../contexts/SettingsContext.jsx';
 import { roundToIncrement } from '../../../lib/fiveThreeOne/math.js';
 import { TrendingUp, Calculator, CheckCircle, Info, AlertTriangle, RotateCcw, ArrowRight } from 'lucide-react';
+import { useProgramV2, selectAutomation, setAutomation } from '@/methods/531/contexts/ProgramContextV2.jsx';
 
 export default function Step9CycleProgression({ data = {}, updateData }) {
+    const { state: program, dispatch } = useProgramV2();
+    const automation = selectAutomation(program);
     const { roundingIncrement } = useSettings();
     // State management with proper fallbacks
     const [newTrainingMaxes, setNewTrainingMaxes] = useState(data?.newTrainingMaxes || {});
@@ -234,6 +237,20 @@ export default function Step9CycleProgression({ data = {}, updateData }) {
                 </div>
                 <div className="mt-3 text-sm text-gray-400 text-center">
                     All weights automatically rounded to nearest 5 lbs
+                </div>
+            </div>
+
+            {/* Automation */}
+            <div className="bg-gray-700 p-6 rounded-lg">
+                <h4 className="text-lg font-medium text-white mb-4">Automation</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    {[{ k: 'autoPercentCalc', label: 'Auto percent calc' }, { k: 'autoFsl', label: 'Auto FSL' }, { k: 'autoDeload', label: 'Auto deload' }, { k: 'autoTmUpdate', label: 'Auto TM update' }].map(opt => (
+                        <label key={opt.k} className="flex items-center justify-between bg-gray-800 rounded border border-gray-700 px-3 py-2">
+                            <span className="text-gray-300">{opt.label}</span>
+                            <input type="checkbox" checked={!!automation[opt.k]}
+                                onChange={(e) => setAutomation(dispatch, { [opt.k]: e.target.checked })} />
+                        </label>
+                    ))}
                 </div>
             </div>
 

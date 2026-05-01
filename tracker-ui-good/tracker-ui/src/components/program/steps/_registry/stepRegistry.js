@@ -269,16 +269,26 @@ export function getStepRequirements(stepId, state) {
     // Prompt 5 strengthened requirements
     const req = [];
     const st = state || {};
-    const enabled = st.coreLiftsEnabled || {};
+    const enabled = st.coreLiftsEnabled || st?.step1?.enabledLifts || {};
     const lifts = st.lifts || {};
-    function liftReady(k) {
+    function liftReadyLegacy(k) {
         const L = lifts[k] || {};
         return !!(L.tm || L.oneRM || (L.testWeight && L.testReps));
+    }
+    function liftReadyFromStep1(k) {
+        const inp = st?.step1?.inputs?.[k];
+        const tm = st?.step1?.tmTable?.[k];
+        if (typeof tm === 'number' && tm > 0) return true;
+        if (!inp) return false;
+        const w = Number(inp?.repCalcWeight), r = Number(inp?.repCalcReps);
+        return (!!inp?.manualTm && Number(inp.manualTm) > 0) || (!!inp?.oneRm && Number(inp.oneRm) > 0) || (w > 0 && r >= 1);
     }
 
     if (stepId === STEP_IDS.PROGRAM_FUNDAMENTALS) {
         for (const k of ['press', 'deadlift', 'bench', 'squat']) {
-            if ((enabled[k] ?? true) && !liftReady(k)) req.push(`Enter 1RM or rep test for ${k}`);
+            if (enabled[k] === false) continue;
+            const ok = liftReadyFromStep1(k) || liftReadyLegacy(k);
+            if (!ok) req.push(`Enter 1RM or rep test for ${k}`);
         }
     }
 

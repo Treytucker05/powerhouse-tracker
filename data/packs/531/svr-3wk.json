@@ -1,0 +1,15 @@
+{
+    "kind": "pack",
+    "program": "531",
+    "title": "SVR (3 weeks)",
+    "sourceProgramFile": "beyond-2013.json",
+    "sequence": [
+        {
+            "templateId": "svr-4d"
+        }
+    ],
+    "notes": [
+        "SVR wave per Beyond 5/3/1: W1 3x3+ @ ~90%, W2 5x5 @ ~80%, W3 5/3/1 + singles.",
+        "Template uses the 4-day schedule and can be repeated or paired with deload."
+    ]
+}

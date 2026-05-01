@@ -73,13 +73,18 @@ import Step2TemplateOrCustom from './steps/Step2TemplateOrCustom.jsx';
 import Step3DesignCustom from './steps/Step3DesignCustom.jsx';
 import Step4ReviewExport from './steps/Step4ReviewExport.jsx';
 import Step5ProgressionSmart from './steps/Step5ProgressionSmart.jsx';
+import Step5Progression from '@/components/program/steps/Step5/Progression';
+import Step6Calendar from '@/components/program/steps/Step6Calendar';
+import { LibraryButtons } from '@/components/program/steps/LibraryButtons.tsx';
+import SettingsDrawer from '@/components/ui/SettingsDrawer';
 
 const STEPS = [
     { id: 'fundamentals', title: 'Fundamentals', description: 'Units, rounding, TM%, 1RM/rep tests' },
     { id: 'template', title: 'Template / Custom', description: 'Select template or continue custom' },
     { id: 'design', title: 'Design (if Custom)', description: 'Custom schedule, warm-ups, supplemental, assistance' },
     { id: 'review', title: 'Review & Export', description: 'Cycle preview, export & print' },
-    { id: 'progress', title: 'Progress TMs', description: 'Week 4 done? Advance training maxes' }
+    { id: 'progress', title: 'Progress TMs', description: 'Week 4 done? Advance training maxes' },
+    { id: 'calendar', title: 'Calendar', description: 'Place sessions and finalize your plan' }
 ];
 
 function WizardShell() {
@@ -89,12 +94,12 @@ function WizardShell() {
     // Initialize stepIndex from URL parameter
     const getStepIndexFromUrl = () => {
         const step = parseInt(stepNumber, 10);
-        // Validate step number is in range [1-5], default to 1 if invalid
-        if (step >= 1 && step <= 5) {
+        // Validate step number is in range [1-6], default to 1 if invalid
+        if (step >= 1 && step <= 6) {
             return step - 1; // Convert 1-based to 0-based
         } else {
             // If invalid step number, redirect to step 1
-            if (stepNumber && (step < 1 || step > 5 || isNaN(step))) {
+            if (stepNumber && (step < 1 || step > 6 || isNaN(step))) {
                 navigate('/builder/531/v2/step/1', { replace: true });
             }
             return 0; // Default to step 1 (index 0)
@@ -830,6 +835,10 @@ function WizardShell() {
                         }}
                     />
                 );
+            case 5:
+                return (
+                    <Step6Calendar />
+                );
             default:
                 return <div className="text-red-400">Unknown step</div>;
         }
@@ -937,6 +946,16 @@ function WizardShell() {
                                         <RotateCcw className="w-3 h-3" />
                                         Reset
                                     </button>
+                                </div>
+                                {/* Always-visible Library buttons row beneath the step header */}
+                                <div className="flex items-center justify-between gap-3">
+                                    <LibraryButtons />
+                                    <div className="flex items-center gap-2">
+                                        <a href="#/calendar" className="px-2 py-1 rounded border border-gray-700 text-xs bg-[#0b1220] hover:bg-[#ef4444]">Calendar</a>
+                                        <a href="#/preview" className="px-2 py-1 rounded border border-gray-700 text-xs bg-[#0b1220] hover:bg-[#ef4444]">Preview</a>
+                                        <a href="#/tools/data-coverage" className="px-3 py-2 rounded bg-[#1f2937] hover:bg-[#ef4444] text-white text-sm">Data Coverage</a>
+                                        <SettingsDrawer />
+                                    </div>
                                 </div>
 
                                 {(() => {
@@ -1338,9 +1357,9 @@ function WizardShell() {
                                     <ToggleButton
                                         on={true}
                                         disabled={false}
-                                        onClick={handleStartCycle}
+                                        onClick={() => { handleStartCycle(); setStepIndex(5); updateStepUrl(5); }}
                                         className={`flex items-center gap-2 text-sm px-5`}
-                                    >Start Next Cycle <ChevronRight className="w-4 h-4" /></ToggleButton>
+                                    >Start Next Cycle → Calendar <ChevronRight className="w-4 h-4" /></ToggleButton>
                                 )}
                                 {!(stepIndex === 0 || stepIndex === 2 || stepIndex === 3) && <div className="w-[96px]" />}
                             </div>

@@ -1,0 +1,2 @@
+RuleId,AllowedPattern,AllowedWeeks,MaxJokers,IncrementHint,StopCondition,Notes
+joker_basic,3/5/1,"3s,1s",2,"~+5-10% steps","Never miss; bar speed rule","Only in Anchor. TODO verify wording"

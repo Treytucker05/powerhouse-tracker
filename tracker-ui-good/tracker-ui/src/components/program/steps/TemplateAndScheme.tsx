@@ -1,17 +1,25 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useBuilder } from '@/context/BuilderState';
 import { supabase, getCurrentUserId } from '@/lib/supabaseClient';
-import { TEMPLATES as templates, TEMPLATE_DETAILS, TEMPLATE_META, templateLabel } from '@/lib/builder/templates';
+import { TEMPLATES as TEMPLATE_DEFS, TEMPLATE_DETAILS, TEMPLATE_META, templateLabel } from '@/lib/builder/templates';
+import useSchedule from '@/store/scheduleStore';
 import BuilderProgress from './BuilderProgress';
-// Removed inline WorkoutPreview to avoid duplication with Step 4 comprehensive preview
+import { loadCsv } from '@/lib/loadCsv';
+import type { TemplateCsv } from '@/types/templates';
+import type { SupplementalRow } from '@/types/step3';
 
-// --- Detailed Workout Definitions (UI only, not final programming engine) ---
-// Each template maps to 4 training days (classic) with main lift emphasis ordering.
-// We derive main lift order from standard 4-day 5/3/1 rotation: Press, Deadlift, Bench, Squat OR user preference later.
-// For now keep fixed order for preview.
-// Template/meta now imported from shared module
+// Helper: compute rough fit meters for selection summary
+function fitMeter(row: SupplementalRow) {
+    const sets = parseInt(String(row.SupplementalSetsReps || "").match(/\d+/)?.[0] ?? "0", 10) || 0;
+    const time = Math.min(5, Math.round(sets / 2) + (Number((row as any).AssistancePerCategoryMax || 0) > 75 ? 2 : 0));
+    const hypertrophy = Math.min(5, Math.round(sets / 2) + (row.SupplementalScheme === "BBB" ? 2 : 0));
+    const strength = row.Phase === "Anchor" && row.MainPattern !== "5s PRO" ? 4 : 2;
+    const cond = Math.min(5, (Number((row as any).HardConditioningMax || 0) >= 3 ? 4 : 2));
+    return { strength, hypertrophy, time, cond };
+}
 
+// Meta snippet used by details panel (time, difficulty, focus, suitability)
 function renderTemplateMeta(id: string) {
     const meta = TEMPLATE_META[id];
     if (!meta) return null;
@@ -63,14 +71,40 @@ function renderTemplateDetail(id: string) {
 }
 
 // Template comparison component
-function TemplateComparisonTable({ templateIds, onRemove, onSelect }: {
+function TemplateComparisonTable({ templateIds, templates, onRemove, onSelect }: {
     templateIds: string[],
+    templates: any[],
     onRemove: (id: string) => void,
     onSelect: (id: string) => void
 }) {
-    const compareTemplates = templateIds.map(id => templates.find(t => t.id === id)).filter(Boolean);
+    // Local helper: map template name to id
+    const nameToId = (name?: string) => {
+        const s = String(name || '').trim().toLowerCase();
+        switch (s) {
+            case 'boring but big': return 'bbb';
+            case 'triumvirate': return 'triumvirate';
+            case 'periodization bible': return 'periodization_bible';
+            case 'bodyweight': return 'bodyweight';
+            case 'jack sh*t':
+            case 'jack shit': return 'jackshit';
+            default:
+                return s.replace(/[^a-z0-9]+/g, '_');
+        }
+    };
 
-    if (compareTemplates.length === 0) {
+    // Build rows by matching selected ids to CSV rows
+    const rows = (templateIds || []).map(id => {
+        const row = (templates || []).find((t: any) => {
+            const key = String(t['Template Name'] ?? t.Template ?? t.display_name ?? '').trim();
+            if (!key) return false;
+            return nameToId(key) === id;
+        });
+        const def = TEMPLATE_DEFS.find(d => d.id === id);
+        const title = (row?.['Template Name'] as string) || (row as any)?.display_name || def?.title || id;
+        return { id, title, row };
+    }).filter(Boolean);
+
+    if (!rows.length) {
         return (
             <div className="text-center py-8" data-testid="comparison-empty">
                 <div className="text-gray-400 text-sm">
@@ -81,111 +115,53 @@ function TemplateComparisonTable({ templateIds, onRemove, onSelect }: {
         );
     }
 
+    const get = (r: any, key: string) => {
+        if (!r) return '—';
+        return (r[key] ?? '—') as string;
+    };
+
     return (
         <div className="overflow-x-auto" data-testid="comparison-table">
             <table className="w-full border border-gray-700 rounded-lg">
                 <thead>
                     <tr className="bg-gray-800/60">
                         <th className="text-left p-3 border-b border-gray-700 text-sm font-medium">Template</th>
-                        {compareTemplates.map(template => (
-                            <th key={template!.id} className="text-center p-3 border-b border-gray-700 min-w-[200px]">
+                        <th className="text-left p-3 border-b border-gray-700 text-sm font-medium">Main Work</th>
+                        <th className="text-left p-3 border-b border-gray-700 text-sm font-medium">Supplemental</th>
+                        <th className="text-left p-3 border-b border-gray-700 text-sm font-medium">Assistance</th>
+                        <th className="text-left p-3 border-b border-gray-700 text-sm font-medium">Conditioning</th>
+                        <th className="text-left p-3 border-b border-gray-700 text-sm font-medium">Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {rows.map(({ id, title, row }) => (
+                        <tr key={id} className="odd:bg-gray-900/40">
+                            <td className="p-3 border-b border-gray-800 align-top text-sm">
                                 <div className="space-y-2">
-                                    <div className="font-medium">{template!.title}</div>
-                                    <div className="flex gap-2 justify-center">
+                                    <div className="font-medium">{title}</div>
+                                    <div className="flex gap-2">
                                         <button
-                                            onClick={() => onSelect(template!.id)}
+                                            onClick={() => onSelect(id)}
                                             className="px-2 py-1 text-xs bg-red-600 hover:bg-red-700 rounded text-white transition"
                                         >
                                             Select
                                         </button>
                                         <button
-                                            onClick={() => onRemove(template!.id)}
+                                            onClick={() => onRemove(id)}
                                             className="px-2 py-1 text-xs bg-gray-600 hover:bg-gray-700 rounded text-white transition"
                                         >
                                             Remove
                                         </button>
                                     </div>
                                 </div>
-                            </th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td className="p-3 border-b border-gray-700 text-sm font-medium text-gray-400">Description</td>
-                        {compareTemplates.map(template => (
-                            <td key={template!.id} className="p-3 border-b border-gray-700 text-xs">
-                                {template!.desc}
                             </td>
-                        ))}
-                    </tr>
-                    <tr>
-                        <td className="p-3 border-b border-gray-700 text-sm font-medium text-gray-400">Session Time</td>
-                        {compareTemplates.map(template => {
-                            const meta = (TEMPLATE_META as any)[template!.id];
-                            return (
-                                <td key={template!.id} className="p-3 border-b border-gray-700 text-xs">
-                                    {meta?.time || '—'}
-                                </td>
-                            );
-                        })}
-                    </tr>
-                    <tr>
-                        <td className="p-3 border-b border-gray-700 text-sm font-medium text-gray-400">Difficulty</td>
-                        {compareTemplates.map(template => {
-                            const meta = (TEMPLATE_META as any)[template!.id];
-                            return (
-                                <td key={template!.id} className="p-3 border-b border-gray-700 text-xs">
-                                    <span className={`px-2 py-1 rounded text-xs ${meta?.difficulty === 'Beginner' ? 'bg-green-600/20 text-green-200' :
-                                        meta?.difficulty === 'Intermediate' ? 'bg-yellow-600/20 text-yellow-200' :
-                                            meta?.difficulty === 'Advanced' ? 'bg-red-600/20 text-red-200' :
-                                                'bg-gray-600/20 text-gray-200'
-                                        }`}>
-                                        {meta?.difficulty || '—'}
-                                    </span>
-                                </td>
-                            );
-                        })}
-                    </tr>
-                    <tr>
-                        <td className="p-3 border-b border-gray-700 text-sm font-medium text-gray-400">Focus Areas</td>
-                        {compareTemplates.map(template => {
-                            const meta = (TEMPLATE_META as any)[template!.id];
-                            return (
-                                <td key={template!.id} className="p-3 border-b border-gray-700 text-xs">
-                                    <div className="space-y-1">
-                                        {meta?.focus?.map((focus: string, i: number) => (
-                                            <div key={i} className="px-2 py-1 bg-blue-600/20 text-blue-200 rounded text-xs">
-                                                {focus}
-                                            </div>
-                                        )) || '—'}
-                                    </div>
-                                </td>
-                            );
-                        })}
-                    </tr>
-                    <tr>
-                        <td className="p-3 border-b border-gray-700 text-sm font-medium text-gray-400">Best For</td>
-                        {compareTemplates.map(template => {
-                            const meta = (TEMPLATE_META as any)[template!.id];
-                            return (
-                                <td key={template!.id} className="p-3 border-b border-gray-700 text-xs">
-                                    {meta?.suitability || '—'}
-                                </td>
-                            );
-                        })}
-                    </tr>
-                    <tr>
-                        <td className="p-3 text-sm font-medium text-gray-400">Cautions</td>
-                        {compareTemplates.map(template => {
-                            const meta = (TEMPLATE_META as any)[template!.id];
-                            return (
-                                <td key={template!.id} className="p-3 text-xs text-orange-200">
-                                    {meta?.caution || '—'}
-                                </td>
-                            );
-                        })}
-                    </tr>
+                            <td className="p-3 border-b border-gray-800 align-top text-xs">{get(row, 'Main Work')}</td>
+                            <td className="p-3 border-b border-gray-800 align-top text-xs">{get(row, 'Supplemental')}</td>
+                            <td className="p-3 border-b border-gray-800 align-top text-xs">{get(row, 'Assistance')}</td>
+                            <td className="p-3 border-b border-gray-800 align-top text-xs">{get(row, 'Conditioning')}</td>
+                            <td className="p-3 border-b border-gray-800 align-top text-xs">{get(row, 'Notes')}</td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
         </div>
@@ -196,7 +172,10 @@ function TemplateComparisonTable({ templateIds, onRemove, onSelect }: {
 // scheme descriptor moved to shared module if needed later
 
 export default function TemplateAndScheme() {
-    const { step2, setStep2 } = useBuilder();
+    // Align with BuilderState context API: returns { state, setState }
+    const { state: builderState, setState: setBuilderState } = useBuilder();
+    const step2 = (builderState as any)?.step2 || {};
+    const setStep2 = (u: any) => setBuilderState({ step2: { ...((builderState as any)?.step2 || {}), ...u } });
     const navigate = useNavigate();
     const [expanded, setExpanded] = React.useState<string | null>(null);
     const [searchQuery, setSearchQuery] = React.useState('');
@@ -206,6 +185,190 @@ export default function TemplateAndScheme() {
     const [compareTemplates, setCompareTemplates] = React.useState<string[]>([]);
     const detailsRef = React.useRef<HTMLDivElement | null>(null);
     const prevExpanded = React.useRef<string | null>(null);
+
+    // Step 1 schedule context
+    const daysPerWeek = useSchedule(s => s.daysPerWeek);
+    const scheduleKey = (daysPerWeek ? `${daysPerWeek}D` : '') as '2D' | '3D' | '4D' | '';
+    // Source of truth: Step 1 schedule store. We only save split info into step2 on selection,
+    // but we do not read from it here to avoid stale persisted values.
+    const effectiveScheduleKey = scheduleKey;
+    const effectiveDaysPerWeek = (daysPerWeek || null) as number | null;
+
+    // Enrichment state (badges + tags)
+    type Enriched = { id: string; display_name?: string; tags?: string[]; badges?: { time_band?: string; difficulty?: string; focus?: string } | null; blurb?: string };
+    const [enriched, setEnriched] = useState<Enriched[] | null>(null);
+    const [enrichedMap, setEnrichedMap] = useState<Record<string, Enriched>>({});
+    const [infoFilter, setInfoFilter] = useState<'all' | 'detailed' | 'needs_research'>('all');
+    const [sortKey, setSortKey] = useState<'none' | 'difficulty' | 'time_band'>('none');
+
+    // Utility: slugify to underscore id
+    const slugUnderscore = (s: string) => s.toLowerCase().trim().replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+
+    // Load enrichment (non-blocking)
+    useEffect(() => {
+        let alive = true;
+        (async () => {
+            try {
+                const res = await fetch(`${import.meta.env.BASE_URL}templates/enriched.json`, { cache: 'no-store' });
+                if (!res.ok) throw new Error(String(res.status));
+                const data = (await res.json()) as Enriched[];
+                if (!alive) return;
+                setEnriched(data);
+                const map: Record<string, Enriched> = {};
+                (data || []).forEach((d) => {
+                    if (!d) return;
+                    const idKey = String((d as any).id || '').trim();
+                    if (idKey) map[idKey] = d;
+                    const disp = String((d as any).display_name || '').trim();
+                    if (disp) map[slugUnderscore(disp)] = d;
+                });
+                setEnrichedMap(map);
+            } catch (e) {
+                // Non-blocking on failure
+                if (import.meta.env.DEV) console.warn('enriched.json load failed', e);
+                if (alive) { setEnriched([]); setEnrichedMap({}); }
+            }
+        })();
+        return () => { alive = false; };
+    }, []);
+
+    // Map CSV template names to internal IDs
+    const nameToId = (name: string) => {
+        const s = name.trim().toLowerCase();
+        switch (s) {
+            case 'boring but big': return 'bbb';
+            case 'triumvirate': return 'triumvirate';
+            case 'periodization bible': return 'periodization_bible';
+            case 'bodyweight': return 'bodyweight';
+            case 'jack sh*t':
+            case 'jack shit': return 'jackshit';
+            default:
+                return s.replace(/[^a-z0-9]+/g, '_');
+        }
+    };
+
+    // Load templates from CSV (master + additions)
+    const [csvTemplates, setCsvTemplates] = useState<TemplateCsv[]>([]);
+    useEffect(() => {
+        let active = true;
+        const MASTER_URL = `${import.meta.env.BASE_URL}methodology/extraction/templates_master.csv`;
+        const ADDITIONS_URL = `${import.meta.env.BASE_URL}methodology/extraction/templates_additions.csv`;
+        (async () => {
+            try {
+                const master = await loadCsv<TemplateCsv>(MASTER_URL).catch(() => []);
+                const additions = await loadCsv<TemplateCsv>(ADDITIONS_URL).catch(() => []);
+
+                // Normalize additions ids and fields
+                const addById = new Map<string, TemplateCsv>();
+                (additions || []).forEach((r: TemplateCsv) => {
+                    const id = String(r.id || '').trim();
+                    if (!id) return;
+                    addById.set(id, r);
+                });
+
+                // Map master into a common shape with synthetic id
+                const norm = (master || []).map((row: any) => {
+                    const name: string = String(row['Template Name'] ?? row.Template ?? '').trim();
+                    const id = name
+                        ? name.toLowerCase()
+                            .replace(/^(jack sh\*t|jack shit)$/, 'jackshit')
+                            .replace(/[^a-z0-9]+/g, '-')
+                        : '';
+                    return { ...(row as TemplateCsv), id } as TemplateCsv;
+                });
+
+                // Merge: prefer additions (have source_book) on duplicate ids
+                const mergedById = new Map<string, TemplateCsv>();
+                norm.forEach(r => { if (r.id) mergedById.set(r.id, r); });
+                addById.forEach((v, k) => { mergedById.set(k, v); });
+
+                // Stable sort: category → display_name (fallback to title)
+                const merged = Array.from(mergedById.values()).sort((a, b) => {
+                    const ca = String((a as any).category || '').toLowerCase();
+                    const cb = String((b as any).category || '').toLowerCase();
+                    if (ca !== cb) return ca < cb ? -1 : 1;
+                    const ta = String((a as any).display_name || (a as any)['Template Name'] || '').toLowerCase();
+                    const tb = String((b as any).display_name || (b as any)['Template Name'] || '').toLowerCase();
+                    return ta < tb ? -1 : ta > tb ? 1 : 0;
+                });
+                if (active) setCsvTemplates(merged);
+            } catch {
+                if (active) setCsvTemplates([]);
+            }
+        })();
+        return () => { active = false; };
+    }, []);
+
+    // Debug effect removed to avoid duplicate fetch/log noise
+
+    // Build UI list from CSV rows
+    const availableTemplates = React.useMemo(() => {
+        function toTitle(row: TemplateCsv): string {
+            const name = String((row as any)['Template Name'] ?? (row as any).Template ?? '').trim();
+            return name || String(row.display_name || '').trim() || '';
+        }
+        function toId(row: TemplateCsv): string {
+            const name = toTitle(row);
+            return name
+                ? name.toLowerCase().replace(/^(jack sh\*t|jack shit)$/, 'jackshit').replace(/[^a-z0-9]+/g, '_')
+                : String(row.id || '').trim();
+        }
+
+        return (csvTemplates || [])
+            .map((row: TemplateCsv) => {
+                const name = toTitle(row);
+                const id = toId(row);
+                const def = TEMPLATE_DEFS.find(d => d.id === id);
+                const desc = def?.desc || String((row as any).Notes ?? (row as any).Description ?? row.notes ?? '').trim();
+                // Prefer additions fields when present
+                const mainWork = (row as any)['Main Work'] ?? '';
+                const supplemental = (row as any)['Supplemental'] ?? row.supplemental ?? '';
+                const assistance = (row as any)['Assistance'] ?? row.assistance_guideline ?? '';
+                const conditioning = (row as any)['Conditioning'] ?? row.conditioning_guideline ?? '';
+                const notes = (row as any)['Notes'] ?? row.notes ?? '';
+                const leaderAnchor = (row as any)['Leader/Anchor'] ?? row.leader_anchor ?? '';
+                return {
+                    id,
+                    title: name || templateLabel(id),
+                    desc,
+                    mainWork,
+                    supplemental,
+                    assistance,
+                    conditioning,
+                    notes,
+                    leaderAnchor,
+                    difficulty: 'All',
+                    focus: 'General',
+                };
+            })
+            .filter((t: any, i: number, a: any[]) => a.findIndex(x => x.id === t.id) === i);
+    }, [csvTemplates]);
+
+    // Currently selected template's CSV row (for details panel)
+    const selectedCsv = React.useMemo(() => {
+        if (!expanded) return null;
+        const match = (csvTemplates || []).find((t: any) => {
+            const key = String(t['Template Name'] ?? t.Template ?? t.display_name ?? '').trim();
+            if (!key) return false;
+            return nameToId(key) === expanded;
+        });
+        return match || null;
+    }, [csvTemplates, expanded]);
+
+    // Selected template CSV row for Selection Summary
+    // Helper to safely resolve a template id from multiple shapes
+    const getTemplateId = (t: any) => t?.templateId ?? t?.template?.id ?? t?.template ?? null;
+    const selectedTemplateId = getTemplateId(step2);
+
+    const selectedCsvForSummary = React.useMemo(() => {
+        if (!selectedTemplateId) return null;
+        const match = (csvTemplates || []).find((t: any) => {
+            const key = String(t['Template Name'] ?? t.Template ?? t.display_name ?? '').trim();
+            if (!key) return false;
+            return nameToId(key) === selectedTemplateId;
+        });
+        return match || null;
+    }, [csvTemplates, selectedTemplateId]);
 
     const onTemplate = (id: string) => {
         if (compareMode) {
@@ -249,7 +412,7 @@ export default function TemplateAndScheme() {
         prevExpanded.current = expanded;
     }, [expanded]);
     // Scheme selection moved to Step 3 (Customize)
-    const canNext = !!step2.templateId;
+    const canNext = !!selectedTemplateId;
 
     // Persist Step2 (template + scheme) debounced
     React.useEffect(() => {
@@ -292,7 +455,8 @@ export default function TemplateAndScheme() {
 
     // Filter templates based on search and filter criteria
     const filteredTemplates = React.useMemo(() => {
-        return templates.filter(template => {
+        // First stage: apply existing text/meta filters
+        let list = availableTemplates.filter(template => {
             const meta = (TEMPLATE_META as any)[template.id];
 
             // Search query filter (matches title or description)
@@ -315,18 +479,45 @@ export default function TemplateAndScheme() {
 
             return true;
         });
-    }, [searchQuery, difficultyFilter, focusFilter]);
 
+        // Second stage: info filter using enrichment
+        if (infoFilter !== 'all') {
+            list = list.filter(t => {
+                const detail = enrichedMap[t.id] || null;
+                const mergedTags = ([] as string[])
+                    .concat((t as any).tags || [])
+                    .concat(detail?.tags || [])
+                    .filter(Boolean);
+                const hasDetail = !!detail;
+                const needsResearch = mergedTags.length === 0 || detail?.blurb === 'NEEDS_RESEARCH';
+                if (infoFilter === 'detailed') return hasDetail && !needsResearch;
+                return needsResearch; // needs_research
+            });
+        }
+
+        // Sorting by enrichment badges
+        if (sortKey !== 'none') {
+            const key = sortKey;
+            list = [...list].sort((a, b) => {
+                const ad = enrichedMap[a.id]?.badges?.[key] || '';
+                const bd = enrichedMap[b.id]?.badges?.[key] || '';
+                return String(ad).localeCompare(String(bd));
+            });
+        }
+        return list;
+    }, [searchQuery, difficultyFilter, focusFilter, availableTemplates, infoFilter, sortKey, enrichedMap]);
     // Get unique filter options
     const difficulties = React.useMemo(() => {
-        const allDifficulties = templates.map(t => (TEMPLATE_META as any)[t.id]?.difficulty).filter(Boolean);
+        const allDifficulties = availableTemplates
+            .map(t => (TEMPLATE_META as any)[t.id]?.difficulty)
+            .filter(Boolean) as string[];
         return [...new Set(allDifficulties)];
-    }, []);
+    }, [availableTemplates]);
 
     const focusOptions = React.useMemo(() => {
-        const allFocus = templates.flatMap(t => (TEMPLATE_META as any)[t.id]?.focus || []);
+        const allFocus = availableTemplates.flatMap(t => (TEMPLATE_META as any)[t.id]?.focus || []) as string[];
         return [...new Set(allFocus)];
-    }, []);
+    }, [availableTemplates]);
 
     return (
         <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col" data-testid="step2-container">
@@ -363,6 +554,15 @@ export default function TemplateAndScheme() {
                                 </div>
                             </div>
                         )}
+
+                        {/* Scheme chips (lightweight inline UI) */}
+                        <div className="mt-2 text-sm">
+                            <span className="mr-2">Scheme:</span>
+                            {(["5/3/1", "3/5/1", "5s PRO"] as const).map(m => (
+                                <button key={m} onClick={() => {/* integrate with step2 state when ready */ }}
+                                    className="px-2 py-1 mr-1 rounded border border-gray-700 bg-[#0b1220] hover:bg-[#ef4444]">{m}</button>
+                            ))}
+                        </div>
 
                         {/* Search and Filter Controls */}
                         <div className="mb-6 space-y-4">
@@ -426,11 +626,38 @@ export default function TemplateAndScheme() {
                                         </button>
                                     </div>
                                 )}
+                                {/* Info Filter */}
+                                <div className="flex items-end gap-2">
+                                    <div className="min-w-[200px]">
+                                        <label className="block text-xs text-gray-400 mb-1">Info</label>
+                                        <div className="flex gap-2">
+                                            {(['all', 'detailed', 'needs_research'] as const).map(mode => (
+                                                <button
+                                                    key={mode}
+                                                    onClick={() => setInfoFilter(mode)}
+                                                    className={`px-2 py-1 text-xs rounded border ${infoFilter === mode ? 'border-red-500 text-red-300' : 'border-gray-600 text-gray-300 hover:border-gray-500'}`}
+                                                >{mode === 'all' ? 'All' : 'Detailed'}{mode === 'needs_research' ? ' (Needs Research)' : ''}</button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="min-w-[180px]">
+                                        <label className="block text-xs text-gray-400 mb-1">Sort</label>
+                                        <select
+                                            value={sortKey}
+                                            onChange={(e) => setSortKey(e.target.value as any)}
+                                            className="w-full px-3 py-2 text-sm bg-gray-800 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                                        >
+                                            <option value="none">Default</option>
+                                            <option value="difficulty">Difficulty</option>
+                                            <option value="time_band">Time Band</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Results Summary */}
                             <div className="text-xs text-gray-400">
-                                Showing {filteredTemplates.length} of {templates.length} templates
+                                Showing {filteredTemplates.length} of {availableTemplates.length} templates
                                 {(searchQuery || difficultyFilter || focusFilter) && (
                                     <span className="ml-2">
                                         {searchQuery && `• Search: "${searchQuery}"`}
@@ -443,10 +670,16 @@ export default function TemplateAndScheme() {
 
                         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {filteredTemplates.map(t => {
-                                const isSelected = step2.templateId === t.id;
+                                const isSelected = selectedTemplateId === t.id;
                                 const isExpanded = expanded === t.id;
                                 const isInComparison = compareTemplates.includes(t.id);
                                 const meta = (TEMPLATE_META as any)[t.id];
+                                const detail = enrichedMap[t.id];
+                                const tags = ([] as string[])
+                                    .concat((t as any).tags || [])
+                                    .concat(detail?.tags || [])
+                                    .filter(Boolean)
+                                    .slice(0, 8);
 
                                 let borderClass = 'border-gray-700 hover:border-gray-500 bg-gray-800/50';
                                 if (compareMode) {
@@ -483,8 +716,22 @@ export default function TemplateAndScheme() {
                                                         {!isSelected && isExpanded && <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-600/60 text-white">Viewing</span>}
                                                     </>
                                                 )}
+                                                {/* Leader/Anchor badge */}
+                                                {(() => {
+                                                    const raw = String((t as any).leaderAnchor || '').toLowerCase();
+                                                    if (!raw) return null;
+                                                    const isLeader = /leader/.test(raw) && !/anchor/.test(raw);
+                                                    const isAnchor = /anchor/.test(raw) && !/leader/.test(raw);
+                                                    const isBoth = /leader/.test(raw) && /anchor/.test(raw);
+                                                    const label = isBoth ? 'Leader/Anchor' : isLeader ? 'Leader' : isAnchor ? 'Anchor' : (t as any).leaderAnchor;
+                                                    const cls = isAnchor
+                                                        ? 'border border-red-500 text-red-400'
+                                                        : 'border border-gray-500 text-gray-300';
+                                                    return <span className={`text-[10px] px-2 py-0.5 rounded-full ${cls}`}>{label}</span>;
+                                                })()}
                                             </div>
                                             <p className="text-xs text-gray-300 leading-snug mb-2">{t.desc}</p>
+                                            {/* Built-in meta badges */}
                                             {meta && (
                                                 <div className="space-y-1">
                                                     <div className="flex flex-wrap gap-1">
@@ -495,8 +742,52 @@ export default function TemplateAndScheme() {
                                                         ))}
                                                     </div>
                                                     <div className="text-[10px] text-gray-500 leading-snug line-clamp-2">Best: {meta.suitability}</div>
+                                                    {/* Compatibility with days/week (text line) */}
+                                                    {effectiveScheduleKey && (
+                                                        <div className={`text-[10px] mt-0.5 ${meta.supports?.includes(daysPerWeek as 2 | 3 | 4) ? 'text-emerald-300' : 'text-amber-300'}`}>
+                                                            {meta.supports?.includes((effectiveDaysPerWeek as any) as 2 | 3 | 4)
+                                                                ? `Works with your ${effectiveDaysPerWeek}-day plan${meta.splits?.[effectiveScheduleKey] ? ` • ${meta.splits[effectiveScheduleKey]}` : ''}`
+                                                                : `Not ideal for your ${effectiveDaysPerWeek}-day plan`}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             )}
+                                            {/* 2D/3D/4D badges (always show) */}
+                                            <div className="flex items-center gap-1 mt-1">
+                                                {(['2D', '3D', '4D'] as const).map(k => {
+                                                    const n = Number(k[0]) as 2 | 3 | 4;
+                                                    const supported = ((meta?.supports || []) as Array<2 | 3 | 4>).includes(n);
+                                                    const cls = supported
+                                                        ? 'bg-emerald-900/30 border-emerald-600 text-emerald-300'
+                                                        : 'bg-gray-900/30 border-gray-700 text-gray-400';
+                                                    return <span key={k} className={`px-1.5 py-0.5 rounded border text-[10px] ${cls}`}>{k}</span>;
+                                                })}
+                                            </div>
+                                            {/* Enriched badges */}
+                                            {detail && (
+                                                <div className="mt-2 flex flex-wrap gap-1">
+                                                    {detail.badges?.time_band && (
+                                                        <span className="px-2 py-0.5 rounded-full bg-gray-800 border border-gray-700 text-[10px]">⏱ {detail.badges.time_band}</span>
+                                                    )}
+                                                    {detail.badges?.difficulty && (
+                                                        <span className="px-2 py-0.5 rounded-full bg-gray-800 border border-gray-700 text-[10px]">⚙️ {detail.badges.difficulty}</span>
+                                                    )}
+                                                    {detail.badges?.focus && (
+                                                        <span className="px-2 py-0.5 rounded-full bg-gray-800 border border-gray-700 text-[10px]">🎯 {detail.badges.focus}</span>
+                                                    )}
+                                                </div>
+                                            )}
+                                            {/* Tags / Needs Research */}
+
+                                            <div className="mt-2 flex flex-wrap gap-1">
+                                                {tags.length > 0 ? (
+                                                    tags.map((tg) => (
+                                                        <span key={tg} className="px-2 py-0.5 rounded bg-gray-900 border border-gray-700 text-[10px] text-gray-300">{tg}</span>
+                                                    ))
+                                                ) : (
+                                                    <span className="px-2 py-0.5 rounded bg-gray-800 border border-gray-700 text-[10px] text-gray-400">Needs Research</span>
+                                                )}
+                                            </div>
                                         </div>
                                     </button>
                                 );
@@ -532,26 +823,84 @@ export default function TemplateAndScheme() {
                                         <h3 className="font-semibold mb-4 text-sm">Template Comparison</h3>
                                         <TemplateComparisonTable
                                             templateIds={compareTemplates}
+                                            templates={csvTemplates}
                                             onRemove={removeFromComparison}
-                                            onSelect={(id) => setStep2({ templateId: id })}
+                                            onSelect={(id) => {
+                                                const meta = (TEMPLATE_META as any)[id] || null;
+                                                const splitLabel = scheduleKey && meta?.splits?.[scheduleKey] ? meta.splits[scheduleKey] : null;
+                                                setStep2({ templateId: id, template: id, splitKey: scheduleKey || null, splitLabel: splitLabel || null, daysPerWeek });
+                                            }}
                                         />
                                     </>
                                 ) : (
                                     <>
                                         <h3 className="font-semibold mb-2 text-sm">Template Details</h3>
-                                        {!expanded && <p className="text-xs text-gray-500">Select a template card above to view its full structure, focus and guidance.</p>}
+                                        {!expanded && !selectedTemplateId && (
+                                            <p className="text-xs text-gray-500">Select a template card above to view its details.</p>
+                                        )}
+                                        {expanded && !selectedTemplateId && (
+                                            <div className="text-xs text-gray-400">Previewing. Click "Use This Template" to select.</div>
+                                        )}
                                         {expanded && (
                                             <div className="space-y-3">
                                                 <div className="flex items-center gap-2">
-                                                    <h4 className="text-sm font-medium">{templates.find(t => t.id === expanded)?.title}</h4>
-                                                    {step2.templateId === expanded && <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-600/70 text-white">Selected</span>}
+                                                    <h4 className="text-sm font-medium">{availableTemplates.find(t => t.id === expanded)?.title || TEMPLATE_DEFS.find(t => t.id === expanded)?.title || templateLabel(expanded)}</h4>
+                                                    {selectedTemplateId === expanded && <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-600/70 text-white">Selected</span>}
                                                 </div>
-                                                {renderTemplateDetail(expanded)}
+                                                {(() => {
+                                                    const meta = (TEMPLATE_META as any)[expanded];
+                                                    if (!meta) return null;
+                                                    const ok = meta.supports?.includes((effectiveDaysPerWeek as any) as 2 | 3 | 4);
+                                                    const split = (effectiveScheduleKey && meta.splits?.[effectiveScheduleKey]) ? ` • ${meta.splits[effectiveScheduleKey]}` : '';
+                                                    return (
+                                                        <div className={`text-[11px] ${ok ? 'text-emerald-300' : 'text-amber-300'}`}>
+                                                            {ok ? `Works with your ${effectiveDaysPerWeek}-day plan${split}` : `Not ideal for your ${effectiveDaysPerWeek}-day plan`}
+                                                        </div>
+                                                    );
+                                                })()}
+                                                {(() => {
+                                                    const meta = (TEMPLATE_META as any)[expanded];
+                                                    if (!meta) return null;
+                                                    const tm = meta.recommendedTmPct;
+                                                    const tmLabel = tm && typeof tm === 'object' && typeof tm.min === 'number' && typeof tm.max === 'number'
+                                                        ? `TM ${Math.round(tm.min * 100)}–${Math.round(tm.max * 100)}%`
+                                                        : (typeof tm === 'number' ? `TM ${Math.round(tm * 100)}%` : null);
+                                                    const pol = [
+                                                        meta.amrapPolicy === 'off' ? 'AMRAP: Off' : (meta.amrapPolicy ? `AMRAP: ${meta.amrapPolicy}` : null),
+                                                        meta.jokerPolicy === 'not_used' ? 'Jokers: No' : (meta.jokerPolicy ? `Jokers: ${meta.jokerPolicy}` : null),
+                                                        meta.tmIncrements ? `TM inc: +${meta.tmIncrements.upper}/+${meta.tmIncrements.lower} lb per cycle` : null,
+                                                        meta.deloadPolicy ? '7th Week: Yes (between phases)' : null,
+                                                        expanded === '5_s_pro_ssl' ? 'SSL %: 75/80/85 TM' : null
+                                                    ].filter(Boolean).join(' · ');
+                                                    if (!tmLabel && !pol) return null;
+                                                    return (
+                                                        <div className="text-[10px] text-gray-300">
+                                                            {tmLabel && <div>{tmLabel}</div>}
+                                                            {pol && <div>Policies: {pol}</div>}
+                                                        </div>
+                                                    );
+                                                })()}
+                                                {/* CSV-backed details */}
+                                                {selectedCsv ? (
+                                                    <div className="space-y-1 text-xs text-gray-300">
+                                                        <p><strong className="text-gray-400">Main Work:</strong> {(selectedCsv as any).ui_main || selectedCsv['Main Work'] || '—'}</p>
+                                                        <p><strong className="text-gray-400">Supplemental:</strong> {(selectedCsv as any).ui_supplemental || selectedCsv['Supplemental'] || '—'}</p>
+                                                        <p><strong className="text-gray-400">Assistance:</strong> {(selectedCsv as any).ui_assistance || selectedCsv['Assistance'] || '—'}</p>
+                                                        <p><strong className="text-gray-400">Conditioning:</strong> {(selectedCsv as any).ui_conditioning || selectedCsv['Conditioning'] || '—'}</p>
+                                                        <p><strong className="text-gray-400">Notes:</strong> {(selectedCsv as any).ui_notes || selectedCsv['Notes'] || (selectedCsv as any).notes || '—'}</p>
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-xs text-gray-500">No details available.</div>
+                                                )}
                                                 <div className="flex gap-2 pt-1">
-                                                    {step2.templateId !== expanded && (
+                                                    {selectedTemplateId !== expanded && (
                                                         <button
                                                             type="button"
-                                                            onClick={() => setStep2({ templateId: expanded })}
+                                                            onClick={() => {
+                                                                const meta = (TEMPLATE_META as any)[expanded] || null;
+                                                                const splitLabel = scheduleKey && meta?.splits?.[scheduleKey] ? meta.splits[scheduleKey] : null;
+                                                                setStep2({ templateId: expanded, template: expanded, splitKey: scheduleKey || null, splitLabel: splitLabel || null, daysPerWeek });
+                                                            }}
                                                             className="text-xs px-3 py-1.5 rounded bg-red-600 hover:bg-red-500 text-white font-medium"
                                                         >Use This Template</button>
                                                     )}
@@ -574,14 +923,63 @@ export default function TemplateAndScheme() {
                 <aside className="col-span-12 lg:col-span-4 space-y-4">
                     <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-4 text-sm" data-testid="selection-summary">
                         <h3 className="font-semibold mb-2">Selection Summary</h3>
-                        <p className="text-xs text-gray-400 mb-2">These choices determine default assistance, deload policy and AMRAP flags.</p>
-                        <ul className="text-xs space-y-1">
-                            <li>Template: <span className="font-mono">{templateLabel(step2.templateId)}</span></li>
-                            <li>Scheme: <span className="font-mono">(choose next step)</span></li>
-                        </ul>
-                        {step2.templateId && (
-                            <div className="mt-3 text-[11px] text-gray-400 space-y-1">
-                                {renderTemplateMeta(step2.templateId)}
+                        {!selectedTemplateId ? (
+                            <div className="text-xs text-gray-500">Choose a template first.</div>
+                        ) : !selectedCsvForSummary ? (
+                            <div className="text-xs text-gray-500">No template selected.</div>
+                        ) : (
+                            <div className="text-sm text-gray-300 space-y-1">
+                                <p><strong className="text-gray-400">Template:</strong> {selectedCsvForSummary['Template Name'] || '(none)'}</p>
+                                <p><strong className="text-gray-400">Main Work:</strong> {selectedCsvForSummary['Main Work'] || '—'}</p>
+                                <p><strong className="text-gray-400">Supplemental:</strong> {selectedCsvForSummary['Supplemental'] || '—'}</p>
+                                <p><strong className="text-gray-400">Assistance:</strong> {selectedCsvForSummary['Assistance'] || '—'}</p>
+                                <p><strong className="text-gray-400">Conditioning:</strong> {selectedCsvForSummary['Conditioning'] || '—'}</p>
+                                <p><strong className="text-gray-400">Notes:</strong> {selectedCsvForSummary['Notes'] || '—'}</p>
+                                {(() => {
+                                    const k = (step2 as any)?.splitKey as '2D' | '3D' | '4D' | null;
+                                    const label = (step2 as any)?.splitLabel as string | null;
+                                    const d = (step2 as any)?.daysPerWeek as number | null;
+                                    if (!k && !label && !d) return null;
+                                    return (
+                                        <p className="mt-1"><strong className="text-gray-400">Split:</strong> {d ? `${d}-day` : ''} {k || ''} {label ? `• ${label}` : ''}</p>
+                                    );
+                                })()}
+                                {/* Fit Meter */}
+                                {(() => {
+                                    try {
+                                        const fit = fitMeter(selectedCsvForSummary as unknown as SupplementalRow);
+                                        return (
+                                            <div className="mt-2 text-xs text-gray-300 flex flex-wrap gap-2">
+                                                <span>Strength ★{"★".repeat(fit.strength)}{"☆".repeat(5 - fit.strength)}</span>
+                                                <span>Hypertrophy ★{"★".repeat(fit.hypertrophy)}{"☆".repeat(5 - fit.hypertrophy)}</span>
+                                                <span>Time ★{"★".repeat(fit.time)}{"☆".repeat(5 - fit.time)}</span>
+                                                <span title="How much conditioning volume this template tolerates without hurting recovery.">Conditioning Room ★{"★".repeat(fit.cond)}{"☆".repeat(5 - fit.cond)}</span>
+                                            </div>
+                                        );
+                                    } catch { return null; }
+                                })()}
+                                {(() => {
+                                    const id = selectedTemplateId as string;
+                                    const meta = (TEMPLATE_META as any)[id];
+                                    if (!meta) return null;
+                                    const ok = meta.supports?.includes((effectiveDaysPerWeek as any) as 2 | 3 | 4);
+                                    const split = (effectiveScheduleKey && meta.splits?.[effectiveScheduleKey]) ? ` • ${meta.splits[effectiveScheduleKey]}` : '';
+                                    return (
+                                        <div className={`mt-2 text-xs ${ok ? 'text-emerald-300' : 'text-amber-300'}`}>
+                                            {ok ? `Works with your ${effectiveDaysPerWeek}-day plan${split}` : `Not ideal for your ${effectiveDaysPerWeek}-day plan`}
+                                        </div>
+                                    );
+                                })()}
+                                <div className="pt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            try { sessionStorage.setItem('applyTemplateDefaults', '1'); } catch { }
+                                            navigate('/build/step3?tab=assistance');
+                                        }}
+                                        className="mt-2 text-xs px-3 py-1.5 rounded border border-gray-600 hover:border-red-500 text-gray-200"
+                                    >Start with Template Defaults → Step 3</button>
+                                </div>
                             </div>
                         )}
                     </div>

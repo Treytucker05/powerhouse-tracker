@@ -37,6 +37,9 @@ A modern React-based training tracker with **complete program design system**, *
 
 ### **Documentation Archive**
 - **📁 Historical Docs:** [`docs/archive/`](docs/archive/) - Completed implementations and old planning files
+ - **📚 Docs Hub:** [`docs/INDEX.md`](docs/INDEX.md) - Canonical index of all docs (supersedes legacy indices)
+
+> Ongoing: README and instructional files are being consolidated per [`docs/docs-audit.md`](docs/docs-audit.md). Merged drafts live in `docs/merge-drafts/`.
 
 ## 🎯 Latest Features (v3.0.0)
 
@@ -395,6 +398,32 @@ The Program Design system features a horizontal navigation bar with 7 evidence-b
 ### Training Execution
 1. **Start Session**: Begin workout from dashboard or logger
 2. **Log Sets**: Record exercise, weight, reps, and RIR in real-time
+
+## 5/3/1 Extraction Build
+
+All template / exercise data lives in:  
+`scripts/extraction.config.json` (edit this only).
+
+### Build Options
+
+**Option 1 — VS Code Task**  
+- Press `Ctrl+Shift+P` → “Run Task” → `Build Extraction Sheet (TS)` or `Build Extraction Sheet (JS Fallback)`.
+
+**Option 2 — npm scripts**  
+- `npm run extract:build` → TypeScript (ts-node)  
+- `npm run extract:build:js` → JavaScript fallback  
+- `npm run extract:all` → Build + auto-open Excel + CSV folder
+
+**Option 3 — Double-click**  
+- Run `scripts/run-extraction.cmd` from Explorer.
+
+### Outputs
+- Excel workbook: `data/extraction/531_extraction_template.xlsx`  
+- CSVs: `public/methodology/extraction/*.csv`
+
+**Rule:** never hand-edit Excel/CSVs. Always update the JSON and rebuild.
+
+---
 3. **Track Progress**: Monitor volume, fatigue, and adaptation markers
 4. **Analyze Performance**: Review session data and intelligence recommendations
 

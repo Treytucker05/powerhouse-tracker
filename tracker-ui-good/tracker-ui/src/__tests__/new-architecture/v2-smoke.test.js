@@ -13,7 +13,7 @@ describe('5/3/1 V2 Architecture Smoke Test', () => {
         // Current canonical defaults: units 'lbs' (plural) and rounding 'nearest'
         expect(initialProgramV2.units).toBe('lbs');
         expect(initialProgramV2.rounding).toBe('nearest');
-        expect(initialProgramV2.tmPct).toBe(0.90);
+        expect(initialProgramV2.tmPct).toBe(0.85);
         expect(initialProgramV2.lifts.squat.name).toBe('squat');
         expect(initialProgramV2.schedule.variant).toBe('4day');
         expect(initialProgramV2.loading.option).toBe(1);

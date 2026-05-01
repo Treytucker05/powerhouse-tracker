@@ -87,7 +87,22 @@ export const initialProgramV2 = {
     units: UNITS.LBS,
     // Rounding stored as mode string (nearest|ceil|floor). Default per spec should be neutral/standard.
     rounding: 'nearest',
-    tmPct: 0.90, // decimal canonical (0.85-1.00)
+    // Training max percent
+    // Keep canonical decimal, but default to 0.85 (85%) per requirement.
+    tmPct: 0.85, // decimal canonical (0.85-1.00)
+    // UI/helper choice for TM percent (85 | 90)
+    tmPctChoice: 85,
+    // Rounding increment separate from rounding mode; default depends on units
+    roundingIncrement: 5, // lb default; 2.5 for kg
+    // Global frequency and split controls (do not remove/alter schedule shape)
+    frequencyDays: 4, // 2|3|4
+    splitStyle: 'one_lift', // 'one_lift' | 'full_body'
+    // Phase plan configuration (Leader/Anchor scheme selectors)
+    phasePlan: {
+        pattern: '2+1', // '2+1' | '3+1'
+        leader: { mainSet: '5s_pro' },
+        anchor: { mainSet: 'pr_sets' }
+    },
     // Flow / template selection additions
     flowMode: 'custom', // 'custom' | 'template'
     templateKey: null,  // one of TEMPLATE_KEYS or null
@@ -128,8 +143,17 @@ export const initialProgramV2 = {
     },
     template: 'custom',
     templateLock: false,
-    supplemental: { strategy: 'none' },
-    assistance: { 1: [], 2: [], 3: [], 4: [], mode: 'minimal' },
+    // Supplemental scheme config (extend, do not remove existing keys)
+    supplemental: { strategy: 'none', schemeId: 'fsl' }, // schemeId: 'fsl' | 'bbb' | 'bbs' | 'ssl'
+    // Assistance plan and targets
+    assistance: {
+        1: [], 2: [], 3: [], 4: [],
+        mode: 'minimal',
+        // Assistance volume targets (percent of session goal, 0-100)
+        targets: { push: 75, pull: 75, core: 75 },
+        // Explicit selections e.g., ['Dips','Chins'] if user-curated
+        selections: []
+    },
     // Assistance customization flags
     assistMode: 'template', // 'template' | 'custom'
     assistCustom: null, // when custom: { days: { Press: [...], Deadlift: [...], ... } }
@@ -145,6 +169,20 @@ export const initialProgramV2 = {
         modalities: { hiit: ['Prowler Pushes', 'Hill Sprints'], liss: ['Walking'] },
         note: 'Target 3–4 conditioning sessions (hill sprints / prowler). Keep after lifting or on off days.'
     },
+    // Seventh week (deload or TM test)
+    seventhWeek: { mode: 'deload', criteria: 'afterLeader' },
+    // Progression rules (unit-aware defaults)
+    progression: {
+        increments: { upper: 5, lower: 10 }, // lb default; 2.5/5 for kg
+        rule: 'pass_hold_reset',
+        criteria: { minReps: 5 }
+    },
+    // Logging preferences
+    logging: { trackAmrap: true, est1rmFormula: 'wendler', prFlags: true },
+    // Automation toggles
+    automation: { autoPercentCalc: true, autoFsl: true, autoDeload: true, autoTmUpdate: true },
+    // Global include warmups (UI convenience; schedule.includeWarmups remains authoritative for day gen)
+    includeWarmups: true,
     amrapWk3: {},
     cycle: 1
 };
@@ -160,7 +198,48 @@ function migrateProgramCore(p) {
         if (Number.isFinite(num) && num > 1) next.tmPct = num / 100;
     }
     if (typeof next.tmPct === 'number' && next.tmPct > 1) next.tmPct = next.tmPct / 100;
-    if (typeof next.tmPct !== 'number' || !(next.tmPct > 0.5 && next.tmPct <= 1.05)) next.tmPct = 0.9;
+    if (typeof next.tmPct !== 'number' || !(next.tmPct > 0.5 && next.tmPct <= 1.05)) next.tmPct = 0.85;
+    // Ensure tmPctChoice aligns to tmPct (85 or 90)
+    if (next.tmPctChoice == null) next.tmPctChoice = (Math.round((next.tmPct || 0.9) * 100) <= 86 ? 85 : 90);
+    // Rounding increment default by units
+    if (next.roundingIncrement == null) next.roundingIncrement = (next.units === UNITS.KGS || next.units === 'kg' || next.units === 'kgs') ? 2.5 : 5;
+    // frequencyDays default
+    if (next.frequencyDays == null) next.frequencyDays = 4;
+    if (!next.splitStyle) next.splitStyle = 'one_lift';
+    if (!next.phasePlan) next.phasePlan = { pattern: '2+1', leader: { mainSet: '5s_pro' }, anchor: { mainSet: 'pr_sets' } };
+    // Supplemental schemeId
+    next.supplemental = { ...(next.supplemental || {}), schemeId: next?.supplemental?.schemeId || 'fsl' };
+    // Assistance targets and selections
+    next.assistance = {
+        ...(next.assistance || { 1: [], 2: [], 3: [], 4: [], mode: 'minimal' }),
+        targets: next?.assistance?.targets || { push: 75, pull: 75, core: 75 },
+        selections: Array.isArray(next?.assistance?.selections) ? next.assistance.selections : []
+    };
+    // Seventh week
+    if (!next.seventhWeek) next.seventhWeek = { mode: 'deload', criteria: 'afterLeader' };
+    // Progression defaults
+    if (!next.progression) {
+        const isKg = (next.units === UNITS.KGS || next.units === 'kg' || next.units === 'kgs');
+        next.progression = {
+            increments: isKg ? { upper: 2.5, lower: 5 } : { upper: 5, lower: 10 },
+            rule: 'pass_hold_reset',
+            criteria: { minReps: next.tmPctChoice === 85 ? 5 : 3 }
+        };
+    } else {
+        if (!next.progression.increments) {
+            const isKg = (next.units === UNITS.KGS || next.units === 'kg' || next.units === 'kgs');
+            next.progression.increments = isKg ? { upper: 2.5, lower: 5 } : { upper: 5, lower: 10 };
+        }
+        if (!next.progression.rule) next.progression.rule = 'pass_hold_reset';
+        if (!next.progression.criteria) next.progression.criteria = { minReps: next.tmPctChoice === 85 ? 5 : 3 };
+        if (next.progression.criteria.minReps == null) next.progression.criteria.minReps = (next.tmPctChoice === 85 ? 5 : 3);
+    }
+    // Logging
+    if (!next.logging) next.logging = { trackAmrap: true, est1rmFormula: 'wendler', prFlags: true };
+    // Automation
+    if (!next.automation) next.automation = { autoPercentCalc: true, autoFsl: true, autoDeload: true, autoTmUpdate: true };
+    // Global includeWarmups flag
+    if (next.includeWarmups == null) next.includeWarmups = (next.schedule?.includeWarmups !== false);
     delete next.tmPercent;
     if (next.lifts) {
         const lifts = { ...next.lifts };
@@ -181,14 +260,28 @@ export function migrateProgramV2(p) {
 
 function reducerV2(state, action) {
     switch (action.type) {
+        case 'SET_TM_PCT_CHOICE': {
+            const tmPctChoice = action.value === 90 ? 90 : 85;
+            const tmPct = tmPctChoice / 100;
+            // Also update progression criteria minReps based on choice
+            const progression = {
+                ...(state.progression || {}),
+                criteria: { ...(state.progression?.criteria || {}), minReps: tmPctChoice === 85 ? 5 : 3 }
+            };
+            return { ...state, tmPctChoice, tmPct, progression };
+        }
         case 'SET_ASSISTANCE_LOAD_MODE':
             return { ...state, assistanceLoadMode: action.payload };
         case 'SET_CONDITIONING':
             return { ...state, conditioning: { ...state.conditioning, ...action.payload } };
         case 'SET_UNITS': return { ...state, units: action.units };
         case 'SET_ROUNDING': return { ...state, rounding: action.rounding };
+        case 'SET_ROUNDING_INCREMENT': return { ...state, roundingIncrement: Number(action.value) };
         case 'SET_TM_PCT': return { ...state, tmPct: action.tmPct };
         // Removed SET_TM_PERCENT - tmPct is canonical
+        case 'SET_FREQUENCY_DAYS': return { ...state, frequencyDays: Number(action.value) };
+        case 'SET_SPLIT_STYLE': return { ...state, splitStyle: action.value };
+        case 'SET_PHASE_PLAN': return { ...state, phasePlan: { ...state.phasePlan, ...(action.value || action.payload || {}) } };
         case 'SET_FLOW_MODE': return { ...state, flowMode: action.payload };
         case 'SET_TEMPLATE_KEY': return { ...state, templateKey: action.payload };
         case 'SET_TEMPLATE_SPEC': return { ...state, templateSpec: action.payload };
@@ -253,6 +346,8 @@ function reducerV2(state, action) {
         case 'SET_WARMUPS': return { ...state, warmups: { ...state.warmups, ...action.warmups } };
         case 'SET_SUPPLEMENTAL': return { ...state, supplemental: { ...state.supplemental, ...(action.supplemental || action.payload || {}) } };
         case 'SET_ASSISTANCE': return { ...state, assistance: { ...state.assistance, ...(action.assistance || action.payload || {}) } };
+        case 'SET_ASSISTANCE_TARGETS': return { ...state, assistance: { ...state.assistance, targets: { ...state.assistance?.targets, ...(action.value || action.payload || {}) } } };
+        case 'SET_ASSISTANCE_SELECTIONS': return { ...state, assistance: { ...state.assistance, selections: Array.isArray(action.value) ? action.value : [] } };
         case 'SET_EQUIPMENT': return { ...state, equipment: Array.isArray(action.payload) ? action.payload : state.equipment };
         case 'SET_ASSIST_MODE': return { ...state, assistMode: action.payload };
         case 'SET_ASSIST_CUSTOM': {
@@ -277,6 +372,11 @@ function reducerV2(state, action) {
         case 'SET_AMRAP_WK3': return { ...state, amrapWk3: { ...(state.amrapWk3 || {}), ...(action.payload || {}) } };
         case 'SET_CYCLE': return { ...state, cycle: action.payload };
         case 'SET_WEEK': return { ...state, week: action.payload };
+        case 'SET_SEVENTH_WEEK': return { ...state, seventhWeek: { ...state.seventhWeek, ...(action.value || action.payload || {}) } };
+        case 'SET_PROGRESSION': return { ...state, progression: { ...state.progression, ...(action.value || action.payload || {}) } };
+        case 'SET_LOGGING': return { ...state, logging: { ...state.logging, ...(action.value || action.payload || {}) } };
+        case 'SET_AUTOMATION': return { ...state, automation: { ...state.automation, ...(action.value || action.payload || {}) } };
+        case 'SET_INCLUDE_WARMUPS_GLOBAL': return { ...state, includeWarmups: !!action.value };
         case 'SET_HISTORY': return { ...state, history: action.history };
         case 'APPLY_TEMPLATE':
             return applyTemplate(state, action.key);
@@ -326,6 +426,10 @@ function useProgramReducerV2() {
             try {
                 if (typeof window !== 'undefined' && window.localStorage) {
                     window.localStorage.setItem('ph_program_v2', JSON.stringify(state));
+                    // Mirror canonical trainingMaxes to compatibility key expected by some legacy utilities
+                    if (state?.trainingMaxes) {
+                        window.localStorage.setItem('trainingMaxes', JSON.stringify(state.trainingMaxes));
+                    }
                 }
             } catch { /* ignore persistence errors in test/jsdom */ }
         }, 250);
@@ -380,3 +484,80 @@ export const setAssistCustomDay = (dispatch, dayId, items) =>
     dispatch({ type: 'SET_ASSIST_CUSTOM', dayId, items });
 export const resetAssistDay = (dispatch, dayId, items) =>
     dispatch({ type: 'RESET_ASSIST_DAY', dayId, items });
+
+// --- New selectors & setters (typed via JSDoc) ---
+
+/** @returns {85|90} */
+export const selectTmPctChoice = (state) => state.tmPctChoice;
+export const setTmPctChoice = (dispatch, value /* 85|90 */) =>
+    dispatch({ type: 'SET_TM_PCT_CHOICE', value });
+
+/** @returns {number} */
+export const selectRoundingIncrement = (state) => state.roundingIncrement;
+export const setRoundingIncrement = (dispatch, value /* number */) =>
+    dispatch({ type: 'SET_ROUNDING_INCREMENT', value });
+
+/** @returns {number} */
+export const selectTmPct = (state) => state.tmPct;
+export const setTmPct = (dispatch, tmPct /* number 0-1 */) =>
+    dispatch({ type: 'SET_TM_PCT', tmPct });
+
+/** @returns {2|3|4} */
+export const selectFrequencyDays = (state) => state.frequencyDays;
+export const setFrequencyDays = (dispatch, value /* 2|3|4 */) =>
+    dispatch({ type: 'SET_FREQUENCY_DAYS', value });
+
+/** @returns {'one_lift'|'full_body'} */
+export const selectSplitStyle = (state) => state.splitStyle;
+export const setSplitStyle = (dispatch, value /* 'one_lift'|'full_body' */) =>
+    dispatch({ type: 'SET_SPLIT_STYLE', value });
+
+/** @returns {{pattern:'2+1'|'3+1',leader:{mainSet:string},anchor:{mainSet:string}}} */
+export const selectPhasePlan = (state) => state.phasePlan;
+export const setPhasePlan = (dispatch, patch /* partial */) =>
+    dispatch({ type: 'SET_PHASE_PLAN', value: patch });
+
+/** @returns {'2+1'|'3+1'} */
+export const selectPhasePattern = (state) => state?.phasePlan?.pattern;
+export const setPhasePattern = (dispatch, pattern /* '2+1'|'3+1' */) =>
+    dispatch({ type: 'SET_PHASE_PLAN', value: { pattern } });
+
+/** @returns {'fsl'|'bbb'|'bbs'|'ssl'} */
+export const selectSupplementalSchemeId = (state) => state?.supplemental?.schemeId;
+export const setSupplementalSchemeId = (dispatch, schemeId) =>
+    dispatch({ type: 'SET_SUPPLEMENTAL', supplemental: { schemeId } });
+
+/** @returns {{push:number,pull:number,core:number}} */
+export const selectAssistanceTargets = (state) => state?.assistance?.targets || { push: 75, pull: 75, core: 75 };
+export const setAssistanceTargets = (dispatch, patch) =>
+    dispatch({ type: 'SET_ASSISTANCE_TARGETS', value: patch });
+
+/** @returns {string[]} */
+export const selectAssistanceSelections = (state) => state?.assistance?.selections || [];
+export const setAssistanceSelections = (dispatch, selections /* string[] */) =>
+    dispatch({ type: 'SET_ASSISTANCE_SELECTIONS', value: selections });
+
+/** @returns {{mode:'deload'|'tm_test',criteria:'afterLeader'|'every7th'}} */
+export const selectSeventhWeek = (state) => state.seventhWeek;
+export const setSeventhWeek = (dispatch, patch) =>
+    dispatch({ type: 'SET_SEVENTH_WEEK', value: patch });
+
+/** @returns {{increments:{upper:number,lower:number},rule:string,criteria:{minReps:number}}} */
+export const selectProgression = (state) => state.progression;
+export const setProgression = (dispatch, patch) =>
+    dispatch({ type: 'SET_PROGRESSION', value: patch });
+
+/** @returns {{trackAmrap:boolean,est1rmFormula:string,prFlags:boolean}} */
+export const selectLogging = (state) => state.logging;
+export const setLogging = (dispatch, patch) =>
+    dispatch({ type: 'SET_LOGGING', value: patch });
+
+/** @returns {{autoPercentCalc:boolean,autoFsl:boolean,autoDeload:boolean,autoTmUpdate:boolean}} */
+export const selectAutomation = (state) => state.automation;
+export const setAutomation = (dispatch, patch) =>
+    dispatch({ type: 'SET_AUTOMATION', value: patch });
+
+/** @returns {boolean} */
+export const selectIncludeWarmupsGlobal = (state) => !!state.includeWarmups;
+export const setIncludeWarmupsGlobal = (dispatch, value /* boolean */) =>
+    dispatch({ type: 'SET_INCLUDE_WARMUPS_GLOBAL', value });

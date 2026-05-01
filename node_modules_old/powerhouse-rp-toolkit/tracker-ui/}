@@ -1,0 +1,1 @@
+function Intelligence() { return <h2 className="text-xl pt-6">Intelligence placeholder</h2

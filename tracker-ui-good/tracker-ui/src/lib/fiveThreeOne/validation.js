@@ -12,27 +12,44 @@ function liftReady(l) {
 export function validateFundamentals(state) {
     const errors = [];
 
-    // New wizard shape: lifts + per-lift data
+    // Support both legacy top-level shape and new Step 1 condensed shape under state.step1
     const lifts = state?.lifts || {};
-    const enabled = state?.coreLiftsEnabled || { squat: true, bench: true, deadlift: true, press: true };
+    const step1 = state?.step1 || {};
+    const enabled = state?.coreLiftsEnabled || step1?.enabledLifts || { squat: true, bench: true, deadlift: true, press: true };
 
     const label = { squat: 'squat', bench: 'bench press', deadlift: 'deadlift', press: 'overhead press' };
+    // Helper to evaluate readiness from new step1.inputs shape
+    const liftReadyFromStep1 = (inp) => {
+        if (!inp || typeof inp !== 'object') return false;
+        return isNum(inp.manualTm) || isNum(inp.oneRm) || (isNum(inp.repCalcWeight) && isNum(inp.repCalcReps) && Number(inp.repCalcReps) >= 1);
+    };
+
     for (const k of ['press', 'deadlift', 'bench', 'squat']) {
         if (enabled[k] === false) continue;
-        if (!liftReady(lifts[k])) {
+        let ok = false;
+        // Prefer tmTable presence if available
+        if (step1?.tmTable && isNum(step1.tmTable[k])) ok = true;
+        // Else check new inputs bag
+        else if (step1?.inputs && liftReadyFromStep1(step1.inputs[k])) ok = true;
+        // Else fallback to legacy top-level lifts
+        else if (liftReady(lifts[k])) ok = true;
+
+        if (!ok) {
             errors.push(`Enter 1RM or rep test (or set TM) for ${label[k]}`);
         }
     }
 
     // TM percent (global) should be reasonable
     // Canonical: tmPct decimal (0.85-0.95). Accept legacy integer fallback for migration.
-    const rawPct = (typeof state?.tmPct === 'number' && state.tmPct > 0 && state.tmPct <= 1) ? state.tmPct : 0.90;
+    const tmPctCandidate = (typeof step1?.tmPct === 'number') ? step1.tmPct : state?.tmPct;
+    const rawPct = (typeof tmPctCandidate === 'number' && tmPctCandidate > 0 && tmPctCandidate <= 1) ? tmPctCandidate : 0.90;
     if (!(rawPct >= 0.80 && rawPct <= 0.95)) {
         errors.push(`TM percentage should be 80-95% (got ${Math.round(rawPct * 100)}%)`);
     }
 
     // Rounding increment
-    const roundingInc = state?.rounding?.increment ?? (state?.units === 'kg' ? 2.5 : 5);
+    const units = state?.units || step1?.units;
+    const roundingInc = state?.rounding?.increment ?? (units === 'kg' ? 2.5 : 5);
     if (!isNum(roundingInc)) {
         errors.push('Set a weight rounding increment (e.g., 5 lb or 2.5 kg)');
     }

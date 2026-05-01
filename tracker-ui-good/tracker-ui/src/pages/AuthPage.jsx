@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useApp } from '@/context/AppContext';
 
 export default function AuthPage() {
@@ -12,31 +12,46 @@ export default function AuthPage() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useApp();
+  const base = (import.meta.env && import.meta.env.BASE_URL) ? import.meta.env.BASE_URL : '/';
 
-  useEffect(() => { if (user) navigate('/hub', { replace: true }); }, [user, navigate]);
+  // Compute target after auth: next query param or Dashboard
+  const getNextPath = () => {
+    try {
+      const params = new URLSearchParams(location.search);
+      const next = params.get('next');
+      const target = next && next.startsWith('/') ? next : '/';
+      return target === '/hub' ? '/' : target;
+    } catch {
+      return '/';
+    }
+  };
+
+  useEffect(() => { if (user) navigate(getNextPath(), { replace: true }); }, [user, navigate, location.search]);
 
   const handleSignIn = async (e) => {
     e.preventDefault(); setLoading(true); setError('');
-    try { const { error } = await supabase.auth.signInWithPassword({ email, password }); if (error) throw error; navigate('/hub'); }
+    try { const { error } = await supabase.auth.signInWithPassword({ email, password }); if (error) throw error; navigate(getNextPath()); }
     catch (err) { setError(err.message); } finally { setLoading(false); }
   };
   const handleSignUp = async (e) => {
     e.preventDefault(); setLoading(true); setError(''); setMessage('');
     try {
       if (password !== confirmPassword) throw new Error('Passwords do not match'); if (password.length < 6) throw new Error('Password must be at least 6 characters');
-      const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin + '/auth/callback' } }); if (error) throw error; if (data.user) setMessage('Check your email to confirm your account.');
+      const redirectTo = `${window.location.origin}${base}#/auth/callback`;
+      const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: redirectTo } }); if (error) throw error; if (data.user) setMessage('Check your email to confirm your account.');
     }
     catch (err) { setError(err.message); } finally { setLoading(false); }
   };
   const handleReset = async (e) => {
     e.preventDefault(); setLoading(true); setError(''); setMessage('');
-    try { const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + '/auth/update-password' }); if (error) throw error; setMessage('Password reset email sent.'); }
+    try { const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}${base}#/auth/update-password` }); if (error) throw error; setMessage('Password reset email sent.'); }
     catch (err) { setError(err.message); } finally { setLoading(false); }
   };
 
   const handleGoogleSignIn = async () => {
-    try { setLoading(true); setError(''); const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin + '/auth/callback' } }); if (error) throw error; }
+    try { setLoading(true); setError(''); const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: `${window.location.origin}${base}#/auth/callback` } }); if (error) throw error; }
     catch (err) { setError(err.message); setLoading(false); }
   };
 

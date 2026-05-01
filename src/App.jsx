@@ -1,5 +1,6 @@
 import React from 'react'
 import { Routes, Route } from 'react-router-dom'
+import ProgramWizard531 from './methods/531/components/ProgramWizard531'
 import { useApp } from './context'
 import Assessment from './components/Assessment'
 import Program from './pages/Program'
@@ -8,7 +9,7 @@ import Navbar from './components/ui/Navbar'
 import ProtectedRoute from './components/ui/ProtectedRoute'
 
 function App() {
-    const { user, assessment, loading } = useApp()
+    const { loading } = useApp();
 
     if (loading.user) {
         return (
@@ -18,7 +19,7 @@ function App() {
                     <p className="text-xl">Loading PowerHouse Tracker...</p>
                 </div>
             </div>
-        )
+        );
     }
 
     return (
@@ -28,20 +29,29 @@ function App() {
                 <Routes>
                     <Route path="/login" element={<Auth />} />
                     <Route path="/signup" element={<Auth />} />
-                    <Route path="/" element={
-                        <ProtectedRoute>
-                            <div className="text-center py-12">
-                                <h1 className="text-4xl font-bold text-white mb-4">Welcome to PowerHouse Tracker</h1>
-                                <p className="text-gray-400 mb-8">Complete your assessment and build your program</p>
-                                <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 max-w-md mx-auto">
-                                    <h2 className="text-xl font-semibold mb-4">Getting Started</h2>
-                                    <p className="text-gray-300 mb-4">Click "Program Design" to start your integrated assessment and program building process.</p>
-                                    <a
-                                        href="/program"
-                                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg inline-block transition-colors"
-                                    >
-                                        Start Program Design
-                                    </a>
+                    <Route
+                        path="/"
+                        element={
+                            <ProtectedRoute>
+                                <div className="text-center py-12">
+                                    <h1 className="text-4xl font-bold text-white mb-4">
+                                        Welcome to PowerHouse Tracker
+                                    </h1>
+                                    <p className="text-gray-400 mb-8">
+                                        Complete your assessment and build your program
+                                    </p>
+                                    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 max-w-md mx-auto">
+                                        <h2 className="text-xl font-semibold mb-4">Getting Started</h2>
+                                        <p className="text-gray-300 mb-4">
+                                            Click "Program Design" to start your integrated assessment and program building process.
+                                        </p>
+                                        <a
+                                            href="/program"
+                                            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg inline-block transition-colors"
+                                        >
+                                            Start Program Design
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </ProtectedRoute>
@@ -51,10 +61,15 @@ function App() {
                             <Program />
                         </ProtectedRoute>
                     } />
+                    <Route path="/program-design/step/2" element={
+                        <ProtectedRoute>
+                            <ProgramWizard531 initialStep={2} />
+                        </ProtectedRoute>
+                    } />
                 </Routes>
             </main>
         </div>
-    )
+    );
 }
 
-export default App
+export default App;

@@ -1,0 +1,519 @@
+{
+    "programId": "531",
+    "version": "v2",
+    "source": {
+        "sourceTitle": "5/3/1: The Simplest and Most Effective Training System to Increase Raw Strength",
+        "edition": "Second",
+        "year": 2011,
+        "pageRanges": [
+            "pp.10-13",
+            "pp.21-24",
+            "pp.31-33",
+            "pp.46-49",
+            "pp.76-77",
+            "pp.91-92",
+            "pp.123-130"
+        ]
+    },
+    "allowedUnits": [
+        "lb",
+        "kg"
+    ],
+    "lifts": {
+        "squat": {
+            "name": "Back Squat",
+            "aliases": [
+                "Squat"
+            ],
+            "tmCap": null
+        },
+        "bench": {
+            "name": "Bench Press",
+            "aliases": [
+                "Flat Bench"
+            ],
+            "tmCap": null
+        },
+        "deadlift": {
+            "name": "Deadlift",
+            "aliases": [],
+            "tmCap": null
+        },
+        "press": {
+            "name": "Overhead Press",
+            "aliases": [
+                "Military Press",
+                "Standing Press"
+            ],
+            "tmCap": null
+        }
+    },
+    "tmRule": {
+        "type": "percentage_of_1rm",
+        "factor": 0.9
+    },
+    "tmProgression": {
+        "perCycle": {
+            "upper": 5,
+            "lower": 10
+        },
+        "unit": "lb",
+        "perWeek": null
+    },
+    "rounding": {
+        "increment": 5,
+        "unit": "lb",
+        "minBar": 45,
+        "availablePlates": []
+    },
+    "options": {
+        "allowJokers": null,
+        "allowPRSets": true,
+        "supersetAssistance": null,
+        "restSeconds": {
+            "main": null,
+            "supplemental": null,
+            "assistance": null
+        },
+        "warmupNote": "Warm-up each lift with ~40%x5, 50%x5, 60%x3 from TM.",
+        "conditioningNote": "Use hills or Prowler as available; frequency per schedule."
+    },
+    "weeks": [
+        {
+            "id": "w1-5s",
+            "label": "Week 1 – 5s",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.65,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.75,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.85,
+                    "reps": "5+",
+                    "prSet": true,
+                    "amrap": true
+                }
+            ],
+            "notes": [
+                "Standard 65/75/85% 5s; last set is a PR set. "
+            ]
+        },
+        {
+            "id": "w2-3s",
+            "label": "Week 2 – 3s",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.70,
+                    "reps": 3
+                },
+                {
+                    "percentOfTM": 0.80,
+                    "reps": 3
+                },
+                {
+                    "percentOfTM": 0.90,
+                    "reps": "3+",
+                    "prSet": true,
+                    "amrap": true
+                }
+            ],
+            "notes": [
+                "Standard 70/80/90% 3s; last set is a PR set. "
+            ]
+        },
+        {
+            "id": "w3-531",
+            "label": "Week 3 – 5/3/1",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.75,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.85,
+                    "reps": 3
+                },
+                {
+                    "percentOfTM": 0.95,
+                    "reps": "1+",
+                    "prSet": true,
+                    "amrap": true
+                }
+            ],
+            "notes": [
+                "75/85/95% with PR set on top. "
+            ]
+        },
+        {
+            "id": "w4-deload",
+            "label": "Week 4 – Deload",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.40,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.50,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.60,
+                    "reps": 5
+                }
+            ],
+            "deload": true,
+            "notes": [
+                "No PR sets during deload. "
+            ]
+        },
+        {
+            "id": "w1-5s-alt",
+            "label": "Option 2 Week 1 – 5s (75/80/85)",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.75,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.80,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.85,
+                    "reps": "5+",
+                    "prSet": true,
+                    "amrap": true
+                }
+            ],
+            "notes": [
+                "Alternate sequencing per Option 2. "
+            ]
+        },
+        {
+            "id": "w2-3s-alt",
+            "label": "Option 2 Week 2 – 3s (80/85/90)",
+            "mainSets": [
+                {
+                    "percentOfTM": 0.80,
+                    "reps": 3
+                },
+                {
+                    "percentOfTM": 0.85,
+                    "reps": 3
+                },
+                {
+                    "percentOfTM": 0.90,
+                    "reps": "3+",
+                    "prSet": true,
+                    "amrap": true
+                }
+            ],
+            "notes": [
+                "Alternate sequencing per Option 2. "
+            ]
+        }
+    ],
+    "schedules": [
+        {
+            "id": "4d-standard",
+            "label": "4 days/wk standard",
+            "days": [
+                {
+                    "name": "Day 1",
+                    "mainLift": "press"
+                },
+                {
+                    "name": "Day 2",
+                    "mainLift": "deadlift"
+                },
+                {
+                    "name": "Day 3",
+                    "mainLift": "bench"
+                },
+                {
+                    "name": "Day 4",
+                    "mainLift": "squat"
+                }
+            ]
+        },
+        {
+            "id": "3d-beginner-full-body",
+            "label": "3 days/wk full body (beginner)",
+            "days": [
+                {
+                    "name": "Mon",
+                    "mainLift": "squat",
+                    "secondaryLift": "bench",
+                    "notes": [
+                        "Bench secondary: 55/65/75%x5. "
+                    ]
+                },
+                {
+                    "name": "Wed",
+                    "mainLift": "deadlift",
+                    "secondaryLift": "press",
+                    "notes": [
+                        "Press uses 5/3/1 here. "
+                    ]
+                },
+                {
+                    "name": "Fri",
+                    "mainLift": "bench",
+                    "secondaryLift": "squat",
+                    "notes": [
+                        "Squat secondary: 55/65/75%x5. "
+                    ]
+                }
+            ]
+        }
+    ],
+    "supplemental": [
+        {
+            "id": "sec-ramp-3x5",
+            "name": "Secondary Ramp 3x5 55/65/75",
+            "type": "custom",
+            "sets": [
+                {
+                    "percentOfTM": 0.55,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.65,
+                    "reps": 5
+                },
+                {
+                    "percentOfTM": 0.75,
+                    "reps": 5
+                }
+            ],
+            "onMainLiftDay": true,
+            "appliesTo": "specific_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "Use on secondary lift; not to failure."
+            ]
+        },
+        {
+            "id": "bbb-30-5x10",
+            "name": "Boring But Big 30%",
+            "type": "fixed",
+            "sets": 5,
+            "reps": 10,
+            "percentOfTM": 0.3,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "Start light (about 30–40% TM) if first time. "
+            ]
+        },
+        {
+            "id": "bbb-40-5x10",
+            "name": "Boring But Big 40%",
+            "type": "fixed",
+            "sets": 5,
+            "reps": 10,
+            "percentOfTM": 0.4,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "Within first-session guidance. "
+            ]
+        },
+        {
+            "id": "bbb-50-5x10",
+            "name": "Boring But Big 50%",
+            "type": "fixed",
+            "sets": 5,
+            "reps": 10,
+            "percentOfTM": 0.5,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "Author suggests 50–60% TM once comfortable. "
+            ]
+        },
+        {
+            "id": "bbb-60-5x10",
+            "name": "Boring But Big 60%",
+            "type": "fixed",
+            "sets": 5,
+            "reps": 10,
+            "percentOfTM": 0.6,
+            "onMainLiftDay": true,
+            "appliesTo": "main_lift",
+            "liftId": null,
+            "restSeconds": null,
+            "notes": [
+                "Upper end of BBB range in v2. "
+            ]
+        }
+    ],
+    "assistance": {
+        "targets": {
+            "push": {
+                "min": 30,
+                "max": 60,
+                "unit": "reps"
+            },
+            "pull": {
+                "min": 30,
+                "max": 60,
+                "unit": "reps"
+            },
+            "ham_low_back": {
+                "min": 30,
+                "max": 60,
+                "unit": "reps"
+            },
+            "quad_hip": {
+                "min": 30,
+                "max": 60,
+                "unit": "reps"
+            },
+            "core": {
+                "min": 30,
+                "max": 60,
+                "unit": "reps"
+            }
+        },
+        "pools": {
+            "push": [
+                "dips",
+                "incline press",
+                "db bench"
+            ],
+            "pull": [
+                "chin-up",
+                "dumbbell row",
+                "kroc row",
+                "face pull",
+                "rear delt raise"
+            ],
+            "ham_low_back": [
+                "good morning",
+                "back raise",
+                "leg curl"
+            ],
+            "quad_hip": [
+                "leg press",
+                "lunge",
+                "split squat"
+            ],
+            "core": [
+                "hanging leg raise",
+                "ab wheel",
+                "plank"
+            ]
+        },
+        "rules": {
+            "superset": null,
+            "totalTimeMinutes": null,
+            "perDayExerciseCount": 2
+        }
+    },
+    "assistanceProfiles": [
+        {
+            "id": "bbb",
+            "label": "Boring But Big"
+        },
+        {
+            "id": "triumvirate",
+            "label": "Triumvirate",
+            "overrides": {
+                "rules": {
+                    "perDayExerciseCount": 2
+                }
+            }
+        }
+    ],
+    "templates": [
+        {
+            "id": "original-4d",
+            "name": "Original 5/3/1 (4d)",
+            "scheduleId": "4d-standard",
+            "weekOrder": [
+                "w1-5s",
+                "w2-3s",
+                "w3-531",
+                "w4-deload"
+            ],
+            "assistanceProfileId": "triumvirate",
+            "notes": [
+                "Basic 4-day split per v2. "
+            ]
+        },
+        {
+            "id": "bbb-4d-50",
+            "name": "BBB 50% (4d)",
+            "scheduleId": "4d-standard",
+            "weekOrder": [
+                "w1-5s",
+                "w2-3s",
+                "w3-531",
+                "w4-deload"
+            ],
+            "supplementalByDay": {
+                "0": "bbb-50-5x10",
+                "1": "bbb-50-5x10",
+                "2": "bbb-50-5x10",
+                "3": "bbb-50-5x10"
+            },
+            "assistanceProfileId": "bbb",
+            "notes": [
+                "BBB uses 5x10 on same lift based on TM. "
+            ]
+        },
+        {
+            "id": "option2-4d",
+            "name": "Option 2 sequencing (4d)",
+            "scheduleId": "4d-standard",
+            "weekOrder": [
+                "w1-5s-alt",
+                "w2-3s-alt",
+                "w3-531",
+                "w4-deload"
+            ],
+            "assistanceProfileId": "triumvirate",
+            "notes": [
+                "Alternate order per v2 Option 2. "
+            ]
+        },
+        {
+            "id": "beginner-3d",
+            "name": "Full Body Beginner (3d)",
+            "scheduleId": "3d-beginner-full-body",
+            "weekOrder": [
+                "w1-5s",
+                "w2-3s",
+                "w3-531",
+                "w4-deload"
+            ],
+            "supplementalByDay": {
+                "0": "sec-ramp-3x5",
+                "2": "sec-ramp-3x5"
+            },
+            "notes": [
+                "Includes secondary 55/65/75%x5 sets as shown. "
+            ]
+        }
+    ],
+    "notes": [
+        "TM is 90% of actual or estimated 1RM. ",
+        "+5 lb (bench/press) and +10 lb (squat/deadlift) after each 4-week cycle. ",
+        "Use Excel or round to nearest 5 lb for simplicity. ",
+        "Warm-up suggestion 40/50/60 before work sets. ",
+        "PR set is only the last set; no PRs in deload week. ",
+        "Standard week logs at 65/75/85, 70/80/90, 75/85/95 and deload 40/50/60 are printed in v2. "
+    ]
+}

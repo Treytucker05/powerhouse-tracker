@@ -1,0 +1,122 @@
+id,display_name,book,pages,tags,unknown_tag_keys,uncolored_tag_keys,missing_frequency,missing_scheme,missing_supplemental,missing_assistance,missing_phase,missing_template_group,suggested_additions
+5-s-pro-5x5-fsl,5's PRO + 5x5 FSL,Forever,62,phase:anchor|phase:leader|supplemental:fsl|template:forever,,,,,,,,,
+five-and-dime-leader-,Five and Dime (Leader),Forever,101,phase:leader|scheme:5x5-531|template:forever,,,,,,,,,
+five-and-dime-anchor-,Five and Dime (Anchor),Forever,103,phase:anchor|scheme:5x5-531|template:forever,,,,,,,,,
+god-is-a-beast-leader-,God Is a Beast (Leader),Forever,107,phase:leader|scheme:spinal-tap|template:forever,,,,,,,,,
+leviathan,Leviathan,Forever,199,phase:anchor|phase:leader|supplemental:bbb|supplemental:fsl|template:forever,,,,,,,,,
+triumvirate,Triumvirate,Forever,59,phase:anchor|phase:leader|scheme:531|template:forever,,,,,,,,,
+krypteia,Krypteia,Forever,91,phase:leader|supplemental:fsl|template:forever,,,,,,,,,
+boring-but-strong-bbs-,Boring But Strong (BBS),Forever,70,phase:leader|scheme:531|supplemental:fsl|template:forever,,,,,,,,,
+full-body-full-boring,"Full Body, Full Boring",Forever,84,phase:leader|scheme:531|supplemental:bbb|template:forever,,,,,,,,,
+pervertor,Pervertor,Forever,113,phase:leader|scheme:351|supplemental:bbb|supplemental:fsl|supplemental:ssl|template:forever,,,,,,,,,
+black-army-jacket,Black Army Jacket,Forever,120,phase:leader|scheme:531|supplemental:bbb|template:forever,,,,,,,,,
+limited-time-bbb,Limited Time — BBB,Forever,134,phase:leader|scheme:531|supplemental:bbb|template:forever,,,,,,,,,
+limited-time-bbs,Limited Time — BBS,Forever,136,phase:leader|scheme:531|template:forever,,,,,,,,,
+wendler-classic,Wendler Classic,Forever,142,phase:anchor|scheme:531|supplemental:fsl|supplemental:ssl|template:forever,,,,,,,,,
+walrus-training,Walrus Training,Forever,150,assistance:circuits|template:forever,,,,,,,,,
+full-body-2-day-option-1-,Full Body — 2 Day (Option 1),Forever,160,phase:anchor|phase:leader|scheme:531|supplemental:fsl|template:forever,,,,,,,,,
+full-body-2-day-option-2-,Full Body — 2 Day (Option 2),Forever,162,phase:leader|supplemental:bbb|template:forever,,,,,,,,,
+full-body-3-day-option-1-,Full Body — 3 Day (Option 1),Forever,165,phase:leader|scheme:531|supplemental:ssl|template:forever,,,,,,,,,
+full-body-3-day-option-2-,Full Body — 3 Day (Option 2),Forever,168,phase:leader|template:forever,,,,,,,,,
+full-body-4-day,Full Body — 4 Day,Forever,170,phase:anchor|phase:leader|scheme:531|supplemental:fsl|template:forever,,,,,,,,,
+building-the-monolith-btm-,Building the Monolith (BtM),Forever,128,phase:leader|template:forever,,,,,,,,,
+krypteia-challenge,Krypteia Challenge,Forever,95,assistance:circuits|phase:leader|supplemental:fsl|template:forever,,,,,,,,,
+2x2x2,2x2x2,Forever,178,phase:leader|template:forever,,,,,,,,,
+spinal-tap-strength-i,Spinal Tap — Strength I,Forever,186,phase:leader|scheme:spinal-tap|template:forever,,,,,,,,,
+spinal-tap-strength-ii,Spinal Tap — Strength II,Forever,188,phase:leader|scheme:spinal-tap|template:forever,,,,,,,,,
+,5's PRO + 5x5 FSL,Forever,62,phase:anchor|phase:leader|supplemental:fsl|template:forever,,,,,,,,,
+,Five and Dime (Leader),Forever,101,phase:leader|scheme:5x5-531|template:forever,,,,,,,,,
+,Five and Dime (Anchor),Forever,103,phase:anchor|scheme:5x5-531|template:forever,,,,,,,,,
+,God Is a Beast (Leader),Forever,107,phase:leader|scheme:spinal-tap|template:forever,,,,,,,,,
+,Leviathan,Forever,199,phase:anchor|phase:leader|supplemental:bbb|supplemental:fsl|template:forever,,,,,,,,,
+,Triumvirate,Forever,59,phase:anchor|phase:leader|scheme:531|template:forever,,,,,,,,,
+,Krypteia,Forever,91,phase:leader|supplemental:fsl|template:forever,,,,,,,,,
+,Boring But Strong (BBS),Forever,70,phase:leader|scheme:531|supplemental:fsl|template:forever,,,,,,,,,
+,"Full Body, Full Boring",Forever,84,phase:leader|scheme:531|supplemental:bbb|template:forever,,,,,,,,,
+,Pervertor,Forever,113,phase:leader|scheme:351|supplemental:bbb|supplemental:fsl|supplemental:ssl|template:forever,,,,,,,,,
+,Black Army Jacket,Forever,120,phase:leader|scheme:531|supplemental:bbb|template:forever,,,,,,,,,
+,Limited Time — BBB,Forever,134,phase:leader|scheme:531|supplemental:bbb|template:forever,,,,,,,,,
+,Limited Time — BBS,Forever,136,phase:leader|scheme:531|template:forever,,,,,,,,,
+,Wendler Classic,Forever,142,phase:anchor|scheme:531|supplemental:fsl|supplemental:ssl|template:forever,,,,,,,,,
+,Walrus Training,Forever,150,assistance:circuits|template:forever,,,,,,,,,
+,Full Body — 2 Day (Option 1),Forever,160,phase:anchor|phase:leader|scheme:531|supplemental:fsl|template:forever,,,,,,,,,
+,Full Body — 2 Day (Option 2),Forever,162,phase:leader|supplemental:bbb|template:forever,,,,,,,,,
+,Full Body — 3 Day (Option 1),Forever,165,phase:leader|scheme:531|supplemental:ssl|template:forever,,,,,,,,,
+,Full Body — 3 Day (Option 2),Forever,168,phase:leader|template:forever,,,,,,,,,
+,Full Body — 4 Day,Forever,170,phase:anchor|phase:leader|scheme:531|supplemental:fsl|template:forever,,,,,,,,,
+,Building the Monolith (BtM),Forever,128,phase:leader|template:forever,,,,,,,,,
+,Krypteia Challenge,Forever,95,assistance:circuits|phase:leader|supplemental:fsl|template:forever,,,,,,,,,
+,2x2x2,Forever,178,phase:leader|template:forever,,,,,,,,,
+,Spinal Tap — Strength I,Forever,186,phase:leader|scheme:spinal-tap|template:forever,,,,,,,,,
+,Spinal Tap — Strength II,Forever,188,phase:leader|scheme:spinal-tap|template:forever,,,,,,,,,
+5-s-pro-5x5-fsl,5's PRO + 5x5 FSL,Forever,62,phase:anchor|phase:leader|supplemental:fsl|template:forever,,,,,,,,,
+five-and-dime-leader-,Five and Dime (Leader),Forever,101,phase:leader|scheme:5x5-531|template:forever,,,,,,,,,
+five-and-dime-anchor-,Five and Dime (Anchor),Forever,103,phase:anchor|scheme:5x5-531|template:forever,,,,,,,,,
+god-is-a-beast-leader-,God Is a Beast (Leader),Forever,107,phase:leader|scheme:spinal-tap|template:forever,,,,,,,,,
+leviathan,Leviathan,Forever,199,phase:anchor|phase:leader|supplemental:bbb|supplemental:fsl|template:forever,,,,,,,,,
+triumvirate,Triumvirate,Forever,59,phase:anchor|phase:leader|scheme:531|template:forever,,,,,,,,,
+krypteia,Krypteia,Forever,91,phase:leader|supplemental:fsl|template:forever,,,,,,,,,
+boring-but-strong-bbs-,Boring But Strong (BBS),Forever,70,phase:leader|scheme:531|supplemental:fsl|template:forever,,,,,,,,,
+full-body-full-boring,"Full Body, Full Boring",Forever,84,phase:leader|scheme:531|supplemental:bbb|template:forever,,,,,,,,,
+pervertor,Pervertor,Forever,113,phase:leader|scheme:351|supplemental:bbb|supplemental:fsl|supplemental:ssl|template:forever,,,,,,,,,
+black-army-jacket,Black Army Jacket,Forever,120,phase:leader|scheme:531|supplemental:bbb|template:forever,,,,,,,,,
+limited-time-bbb,Limited Time — BBB,Forever,134,phase:leader|scheme:531|supplemental:bbb|template:forever,,,,,,,,,
+limited-time-bbs,Limited Time — BBS,Forever,136,phase:leader|scheme:531|template:forever,,,,,,,,,
+wendler-classic,Wendler Classic,Forever,142,phase:anchor|scheme:531|supplemental:fsl|supplemental:ssl|template:forever,,,,,,,,,
+walrus-training,Walrus Training,Forever,150,assistance:circuits|template:forever,,,,,,,,,
+full-body-2-day-option-1-,Full Body — 2 Day (Option 1),Forever,160,phase:anchor|phase:leader|scheme:531|supplemental:fsl|template:forever,,,,,,,,,
+full-body-2-day-option-2-,Full Body — 2 Day (Option 2),Forever,162,phase:leader|supplemental:bbb|template:forever,,,,,,,,,
+full-body-3-day-option-1-,Full Body — 3 Day (Option 1),Forever,165,phase:leader|scheme:531|supplemental:ssl|template:forever,,,,,,,,,
+full-body-3-day-option-2-,Full Body — 3 Day (Option 2),Forever,168,phase:leader|template:forever,,,,,,,,,
+full-body-4-day,Full Body — 4 Day,Forever,170,phase:anchor|phase:leader|scheme:531|supplemental:fsl|template:forever,,,,,,,,,
+building-the-monolith-btm-,Building the Monolith (BtM),Forever,128,phase:leader|template:forever,,,,,,,,,
+krypteia-challenge,Krypteia Challenge,Forever,95,assistance:circuits|phase:leader|supplemental:fsl|template:forever,,,,,,,,,
+2x2x2,2x2x2,Forever,178,phase:leader|template:forever,,,,,,,,,
+spinal-tap-strength-i,Spinal Tap — Strength I,Forever,186,phase:leader|scheme:spinal-tap|template:forever,,,,,,,,,
+spinal-tap-strength-ii,Spinal Tap — Strength II,Forever,188,phase:leader|scheme:spinal-tap|template:forever,,,,,,,,,
+spinal-tap-1,Spinal Tap (All weeks in one day),Beyond 5/3/1,77–79,scheme:531|frequency:4d,frequency:4d,,,,,,yes,yes,template:beyond|phase:leader
+spinal-tap-2,Spinal Tap (Triples Only),Beyond 5/3/1,80–82,frequency:4d,frequency:4d,,,,,,yes,yes,template:beyond|phase:leader
+spinal-tap-anchor-black-army,Spinal Tap — Anchor (Black Army Jacket),Forever (2017),117–121,frequency:3d,frequency:3d,,,yes,,,yes,yes,template:forever|scheme:spinal-tap|phase:anchor
+anchor-5x5-3-1-guidelines,Anchor — 5×5/3/1 Guidelines,Forever (2017),96–109,,,,,,,,yes,yes,template:forever|phase:anchor
+strength-circuits,5/3/1 Strength Circuits,Forever (2017),211,Perfect form; never more than 80% TM; not for beginners.|scheme:531|frequency:3d,Perfect form; never more than 80% TM; not for beginners.|frequency:3d,,,,,yes,yes,yes,template:forever|assistance:circuits|phase:leader
+full-body-leader-anchor,Full Body (Leader/Anchor,,5/3/1 Forever,Follows Leader/Anchor model,Follows Leader/Anchor model,,,,,,yes,,phase:leader
+full-body-v2,Full Body (v2),Beyond (2013),71–72,scheme:531|frequency:3d,frequency:3d,,,,,,yes,yes,template:beyond|phase:leader
+full-boring,Full Body — Full Boring (high DL freq),Beyond 5/3/1,75,scheme:531|frequency:3d,frequency:3d,,,,,,yes,yes,template:beyond|phase:leader
+full-body-pc,Full Body + Power Clean,Beyond 5/3/1,72–74,scheme:531|frequency:3d,frequency:3d,,,,,,yes,yes,template:beyond|phase:leader
+full-body,Full Body (3‑day),Beyond 5/3/1,71,frequency:3d,frequency:3d,,,,,,yes,yes,template:beyond|phase:leader
+bbb-standard-6wk,Boring But Big — 6‑Week,Beyond (2013),36,W2 50|scheme:531|frequency:4d,W2 50|frequency:4d,,,,,,yes,yes,template:beyond|phase:leader
+bbb-variation-1,Boring But Big — Variation I,Beyond (2013),32–34,then 5x10 @ first-set percent.|scheme:531|frequency:4d,then 5x10 @ first-set percent.|frequency:4d,,,,,,yes,yes,template:beyond|phase:leader
+bbb-variation-2,Boring But Big — Variation II (10/8/5),Beyond (2013),35–36,scheme:531|frequency:4d,frequency:4d,,,,,,yes,yes,template:beyond|phase:leader
+bbb-6wk,Boring But Big (6‑Week Challenge),Beyond 5/3/1,36,scheme:531|frequency:4d,frequency:4d,,,,,,yes,yes,template:beyond|phase:leader
+bbb-base,Boring But Big (Base),Beyond 5/3/1,29–31,scheme:531|frequency:4d,frequency:4d,,,,,,yes,yes,template:beyond|phase:leader
+bbb-var1,Boring But Big (Variation I),Beyond 5/3/1,32–34,scheme:531|frequency:4d,frequency:4d,,,,,,yes,yes,template:beyond|phase:leader
+bbb-var2,Boring But Big (Variation II),Beyond 5/3/1,35,scheme:531|frequency:4d,frequency:4d,,,,,,yes,yes,template:beyond|phase:leader
+bbb-13wk,Boring But Big — 13‑Week Challenge,Beyond (2013),39–41,scheme:531|frequency:4d,frequency:4d,,,,,,yes,yes,template:beyond|phase:leader
+bbb-5x5,Boring But Big — 5x5 @ 80%,Beyond (2013),37,scheme:531|frequency:4d,frequency:4d,,,,,,yes,yes,template:beyond|phase:leader
+bbb-5x3,Boring But Big — 5x3 @ 90%,Beyond (2013),38,scheme:531|frequency:4d,frequency:4d,,,,,,yes,yes,template:beyond|phase:leader
+six-week-cycle-scaffold,6‑Week Cycle Scaffold,Beyond (2013),11–12,scheme:531,,,,,,,,yes,template:beyond
+bbb-5x1,Boring But Big (5x1 @ TM),Beyond 5/3/1,39–40,scheme:531|frequency:4d,frequency:4d,,,,,,yes,yes,template:beyond|phase:anchor
+six-week-cycle,6‑Week Cycle (2 cycles no deload),Beyond 5/3/1,11–13,frequency:4d,frequency:4d,,,,,,,yes,template:beyond
+deload-menu,Deload Menu (5 styles),Beyond 5/3/1,85–87,,,,yes,,,,,yes,template:beyond
+assistance-vol,Assistance Volume Guidelines,5/3/1 Forever,63–75,,,,yes,,,,,yes,template:forever
+god-is-a-beast-leader,God Is A Beast (Leader),Forever (2017),107–109,frequency:4d,frequency:4d,,,yes,,,yes,yes,template:forever|scheme:spinal-tap|phase:leader
+beyond-base,Beyond 5/3/1 (Training Maximally),Beyond 5/3/1,60–66,frequency:3d,frequency:3d,,,,,,yes,yes,template:beyond|phase:leader
+jokers-fsl,Jokers + First Set Last (kit),Beyond 5/3/1,51–57,scheme:531|frequency:4d,frequency:4d,,,,,,yes,yes,template:beyond|phase:anchor
+svr,SVR (3/5/1 + singles),Beyond 5/3/1,49,scheme:531|frequency:4d,frequency:4d,,,,,,yes,yes,template:beyond|phase:anchor
+strength-challenge,Strength Challenge (Beyond),,,Beyond (2013)|scheme:531|frequency:4d,Beyond (2013)|frequency:4d,,,,,,,,
+rule-of-10,Rule of 10 (per week),all weeks.,Beyond 5/3/1,scheme:531|frequency:4d,frequency:4d,,,,,,yes,,phase:leader
+bbs,Boring But Strong (BBS 10×5),133–146,,scheme:531|frequency:4d,frequency:4d,,,,,,,,
+fives-pro-forever,5’s PRO Forever,Forever (2017),218,scheme:531|frequency:3d,frequency:3d,,,,,,yes,yes,template:forever|phase:leader
+leviathan-system,Leviathan,Forever (2017),198–199,Singles|frequency:3d,Singles|frequency:3d,,,,,,,yes,template:forever
+spinal-tap-5spro-leader,Spinal Tap — 5’s PRO (Leader),,,118–121|frequency:3d,118–121|frequency:3d,,,,,,,,
+football_winter_8wk_weightroom,Winter Strength & Conditioning — 8 Week Cycle (Weight Room),5/3/1 for Football (2011),132-144,frequency:3d|scheme:531|assistance:template|season:off_season|population:team|template:football,frequency:3d,,,,,,,,
+football_winter_8wk_skill_field,Jumps/Throws/Speed — First 8 Weeks (Skill),5/3/1 for Football (2011),84-91,Falling-start sprints; Box Jumps at 80% of max; Week 4 deload; full recovery between reps.|frequency:3d,Falling-start sprints; Box Jumps at 80% of max; Week 4 deload; full recovery between reps.|frequency:3d,,,,,,,yes,template:football
+football_winter_8wk_linemen_field,Jumps/Throws/Speed — First 8 Weeks (Linemen),5/3/1 for Football (2011),92-98,Push-up start accelerations; introduce Kneeling Coil Throw; Week 4 deload.|frequency:3d,Push-up start accelerations; introduce Kneeling Coil Throw; Week 4 deload.|frequency:3d,,,,,,,yes,template:football
+football_summer9_skill_field,Going Into the Summer — 9 Weeks (Skill) [Field],5/3/1 for Football (2011),99-107,Depth Jumps; deload in Weeks 4 and 9.|frequency:3d,Depth Jumps; deload in Weeks 4 and 9.|frequency:3d,,,,,,,yes,template:football
+football_summer9_linemen_field,Going Into the Summer — 9 Weeks (Linemen) [Field],5/3/1 for Football (2011),108-116,frequency:3d|conditioning:jumps_throws|season:off_season|population:linemen|template:football,frequency:3d|conditioning:jumps_throws,,,,,,,,
+football_summer9_weightroom,Going Into the Summer — 9 Week Training Cycle (Weight Room),5/3/1 for Football (2011),147-155,frequency:3d|scheme:531|assistance:template|season:off_season|population:team|template:football,frequency:3d,,,,,,,,
+football_precamp6_skill_field,Summer Pre-Camp — 6 Weeks (Skill) [Field],5/3/1 for Football (2011),117-123,Hurdles|frequency:3d,Hurdles|frequency:3d,,,,,,,yes,template:football
+football_precamp6_linemen_field,Summer Pre-Camp — 6 Weeks (Linemen) [Field],5/3/1 for Football (2011),124-131,frequency:3d|conditioning:jumps_throws|season:off_season|population:linemen|template:football,frequency:3d|conditioning:jumps_throws,,,,,,,,
+football_precamp6_weightroom,Summer Pre-Camp — 6 Week Training Cycle (Weight Room),5/3/1 for Football (2011),156-163,repeatable Mon/Wed/Fri lift order; Week 4 deload (use deload %); assistance kept efficient.|scheme:531|frequency:3d,repeatable Mon/Wed/Fri lift order; Week 4 deload (use deload %); assistance kept efficient.|frequency:3d,,,,,,,yes,template:football
+football_inseason_2day_weightroom,In‑Season Training — 2‑Day (Weight Room),5/3/1 for Football (2011),163-168,No PR sets; TM=90%; Mon/Wed lifts; ~30–45 min; minimal assistance; integrate in‑season conditioning schedule (football intervals + tempo runs).|scheme:531|frequency:2d,No PR sets; TM=90%; Mon/Wed lifts; ~30–45 min; minimal assistance; integrate in‑season conditioning schedule (football intervals + tempo runs).|frequency:2d,,,,,,,yes,template:football
+football_inseason_conditioning,In‑Season Conditioning — Weekly Schedule,5/3/1 for Football (2011),165-168,Intervals: 3–6s all‑out with 20–90s rest; start with 90s rest and reduce toward 20–30s; Tue/Thu tempo per position charts; Fri dealer’s choice or intervals; integrates around Mon/Wed lifts.|frequency:5d,Intervals: 3–6s all‑out with 20–90s rest; start with 90s rest and reduce toward 20–30s; Tue/Thu tempo per position charts; Fri dealer’s choice or intervals; integrates around Mon/Wed lifts.|frequency:5d,,,,,,,yes,template:football

@@ -3,41 +3,54 @@ import { useNavigate, UNSAFE_NavigationContext } from 'react-router-dom';
 import { step1_fundamentals } from '@/lib/step1';
 import type { Step1State, LiftId } from '@/lib/step1/types';
 import { useBuilder } from '@/context/BuilderState';
+import { useProgramV2, setTmPctChoice, setRoundingIncrement } from '@/methods/531/contexts/ProgramContextV2.jsx';
+import { UNITS as CANON_UNITS } from '@/lib/units';
 import { supabase, getCurrentUserId } from '@/lib/supabaseClient';
 import BuilderProgress from './BuilderProgress';
+import SchedulePanel from '@/components/program/steps/Step1/SchedulePanel';
+import type { Assignments as RotationAssignments } from '@/components/program/steps/Step1/DndRotationPlanner';
+import Step1CalendarPlanner from '@/components/program/steps/Step1/Step1CalendarPlanner';
 // Lightweight local UI primitives (placeholder until design system integration)
-type PillVariant = 'indigo' | 'emerald' | 'amber' | 'neutral';
+type PillVariant = 'indigo' | 'emerald' | 'amber' | 'neutral' | 'red';
 type PillProps = React.PropsWithChildren<{ active?: boolean; onClick?: () => void; label?: string; variant?: PillVariant }>;
 const variantStyles: Record<PillVariant, { active: string; inactive: string; focus: string }> = {
     indigo: {
-        active: 'bg-indigo-600/25 text-indigo-200 border-indigo-400 shadow-sm',
-        inactive: 'bg-gray-800/60 text-gray-300 border-gray-700 hover:border-indigo-500 hover:text-indigo-200',
-        focus: 'focus:ring-indigo-500/60'
+        active: 'bg-indigo-600/25 text-indigo-200 border-2 border-indigo-400 shadow-sm',
+        inactive: 'bg-gray-800/60 text-gray-300 border border-gray-700 hover:border-indigo-500 hover:text-indigo-200',
+        focus: 'focus-visible:ring-1 focus-visible:ring-gray-500/30 focus-visible:ring-offset-0'
     },
     emerald: {
-        active: 'bg-emerald-600/20 text-emerald-200 border-emerald-400 shadow-sm',
-        inactive: 'bg-gray-800/60 text-gray-300 border-gray-700 hover:border-emerald-500 hover:text-emerald-200',
-        focus: 'focus:ring-emerald-500/60'
+        active: 'bg-emerald-600/20 text-emerald-200 border-2 border-emerald-400 shadow-sm',
+        inactive: 'bg-gray-800/60 text-gray-300 border border-gray-700 hover:border-emerald-500 hover:text-emerald-200',
+        focus: 'focus-visible:ring-1 focus-visible:ring-gray-500/30 focus-visible:ring-offset-0'
     },
     amber: {
-        active: 'bg-amber-600/25 text-amber-200 border-amber-400 shadow-sm',
-        inactive: 'bg-gray-800/60 text-gray-300 border-gray-700 hover:border-amber-500 hover:text-amber-200',
-        focus: 'focus:ring-amber-500/60'
+        active: 'bg-amber-600/25 text-amber-200 border-2 border-amber-400 shadow-sm',
+        inactive: 'bg-gray-800/60 text-gray-300 border border-gray-700 hover:border-amber-500 hover:text-amber-200',
+        focus: 'focus-visible:ring-1 focus-visible:ring-gray-500/30 focus-visible:ring-offset-0'
     },
     neutral: {
-        active: 'bg-gray-700 text-gray-100 border-gray-400 shadow-sm',
-        inactive: 'bg-gray-800/60 text-gray-300 border-gray-700 hover:border-gray-500 hover:text-gray-200',
-        focus: 'focus:ring-gray-500/60'
+        active: 'bg-gray-700 text-gray-100 border-2 border-gray-400 shadow-sm',
+        inactive: 'bg-gray-800/60 text-gray-300 border border-gray-700 hover:border-gray-500 hover:text-gray-200',
+        focus: 'focus-visible:ring-1 focus-visible:ring-gray-500/30 focus-visible:ring-offset-0'
+    },
+    red: {
+        // Make active state highly distinct vs. inactive and independent of focus
+        active: 'bg-red-600 text-white border-2 border-red-300 shadow-md ring-2 ring-red-400/70 ring-offset-1 ring-offset-gray-900',
+        inactive: 'bg-gray-900/40 text-red-200 border border-red-700/70 hover:border-red-500/70 hover:bg-red-900/20',
+        focus: 'focus-visible:ring-1 focus-visible:ring-gray-500/30 focus-visible:ring-offset-0'
     }
 };
-const Pill = ({ active, onClick, children, variant = 'neutral' }: PillProps) => {
+const Pill = ({ active, onClick, children, variant = 'red' }: PillProps) => {
     const v = variantStyles[variant];
     return (
         <button
             type="button"
             onClick={onClick}
-            className={`px-3 py-1 text-[11px] rounded-md border transition select-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 ${v.focus} ${active ? v.active : v.inactive}`}
+            aria-pressed={!!active}
+            className={`px-3 py-1 text-[11px] rounded-md border transition select-none font-semibold outline-none ${v.focus} ${active ? v.active : v.inactive}`}
         >
+            {active ? <span className="mr-1">✓</span> : null}
             {children}
         </button>
     );
@@ -81,7 +94,7 @@ const Input = (props: React.InputHTMLAttributes<HTMLInputElement>) => {
                 // Prevent scientific notation or minus signs for these fields
                 if (['e', 'E', '+', '-'].includes(e.key)) e.preventDefault();
             }}
-            className={`mt-1 w-full rounded-md border border-gray-700 bg-gray-900/60 px-2 py-1 text-sm text-gray-100 placeholder-gray-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/40 ${props.className || ''}`.trim()}
+            className={`mt-1 w-full rounded-md border border-gray-700 bg-gray-800/60 px-2 py-1 text-sm text-gray-100 placeholder-gray-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/40 ${props.className || ''}`.trim()}
             type={props.type || 'number'}
         />
     );
@@ -117,9 +130,13 @@ const defaultStep1State: LocalStep1 = {
 interface Props {
     goToStep?: (n: number) => void;
     saveProgramDraft?: (data: any) => void; // TODO strong type when draft shape available
+    // When embedded inside ProgramWizard531, these are provided. Keep optional for standalone usage/tests.
+    data?: any;
+    updateData?: (updates: any) => void;
 }
 
-export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Props) {
+export default function ProgramFundamentals({ goToStep, saveProgramDraft, data, updateData }: Props) {
+    const { state: program, dispatch } = useProgramV2();
     // Some legacy tests mount without a Router; detect and fallback
     let navigate: ReturnType<typeof useNavigate> | null = null;
     try {
@@ -129,12 +146,14 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
     } catch (e) {
         navigate = null;
     }
-    const { step1, setStep1 } = useBuilder();
+    const { state: builderState, setState: setBuilderState } = useBuilder();
+    const step1 = (builderState as any)?.step1 || {};
+    const setStep1 = (u: any) => setBuilderState({ step1: { ...((builderState as any)?.step1 || {}), ...u } });
     // Adapt builder's Step1 meta shape to this component's richer state shape; keep internal but sync outward.
     const [state, setState] = React.useState<LocalStep1>(() => {
         // Derive initial lift method/values from builder meta (if any) so data persists without waiting on Supabase hydration.
         const deriveLift = (key: string) => {
-            const input = (step1?.inputs || {})[key] || {} as any;
+            const input = ((step1 && (step1 as any).inputs) ? (step1 as any).inputs : {})[key] || {} as any;
             if (input.manualTm && input.manualTm > 0) {
                 return { method: 'manual', manualTM: input.manualTm } as any;
             }
@@ -146,11 +165,15 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
             }
             return { method: 'tested', oneRM: 0 } as any;
         };
+        // Normalize potential aliases coming from persisted builder meta
+        const normalizeUnits = (u: any): 'lb' | 'kg' => (u === 'kg' || u === 'kilogram' || u === 'kilograms') ? 'kg' : 'lb';
+        const normalizePct = (p: any): 0.85 | 0.90 => (p === 0.85 ? 0.85 : 0.90);
+        const normalizeStrategy = (s: any): 'nearest' | 'down' | 'up' => (s === 'down' || s === 'up') ? s : 'nearest';
         return {
             ...defaultStep1State,
-            units: step1?.units || 'lb',
-            tmPct: (step1?.tmPct === 0.85 ? 0.85 : 0.90),
-            rounding: { strategy: 'nearest', increment: step1?.rounding || 5 },
+            units: normalizeUnits(step1 ? (step1 as any).units : undefined),
+            tmPct: normalizePct(step1 ? (step1 as any).tmPct : undefined),
+            rounding: { strategy: normalizeStrategy(step1 ? (step1 as any)?.rounding?.strategy : undefined), increment: (typeof (step1 ? (step1 as any).rounding : undefined) === 'number' ? ((step1 as any)?.rounding as any) : (step1 as any)?.rounding?.increment) || 5 },
             lifts: {
                 squat: deriveLift('squat'),
                 bench: deriveLift('bench'),
@@ -158,52 +181,63 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                 press: deriveLift('press'),
             },
             variants: {
-                squat: step1?.variants?.squat || 'back_squat',
-                bench: step1?.variants?.bench || 'bench_press',
-                deadlift: step1?.variants?.deadlift || 'conventional_deadlift',
-                press: step1?.variants?.press || 'overhead_press'
+                squat: (step1 as any)?.variants?.squat || 'back_squat',
+                bench: (step1 as any)?.variants?.bench || 'bench_press',
+                deadlift: (step1 as any)?.variants?.deadlift || 'conventional_deadlift',
+                press: (step1 as any)?.variants?.press || 'overhead_press'
             },
             deadliftRepStyle: (step1 as any)?.deadliftRepStyle || 'touch_and_go'
-        };
+        } as LocalStep1;
     });
+    // Rotation mapping (DnD planner). Kept separately so we can pass as controlled value and persist alongside step1
+    const [rotation, setRotation] = React.useState<RotationAssignments>({});
+    const [startDateISO, setStartDateISO] = React.useState<string>(() => {
+        const existing = (step1 as any)?.startDate;
+        const today = new Date();
+        const iso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        return typeof existing === 'string' && existing.match(/^\d{4}-\d{2}-\d{2}$/) ? existing : iso;
+    });
+
+    // (debug logging removed)
 
     // If builder meta later gains values (e.g., restored from localStorage) while internal lifts are still empty, sync once.
     React.useEffect(() => {
-        setState(prev => {
-            const allEmpty = Object.values(prev.lifts).every((l: any) => (l.oneRM ?? l.weight ?? l.manualTM ?? 0) === 0);
-            if (!allEmpty) return prev;
-            const hasAny = Object.values(step1.inputs || {}).some((i: any) => (i?.oneRm || i?.manualTm || (i?.repCalcWeight && i?.repCalcReps)));
-            if (!hasAny) return prev;
-            const deriveLift = (key: string) => {
-                const input = (step1?.inputs || {})[key] || {} as any;
-                if (input.manualTm && input.manualTm > 0) return { method: 'manual', manualTM: input.manualTm } as any;
-                if (input.repCalcWeight && input.repCalcReps) return { method: 'reps', weight: input.repCalcWeight, reps: input.repCalcReps } as any;
-                if (input.oneRm && input.oneRm > 0) return { method: 'tested', oneRM: input.oneRm } as any;
-                return { method: 'tested', oneRM: 0 } as any;
-            };
-            return {
-                ...prev,
-                lifts: {
-                    squat: deriveLift('squat'),
-                    bench: deriveLift('bench'),
-                    deadlift: deriveLift('deadlift'),
-                    press: deriveLift('press'),
-                },
-                variants: {
-                    squat: step1?.variants?.squat || prev.variants?.squat || 'back_squat',
-                    bench: step1?.variants?.bench || prev.variants?.bench || 'bench_press',
-                    deadlift: step1?.variants?.deadlift || prev.variants?.deadlift || 'conventional_deadlift',
-                    press: step1?.variants?.press || prev.variants?.press || 'overhead_press'
-                },
-                deadliftRepStyle: (step1 as any)?.deadliftRepStyle || prev.deadliftRepStyle || 'touch_and_go'
-            };
-        });
+        const allEmpty = Object.values(state.lifts).every((l: any) => (l.oneRM ?? l.weight ?? l.manualTM ?? 0) === 0);
+        const hasAny = Object.values(((step1 as any)?.inputs || {})).some((i: any) => (i?.oneRm || i?.manualTm || (i?.repCalcWeight && i?.repCalcReps)));
+        if (!allEmpty || !hasAny) return;
+        const deriveLift = (key: string) => {
+            const input = (((step1 as any)?.inputs || {}) as any)[key] || {} as any;
+            if (input.manualTm && input.manualTm > 0) return { method: 'manual', manualTM: input.manualTm } as any;
+            if (input.repCalcWeight && input.repCalcReps) return { method: 'reps', weight: input.repCalcWeight, reps: input.repCalcReps } as any;
+            if (input.oneRm && input.oneRm > 0) return { method: 'tested', oneRM: input.oneRm } as any;
+            return { method: 'tested', oneRM: 0 } as any;
+        };
+        setState(prev => ({
+            ...prev,
+            lifts: {
+                squat: deriveLift('squat'),
+                bench: deriveLift('bench'),
+                deadlift: deriveLift('deadlift'),
+                press: deriveLift('press'),
+            },
+            variants: {
+                squat: (step1 as any)?.variants?.squat || (prev as any).variants?.squat || 'back_squat',
+                bench: (step1 as any)?.variants?.bench || (prev as any).variants?.bench || 'bench_press',
+                deadlift: (step1 as any)?.variants?.deadlift || (prev as any).variants?.deadlift || 'conventional_deadlift',
+                press: (step1 as any)?.variants?.press || (prev as any).variants?.press || 'overhead_press'
+            },
+            deadliftRepStyle: (step1 as any)?.deadliftRepStyle || (prev as any).deadliftRepStyle || 'touch_and_go'
+        }));
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [step1.inputs]);
+    }, [(step1 as any)?.inputs, (step1 as any)?.variants, (step1 as any)?.deadliftRepStyle]);
 
     // Push condensed snapshot back to builder meta on every calc change & debounce persist
+    const [saveStatus, setSaveStatus] = React.useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+    const disableCloudSaveRef = React.useRef<boolean>(false);
+    const lastPushedRef = React.useRef<string>('');
     React.useEffect(() => {
-        const { tmTable } = step1_fundamentals(state);
+        const res: any = step1_fundamentals(state as any);
+        const tmTable: any[] = Array.isArray(res?.tmTable) ? res.tmTable : [];
         const condensed: any = {
             units: state.units as any,
             tmPct: (state.tmPct === 0.85 ? 0.85 : 0.9) as 0.85 | 0.9,
@@ -215,38 +249,74 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                 repCalcReps: (v as any).reps,
                 manualTm: (v as any).manualTM
             }])) as any,
-            tmTable: Object.fromEntries(tmTable.map(r => [r.lift, r.tmDisplay || 0])) as any
+            tmTable: Object.fromEntries((tmTable as any[]).map((r: any) => [r.lift, r.tmDisplay || 0])) as any
         };
         // include variants for persistence
         (condensed as any).variants = state.variants;
         condensed.deadliftRepStyle = state.deadliftRepStyle;
-        setStep1(condensed);
+        // include rotation mapping (controlled)
+        (condensed as any).rotation = rotation;
+        (condensed as any).startDate = startDateISO;
+        // Guard against infinite loops: only push when condensed actually changes
+        const fingerprint = JSON.stringify(condensed);
+        if (fingerprint !== lastPushedRef.current) {
+            lastPushedRef.current = fingerprint;
+            setStep1(condensed);
+
+            // Also sync into the outer ProgramWizard state when available so step validation advances
+            try {
+                const liftsFromTm = Object.fromEntries((tmTable as any[]).map((r: any) => [r.lift, { tm: r.tmDisplay || 0 }])) as any;
+                const roundingObj = { increment: state.rounding.increment, mode: state.rounding.strategy } as any;
+                // Only call if parent provided updater
+                (typeof (updateData) === 'function') && updateData({
+                    step1: condensed,
+                    units: state.units,
+                    tmPct: condensed.tmPct,
+                    rounding: roundingObj,
+                    lifts: liftsFromTm
+                });
+            } catch { /* no-op */ }
+        }
 
         // Debounced persistence (skip during tests / SSR)
         const isTest = typeof window === 'undefined' || (window as any)?.process?.env?.NODE_ENV === 'test';
         let handle: any;
-        if (!isTest) {
+        if (!isTest && lastPushedRef.current) {
+            setSaveStatus('saving');
             handle = setTimeout(async () => {
                 try {
+                    if (disableCloudSaveRef.current) { setSaveStatus('saved'); setTimeout(() => setSaveStatus('idle'), 1200); return; }
                     const userId = await getCurrentUserId();
-                    if (!userId) return;
+                    if (!userId) { setSaveStatus('saved'); setTimeout(() => setSaveStatus('idle'), 1200); return; }
                     const payload = {
                         user_id: userId,
                         step: 1,
-                        state: state, // full UI state for potential future migrations
-                        condensed,
+                        state: { ...state, rotation, startDate: startDateISO }, // full UI state for potential future migrations
+                        condensed: JSON.parse(lastPushedRef.current),
                         updated_at: new Date().toISOString()
                     };
                     // Upsert into table program_builder_state (create instruction in README if table missing)
-                    await supabase.from('program_builder_state').upsert(payload, { onConflict: 'user_id,step' });
+                    const { error } = await supabase.from('program_builder_state').upsert(payload, { onConflict: 'user_id,step' });
+                    if (error) {
+                        // If table is missing in local dev, avoid spamming network with retries
+                        if ((error as any)?.code === '42P01' /* Postgres undefined_table */ || (error as any)?.status === 404) {
+                            disableCloudSaveRef.current = true;
+                        }
+                        throw error;
+                    }
+                    setSaveStatus('saved');
+                    setTimeout(() => setSaveStatus('idle'), 1200);
                 } catch (err) {
                     // Non-fatal
                     if (import.meta.env.DEV) console.warn('Step1 persist failed', err);
+                    setSaveStatus('error');
+                    setTimeout(() => setSaveStatus('idle'), 2000);
                 }
             }, 600); // 600ms debounce
         }
         return () => handle && clearTimeout(handle);
-    }, [state, setStep1]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [state, rotation]);
 
     // Initial load: attempt to hydrate from Supabase if empty (client side only)
     React.useEffect(() => {
@@ -263,7 +333,15 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                 const { data, error } = await supabase.from('program_builder_state').select('*').eq('user_id', userId).eq('step', 1).single();
                 if (error || !data) return;
                 if (data.state && active) {
-                    setState((s) => ({ ...s, ...data.state }));
+                    const { rotation: r, startDate, ...rest } = data.state as any;
+                    setState((s) => ({ ...s, ...rest }));
+                    if (r && typeof r === 'object') setRotation(r as RotationAssignments);
+                    if (typeof startDate === 'string') setStartDateISO(startDate);
+                } else if (data.condensed && active) {
+                    const r = (data.condensed as any)?.rotation;
+                    if (r && typeof r === 'object') setRotation(r as RotationAssignments);
+                    const sd = (data.condensed as any)?.startDate;
+                    if (typeof sd === 'string') setStartDateISO(sd);
                 }
             } catch (e) {
                 if (import.meta.env.DEV) console.warn('Hydrate step1 failed', e);
@@ -275,7 +353,31 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
     }, []);
 
     // compute once per render
-    const { tmTable, helper } = step1_fundamentals(state);
+    const resNow: any = step1_fundamentals(state as any);
+    const tmTable: any[] = Array.isArray(resNow?.tmTable) ? resNow.tmTable : [];
+    const tmReadyCount = React.useMemo(() => (tmTable as any[]).filter((r: any) => (r.tmDisplay ?? 0) > 0).length, [tmTable]);
+
+    // Enforce valid selections at all times (one per toggle group)
+    React.useEffect(() => {
+        setState(prev => {
+            let changed = false;
+            let units: 'lb' | 'kg' = (prev.units === 'kg' || prev.units === 'lb') ? prev.units : 'lb';
+            if (units !== prev.units) changed = true;
+            let tmPct: 0.85 | 0.90 = (prev.tmPct === 0.85 ? 0.85 : 0.90);
+            if (tmPct !== prev.tmPct) changed = true;
+            const prevStrategy = (prev.rounding as any)?.strategy;
+            const strategy: any = (prevStrategy === 'down' || prevStrategy === 'up' || prevStrategy === 'nearest') ? prevStrategy : 'nearest';
+            if (strategy !== prev.rounding.strategy) changed = true;
+            const deadliftRepStyle: any = (prev as any).deadliftRepStyle === 'dead_stop' || (prev as any).deadliftRepStyle === 'touch_and_go' ? (prev as any).deadliftRepStyle : 'touch_and_go';
+            if (deadliftRepStyle !== (prev as any).deadliftRepStyle) changed = true;
+            if (!changed) return prev;
+            // adjust increment if current value illegal for unit
+            let increment = prev.rounding.increment;
+            if (units === 'lb' && (increment !== 5 && increment !== 2.5)) increment = 5;
+            if (units === 'kg' && (increment !== 2.5 && increment !== 1.0)) increment = 2.5;
+            return { ...prev, units, tmPct, deadliftRepStyle, rounding: { ...prev.rounding, strategy, increment } } as any;
+        });
+    }, []);
 
     const onUnits = (units: 'lb' | 'kg') => {
         setState(s => ({
@@ -290,9 +392,19 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
                         : (s.rounding.increment === 5 ? 2.5 : s.rounding.increment)  // prefer 2.5kg default
             }
         }));
+        // Also sync rounding increment default into V2 context based on canonical units
+        try {
+            const u = units === 'kg' ? CANON_UNITS.KG : CANON_UNITS.LBS;
+            const inc = u === CANON_UNITS.KG ? 2.5 : 5;
+            setRoundingIncrement(dispatch, inc);
+        } catch { }
     };
 
-    const onTmPct = (pct: 0.85 | 0.90) => setState(s => ({ ...s, tmPct: pct }));
+    const onTmPct = (pct: 0.85 | 0.90) => {
+        setState(s => ({ ...s, tmPct: pct }));
+        // Update V2 tmPctChoice which also adjusts minReps criteria
+        try { setTmPctChoice(dispatch, pct === 0.90 ? 90 : 85); } catch { }
+    };
 
     const onToggleMicro = (checked: boolean) => {
         setState(s => ({
@@ -313,23 +425,10 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
     const setManualTM = (lift: LiftKey, manualTM: number) => setState(s => ({ ...s, lifts: { ...s.lifts, [lift]: { ...s.lifts[lift], method: 'manual', manualTM } } }));
     const setMethod = (lift: LiftKey, method: 'tested' | 'reps' | 'manual') => setState(s => ({ ...s, lifts: { ...s.lifts, [lift]: { ...s.lifts[lift], method } } }));
 
-    // Unified vertical red stacked buttons selector as requested
-    const renderMethodSelector = (_variant: any, lift: LiftKey, method: string) => {
-        const change = (m: 'tested' | 'reps' | 'manual') => setMethod(lift, m);
-        const base = 'w-full text-[12px] tracking-wide font-medium px-3 py-2 rounded-sm transition focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900';
-        const activeCls = 'bg-red-700 text-white shadow-sm';
-        const inactiveCls = 'bg-red-800 text-red-100 hover:bg-red-700/90';
-        return (
-            <div className="flex flex-col gap-2">
-                <button type="button" onClick={() => change('tested')} aria-pressed={method === 'tested'} className={`${base} ${method === 'tested' ? activeCls : inactiveCls}`}>Tested 1RM</button>
-                <button type="button" onClick={() => change('reps')} aria-pressed={method === 'reps'} className={`${base} ${method === 'reps' ? activeCls : inactiveCls}`}>Reps x Weight</button>
-                <button type="button" onClick={() => change('manual')} aria-pressed={method === 'manual'} className={`${base} ${method === 'manual' ? activeCls : inactiveCls}`}>Direct TM</button>
-            </div>
-        );
-    };
+    // (removed) legacy stacked-button method selector; radios are used per-lift now.
 
     const onNext = () => {
-        if (tmTable.some(r => (r.tmDisplay ?? 0) <= 0)) return; // guard
+        if ((tmTable as any[]).some((r: any) => (r.tmDisplay ?? 0) <= 0)) return; // guard
         if (saveProgramDraft) {
             saveProgramDraft({
                 step1: state,
@@ -340,7 +439,7 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
         if (goToStep) goToStep(2); else if (navigate) navigate('/build/step2');
     };
 
-    const tmLookup = React.useMemo(() => Object.fromEntries(tmTable.map(r => [r.lift, r.tmDisplay ?? '—'])), [tmTable]);
+    const tmLookup = React.useMemo(() => Object.fromEntries((tmTable as any[]).map((r: any) => [r.lift, r.tmDisplay ?? '—'])), [tmTable]);
 
     // Variant options per lift (MVP list; codes stable for persistence)
     const VARIANT_OPTIONS: Record<LiftKey, { code: string; label: string }[]> = {
@@ -381,237 +480,229 @@ export default function ProgramFundamentals({ goToStep, saveProgramDraft }: Prop
         <div className="min-h-screen bg-gray-900 text-gray-100 px-6 py-8">
             <div className="max-w-7xl mx-auto flex flex-col gap-8">
                 <BuilderProgress current={1} />
-                <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <h1 className="text-2xl font-semibold tracking-tight">Step 1 · Program Fundamentals</h1>
-                    <div className="flex flex-wrap items-center gap-4">
-                        <label className="flex items-center gap-2">
-                            <span className="text-xs uppercase tracking-wide text-gray-400">Units</span>
-                            <div className="flex gap-1.5">
-                                <Pill active={state.units === 'lb'} onClick={() => onUnits('lb')}>LBS</Pill>
-                                <Pill active={state.units === 'kg'} onClick={() => onUnits('kg')}>KG</Pill>
+                <header className="flex flex-col gap-4">
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-2xl font-bold tracking-tight text-gray-100">Step 1 · Program Fundamentals</h1>
+                        <span aria-live="polite" className="text-xs inline-flex items-center gap-1 text-gray-400">
+                            {saveStatus === 'saving' && (<>
+                                <span className="inline-block h-2 w-2 rounded-full bg-amber-400 animate-pulse" /> Saving…
+                            </>)}
+                            {saveStatus === 'saved' && (<>
+                                <span className="inline-block h-2 w-2 rounded-full bg-emerald-400" /> Saved
+                            </>)}
+                            {saveStatus === 'error' && (<>
+                                <span className="inline-block h-2 w-2 rounded-full bg-red-500" /> Saved locally
+                            </>)}
+                        </span>
+                    </div>
+                    {/* Controls in separate containers laid out to fill space */}
+                    <div className="w-full">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 items-stretch">
+                            {/* Units */}
+                            <div className="bg-gray-800/60 border border-gray-700 p-3 rounded-md h-full">
+                                <div className="text-[10px] uppercase tracking-wide text-gray-400">Units</div>
+                                <div className="mt-2 grid grid-cols-[max-content,1fr] gap-3 items-start">
+                                    <div className="flex flex-col gap-1.5">
+                                        <Pill variant="red" active={state.units === 'lb'} onClick={() => onUnits('lb')}>LBS</Pill>
+                                        <Pill variant="red" active={state.units === 'kg'} onClick={() => onUnits('kg')}>KG</Pill>
+                                    </div>
+                                    <p className="text-xs text-gray-300/90 leading-relaxed min-w-0">
+                                        Sets the display and rounding system for all weights. Switching converts how
+                                        values are shown, not your saved lifts.
+                                    </p>
+                                </div>
                             </div>
-                        </label>
-
-                        <label className="flex items-center gap-2">
-                            <span className="text-xs uppercase tracking-wide text-gray-400">TM %</span>
-                            <div className="flex gap-1.5">
-                                <Pill active={state.tmPct === 0.90} onClick={() => onTmPct(0.90)}>90%</Pill>
-                                <Pill active={state.tmPct === 0.85} onClick={() => onTmPct(0.85)}>85%</Pill>
+                            {/* TM % */}
+                            <div className="bg-gray-800/60 border border-gray-700 p-3 rounded-md h-full">
+                                <div className="text-[10px] uppercase tracking-wide text-gray-400">TM %</div>
+                                <div className="mt-2 grid grid-cols-[max-content,1fr] gap-3 items-start">
+                                    <div className="flex flex-col gap-1.5">
+                                        <Pill variant="red" active={state.tmPct === 0.90} onClick={() => onTmPct(0.90)}>90%</Pill>
+                                        <Pill variant="red" active={state.tmPct === 0.85} onClick={() => onTmPct(0.85)}>85%</Pill>
+                                    </div>
+                                    <p className="text-xs text-gray-300/90 leading-relaxed min-w-0">
+                                        Training Max is the percentage of your true max used to calculate working sets.
+                                        90% is the classic 5/3/1 choice; 85% is often better for older or newer clients.
+                                    </p>
+                                </div>
                             </div>
-                        </label>
-
-                        <label className="flex items-center gap-3">
-                            <Switch
-                                checked={state.rounding.increment === (state.units === 'lb' ? 2.5 : 1.0)}
-                                onCheckedChange={onToggleMicro}
-                                label="Use microplates"
-                            />
-                            <HelperText>
-                                LB increments: {state.units === 'lb' ? '2.5 / 5' : '—'} · KG increments: {state.units === 'kg' ? '1.0 / 2.5' : '—'}
-                            </HelperText>
-                        </label>
-                        <label className="flex items-center gap-2">
-                            <span className="text-xs uppercase tracking-wide text-gray-400">Rounding</span>
-                            <div className="flex gap-1.5">
-                                {(['nearest', 'down', 'up'] as const).map(r => (
-                                    <Pill key={r} active={state.rounding.strategy === r} onClick={() => setState(s => ({ ...s, rounding: { ...s.rounding, strategy: r as any, increment: s.rounding.increment } }))}>{r}</Pill>
-                                ))}
+                            {/* Microplates */}
+                            <div className="bg-gray-800/60 border border-gray-700 p-3 rounded-md h-full">
+                                <div className="text-[10px] uppercase tracking-wide text-gray-400">Microplates</div>
+                                <div className="mt-2 grid grid-cols-[max-content,1fr] gap-3 items-start">
+                                    <div className="flex items-start">
+                                        <Switch
+                                            checked={state.rounding.increment === (state.units === 'lb' ? 2.5 : 1.0)}
+                                            onCheckedChange={onToggleMicro}
+                                            label="Use microplates"
+                                        />
+                                    </div>
+                                    <div className="min-w-0">
+                                        <p className="text-[11px] text-gray-400">LB inc: {state.units === 'lb' ? '2.5 / 5' : '—'} · KG inc: {state.units === 'kg' ? '1.0 / 2.5' : '—'}</p>
+                                        <p className="mt-1 text-xs text-gray-300/90 leading-relaxed">Enable smaller jumps for finer progress between weeks.</p>
+                                    </div>
+                                </div>
                             </div>
-                        </label>
+                            {/* Rounding */}
+                            <div className="bg-gray-800/60 border border-gray-700 p-3 rounded-md h-full">
+                                <div className="text-[10px] uppercase tracking-wide text-gray-400">Rounding</div>
+                                <div className="mt-2 grid grid-cols-[max-content,1fr] gap-3 items-start">
+                                    <div className="flex flex-col gap-1.5">
+                                        {(['nearest', 'down', 'up'] as const).map(r => (
+                                            <Pill key={r} variant="red" active={state.rounding.strategy === r} onClick={() => setState(s => ({ ...s, rounding: { ...s.rounding, strategy: r as any } }))}>{r}</Pill>
+                                        ))}
+                                    </div>
+                                    <div className="text-xs text-gray-300/90 leading-relaxed min-w-0">
+                                        <p>Choose how we round target weights to a loadable plate increment.</p>
+                                        <ul className="mt-1 list-disc pl-4 space-y-1">
+                                            <li><span className="font-semibold">Nearest</span>: Round to the closest loadable weight. Balanced and recommended.</li>
+                                            <li><span className="font-semibold">Down</span>: Always round down (never overshoot). Good for conservative or fatigued weeks.</li>
+                                            <li><span className="font-semibold">Up</span>: Always round up (slightly harder). Use when you want a small push.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </header>
 
-                {/* TM Info Boxes */}
-                <section className="grid sm:grid-cols-3 gap-4">
-                    <div className="rounded-md border border-red-600/30 bg-gradient-to-br from-red-900/40 via-red-800/20 to-red-900/10 p-4 text-[11px] leading-relaxed shadow-sm">
-                        <h4 className="text-xs font-semibold mb-1 tracking-wide text-red-300">Training Max</h4>
-                        <p className="text-red-100/80">Use <span className="font-mono text-red-200">{Math.round(state.tmPct * 100)}%</span> of a real or estimated 1RM. Drop to 85% if recovery or technique is off.</p>
-                    </div>
-                    <div className="rounded-md border border-indigo-600/30 bg-gradient-to-br from-indigo-900/40 via-indigo-800/20 to-indigo-900/10 p-4 text-[11px] leading-relaxed shadow-sm">
-                        <h4 className="text-xs font-semibold mb-1 tracking-wide text-indigo-300">Cycle Increments</h4>
-                        <p className="text-indigo-100/80">Each new cycle: <span className="font-mono">+5 lb (upper) / +10 lb (lower)</span> or <span className="font-mono">+2.5 / +5 kg</span>.</p>
-                    </div>
-                    <div className="rounded-md border border-cyan-600/30 bg-gradient-to-br from-cyan-900/40 via-cyan-800/20 to-cyan-900/10 p-4 text-[11px] leading-relaxed shadow-sm">
-                        <h4 className="text-xs font-semibold mb-1 tracking-wide text-cyan-300">Rounding & Microplates</h4>
-                        <p className="text-cyan-100/80">Increment {state.rounding.increment}{state.units}. Microplates {state.rounding.increment < (state.units === 'lb' ? 5 : 2.5) ? 'enabled' : 'off'}.</p>
-                        <p className="text-cyan-200/60 italic mt-1">{helper.roundingHint}</p>
-                    </div>
-                </section>
-                <section className="rounded-md border border-gray-800 bg-gray-800/40 p-4 text-[11px] leading-relaxed text-gray-300">
-                    <strong className="block mb-1 text-gray-200">How to enter Training Max</strong>
-                    <ul className="list-disc pl-5 space-y-1">
-                        <li><span className="text-gray-200">Tested 1RM:</span> Enter a recent single. We multiply by TM%.</li>
-                        <li><span className="text-gray-200">Reps x Weight:</span> Enter any multi‑rep PR (e.g. 5 reps @ 200). We estimate 1RM and apply TM%.</li>
-                        <li><span className="text-gray-200">Direct TM:</span> Override and enter the exact Training Max you want to use.</li>
-                    </ul>
-                    <p className="mt-2 text-[10px] text-gray-400">Pick ONE method per lift. Switching methods preserves prior values so you can compare.</p>
-                </section>
+                {/* (global method selection removed; each lift has its own) */}
 
-                {/* One-RM Inputs */}
-                <section className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    {(['press', 'bench', 'squat', 'deadlift'] as LiftId[]).map((id, idx) => {
-                        const tmVal = tmLookup[id];
-                        const title = id === 'press' ? 'Overhead Press' : id;
-                        const liftState: any = state.lifts[id];
-                        const method = liftState.method;
-                        const variant = 'stacked';
-                        const currentVariant = state.variants ? state.variants[id as LiftId] : undefined;
-                        return (
-                            <div key={id} className="relative border border-gray-800/70 bg-gray-800/50 backdrop-blur rounded-md p-4 shadow-sm flex flex-col gap-3">
-                                <div className="flex items-start justify-between">
-                                    <div className="text-[10px] uppercase tracking-wide text-gray-300 font-semibold">{title}</div>
-                                    <div className="text-[10px] px-2 py-1 rounded bg-gray-900/70 border border-gray-700 font-mono text-gray-200" aria-label={`${title} training max`}>
-                                        {tmVal}
-                                    </div>
-                                </div>
-                                <label className="block text-[10px] text-gray-400">
-                                    Use Variant?
-                                    <div className="mt-1 flex items-center gap-3 text-[11px]">
-                                        <label className="inline-flex items-center gap-1">
-                                            <input
-                                                type="radio"
-                                                name={`variant-mode-${id}`}
-                                                value="base"
-                                                checked={!currentVariant || currentVariant === VARIANT_OPTIONS[id as LiftKey][0].code}
-                                                onChange={() => setVariant(id as LiftKey, VARIANT_OPTIONS[id as LiftKey][0].code)}
-                                            />
-                                            <span className="text-gray-300">Base</span>
-                                        </label>
-                                        <label className="inline-flex items-center gap-1">
-                                            <input
-                                                type="radio"
-                                                name={`variant-mode-${id}`}
-                                                value="variant"
-                                                checked={!!currentVariant && currentVariant !== VARIANT_OPTIONS[id as LiftKey][0].code}
-                                                onChange={() => {
-                                                    // if switching to variant and currently base, pick second option as default
-                                                    const list = VARIANT_OPTIONS[id as LiftKey];
-                                                    setVariant(id as LiftKey, list[1]?.code || list[0].code);
-                                                }}
-                                            />
-                                            <span className="text-gray-300">Variant</span>
-                                        </label>
-                                        {currentVariant && currentVariant !== VARIANT_OPTIONS[id as LiftKey][0].code && (
-                                            <select
-                                                className="ml-2 flex-1 rounded-md border border-gray-700 bg-gray-900/60 px-2 py-1 text-[11px] text-gray-100 focus:border-red-500 focus:ring-2 focus:ring-red-500/40"
-                                                value={currentVariant}
-                                                data-testid={`variant-${id}`}
-                                                onChange={e => setVariant(id as LiftKey, e.target.value)}
-                                            >
-                                                {VARIANT_OPTIONS[id as LiftKey].filter((_, i) => i > 0).map(opt => (
-                                                    <option key={opt.code} value={opt.code}>{opt.label}</option>
-                                                ))}
-                                            </select>
-                                        )}
-                                    </div>
-                                </label>
-                                {renderMethodSelector(variant, id, method)}
-                                {method === 'tested' && (
-                                    <label className="block text-[11px] font-medium text-gray-300">
-                                        Enter 1RM ({state.units})
-                                        <Input value={(liftState.oneRM ?? 0) === 0 ? '' : liftState.oneRM} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTested1RM(id, +e.target.value || 0)} />
-                                    </label>
-                                )}
-                                {method === 'reps' && (
-                                    <div className="grid grid-cols-2 gap-2 text-[11px]">
-                                        <label className="font-medium text-gray-300">
-                                            Weight ({state.units})
-                                            <Input value={(liftState.weight ?? 0) === 0 ? '' : liftState.weight} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRepCalc(id, +e.target.value || 0, liftState.reps || 0)} />
-                                        </label>
-                                        <label className="font-medium text-gray-300">
-                                            Reps
-                                            <Input value={(liftState.reps ?? 0) === 0 ? '' : liftState.reps} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRepCalc(id, liftState.weight || 0, +e.target.value || 0)} />
-                                        </label>
-                                    </div>
-                                )}
-                                {method === 'manual' && (
-                                    <label className="block text-[11px] font-medium text-gray-300">
-                                        Training Max ({state.units})
-                                        <Input value={(liftState.manualTM ?? 0) === 0 ? '' : liftState.manualTM} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setManualTM(id, +e.target.value || 0)} />
-                                    </label>
-                                )}
-                                {/* Deadlift Rep Style (belongs in fundamentals – global technical preference) */}
-                                {id === 'deadlift' && (
-                                    <div className="flex flex-col gap-1 mt-1" data-testid="deadlift-rep-style-picker">
-                                        <div className="text-[10px] uppercase tracking-wide text-gray-500">Rep Style</div>
-                                        <div className="flex gap-2">
-                                            {(['dead_stop', 'touch_and_go'] as const).map(style => {
-                                                const active = (state as any).deadliftRepStyle === style || ((state as any).deadliftRepStyle == null && style === 'touch_and_go');
-                                                return (
-                                                    <button
-                                                        key={style}
-                                                        type="button"
-                                                        aria-pressed={active}
-                                                        onClick={() => setState(s => ({ ...(s as any), deadliftRepStyle: style }))}
-                                                        data-testid={`deadlift-style-${style}`}
-                                                        className={`px-2.5 py-1 rounded border text-[10px] font-medium ${active ? 'border-red-500 bg-red-700/30 text-red-200' : 'border-gray-600 text-gray-300 hover:bg-gray-700'}`}
-                                                    >{style === 'dead_stop' ? 'Dead Stop' : 'Touch & Go'}</button>
-                                                );
-                                            })}
-                                        </div>
-                                        <div className="text-[10px] text-gray-500">Sets expectation for main & supplemental pulling tempo.</div>
-                                    </div>
-                                )}
-                            </div>
-                        );
-                    })}
-                </section>
-
-                {/* (Legacy combined TM tips replaced by info boxes above) */}
-
-                {/* TM Table */}
+                {/* Exercise cards (2x2 responsive grid) */}
                 <section>
-                    <div className="overflow-x-auto rounded-md border border-gray-800 bg-gray-900/40">
-                        <table className="w-full text-xs border-collapse">
-                            <thead className="bg-gray-800/70">
-                                <tr className="text-left">
-                                    <th className="py-2 pl-3 pr-4 font-semibold text-gray-300">Lift</th>
-                                    <th className="py-2 pr-4 font-semibold text-gray-300">1RM ({state.units})</th>
-                                    <th className="py-2 pr-4 font-semibold text-gray-300">TM {Math.round(state.tmPct * 100)}%</th>
-                                    <th className="py-2 pr-4 font-semibold text-gray-300">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-800/60">
-                                {tmTable.map(row => {
-                                    const liftInput = state.lifts[row.lift];
-                                    let baseVal: number | string = '—';
-                                    if (liftInput) {
-                                        switch (liftInput.method) {
-                                            case 'tested':
-                                                baseVal = liftInput.oneRM;
-                                                break;
-                                            case 'reps':
-                                                baseVal = liftInput.weight;
-                                                break;
-                                            case 'manual':
-                                                baseVal = liftInput.manualTM;
-                                                break;
-                                        }
-                                    }
-                                    return (
-                                        <tr key={row.lift} className="hover:bg-gray-800/30 transition">
-                                            <td className="py-2 pl-3 pr-4 capitalize text-gray-200">{
-                                                (() => {
-                                                    const code = state.variants?.[row.lift];
-                                                    if (!code) return (row.lift === 'press' ? 'Overhead Press' : row.lift);
-                                                    const list = VARIANT_OPTIONS[row.lift as LiftKey];
-                                                    const found = list.find(o => o.code === code);
-                                                    return found ? found.label : code.replace(/_/g, ' ');
-                                                })()
-                                            }</td>
-                                            <td className="py-2 pr-4 text-gray-300">{baseVal}</td>
-                                            <td className="py-2 pr-4 font-mono text-gray-100">{row.tmDisplay ?? '—'}</td>
-                                            <td className={`py-2 pr-4 text-[10px] ${row.warnings.length ? 'text-amber-400' : 'text-emerald-400'}`}>{row.warnings.length ? row.warnings.join(', ') : 'OK'}</td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {(['press', 'bench', 'squat', 'deadlift'] as LiftId[]).map((id) => {
+                            const title = id === 'press' ? 'Overhead Press' : id.charAt(0).toUpperCase() + id.slice(1);
+                            const tm = tmLookup[id];
+                            const isComplete = typeof tm === 'number' && tm > 0;
+                            const liftState: any = state.lifts[id];
+                            const currentVariant = state.variants ? state.variants[id as LiftId] : undefined;
+                            const method = liftState.method;
+                            return (
+                                <div key={id} className="exercise-card bg-gray-800/60 border border-gray-700 p-5 rounded-[10px]">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-4">
+                                            {isComplete && <span className="text-white text-2xl">✓</span>}
+                                            <h3 className="capitalize">{title}</h3>
+                                        </div>
+                                        <div className="text-[0.9rem] font-bold">
+                                            <span className={`inline-block px-2 py-1 rounded-md border ${isComplete ? 'bg-red-500 border-red-500 text-white' : 'bg-gray-700 border-gray-700 text-gray-200'}`}>
+                                                TM: {typeof tm === 'number' ? tm : '---'} {state.units}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {/* Variant selector (keep light) */}
+                                    <label className="block mt-2 text-[11px] text-gray-300" aria-label={`Select ${title} variant`}>
+                                        <span className="text-gray-400">Use Variant?</span>
+                                        <div className="mt-1 flex items-center gap-3 text-[11px]">
+                                            <label className="inline-flex items-center gap-1">
+                                                <input type="radio" name={`variant-mode-${id}`} value="base" checked={!currentVariant || currentVariant === VARIANT_OPTIONS[id as LiftKey][0].code} onChange={() => setVariant(id as LiftKey, VARIANT_OPTIONS[id as LiftKey][0].code)} aria-label={`${title} base variant`} />
+                                                <span className="text-gray-300">Base</span>
+                                            </label>
+                                            <label className="inline-flex items-center gap-1">
+                                                <input type="radio" name={`variant-mode-${id}`} value="variant" checked={!!currentVariant && currentVariant !== VARIANT_OPTIONS[id as LiftKey][0].code} onChange={() => { const list = VARIANT_OPTIONS[id as LiftKey]; setVariant(id as LiftKey, list[1]?.code || list[0].code); }} aria-label={`${title} choose alternate variant`} />
+                                                <span className="text-gray-300">Variant</span>
+                                            </label>
+                                            {currentVariant && currentVariant !== VARIANT_OPTIONS[id as LiftKey][0].code && (
+                                                <select className="ml-2 flex-1 rounded-md border border-gray-700 bg-gray-800/60 px-2 py-1 text-[11px] text-gray-100 focus:border-red-500 focus:ring-2 focus:ring-red-500/40" value={currentVariant} data-testid={`variant-${id}`} onChange={e => setVariant(id as LiftKey, e.target.value)} aria-label={`${title} variant options`}>
+                                                    {VARIANT_OPTIONS[id as LiftKey].filter((_, i) => i > 0).map(opt => (
+                                                        <option key={opt.code} value={opt.code}>{opt.label}</option>
+                                                    ))}
+                                                </select>
+                                            )}
+                                        </div>
+                                    </label>
+
+                                    {/* Per-lift method selection (radio row) */}
+                                    <div className="mt-3 text-sm">
+                                        <div className="flex flex-wrap items-center gap-4">
+                                            <label className="inline-flex items-center gap-2 cursor-pointer">
+                                                <input type="radio" name={`method-${id}`} value="tested" checked={method === 'tested'} onChange={() => setMethod(id as any, 'tested')} />
+                                                <span>Tested 1RM</span>
+                                            </label>
+                                            <label className="inline-flex items-center gap-2 cursor-pointer">
+                                                <input type="radio" name={`method-${id}`} value="reps" checked={method === 'reps'} onChange={() => setMethod(id as any, 'reps')} />
+                                                <span>Reps × Weight</span>
+                                            </label>
+                                            <label className="inline-flex items-center gap-2 cursor-pointer">
+                                                <input type="radio" name={`method-${id}`} value="manual" checked={method === 'manual'} onChange={() => setMethod(id as any, 'manual')} />
+                                                <span>Direct TM</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    {method === 'tested' && (
+                                        <label className="block text-[11px] font-medium text-gray-300 mt-3">
+                                            Enter 1RM ({state.units})
+                                            <Input className="exercise-input" aria-label={`${title} tested one rep max in ${state.units}`} value={(liftState.oneRM ?? 0) === 0 ? '' : liftState.oneRM} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTested1RM(id as any, +e.target.value || 0)} />
+                                        </label>
+                                    )}
+                                    {method === 'reps' && (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] mt-3">
+                                            <label className="font-medium text-gray-300">
+                                                Weight ({state.units})
+                                                <Input className="exercise-input" aria-label={`${title} reps method weight in ${state.units}`} value={(liftState.weight ?? 0) === 0 ? '' : liftState.weight} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRepCalc(id as any, +e.target.value || 0, liftState.reps || 0)} />
+                                            </label>
+                                            <label className="font-medium text-gray-300">
+                                                Reps
+                                                <Input className="exercise-input" aria-label={`${title} reps method reps`} value={(liftState.reps ?? 0) === 0 ? '' : liftState.reps} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRepCalc(id as any, liftState.weight || 0, +e.target.value || 0)} />
+                                            </label>
+                                        </div>
+                                    )}
+                                    {method === 'manual' && (
+                                        <label className="block text-[11px] font-medium text-gray-300 mt-3">
+                                            Training Max ({state.units})
+                                            <Input className="exercise-input" aria-label={`${title} direct training max in ${state.units}`} value={(liftState.manualTM ?? 0) === 0 ? '' : liftState.manualTM} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setManualTM(id as any, +e.target.value || 0)} />
+                                        </label>
+                                    )}
+
+                                    {/* Deadlift-only style */}
+                                    {id === 'deadlift' && (
+                                        <div className="mt-4 pt-4 border-t border-gray-700">
+                                            <label className="mr-3">Style:</label>
+                                            <label className="mr-4"><input type="radio" name="deadliftStyle" checked={(state as any).deadliftRepStyle === 'dead_stop'} onChange={() => setState(s => ({ ...(s as any), deadliftRepStyle: 'dead_stop' }))} />{' '}Dead Stop</label>
+                                            <label><input type="radio" name="deadliftStyle" checked={(state as any).deadliftRepStyle === 'touch_and_go'} onChange={() => setState(s => ({ ...(s as any), deadliftRepStyle: 'touch_and_go' }))} />{' '}Touch & Go</label>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
                 </section>
 
+                {/* Progress bar & status */}
+                <section className="bg-gray-800/60 border border-gray-700 p-4 rounded-md mt-8">
+                    <div className="bg-gray-800 h-2 rounded overflow-hidden">
+                        <div className="progress-bar-fill" style={{ background: '#ef4444', height: '100%', width: `${(tmReadyCount / 4) * 100}%`, transition: 'width 0.3s' }} />
+                    </div>
+                    <div className="flex flex-wrap gap-2 mt-4 text-[0.8rem]">
+                        {(['press', 'bench', 'squat', 'deadlift'] as LiftId[]).map((id) => {
+                            const label = id === 'press' ? 'OHP' : id.charAt(0).toUpperCase() + id.slice(1);
+                            const tm = tmLookup[id];
+                            const done = typeof tm === 'number' && tm > 0;
+                            return (
+                                <span
+                                    key={id}
+                                    className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border bg-transparent ${done ? 'text-white' : 'text-gray-400'} border-gray-700`}
+                                >
+                                    {done ? '✓' : '○'} {label}: {typeof tm === 'number' ? tm : '---'}
+                                </span>
+                            );
+                        })}
+                    </div>
+                </section>
+
+                {/* Schedule & Rotation */}
+                <section>
+                    <SchedulePanel />
+                    {/* Calendar planner is now inside SchedulePanel to avoid duplication */}
+                </section>
+
+                {/* Continue button */}
                 <div className="pt-2">
-                    <Button onClick={onNext} className="w-full" data-testid="step1-next" disabled={tmTable.some(r => (r.tmDisplay ?? 0) <= 0)}>Next</Button>
+                    <button onClick={onNext} data-testid="step1-next" style={{ width: '100%', padding: '1.25rem', fontSize: '1.1rem', background: tmReadyCount === 4 ? '#ef4444' : '#f59e0b', color: 'white', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 'bold', marginTop: '2rem' }}>
+                        {tmReadyCount === 4 ? 'Continue to Template →' : `Continue → (${tmReadyCount} of 4 lifts entered)`}
+                    </button>
                 </div>
             </div>
         </div>

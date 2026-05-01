@@ -706,21 +706,18 @@ export default function DesignCustomize() {
 
                     {/* Template preview is shown in Step 2 details to avoid duplication */}
 
-                    <div className="bg-gray-800/60 border border-gray-700 rounded-lg p-4 text-sm" data-testid="readiness-box">
-                        <h3 className="font-semibold mb-2">Generation Readiness</h3>
-                        {readiness.status === 'ready' ? (
-                            <p className="text-xs text-emerald-400">All core inputs set. Proceed to Step 4 to preview.</p>
-                        ) : (
-                            <ul className="text-xs list-disc pl-4 space-y-1 text-amber-400">
-                                {readiness.messages.map(m => <li key={m}>{m}</li>)}
-                            </ul>
-                        )}
-                    </div>
+                    {/* Generation Readiness box removed per spec */}
                 </aside>
             </div>
             <footer className="px-8 py-4 border-t border-gray-800 flex items-center justify-end gap-4">
                 <button onClick={() => navigate('/build/step2')} className="px-4 py-2 rounded border border-gray-600 text-sm hover:bg-gray-800">Back</button>
-                <button onClick={() => navigate('/build/step4')} className="px-4 py-2 rounded border border-red-500 text-sm hover:bg-red-600/10">Next</button>
+                <button
+                    onClick={() => readiness.status === 'ready' && navigate('/build/step4')}
+                    className={`px-4 py-2 rounded text-sm ${readiness.status === 'ready' ? 'bg-red-600 text-white hover:bg-red-500' : 'bg-gray-600/70 text-gray-200 cursor-not-allowed'}`}
+                    title={readiness.status === 'ready' ? 'Next: Preview →' : 'Complete Required Selections'}
+                >
+                    {readiness.status === 'ready' ? 'Next: Preview →' : 'Complete Required Selections'}
+                </button>
             </footer>
         </div>
     );

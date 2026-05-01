@@ -1,0 +1,76 @@
+[
+    // Leaders
+    {
+        "template": "BBB Leader",
+        "phase": "Leader"
+    },
+    {
+        "template": "BBS Leader",
+        "phase": "Leader"
+    },
+    {
+        "template": "FSL Leader (3-4 Day)",
+        "phase": "Leader"
+    },
+    {
+        "template": "SSL Leader (5x5)",
+        "phase": "Leader"
+    },
+    {
+        "template": "Full Body (3 Day)",
+        "phase": "Leader"
+    },
+    {
+        "template": "Full Body, Full Boring",
+        "phase": "Leader"
+    },
+    {
+        "template": "Krypteia",
+        "phase": "Leader"
+    },
+    {
+        "template": "Leviathan Leader",
+        "phase": "Leader"
+    },
+    // Anchors
+    {
+        "template": "PR + FSL Anchor",
+        "phase": "Anchor"
+    },
+    {
+        "template": "PR + Jokers + FSL Anchor",
+        "phase": "Anchor"
+    },
+    {
+        "template": "Widowmaker Anchor",
+        "phase": "Anchor"
+    },
+    {
+        "template": "SVR II Anchor",
+        "phase": "Anchor"
+    },
+    {
+        "template": "The Morning Star",
+        "phase": "Anchor"
+    },
+    {
+        "template": "Spinal Tap (5s PRO Anchor)",
+        "phase": "Anchor"
+    },
+    {
+        "template": "Black Army Jacket",
+        "phase": "Anchor"
+    },
+    {
+        "template": "God Is a Beast",
+        "phase": "Anchor"
+    },
+    {
+        "template": "Coffinworm",
+        "phase": "Anchor"
+    },
+    {
+        "template": "Leviathan Anchor",
+        "phase": "Anchor"
+    }
+]
